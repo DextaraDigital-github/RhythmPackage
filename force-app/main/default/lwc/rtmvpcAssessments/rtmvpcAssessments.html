@@ -1,0 +1,17 @@
+<template>
+	<header class="rtmvpc-pgheader">
+		<div class="rtmvpc-pghtitle">
+			<div class="rtmvpc-pgstitle">Welcome to the Supplier Portal </div>
+			<h1 class="rtmvpc-pgmtitle capitalize">Assessments</h1>
+		</div>
+	</header> 
+		
+	<div class="">
+		<div class="">
+			<div class="cdgWrapper">
+				<c-custom-table rec-id={parentId} obj-name='Rythm__Assessment__c' rel-name='Rythm__Assessments__r'
+					col-list={fieldList.Supplier_Assessment__c} show-progress-bar="true" show-survey="true"></c-custom-table>
+			</div>
+		</div>
+	</div>
+</template>

@@ -1,0 +1,25 @@
+<template>
+    <!-- <div class="rtmvpc-pgheader">
+        COMPLIANCE STATUS
+    </div> -->
+    <header class="rtmvpc-pgheader">
+        <div class="rtmvpc-pghtitle">
+            <div class="rtmvpc-pgstitle">Employee Management</div>
+            <!-- <h1 class="rtmvpc-pgmtitle capitalize">Employees
+                <template lwc:if={navList}>&nbsp; > &nbsp;<b>{navList}</b></template>
+            </h1> -->
+            <template lwc:if={navList}>
+				<h1 class="rtmvpc-pgmtitle capitalize">
+					<template for:each={navList} for:item="navItem">
+						{navItem.tableLabel}
+						<template if:true={activeNavItem}>&nbsp; > &nbsp;</template>
+					</template>
+					<template if:true={activeNavItem}>
+						<b>{activeNavItem.tableLabel}</b>
+					</template>
+				</h1>
+			</template>
+        </div>
+    </header>
+
+</template>

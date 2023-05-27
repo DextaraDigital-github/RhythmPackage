@@ -1,0 +1,92 @@
+<template>
+	<c-rtmvpc-info-panel></c-rtmvpc-info-panel>
+	<c-rtmvpc-home-banner></c-rtmvpc-home-banner>
+	<!-- <c-rtmvpc-home-tabset></c-rtmvpc-home-tabset> -->
+	<div class="slds-p-right_medium slds-p-bottom_medium slds-p-left_small">
+		<div class="slds-grid slds-wrap slds-gutters">
+			<div class="slds-col slds-size_6-of-12 slds-small-size_6-of-12 slds-medium-size_6-of-12 slds-large-size_3-of-12 slds-p-vertical_small">
+
+				<div class="rtmvpc-ig-card rtmvpc-ig-cardbg-yellow">
+					<div class="slds-p-around_small">
+						<h5 class="slds-m-bottom_small"><i class="las la-bell rtmvpc-ig-card-icon"></i> My Alerts</h5>
+						<div class="rtmvpc-ig-number"> {count.Alerts} </div>
+					</div>
+				</div>
+
+			</div>
+			<div class="slds-col slds-size_6-of-12 slds-small-size_6-of-12 slds-medium-size_6-of-12 slds-large-size_3-of-12 slds-p-vertical_small">
+				<div class="rtmvpc-ig-card rtmvpc-ig-cardbg-blue">
+					<div class="slds-p-around_small">
+						<h5 class="slds-m-bottom_small"><i class="las la-clipboard rtmvpc-ig-card-icon"></i> My Assessments</h5>
+						<div class="rtmvpc-ig-number"> {count.Assessments} </div>
+					</div>
+				</div>
+			</div>
+			<div class="slds-col slds-size_6-of-12 slds-small-size_6-of-12 slds-medium-size_6-of-12 slds-large-size_3-of-12 slds-p-vertical_small">
+				<div class="rtmvpc-ig-card rtmvpc-ig-cardbg-orange">
+					<div class="slds-p-around_small">
+						<h5 class="slds-m-bottom_small"><i class="las la-tasks rtmvpc-ig-card-icon"></i> My Tasks</h5>
+						<div class="rtmvpc-ig-number"> {count.Tasks} </div>
+					</div>
+				</div>
+			</div>
+			<div class="slds-col slds-size_6-of-12 slds-small-size_6-of-12 slds-medium-size_6-of-12 slds-large-size_3-of-12 slds-p-vertical_small">
+				<div class="rtmvpc-ig-card rtmvpc-ig-cardbg-green">
+					<div class="slds-p-around_small">
+						<h5 class="slds-m-bottom_small"><i class="las la-project-diagram rtmvpc-ig-card-icon"></i> My Projects</h5>
+						<div class="rtmvpc-ig-number"> {count.Projects} </div>
+					</div>
+				</div>
+			</div>
+			<!-- <div class="slds-col slds-size_6-of-12 slds-small-size_6-of-12 slds-medium-size_6-of-12 slds-large-size_3-of-12 slds-p-vertical_small">
+				<div class="rtmvpc-ig-card rtmvpc-ig-cardbg-purple">
+					<div class="slds-p-around_small">
+						<h5 class="slds-m-bottom_small"><i class="las la-clipboard-check rtmvpc-ig-card-icon"></i> My RFPs</h5>
+						<div class="rtmvpc-ig-number"> 7 </div>
+					</div>
+				</div>
+			</div> -->
+			
+		</div>
+		<div class="chartcontainer slds-grid slds-wrap slds-gutters">
+			<div class="slds-col slds-size_1-of-1 slds-small-size_12-of-12 slds-medium-size_6-of-12 slds-large-size_4-of-12 slds-p-vertical_small">
+				<c-rtmvpc-charts style="width:100%" chart-name="Tasks Status" chart-type="pie"></c-rtmvpc-charts>
+			</div>
+			<div class="slds-col slds-size_1-of-1 slds-small-size_12-of-12 slds-medium-size_6-of-12 slds-large-size_4-of-12 slds-p-vertical_small">
+				<c-rtmvpc-charts style="width:100%" chart-name="Alerts by Employee" chart-type="bar"></c-rtmvpc-charts>
+			</div>
+			<div class="slds-col slds-size_1-of-1 slds-small-size_12-of-12 slds-medium-size_6-of-12 slds-large-size_4-of-12 slds-p-vertical_small">
+				<c-rtmvpc-charts style="width:100%" chart-name="Projects Status" chart-type="doughnut"></c-rtmvpc-charts>
+			</div>
+			<div class="slds-col slds-size_1-of-1 slds-small-size_12-of-12 slds-medium-size_6-of-12 slds-large-size_4-of-12 slds-p-vertical_small">
+				<c-rtmvpc-charts style="width:100%" chart-name="Vendor Employees vs Onsite Employees" chart-type="doughnut"></c-rtmvpc-charts>
+			</div>
+			<div class="slds-col slds-size_1-of-1 slds-small-size_12-of-12 slds-medium-size_6-of-12 slds-large-size_4-of-12 slds-p-vertical_small">
+				<c-rtmvpc-charts style="width:100%" chart-name="Incidents by Project" chart-type="horizontalBar"></c-rtmvpc-charts>
+			</div>
+			<div class="slds-col slds-size_1-of-1 slds-small-size_12-of-12 slds-medium-size_6-of-12 slds-large-size_4-of-12 slds-p-vertical_small">
+				<c-rtmvpc-charts style="width:100%" chart-name="Assessments Status" chart-type="pie"></c-rtmvpc-charts>
+			</div>
+		</div>
+		<!-- <div class="chartcontainer slds-grid slds-wrap slds-gutters">
+			<div class="slds-col slds-size_1-of-1 slds-small-size_12-of-12 slds-medium-size_6-of-12 slds-large-size_4-of-12 slds-p-vertical_small">
+				<c-rtmvpc-charts style="width:100%" label="Tasks Status" chart-type="pie"></c-rtmvpc-charts>
+			</div>
+			<div class="slds-col slds-size_1-of-1 slds-small-size_12-of-12 slds-medium-size_6-of-12 slds-large-size_4-of-12 slds-p-vertical_small">
+				<c-rtmvpc-charts style="width:100%" label="Employees with Alerts" chart-type="bar"></c-rtmvpc-charts>
+			</div>
+			<div class="slds-col slds-size_1-of-1 slds-small-size_12-of-12 slds-medium-size_6-of-12 slds-large-size_4-of-12 slds-p-vertical_small">
+				<c-rtmvpc-charts style="width:100%" label="Projects Status" chart-type="doughnut"></c-rtmvpc-charts>
+			</div>
+			<div class="slds-col slds-size_1-of-1 slds-small-size_12-of-12 slds-medium-size_6-of-12 slds-large-size_4-of-12 slds-p-vertical_small">
+				<c-rtmvpc-charts style="width:100%" label="Vendor Employees vs Onsite Employees" chart-type="Employees vs Onsite"></c-rtmvpc-charts>
+			</div>
+			<div class="slds-col slds-size_1-of-1 slds-small-size_12-of-12 slds-medium-size_6-of-12 slds-large-size_4-of-12 slds-p-vertical_small">
+				<c-rtmvpc-charts style="width:100%" label="Incidents by Project" chart-type="horizontal"></c-rtmvpc-charts>
+			</div>
+			<div class="slds-col slds-size_1-of-1 slds-small-size_12-of-12 slds-medium-size_6-of-12 slds-large-size_4-of-12 slds-p-vertical_small">
+				<c-rtmvpc-charts style="width:100%" label="Assessments Status" chart-type="Assessments Status"></c-rtmvpc-charts>
+			</div>
+		</div> -->
+	</div>
+</template>

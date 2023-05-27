@@ -1,0 +1,20 @@
+<template>
+    <template for:each={accordionData} for:item="field">
+        <div key={field.label}>
+            <label>{field.label}</label>
+            <input type="text" data-field={field.label} oninput={handleInputChange} />
+        </div>
+        <div>
+            Entered Fields: {enteredFields[field.label].join(', ')}
+            <br />
+            Entered Fields Percentage: {percentages[field.label]}%
+        </div>
+        <hr />
+    </template>
+</template>
+
+
+
+
+
+how to calculate percentage of entered fields  and count of entered fileds inside every accordian and display entered fields percentage and entered fields on every accordion UI using lwc dynamically with HTML

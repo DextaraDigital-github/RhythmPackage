@@ -1,0 +1,25 @@
+<template>
+	<div class="">
+		<div class="">
+			<div class="cdgWrapper">
+				<c-custom-table rec-id={parentId} obj-name="Work_Orders__c" rel-name="Work_Orders__r"
+					record-type="012000000000000AAA" col-list={fieldList.Work_Orders__c} table-label="Projects"
+					tabs-data={tabsData.Work_Orders__c} ongetchildnavobject={gotoParentHandler} ongetchildnavobjectonbackclick={gotoParentonBackClickHandler}></c-custom-table>
+			</div>
+		</div>
+	</div>
+	<!-- <div class="rtmvpc-tabset">
+        <lightning-tabset>
+            <lightning-tab label="Projects">
+                <c-rtmvpc-related-lists rec-id="a0h5i000004oqZEAAY" obj-name="Work_Orders__c" rel-name="Work_Orders__r"   fieldvalue={fieldList.Work_Orders__c}></c-rtmvpc-related-lists>
+            </lightning-tab>
+            <lightning-tab label="Alerts">
+                <c-rtmvpc-related-lists rec-id="a0h5i000004oqZEAAY" obj-name="Alert__c" rel-name="Alerts1__r"   fieldvalue={fieldList.Alert__c}></c-rtmvpc-related-lists>
+            </lightning-tab>
+            <lightning-tab label="Incidents">
+                <c-rtmvpc-related-lists rec-id="a0h5i000004oqZEAAY" obj-name="Incidents__c" rel-name="Events__r"   fieldvalue={fieldList.Incidents__c}></c-rtmvpc-related-lists>
+            </lightning-tab>
+            
+        </lightning-tabset>
+    </div> -->
+</template>

@@ -1,0 +1,512 @@
+<template>
+	<template if:true={spinner}>
+		<lightning-spinner alternative-text="Loading" size="large"></lightning-spinner>
+	</template>
+	<template if:false={spinner}>
+		<template lwc:if={showTable}>
+			<div class="slds-p-around_medium">
+				<div class="cdgtitletoolbar slds-grid slds-wrap ">
+					<div class="slds-col slds-small-size_12-of-12 slds-medium-size_6-of-12 slds-large-size_6-of-12">
+						<div class="slds-grid slds-wrap">
+
+							<div class="slds-text-left">
+								<lightning-icon icon-name="standard:budget" size="medium" title=""></lightning-icon>
+							</div>
+							<div class="slds-text-left slds-col_bump-right">
+								<h4 style="min-width:fit-content;">
+									<lightning-combobox name="status" label="List of Records" variant="label-hidden"
+										placeholder="All" value={value} onchange={handleChange} options={statusOptions}>
+									</lightning-combobox>
+
+									<!--<p>Selected option: {value}</p>-->
+								</h4>
+							</div>
+							<div class="slds-col slds-text-left slds-p-left_small">
+								<lightning-button-icon variant="label-hidden" icon-name={iconName}
+									onclick={handleClick}>
+								</lightning-button-icon>
+								<!-- <lightning-button-icon variant="label-hidden" icon-name="utility:pinned"></lightning-button-icon> -->
+							</div>
+						</div>
+					</div>
+					<div class="slds-col slds-small-size_12-of-12 slds-medium-size_6-of-12 slds-large-size_6-of-12">
+						<div class="slds-grid slds-wrap slds-gutters_small">
+							<!-- <div class="slds-col slds-text-align_right slds-size_1-of-1 ">
+
+							
+						</div> -->
+							<!---- Added by Mani--->
+							<!--- -------------Start---------->
+							<!-- <lightning-button variant="success" label="Colomns to Display" title="Colomns to Display" onclick={showModalBox}></lightning-button>
+					<template if:true={isShowModal}>
+						<section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+					<lightning-dual-listbox key={viewColList.Id} data-key={viewColList.Id}
+							name="Column Selector" label="Select Columns to Display"
+							options={viewColList} size="4" onchange={handleChange}
+							value={viewColList.fieldName}>
+						</lightning-dual-listbox>
+						</div>
+						</section>
+						</template> -->
+
+							<!-- <lightning-combobox name="Column Selector" label="Column selector" value={viewColList.fieldName} options={viewColList} onchange={handleChange}></lightning-combobox> -->
+
+							<!------End------->
+
+							<div class="slds-col slds-text-align_right slds-size_1-of-1 ">
+
+								<div class="slds-grid slds-wrap slds-grid_align-end slds-gutters_x-small">
+									<div class="slds-col"></div>
+									<div class="slds-p-left_small">
+										<template if:true={opt_delete}>
+											<lightning-button title="Delete" icon-name="utility:delete"
+												icon-position="left" variant="Destructive" class="slds-m-right_x-small"
+												onclick={deleteHandler}>
+											</lightning-button>
+										</template>
+									</div>
+									<div class="slds-p-left_small">
+										<template if:true={opt_showCalendar}>
+											<lightning-button-group class="slds-m-right_x-small">
+												<lightning-button-icon label="Day View" title="Day View"
+													variant="label-hidden" icon-name="utility:dayview"
+													icon-position="left"></lightning-button-icon>
+												<lightning-button-icon label="Weekly View" title="Weekly View"
+													variant="label-hidden" icon-name="utility:weeklyview"
+													icon-position="left">
+												</lightning-button-icon>
+												<lightning-button-icon label="Monthly View" title="Monthly View"
+													variant="label-hidden" icon-name="utility:monthlyview"
+													icon-position="left">
+												</lightning-button-icon>
+											</lightning-button-group>
+										</template>
+									</div>
+									<div class="slds-p-left_small">
+										<lightning-button-group style="margin-bottom:-3px; ">
+											<template if:true={opt_list}>
+												<lightning-button variant="label-hidden" title="Upload List"
+													icon-name="utility:upload" icon-position="left"></lightning-button>
+											</template>
+											<template if:true={opt_new}>
+												<lightning-button variant="label-hidden" title="Add New"
+													icon-name="utility:new" icon-position="left">
+												</lightning-button>
+											</template>
+											<template if:true={opt_newEmp}>
+												<lightning-button variant="label-hidden" title="New Employee"
+													icon-name="utility:adduser" icon-position="left"></lightning-button>
+											</template>
+										</lightning-button-group>
+									</div>
+									<div class="slds-p-left_small">
+										<lightning-button-menu icon-name="utility:download" menu-alignment="right"
+											menu-size="medium" alternative-text="Export" variant="label-hidden"
+											title="Export">
+
+											<lightning-menu-item label="PDF" title="PDF" value="PDF"
+												onclick={handleExportPDF}>
+											</lightning-menu-item>
+											<lightning-menu-item label="CSV" title="CSV" value="CSV"
+												onclick={handleExportCSV}>
+											</lightning-menu-item>
+											<!-- <lightning-menu-item label="Excel" title="Excel" value="Excel"></lightning-menu-item> -->
+										</lightning-button-menu>
+									</div>
+									<div class="slds-p-left_small">
+										<lightning-button-menu icon-name="utility:settings" menu-alignment="right"
+											menu-size="medium" alternative-text="Settings" variant="label-hidden"
+											title="Settings">
+											<lightning-menu-item label="New" title="New" value="New"
+												onclick={OpenNewSupplierAssModal}>
+											</lightning-menu-item>
+											<lightning-menu-item label="Clone" title="Clone" value="Clone">
+											</lightning-menu-item>
+											<lightning-menu-item label="Rename" title="Rename" value="Rename">
+											</lightning-menu-item>
+											<lightning-menu-item label="Delete" title="Delete" value="Delete">
+											</lightning-menu-item>
+											<!-- <lightning-menu-item label="Column Modifications" title="Column Modifications"
+										value="showorHideColumns" onclick={openShowHideColumnsModal}></lightning-menu-item> -->
+										</lightning-button-menu>
+									</div>
+									<div class="slds-p-left_small slds-m-right_small ">
+										<lightning-button-menu icon-name="utility:table_settings" menu-alignment="right"
+											menu-size="medium" alternative-text="Column Settings" variant="label-hidden"
+											title="Column Settings">
+											<lightning-menu-item label="Show / Hide Columns" title="Show / Hide Columns"
+												onclick={openShowHideColumnsModal} value="showorHideColumns">
+											</lightning-menu-item>
+											<lightning-menu-item label="Shuffle Columns" title="Shuffle Columns"
+												value="ShuffleColumns" onclick={openShuffleColumnsModal}>
+											</lightning-menu-item>
+										</lightning-button-menu>
+									</div>
+								</div>
+
+
+
+								<!-- <div class="slds-button-group" role="group">
+						
+						<button class="slds-button slds-button_neutral" title="Arrange Column(s)"><i class="las la-stream fs24"></i></button>
+						<button class="slds-button slds-button_neutral" title="Add Ne Column(s)"><i class="las la-columns fs24"></i></button>
+					</div> -->
+							</div>
+
+						</div>
+					</div>
+				</div>
+
+				<div class="cdgWrapperinner">
+					<div class="cdg">
+						<div class="tr">
+							<div class="th">
+								<br/>
+								<lightning-input data-id='allCheckboxes' type="checkbox"
+									onchange={checkboxChangeHandler}>
+								</lightning-input>
+								<!-- <input type="checkbox"/> &nbsp; <i class="lar la-star"></i> -->
+
+							</div>
+
+							<template for:each={viewColList} for:item="col">
+								<div key={col.fieldName} class="th">
+									<div class="slds-truncate">{col.label}</div>
+									<i data-id={col.fieldName} onclick={sortClickHandler} data-sorticon
+								class="las la-angle-down sort-inactive"></i>
+									<div><input type="text" data-filtertextbox data-id={col.fieldName} onchange={inputChangeHandler}
+								class="slds-input" /></div>
+									</div>
+							</template>
+
+							<template lwc:if={showProgressBar}>
+								<div class="th">% Completed</div>
+							</template>
+
+							<!-- <template lwc:if={showSurvey}>
+							<div class="th">Survey</div>
+						</template> -->
+
+							<div class="th"></div>
+
+						</div>
+						<!-- <div class="tr">
+						<div class="th">
+							<lightning-input data-id='all' type="checkbox" onchange={checkboxChangeHandler}>
+							</lightning-input>
+						</div>
+						<template for:each={viewColList} for:item="col">
+							<div key={col.fieldName} class="th">
+								<input type="text" data-filtertextbox data-id={col.fieldName} onchange={inputChangeHandler}
+								class="slds-input" />
+						</div>
+						</template>
+						<template lwc:if={showProgressBar}>
+							<div class="th"></div>
+						</template> -->
+						<!-- <template lwc:if={showSurvey}>
+						<div class="th"></div>
+					</template> -->
+						<!-- <div class="th"></div>
+					</div> -->
+
+						<!-- <div class="td">
+                        <div class="colorcode-project4">-->
+						<!-- project1, project2, project3, project4, project5 -->
+						<!-- <div class="slds-truncate">Project 4</div>
+                        </div>
+                    </div>
+                    <div class="td"><div class="slds-truncate">Preparation of the new Project with...</div></div>
+                    <div class="td">
+                        <div class="status-notstarted"> -->
+						<!-- notstarted, inprogress, completed -->
+						<!-- <div class="slds-truncate">Not Started</div>
+                        </div>
+                    </div>
+                    <div class="td"><div class="slds-truncate">04/12/2020</div></div>
+                    <div class="td"><div class="slds-truncate">06/05/2020</div></div> -->
+						<template for:each={recList} for:item="rec">
+							<div key={rec} class="tr" data-id={rec.id}>
+								<div class="td">
+									<lightning-input class="recCheckbox" data-id={rec.id} type="checkbox"
+										onchange={checkboxChangeHandler}></lightning-input>
+									<!-- <input type="checkbox"/> &nbsp; <i class="las la-star"></i> -->
+								</div>
+								<template key={rec.id} for:each={rec.record} for:item="col">
+									<template if:true={rec.viewButton}>
+										<div key={col.fieldName} class="td" data-id={rec.id} onclick={viewClickHandler}>
+
+											<div class={col.classList}>
+												<label class="slds-form-element__label">{col.label}</label>
+
+												<div class="slds-truncate" data-id={col.fieldName} title={col.value}>
+													<template lwc:if={col.isHyperlink}><a>{col.value}</a></template>
+													<template lwc:elseif={col.isHtml}>
+														<div class={col.classList}>Value</div>
+													</template>
+													<template lwc:else>{col.value}</template>
+
+													<template if:true={col.surveySymbol}>
+														<lightning-icon icon-name={col.surveySymbol} size="x-small"
+															style="float:right"></lightning-icon>
+													</template>
+													<template if:true={col.flagSymbol}>
+														<lightning-icon icon-name='utility:lock' size="x-small"
+															style="float:right"></lightning-icon>
+													</template>
+												</div>
+											</div>
+										</div>
+									</template>
+									<template if:true={rec.takeSurvey}>
+										<div key={col.fieldName} class="td" data-id={rec.id}
+											onclick={takeSurveyHandler}>
+
+											<div class={col.classList}>
+												<label class="slds-form-element__label">{col.label}</label>
+
+												<div class="slds-truncate" data-id={col.fieldName} title={col.value}>
+													<template lwc:if={col.isHyperlink}><a>{col.value}</a></template>
+													<template lwc:elseif={col.isHtml}>
+														<div class={col.classList}></div>
+													</template>
+													<template lwc:else>{col.value}</template>
+
+													<template if:true={col.surveySymbol}>
+														<lightning-icon icon-name={col.surveySymbol} size="x-small"
+															style="float:right"></lightning-icon>
+													</template>
+													<template if:true={col.flagSymbol}>
+														<lightning-icon icon-name={col.flagSymbol} size="x-small"
+															style="float:right"></lightning-icon>
+													</template>
+												</div>
+											</div>
+										</div>
+									</template>
+									<!-- <div key={col.fieldName} class="td" data-id={rec.id} onclick={viewClickHandler}>
+
+									<div class={col.classList}>
+										<label class="slds-form-element__label">{col.label}</label>
+
+										<div class="slds-truncate" data-id={col.fieldName} title={col.value}>
+											<template lwc:if={col.isHyperlink}><a>{col.value}</a></template>
+											<template lwc:elseif={col.isHtml}>
+												<div class={col.classList}>Hello</div>
+											</template>
+											<template lwc:else>{col.value}</template>
+
+											<template if:true={col.surveySymbol}>
+												<lightning-icon icon-name={col.surveySymbol} size="x-small"
+													style="float:right"></lightning-icon>
+											</template>
+										</div>
+									</div>
+								</div> -->
+								</template>
+								<template if:true={showProgressBar}>
+									<div class="td">
+										<span>{rec.progressBarValue}%</span>
+										<lightning-progress-bar style="background-color: green !important"
+											value={rec.progressBarValue}></lightning-progress-bar>
+									</div>
+								</template>
+								<!-- <template lwc:if={showSurvey}>
+							<div class="td">
+								<lightning-icon icon-name={rec.surveySymbol} size="small"
+									alternative-text="Indicates approval"></lightning-icon>
+							</div>
+						</template> -->
+								<div class="td">
+									<template if:true={rec.viewButton}>
+										<!-- <button data-id={rec.id} class="cdg_actions" onclick={viewClickHandler}><span class="textstyle01"><i class="las la-eye"></i> View</span></button> -->
+										<lightning-button-menu alternative-text="Show menu" menu-alignment="right"
+											icon-name="utility:threedots_vertical" icon-size="medium">
+											<lightning-menu-item value="View" label="View" data-id={rec.id}
+												onclick={viewClickHandler}></lightning-menu-item>
+											<template if:true={opt_rec_pdf}>
+												<lightning-menu-item label="PDF" title="PDF" value="PDF">
+												</lightning-menu-item>
+											</template>
+											<template if:true={opt_rec_csv}>
+												<lightning-menu-item label="CSV" title="CSV" value="CSV"
+													data-id={rec.id} onclick={csvClickHandler}>
+												</lightning-menu-item>
+											</template>
+										</lightning-button-menu>
+									</template>
+									<template if:true={rec.takeSurvey}>
+										<!-- <button data-id={rec.id} class="cdg_actions" onclick={takeSurveyHandler} style="min-width:102px;"><span class="textstyle01"><i class="las la-poll"></i> {rec.surveyLabel}</span></button> -->
+										<lightning-button-menu alternative-text="Show menu" menu-alignment="right"
+											icon-name="utility:threedots_vertical" icon-size="medium">
+											<lightning-menu-item value={rec.surveyLabel} label={rec.surveyLabel}
+												data-id={rec.id} onclick={takeSurveyHandler}></lightning-menu-item>
+											<template if:true={opt_rec_pdf}>
+												<lightning-menu-item label="PDF" title="PDF" value="PDF"
+													data-id={rec.id} onclick={pdfClickHandler}></lightning-menu-item>
+											</template>
+											<template if:true={opt_rec_csv}>
+												<lightning-menu-item label="CSV" title="CSV" value="CSV"
+													data-id={rec.id} onclick={csvClickHandler}></lightning-menu-item>
+											</template>
+										</lightning-button-menu>
+									</template>
+								</div>
+							</div>
+						</template>
+					</div>
+				</div>
+				<table style="width:auto; margin:auto; margin-top:8px;">
+					<tr>
+						<!-- <td style="vertical-align:bottom;text-align:center;">
+					<button onclick={handleExportCSV}>Export as CSV</button>
+				</td> -->
+						<td>Showing : </td>
+						<td class="slds-p-horizontal_small">
+							<lightning-combobox name="pageSize" label="Page Size" variant="label-hidden"
+								value={selectedPageSize} dropdown-alignment="auto" placeholder="5"
+								options={pageSizeOptions} onchange={handlePageSizeChange}>
+							</lightning-combobox>
+						</td>
+						<td class="slds-p-right_medium"> per page</td>
+						<td style="vertical-align:bottom;text-align:center;">
+							<lightning-button-icon variant="label-hidden" icon-name="utility:jump_to_left" title="First"
+								onclick={handlePreviousClick} class="slds-m-right_xx-small"></lightning-button-icon>
+						</td>
+						<td style="vertical-align:bottom;text-align:center;">
+							<lightning-button-icon variant="label-hidden" icon-name="utility:chevronleft"
+								title="Previous" onclick={handlePreviousClick} class="slds-m-right_x-small">
+							</lightning-button-icon>
+						</td>
+						<td>
+							<lightning-combobox name="pageNumber" label="Page Number" variant="label-hidden"
+								value={selectedPageNumber} dropdown-alignment="auto" placeholder="Page Number"
+								options={pageNumberOptions} onchange={handlePageNumberChange}>
+							</lightning-combobox>
+						</td>
+						<!--
+				<td style="vertical-align:bottom;text-align:center;">
+					<lightning-button-group selected-button-name="1">
+						<lightning-button label="1" name="1" title="Page No: 1"></lightning-button>
+						<lightning-button label="2" name="2" title="Page No: 2"></lightning-button>
+						<lightning-button label="3" name="3" title="Page No: 3"></lightning-button>
+						<lightning-button label="4" name="4" title="Page No: 4"></lightning-button>
+						<lightning-button label="5" name="5" title="Page No: 5"></lightning-button>
+					</lightning-button-group>
+				</td>
+-->
+						<td style="vertical-align:bottom;text-align:center;">
+							<lightning-button-icon variant="label-hidden" icon-name="utility:chevronright" title="Next"
+								onclick={handleNextClick}></lightning-button-icon>
+						</td>
+						<td style="vertical-align:bottom;text-align:center;">
+							<lightning-button-icon variant="label-hidden" icon-name="utility:jump_to_right" title="Last"
+								onclick={handleNextClick} class="slds-m-left_xx-small"></lightning-button-icon>
+						</td>
+
+					</tr>
+				</table>
+			</div>
+		</template>
+		<template if:true={showRecordDetail}>
+			<button class="slds-m-bottom_small cdg_actions" onclick={backClickHandler}><span
+				class="textstyle01"><i class="las la-chevron-circle-left"></i> Back</span></button>
+			<!--<c-rtmvpc-record-details-view record-id={recordDetailId} object-name={objName} record-type={recordType}
+				is-custom-detail-page={isCustomDetailPage} is-custom-design-page={isCustomDesignPage} active-tabtwo={activeTab}
+				field-list={customRecordPageCol} tabs-data={tabsData} ongetdetailpagedetails={assignChildProperties}
+				is-child-record-page={isChildTable}>
+			</c-rtmvpc-record-details-view>
+		-->
+			<!-- <c-rtmvpc-record-detail-page rec-id={recordDetailId} obj-name={objName}></c-rtmvpc-record-detail-page> -->
+		</template>
+		<template if:true={takeSurvey}>
+			<button class="slds-m-bottom_small cdg_actions" onclick={backClickHandler}><span
+				class="textstyle01"><i class="las la-chevron-circle-left"></i> Back</span></button>
+			<!-- <c-Questionnaire vendor={recId} assessment={recordDetailId}></c-Questionnaire> -->
+			<c-rtmvpc-Assessment-Detail></c-rtmvpc-Assessment-Detail>
+		</template>
+
+
+		<!--Show/Hide Columns Modal Popup-->
+		<template if:true={isShowHideColumnsModalOpen}>
+			<section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+				aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+				<div class="slds-modal__container">
+					<!-- Modal/Popup Box header here -->
+					<header class="slds-modal__header">
+						<button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeShowHideColumnsModal}>
+                        <lightning-icon icon-name="utility:close"
+                            alternative-text="close"
+                            variant="inverse"
+                            size="small" ></lightning-icon>
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+						<h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Select Columns to
+							Display
+						</h2>
+					</header>
+					<!-- Modal/Popup Box body starts here -->
+					<div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+
+						<lightning-dual-listbox id="selectColumns" name="Select Columns"
+							source-label="Available Columns" selected-label="Selected Columns" options={columnsOptions}
+							value={selectedColumnOptions} required-options={requiredColumnsOptions}
+							onchange={handleColumnChange}>
+						</lightning-dual-listbox>
+
+					</div>
+					<!-- Modal/Popup Box footer starts here -->
+					<footer class="slds-modal__footer">
+						<button class="slds-button slds-button_neutral" onclick={closeShowHideColumnsModal} title="Cancel">Cancel</button>
+						<button class="slds-button slds-button_brand" onclick={saveColumnsDisplaySettings} title="Save">Save</button>
+					</footer>
+				</div>
+			</section>
+			<div class="slds-backdrop slds-backdrop_open"></div>
+		</template>
+
+		<!--Shuffle Columns Modal Popup-->
+		<template if:true={isShuffleColumnsModalOpen}>
+			<section role="dialog" tabindex="-1" aria-labelledby="modal-heading-02" aria-modal="true"
+				aria-describedby="modal-content-id-2" class="slds-modal slds-fade-in-open">
+				<div class="slds-modal__container">
+					<!-- Modal/Popup Box header here -->
+					<header class="slds-modal__header">
+						<button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeShuffleColumnsModal}>
+                        <lightning-icon icon-name="utility:close"
+                            alternative-text="close"
+                            variant="inverse"
+                            size="small" ></lightning-icon>
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+						<h2 id="modal-heading-02" class="slds-text-heading_medium slds-hyphenate">Shuffle Columns to
+							Display
+						</h2>
+					</header>
+					<!-- Modal/Popup Box body starts here -->
+					<div class="slds-modal__content slds-p-around_medium dx-duallisthide" id="modal-content-id-2">
+
+						<lightning-dual-listbox id="shuffleColumns" name="Shuffle Columns"
+							source-label="Available Columns" selected-label="Shuffle Columns" options={columnsOptions}
+							value={selectedColumnOptions} required-options={requiredColumnsOptions}
+							onchange={handleColumnChange}>
+						</lightning-dual-listbox>
+
+					</div>
+					<!-- Modal/Popup Box footer starts here -->
+					<footer class="slds-modal__footer">
+						<button class="slds-button slds-button_neutral" onclick={closeShuffleColumnsModal} title="Cancel">Cancel</button>
+						<button class="slds-button slds-button_brand" onclick={saveColumnsDisplaySettings} title="Save">Save</button>
+					</footer>
+				</div>
+			</section>
+			<div class="slds-backdrop slds-backdrop_open"></div>
+		</template>
+		<!-- <template if:true={createNewsupplierAss}>
+		<c-assessment-new-list-view asslist={selectedItemId}></c-assessment-new-list-view>
+	</template> -->
+
+
+	</template>
+</template>

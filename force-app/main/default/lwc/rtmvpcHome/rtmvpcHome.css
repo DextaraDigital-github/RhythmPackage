@@ -1,0 +1,17 @@
+.rtmvpc-ig-card {position:relative; border-radius:6px; overflow:hidden; box-shadow:1px 2px 5px rgba(0,0,0,0.4); border:1px solid rgba(0,0,0,0.1); color:var(--white);}
+.rtmvpc-ig-card h5 { text-transform:uppercase;}
+.rtmvpc-ig-number{ border-radius:50%; border:5px solid rgba(255,255,255,0); height:60px; width:60px; text-align:center; line-height:30px; font-size:60px; color:var(--white); font-weight:500; 
+margin:0px 10px 0px auto;}
+
+.rtmvpc-ig-card-icon { position: absolute; transform: rotate(-24deg); font-size: 100px; left:-10px; margin-top:10px; opacity: 0.40;}
+.rtmvpc-ig-cardbg-green {background: #92D050;}
+.rtmvpc-ig-cardbg-blue {background: #4472C4;}
+.rtmvpc-ig-cardbg-orange {background: #ED7D31;}
+.rtmvpc-ig-cardbg-yellow {background: #FFC000;}
+.rtmvpc-ig-cardbg-purple {background: #AA79EB;}
+.rtmvpc-ig-cardbg-pink {background: #F279FF;}
+
+.chartcontainer { width:calc(100vw - 128px); }
+@media only screen and (max-width: 991px) {
+.chartcontainer { width:calc(100vw - 15px); }
+}

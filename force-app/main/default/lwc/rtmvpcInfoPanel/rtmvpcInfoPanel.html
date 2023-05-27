@@ -1,0 +1,16 @@
+<template>
+    <div class="rtmvpc-pannel">
+        <i class="las la-exclamation-triangle"></i> Please add at least one office location or service area. This will make you more discoverable by clients in the Rhythm network &nbsp; 
+        <lightning-button-stateful
+            label-when-off="Update Profile"
+            label-when-on="Updating Profile"
+            label-when-hover="Unfollow"
+            icon-name-when-off="utility:add"
+            icon-name-when-on="utility:check"
+            icon-name-when-hover="utility:close"
+            variant="inverse"
+            selected={isSelected}
+            onclick={handleClick}>
+        </lightning-button-stateful>
+    </div> 
+</template>

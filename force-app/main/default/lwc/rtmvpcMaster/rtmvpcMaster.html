@@ -1,0 +1,80 @@
+<template>
+    <div class="rtmvpc">
+        
+        <div class="rtmvpc-layout slds-grid slds-wrap">
+            <div class="rtmvpc-header slds-col slds-size_12-of-12">
+                <div class="slds-grid slds-wrap">
+                    <div class="rtmvpc-headerlogo">
+                        <div class="slds-grid slds-wrap">
+                            <div class="slds-p-vertical_medium slds-p-left_small menuicontoggle" onclick={toggleMenu}>
+                               <span style="color:#6b3888; font-size:24px;"><i class="las la-bars"></i></span>
+                                <!-- <template if:true={isMobile}>
+                                    <button class="hamburger-menu" onclick={toggleLeftmenu}>
+                                    <lightning-icon icon-name="utility:menu" alternative-text="Toggle left menu"></lightning-icon>
+                                    </button>
+                                </template> -->
+                            </div>
+                            <div>
+                               <span><img src={rtmvpclogotypepic1Url}/></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="rtmvpc-headercenter slds-col_bump-right"></div>
+                    <div class="rtmvpc-headerright slds-text-align_right">
+                        <!-- <lightning-button alternative-text="User Profile" title="User Profile"><i class="las la-user-circle"></i></lightning-button> -->
+                        <lightning-button-menu alternative-text="Show menu" menu-alignment="right" variant="border-filled" icon-name="utility:user">
+                            <lightning-menu-item value="username" label="JAGAN GARIMELLA"></lightning-menu-item>
+                            <lightning-menu-item value="serviceagreement" label="End User Service Agreement"></lightning-menu-item>
+                            <lightning-menu-item value="privacypolicy" label="Privacy Policy"></lightning-menu-item>
+                            <lightning-menu-item value="RHYTHMVENTURES" label="RHYTHM VENTURES"></lightning-menu-item>
+                            <lightning-menu-item value="250359509" label="250359509"></lightning-menu-item>
+                            <lightning-menu-item value="Logout" label="Logout"></lightning-menu-item>                            
+                        </lightning-button-menu>
+                    </div>
+                </div>
+            </div>
+            <div class="rtmvpc-content slds-col slds-size_12-of-12">
+                <div class="rtmvpc-tbl">
+                    <div class="rtmvpc-tblrow">
+                        <div class="rtmvpc-tblcel rtmvpc-leftmenu" data-id="leftmenu">
+                            <div class={isMenuOpen}>
+                                <c-rtmvpc-leftmenu oncollapsemenu={collapseMenuHandler} onleftmenu={handleRenderUI}></c-rtmvpc-leftmenu>
+                            </div>
+                        </div>
+
+                        <div class="rtmvpc-tblcel rtmvpc-contents">
+                            <template if:true = {isHome}><c-rtmvpc-home></c-rtmvpc-home></template>
+                            <template if:true = {isInbox}>
+                                <c-rtmvpc-inbox></c-rtmvpc-inbox>
+                                </template>
+                            <template if:true = {isCalendar}>
+                                <c-rtmvpc-calendar></c-rtmvpc-calendar>
+                               
+                                </template>
+                            <template if:true = {isAssessments}><c-rtmvpc-assessments></c-rtmvpc-assessments></template>	
+                            <template if:true = {isProjects}><c-rtmvpc-projects></c-rtmvpc-projects></template>
+                            <template if:true = {isRFPs}><c-rtmvpc-r-f-ps></c-rtmvpc-r-f-ps></template>
+                            <template if:true = {isEmployees}>
+                                <c-rtmvpc-employees></c-rtmvpc-employees>
+                                </template>
+                            <template if:true = {isDocuments}><c-rtmvpc-documents></c-rtmvpc-documents></template>
+                            <template if:true = {isResources}><c-rtmvpc-resources></c-rtmvpc-resources></template>
+                            <template if:true = {isProfile}><c-rtmvpc-profile></c-rtmvpc-profile></template>                            
+                            <template if:true = {isCompilance}><c-rtmvpc-compliance></c-rtmvpc-compliance></template>
+                            <template if:true = {isAdmin}><c-rtmvpc-admin></c-rtmvpc-admin></template>
+                            <template if:true = {isReports}><c-rtmvpc-reports></c-rtmvpc-reports></template>
+                            <template if:true = {isDashboard}><c-rtmvpc-dashboard></c-rtmvpc-dashboard></template>
+                            <template if:true = {isSettings}><c-rtmvpc-settings></c-rtmvpc-settings></template>
+                        </div>
+                    </div>
+                </div>
+
+                
+            </div>
+            <div class="rtmvpc-footer slds-col slds-size_12-of-12">
+                <c-rtmvpc-footer></c-rtmvpc-footer>
+            </div>
+        </div>
+
+    </div>
+</template>

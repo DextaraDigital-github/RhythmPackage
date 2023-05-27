@@ -1,0 +1,17 @@
+<template>
+    <div class="rtmvpc-tabset">
+        <lightning-tabset>
+            <lightning-tab label="Insurance Details">
+                <c-rtmvpc-related-lists rec-id="a0h5i000004oqZEAAY" obj-name="Insurance__c" rel-name="Insurances__r"  fieldvalue={fieldList.Insurance__c}></c-rtmvpc-related-lists>
+            </lightning-tab>
+            <lightning-tab label="Licenses &amp; Certifications">
+                <!-- Licenses &amp; Certifications -->
+                <c-rtmvpc-related-lists rec-id="a0h5i000004oqZEAAY" obj-name="Lisence__c" rel-name="Licenses__r"  fieldvalue={fieldList.Lisence__c}></c-rtmvpc-related-lists>
+            </lightning-tab>
+            <lightning-tab label="Policies &amp; Procedures">
+                <!-- Policies &amp; Procedures -->
+                <c-rtmvpc-related-lists rec-id="a0h5i000004oqZEAAY" obj-name="Policy_Procedure__c" rel-name="Policies_Procedures__r"  fieldvalue={fieldList.Policy_Procedure__c}></c-rtmvpc-related-lists>
+            </lightning-tab>
+        </lightning-tabset>
+    </div>
+</template>

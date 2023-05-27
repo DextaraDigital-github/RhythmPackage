@@ -1,0 +1,176 @@
+<template>
+	<div class="rtmvpc-card rtmvpc-tabset">
+		<template lwc:if={isCustomDetailPage}>
+			<lightning-layout class="slds-grid slds-wrap" multiple-rows="true">
+				<template for:each={fieldList} for:item="col">
+					<lightning-layout-item class="slds-m-bottom_small" key={col.fieldName} size="6"
+						padding="horizontal-small" margin>
+						<span class="slds-form-element__label">{col.label}</span><br/>
+						<div class="slds-form-element__control">
+							<span class="slds-form-element__static">{col.value}</span>
+						</div>
+					</lightning-layout-item>
+				</template>
+			</lightning-layout>
+		</template>
+		<template lwc:else>
+			<template lwc:if={tabsData}>
+				<lightning-tabset active-tab-value={activeTabtwo}>
+					<template for:each={tabsData} for:item="tab">
+						<template lwc:if={tab.isDetailsTab}>
+							<lightning-tab key={tab.tabName} label={tab.label} value={tab.tabName}
+								onactive={tabActiveHandler}>
+								<lightning-record-view-form onload={handleRecordViewFormLoad} layout-type="Full"
+									object-api-name={objectName} record-id={recordId}>
+									<template if:true={uiPageLayoutView}>
+										<div class="slds-p-horizontal_medium slds-p-bottom_medium">
+											<lightning-accordion allow-multiple-sections-open
+												active-section-name={activeSections}>
+												<template for:each={uiPageLayoutView.sections} for:item="section">
+													<!-- <div key={section.id} -->
+													<!-- class="test-id__section slds-m-vertical_none slds-section has-header slds-p-bottom_medium slds-is-open"> -->
+													<!-- <h3
+											class="test-id__section-header-container slds-section__title slds-theme--shade">
+											<span
+                                class="test-id__section-header-title section-header-title slds-p-horizontal--small">{section.heading}</span>
+										</h3> -->
+													<lightning-accordion-section class="slds-section-title--divider"
+														key={section.id} name={section.heading} label={section.heading}>
+														<!-- <div class="test-id__section-content slds-section__content section__content align-with-title slds-p-horizontal_medium"> -->
+														<div>
+															<lightning-layout multiple-rows="true">
+																<template for:each={section.layoutRows}
+																	for:item="layoutRow">
+																	<template for:each={layoutRow.layoutItems}
+																		for:item="layoutItem">
+																		<template for:each={layoutItem.layoutComponents}
+																			for:item="layoutComponent">
+																			<lightning-layout-item
+																				key={layoutComponent.apiName} size="6"
+																				padding="horizontal-small">
+																				<template
+																					if:true={layoutItem.editableForNew}>
+																					<lightning-output-field
+																						field-name={layoutComponent.apiName}>
+																					</lightning-output-field>
+																				</template>
+																				<template
+																					if:false={layoutItem.editableForNew}>
+																					<template
+																						if:true={layoutComponent.apiName}>
+																						<lightning-output-field
+																							field-name={layoutComponent.apiName}>
+																						</lightning-output-field>
+																					</template>
+																				</template>
+																			</lightning-layout-item>
+																		</template>
+																	</template>
+																</template>
+															</lightning-layout>
+														</div>
+													</lightning-accordion-section>
+													<!-- </div> -->
+												</template>
+											</lightning-accordion>
+										</div>
+									</template>
+								</lightning-record-view-form>
+							</lightning-tab>
+						</template>
+						<template lwc:elseif={tab.isCustomDesignPage}>
+							<lightning-tab key={tab.tabName} label={tab.label} value={tab.tabName}
+								onactive={tabActiveHandler}>
+								<div class="slds-p-horizontal_medium slds-p-bottom_medium">
+									<lightning-accordion allow-multiple-sections-open
+										active-section-name="Risk_Assessment_Questionnaire">
+										<lightning-accordion-section name="Risk_Assessment_Questionnaire"
+											label="Risk Assessment Questionnaire">
+											<lightning-flow flow-api-name="Project_assessment"></lightning-flow>
+										</lightning-accordion-section>
+										<lightning-accordion-section name="Risk_Assessment_Approval"
+											label="Risk Assessment Approval">
+											<lightning-flow flow-api-name="Approval_status"></lightning-flow>
+										</lightning-accordion-section>
+									</lightning-accordion>
+								</div>
+							</lightning-tab>
+						</template>
+						<template lwc:else>
+							<lightning-tab key={tab.tabName} label={tab.label} value={tab.tabName}
+								onactive={tabActiveHandler}>
+								<template for:each={tab.childObjects} for:item="tabchild">
+									<div class="rtmvpc-card slds-m-around_medium" key={tabchild.objName}
+										title={tabchild.label}>
+										<template if:false={tabchild.hideLabel}><b>{tabchild.label}</b></template>
+										<c-custom-table is-child-table='true' rec-id={recordId}
+											obj-name={tabchild.objName} rel-name={tabchild.relName}
+											col-list={tabchild.colList} record-type='012000000000000AAA'
+											tabs-data={tabchild.tabsData} table-label={tabchild.label}
+											onshowchilddetailpage={changeRecordPageView}>
+										</c-custom-table>
+										<!-- <c-custom-table is-child-table='true' rec-id={recordId} obj-name={tabchild.objName}
+											rel-name={tabchild.relName} col-list={tabchild.colList}
+											record-type='012000000000000AAA' tabs-data={tabchild.tabsData} table-label={tabchild.label} onshowchilddetailpage={changeRecordPageView}>
+										</c-custom-table> -->
+									</div>
+								</template>
+							</lightning-tab>
+						</template>
+					</template>
+				</lightning-tabset>
+			</template>
+			<template lwc:else>
+				<lightning-record-view-form onload={handleRecordViewFormLoad} layout-type="Full"
+					object-api-name={objectName} record-id={recordId}>
+					<template if:true={uiPageLayoutView}>
+						<div class="slds-p-horizontal_medium slds-p-bottom_large">
+							<lightning-accordion allow-multiple-sections-open active-section-name={activeSections}>
+								<template for:each={uiPageLayoutView.sections} for:item="section">
+									<!-- <div key={section.id} -->
+									<!-- class="test-id__section slds-m-vertical_none slds-section has-header slds-p-bottom_medium slds-is-open"> -->
+									<!-- <h3
+											class="test-id__section-header-container slds-section__title slds-theme--shade">
+											<span
+                                class="test-id__section-header-title section-header-title slds-p-horizontal--small">{section.heading}</span>
+										</h3> -->
+									<lightning-accordion-section class="slds-section-title--divider" key={section.id}
+										name={section.heading} label={section.heading}>
+										<!-- <div class="test-id__section-content slds-section__content section__content align-with-title slds-p-horizontal_medium"> -->
+										<div>
+											<lightning-layout multiple-rows="true">
+												<template for:each={section.layoutRows} for:item="layoutRow">
+													<template for:each={layoutRow.layoutItems} for:item="layoutItem">
+														<template for:each={layoutItem.layoutComponents}
+															for:item="layoutComponent">
+															<lightning-layout-item key={layoutComponent.apiName}
+																size="6" padding="horizontal-small">
+																<template if:true={layoutItem.editableForNew}>
+																	<lightning-output-field
+																		field-name={layoutComponent.apiName}>
+																	</lightning-output-field>
+																</template>
+																<template if:false={layoutItem.editableForNew}>
+																	<template if:true={layoutComponent.apiName}>
+																		<lightning-output-field
+																			field-name={layoutComponent.apiName}>
+																		</lightning-output-field>
+																	</template>
+																</template>
+															</lightning-layout-item>
+														</template>
+													</template>
+												</template>
+											</lightning-layout>
+										</div>
+									</lightning-accordion-section>
+									<!-- </div> -->
+								</template>
+							</lightning-accordion>
+						</div>
+					</template>
+				</lightning-record-view-form>
+			</template>
+		</template>
+	</div>
+</template>

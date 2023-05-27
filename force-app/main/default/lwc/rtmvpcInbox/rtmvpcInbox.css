@@ -1,0 +1,93 @@
+.cib-cardbase {position:relative; width:100%; height:calc(100vh - 120px); border-radius:0px; overflow:hidden;}
+
+.cib-tbl { display:table; width:100%; height:100%;}
+.cib-row { display:table-row; }
+.cib-cel { display:table-cell; vertical-align:top; }
+.cib-w230 {width:230px}
+.cib-w300 {width:300px}
+.cib-wauto {width:auto}
+
+.cib-pl16 { padding-left:16px;}
+
+.cib-sec_container { width:100%; height:100%; border-radius:0px; border:1px solid rgba(0,0,0,0.2); background:#ffffff; display:flex; flex-direction:column;}
+.cib-sec_header { width:100%; padding:3px 15px 0px; border-bottom:1px solid rgba(0,0,0,0.2); background:rgba(0,0,0,0.1); }
+.cib-sec_header span { display:inline-block; line-height:31px;}
+.cib-sec_header select { width:90px; height:18px; }
+.cib-sec_bodyfull1 { overflow-y:auto; overflow-x:hidden; height:calc(100% - 36px); position: relative; }
+.cib-sec_bodyfull2 { overflow-y:auto; overflow-x:hidden; height:calc(100% - 65px); position: relative; }
+.cib-listul, .cib-listul li {margin:0; padding:0; }
+.cib-listul li {border-bottom:1px solid rgba(0,0,0,0.1); padding: 5px 10px;}
+
+.cib-mtype { position:relative; background:rgba(248,249,250,1); border-left:2px solid rgba(248,249,250,1); padding:0.5rem; }
+.cib-mtype.active { position:relative; background:rgb(207 224 237);border-left:2px solid #2d67c5; padding:0.5rem; }
+.cib-mtype h4 { font-size:14px; padding:5px 15px}
+.cib-mtype .cib-badge { position:absolute; right:13px;top:7px;right:10px; background:#bebebe; border-radius:3px; padding:0px 6px; font-size:12px; font-weight:400; display:inline-block; color:rgba(0,0,0,0.8)}
+
+.cib-serch { border-bottom:1px solid rgba(0,0,0,0.1);}
+.cib-serch-input, .cib-serch-input:focus, .cib-serch-input:hover { border:0px solid transparent; padding:3px 10px; background:transparent; width:100%; }
+.cib-read, .cib-unread { position:relative; }
+.cib-read h4,.cib-unread h4 { font-size:16px;}
+.cib-read a, .cib-unread a{ display:block;}
+.cib-read h4 {  font-weight:400; }
+.cib-unread h4 { color:#2d67c5; font-weight:700;}
+.cib-read {background:rgba(248,249,250,1);}
+.cib-unread {background:rgb(207 224 237); cursor:pointer;}
+
+.cib-datentime {position:absolute; top:10px; right:10px; font-size:10px; color:#999999; }
+.cib-status { text-align: right;float: right;}
+.cib-approved,.cib-rejected,.cib-pending,.cib-inprogress,.cib-needmoreinfo {border-radius:3px; padding:0px 6px; font-size:10px; display:inline-block; background:#d1f7c4; color:rgba(0,0,0,0.8)}
+.cib-approved {background:#d1f7c4;}
+.cib-rejected {background:#ffbdc7;}
+.cib-pending {background:#ffebb3;}
+.cib-inprogress {background:#d3b0e4;}
+.cib-needmoreinfo {background:#b6ddeb;}
+.cib-sender {}
+
+.cib-tophead-details { padding:0px 15px; width:100%; height:63px;  background:#e8eff5; border-bottom:1px solid rgba(0,0,0,0.1);}
+.cib-tophead-details .slds-form-element__label { padding-right:0!important; padding-top:0!important; margin-bottom:0!important;}
+
+.cib-sec_container1 { height:100%; overflow-y:auto; }
+.cib-sec_container2 { height:154px; max-height:154px; }
+.cib-sec_container2 textarea.slds-textarea { height:100px!important; }
+
+.cib-sec_vcontainer { display:block; position:relative; height:100%;}
+.cib-sec_vcontainer1 { display:block; position:absolute; top:0px; height:63px;}
+.cib-sec_vcontainer2 { display:block; width:100%; position:absolute; height:calc(100% - 177px); margin:63px 0px 114px; overflow-y:auto; }
+.cib-sec_vcontainer2_1 { display: block; width: 100%; position: absolute; height: calc(100% - 1px); margin:0px 0px 0px; overflow-y: auto;    }
+.cib-sec_vcontainer2_2 { display: block; width: 100%; position: absolute; height: calc(100% - 0px); margin:0px 0px 0px; overflow-y: auto;    }
+.cib-sec_vcontainer3 { display:block; width:100%; position:absolute; bottom:0px; height:114px; background:#f1f1f1;}
+.cib-top_menu_container{display: none; height:30px; background:#b5bec5;}
+.cib-top_back_container {display:none; background:#b5bec5;}
+.cib-type .cib-sec_header .cig_actions {display:none;}
+@media screen and (max-width:992px) {
+    
+    .cib-row { display: block; height: 100%; position: relative; }
+    .cib-type{ height:100%; }
+    .cib-cel { display: inline-block;}
+    .cib-list{ width: calc(100% - 230px); height: 100%; }
+    .cib-disc{ display: block; position: absolute; right:-115%; top: 0; width: 100%; height: 100%;}
+    .cib-disc.cibshowright{ display: block; position: absolute; right:0%; top: 0; width: 100%; height: 100%;}
+    .cib-top_back_container {display: block; height:30px;}
+    .cib-sec_vcontainer1 { display: block; position:unset; top: 0px; height:63px; }
+    .cib-sec_vcontainer2 { display:block; width:100%; position:absolute; height:calc(100% - 207px); margin:0px 0px 0px; overflow-y:auto; }
+    .cib-sec_vcontainer2_1 { display: block; width: 100%; position: absolute; height: calc(100% - 1px); margin:0px 0px 0px; overflow-y: auto;    }
+    .cib-sec_vcontainer2_2 { display: block; width: 100%; position: absolute; height: calc(100% - 0px); margin:0px 0px 0px; overflow-y: auto;    }
+    
+}
+
+@media screen and (max-width:600px) {
+    .cib-type .cib-sec_header .cig_actions {display:inline-block; margin-left: -15px;}
+    .cib-pl16 {padding-left: 0px;}
+    .cib-type{ display:block; position:absolute; left:-300px; height:100%; }
+    .cib-type.cibshowleft{ display:block; position:absolute; left:0px; z-index:9; height:100%; }
+    .cib-list{ display:block; position:relative; width:100%; height:100%; }
+    .cib-disc{ display: block; position: absolute; right:-115%; top: 0; width: 100%; height: 100%;}
+    .cib-disc.cibshowright{ display: block; position: absolute; right:0%; top: 0; width: 100%; height: 100%;z-index:10;}
+    .cib-top_menu_container{display: block; height:30px;}
+    .cib-sec_bodyfull2 {height: calc(100% - 95px);}
+    .cib-sec_vcontainer1 { display: block; position:unset; top: 0px; height:auto; }
+    .cib-sec_vcontainer2 { display: block; width: 100%; position: absolute; height: calc(100% - 250px); margin:0px 0px 0px; overflow-y: auto;    }
+    .cib-sec_vcontainer2_1 { display: block; width: 100%; position: absolute; height: calc(100% - 1px); margin:0px 0px 0px; overflow-y: auto;    }
+    .cib-sec_vcontainer2_2 { display: block; width: 100%; position: absolute; height: calc(100% - 0px); margin:0px 0px 0px; overflow-y: auto;    }
+
+}

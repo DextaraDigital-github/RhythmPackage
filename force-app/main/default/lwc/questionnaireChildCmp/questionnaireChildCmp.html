@@ -1,0 +1,66 @@
+<template>
+	<template if:true={input}>
+		<template for:each={input} for:item="questionaryEntry">
+			<template for:each={questionaryEntry.questions} for:item="questionary">
+				<template if:true={questionary.isText}>
+					<lightning-input key={questionary.Id} name={questionary.question} data-key={questionary.Id}
+						type="text" label={questionary.question} onchange={handleChange} value={questionary.value}>
+					</lightning-input>
+				</template>
+				<template if:true={questionary.isPicklist}>
+					<lightning-combobox key={questionary.Id} data-key={questionary.Id} name={questionary.question}
+						label={questionary.question} value={questionary.value}
+						options={questionary.optionsWrapper.pickListOptions} onchange={handleChange}>
+					</lightning-combobox>
+				</template>
+				<template if:true={questionary.isMultiPicklist}>
+					<lightning-dual-listbox key={questionary.Id} data-key={questionary.Id} name={questionary.question}
+						label={questionary.question} options={questionary.optionsWrapper.multiPickListOptions} size="4"
+						onchange={handleChange} value={questionary.optionsWrapper.selectedListOptions}>
+					</lightning-dual-listbox>
+				</template>
+				<template if:true={questionary.isDate}>
+					<lightning-input key={questionary.Id} data-key={questionary.Id} name={questionary.question}
+						value={questionary.value} label={questionary.question} type="date" onchange={handleChange}>
+					</lightning-input>
+				</template>
+				<template if:true={questionary.isCheckbox}>
+					<b key={questionary.Id}>
+                      <lightning-formatted-text value={questionary.question} title={questionary.question} key={questionary.Id} data-key={questionary.Id} name={questionary.question}></lightning-formatted-text>
+                    </b>
+					<template key={questionary.Id} data-key={questionary.Id}
+						for:each={questionary.optionsWrapper.checkboxOptions} for:item="option">
+						<div key={option.id}>
+							<lightning-input type="checkbox" label={option.label} value={option.isChecked}
+								onchange={handleChange}></lightning-input>
+						</div>
+					</template>
+				</template>
+				<template if:true={questionary.isNumber}>
+					<lightning-input key={questionary.Id} data-key={questionary.Id} name={questionary.question}
+						value={questionary.value} label={questionary.question} type="phone" onchange={handleChange}>
+					</lightning-input>
+				</template>
+				<template if:true={questionary.isEmail}>
+					<lightning-input key={questionary.Id} data-key={questionary.Id} name={questionary.question}
+						value={questionary.value} label={questionary.question} type="email" onchange={handleChange}>
+					</lightning-input>
+				</template>
+				<template if:true={questionary.isRadio}>
+					<lightning-radio-group key={questionary.Id} data-key={questionary.Id} variant="label-inline"
+						name={questionary.question} onchange={handleChange} label={questionary.question}
+						options={questionary.optionsWrapper.radioOptions} value={questionary.value} type="radio">
+					</lightning-radio-group>
+				</template>
+				<!-- Write Here for Conditional Questioning  -->
+				<template if:true={questionary.Children} key={questionary.Id}>
+					<template if:true={visible} key={questionary.Id}>
+						<c-questionnaire-child-cmp key={questionary.Id} input={questionary.Children}>
+						</c-questionnaire-child-cmp>
+					</template>
+				</template>
+				</template>
+			</template>
+		</template>
+	</template>
+</template>

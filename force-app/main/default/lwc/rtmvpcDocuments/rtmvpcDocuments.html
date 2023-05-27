@@ -1,0 +1,48 @@
+<template>
+    <header class="rtmvpc-pgheader">
+		<div class="rtmvpc-pghtitle">
+			<div class="rtmvpc-pgstitle">Welcome to the Supplier Portal </div>
+			<h1 class="rtmvpc-pgmtitle capitalize">Documents</h1>
+		</div>
+	</header>
+	<div class="rtmvpc-tabset">
+		<lightning-tabset>
+			<lightning-tab label="Insurances">
+				<div class="">
+					<div class="cdgWrapper">
+						<!-- <div class="cdgtitletoolbar slds-grid">
+							<div class="slds-col_bump-right">
+								<h4>Insurance Details</h4>
+							</div>
+							<div>
+								<div class="slds-button-group" role="group">
+									<button class="slds-button slds-button_neutral" title="Add Employee"><i class="las la-user-plus fs24"></i></button>
+									<button class="slds-button slds-button_neutral" title="Upload Insurance Details"><i class="las la-file-upload fs24"></i></button>
+								</div>
+							</div>
+						</div> -->
+						<c-custom-table rec-id={parentId} obj-name="Insurance__c" rel-name="Insurances__r"  col-list={fieldList.Insurance__c}></c-custom-table>
+					</div>
+				</div>
+			</lightning-tab>
+			<lightning-tab label="Licenses">
+				<div class="">
+					<div class="cdgWrapper">
+						<!-- <div class="cdgtitletoolbar slds-grid">
+							<div class="slds-col_bump-right">
+								<h4>Licenses &amp; Certifications</h4>
+							</div>
+							<div>
+								<div class="slds-button-group" role="group">
+									<button class="slds-button slds-button_neutral" title="Add Employee"><i class="las la-user-plus fs24"></i></button>
+									<button class="slds-button slds-button_neutral" title="Upload Documents"><i class="las la-file-upload fs24"></i></button>
+								</div>
+							</div>
+						</div> -->
+						<c-custom-table rec-id={parentId} obj-name="Lisence__c" rel-name="Licenses__r"  col-list={fieldList.Lisence__c}></c-custom-table>
+					</div>
+				</div>
+			</lightning-tab>
+		</lightning-tabset>
+	</div>
+</template>

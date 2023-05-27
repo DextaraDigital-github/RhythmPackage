@@ -1,0 +1,188 @@
+<template>
+	<header class="rtmvpc-pgheader">
+		<div class="rtmvpc-pghtitle">
+			<div class="rtmvpc-pgstitle">Welcome to the Supplier Portal </div>
+			<h1 class="rtmvpc-pgmtitle capitalize">Inbox</h1>
+		</div>
+	</header>
+	<div class="cib-cardbase slds-p-around_small">
+		<div class="cib-tbl">
+			<div class="cib-row">
+				<div class="cib-cel cib-w230 cib-type" data-id="cibtype" aura:id="cibtype">
+					<div class="cib-sec_container">
+						<div class="cib-sec_header">
+							<button class="cig_actions" onclick={handleLeftButtonClick}><i class="las la-chevron-circle-left"></i></button><span>CATEGORY</span>
+						</div>
+						<div class="cib-sec_bodyfull1">
+							<div class="cib-sec_vcontainer2_1">
+								
+									<lightning-vertical-navigation selected-item="reports_recent">
+										<!-- <lightning-vertical-navigation-section label=""> -->
+										<ul class="cib-listul">
+
+											<template for:each={parentListRecords} for:item="item">
+											<li class="cib-mtype items" key={item.Id} data-id={item.Id} onclick={showDataHandler}>{item.Name}
+												<div class="cib-badge">
+														{item.Count}
+													</div>
+											</li>
+											
+											</template>
+											<!-- Commented by Mani -->
+											<!-- 
+												<li class="cib-mtype active items" data-id="Task" onclick={showDataHandler}>
+													<h4>Tasks</h4>
+													<div class="cib-badge">
+														3 / 15
+													</div>
+												</li>
+												<li class="cib-mtype items" data-id="Alert__c" onclick={showDataHandler}>
+													<h4>Alerts</h4>
+													<div class="cib-badge">
+														1 / 10
+													</div>
+												</li>
+												<li class="cib-mtype items" data-id="Incidents__c" onclick={showDataHandler}>
+													<h4>Incidents</h4>
+													<div class="cib-badge">
+														2 / 5
+													</div>
+												</li>
+											 -->
+
+											
+
+											<!-- <li class="cib-mtype items" data-id="Supplier_Inbox_Categ__c"
+												onclick={showDataHandler}>
+												<h4>GENERAL ANNOUNCEMENTS</h4>
+												<div class="cib-badge">2 / 5</div>
+											</li>
+											<li class="cib-mtype items" data-id="Supplier_Inbox_Categ__c"
+												onclick={showDataHandler}>
+												<h4>COMPLIANCE</h4>
+												<div class="cib-badge">1 / 5</div>
+											</li>
+											<li class="cib-mtype items" data-id="Supplier_Inbox_Categ__c"
+												onclick={showDataHandler}>
+												<h4>PROJECTS</h4>
+												<div class="cib-badge">1 / 5</div>
+											</li>
+											<li class="cib-mtype items" data-id="Supplier_Inbox_Categ__c"
+												onclick={showDataHandler}>
+												<h4>ASSESSMENTS</h4>
+												<div class="cib-badge">2 / 5</div>
+											</li>
+											<li class="cib-mtype items" data-id="Supplier_Inbox_Categ__c"
+												onclick={showDataHandler}>
+												<h4>RFPs</h4>
+												<div class="cib-badge">0 / 0</div>
+											</li>
+											<li class="cib-mtype items" data-id="Supplier_Inbox_Categ__c"
+												onclick={showDataHandler}>
+												<h4>CONTRACTS</h4>
+												<div class="cib-badge">0 / 0</div>
+											</li> -->
+										</ul><!-- </lightning-vertical-navigation-section> -->
+									</lightning-vertical-navigation>
+								
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="cib-cel cib- cib-list cib-pl8">
+					<div class="cib-sec_container">
+						<div class="cib-top_menu_container">
+							<div class="slds-float_left">
+								<button class="cig_actions" onclick={handleLeftButtonClick}><i class="las la-bars"></i></button>
+							</div>
+							<div class="slds-float_right">
+								<!-- 
+									<button class="cig_actions " data-id="Task" onclick={showDataHandler}>
+										<i class="las la-tasks"></i>
+									</button> 
+								-->
+								<button class="cig_actions " data-id="Supplier_Inbox_Categ__c" onclick={showDataHandler}>
+									<i class="las la-bell"></i>
+								</button>
+								<button class="cig_actions " data-id="Supplier_Task__c" onclick={showDataHandler}>
+									<i class="las la-exclamation-triangle"></i>
+								</button>
+							</div>
+						</div>
+
+
+							<div class="cib-sec_header">
+								<span>LIST OF INCIDENTS</span>
+								<div class="slds-float_right">
+									<lightning-combobox name="progress" label="Status" variant="label-hidden"
+										value={value} placeholder="Select Progress" options={options}
+										onchange={handleChange}>
+									</lightning-combobox>
+								</div>
+							</div>
+							<div class="cib-serch">
+								<input type="text" placeholder="Search" class="cib-serch-input" onkeyup={searchInputChangeHandler}/>
+							</div>
+							<div class="cib-sec_bodyfull2">
+								<div class="cib-sec_vcontainer2_2">
+									<div class="slds-scrollable_y">
+										<ul>
+											<template for:each={relatedListRecords} for:item="item">
+											<li  class="cib-read" key={item.Id} data-id={item.Id}>
+											<div class="slds-p-around_small" >
+													<h4>
+														<div class="slds-truncate" >{item.Name}</div>
+													</h4>
+													<div class="cib-sender">
+														<div class="slds-truncate">{item.Description}</div>
+													</div>
+												</div>
+												</li>
+											</template>											
+											<!-- <li class="cib-read" onclick={openChatHandler}>
+												<div class="slds-p-around_small" onclick={handleRightButtonClick}>
+													<h4>
+														<div class="slds-truncate">Heading Record Name</div>
+													</h4>
+													<div class="cib-sender">
+														<div class="slds-truncate">Description should be here...</div>
+													</div>
+												</div>
+											</li>
+											<li class="cib-unread">
+												<div class="slds-p-around_small" onclick={handleRightButtonClick}>
+													<h4>
+														<div class="slds-truncate">Heading Record Name</div>
+													</h4>
+													<div class="cib-sender">
+														<div class="slds-truncate">Description should be here...</div>
+													</div>
+												</div>
+											</li> -->
+										</ul>
+									</div>
+								</div>
+							</div>
+					
+					</div>
+				</div>
+			
+			</div>
+		</div>
+	</div>
+	<!-- 
+		<div class="slds-p-around_medium">
+			<div class="slds-grid slds-wrap slds-gutters_x-small">
+				<div class="slds-col slds-size_1-of-1 slds-small-size_12-of-12 slds-medium-size_3-of-12 slds-large-size_2-of-12">
+					<div class="rtmvpc-ib-card slds-scrollable_y">
+						<h4>Task Type</h4>
+					</div>
+				</div>
+				<div class="slds-col slds-size_1-of-1 slds-small-size_12-of-12 slds-medium-size_9-of-12 slds-large-size_10-of-12">
+					<div class="rtmvpc-ib-card slds-scrollable_y">
+					</div>
+				</div>
+			</div>
+		</div>
+	 -->
+</template>
