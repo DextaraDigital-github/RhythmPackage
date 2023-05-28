@@ -8,9 +8,12 @@
 		
 	<div class="">
 		<div class="">
-			<div class="cdgWrapper">
-				<c-custom-table rec-id={parentId} obj-name='Rythm__Assessment__c' rel-name='Rythm__Assessments__r'
-					col-list={fieldList.Supplier_Assessment__c} show-progress-bar="true" show-survey="true"></c-custom-table>
+			<div  class="cdgWrapper">
+				<template if:true={showgrid}>
+						<c-custom-table  rec-id={parentId} obj-name='Rythm__Assessment__c' rel-name='Rythm__Assessments__r' object-record-data={recList} 
+						def-page-size={pageSize}
+							col-list={tablefieldList} show-progress-bar="true" show-survey="true"></c-custom-table>
+				</template>
 			</div>
 		</div>
 	</div>

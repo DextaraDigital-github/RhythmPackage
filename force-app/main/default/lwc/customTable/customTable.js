@@ -58,6 +58,7 @@ export default class CustomTable extends LightningElement {
     @api showProgressBar;
     @api showSurvey;
     @api progressBarValue = 0;
+    @api defPageSize=15;
     @track recList=[];
     @track showTable;
     @track recordDetailId;
@@ -93,9 +94,9 @@ export default class CustomTable extends LightningElement {
     @track objHistoryList = [];
     @api tableLabel;
     @api activeTab = '';
-
+    @api relatedListRecords = [];
     allRecordsList;
-
+    @api objectRecordData=[];
     @track pageSizeOptions = [
         // { label: '5', value: '5' },
         // { label: '10', value: '10' },
@@ -111,6 +112,7 @@ export default class CustomTable extends LightningElement {
     selectedColumnOptions = [];
     requiredColumnsOptions = [];
     //End: Show/Hide/Shuffle Columns
+
 
     @wire(getRelatedListRecords, {
         parentRecordId: '$recId',
@@ -138,6 +140,8 @@ export default class CustomTable extends LightningElement {
             console.log('Wire Related List data', JSON.stringify(error));
         }
     }
+
+    
 
     handlePageNumberChange(event) {
         if (!!event) {
@@ -390,9 +394,9 @@ export default class CustomTable extends LightningElement {
                             }
                             if (colList[j].fieldName === 'Name') {
                                 recJson.isHyperlink = true;
-                                if (this.objName === 'Supplier_Assessment__c') {
-                                    console.log(relatedListRecords[i].fields['Additional__c'].value);
-                                    if (Number(relatedListRecords[i].fields['Additional__c'].value) > 0) {
+                                if (this.objName === 'Rythm__Assessment__c') {
+                                    //console.log(relatedListRecords[i].fields['Additional__c'].value);
+                                    if (relatedListRecords[i].fields['Additional__c'] && Number(relatedListRecords[i].fields['Additional__c'].value) > 0) {
                                         console.log(relatedListRecords[i].fields['Additional__c'].value);
                                         recJson.flagSymbol = 'action:priority';
                                     }
@@ -638,7 +642,7 @@ export default class CustomTable extends LightningElement {
             this.takeSurvey = false;
             this.showRecordDetail = false;
             this.showTable = true;
-            if (this.objName != 'Supplier_Assessment__c') {
+            if (this.objName != 'Rythm__Assessment__c') {
                 console.log(this.navListHandler);
                 var gotoparentTabsetonbackclick = new CustomEvent('getchildnavobjectonbackclick', {
                     detail: this.navListHandler
@@ -760,13 +764,25 @@ export default class CustomTable extends LightningElement {
     }
 
     connectedCallback() {
+
+        this.relatedListRecords = JSON.parse(JSON.stringify(this.objectRecordData));
+        this.preparePaginationControlsData();
+        let pageSizeDefaultValue = this.pageSizeOptions[0].value;
+        let currentPageRecords = this.getPageRecords(this.relatedListRecords, 1, pageSizeDefaultValue);
+        this.viewColList = this.colList;
+        this.recList = this.assignData(currentPageRecords, this.viewColList);
+        this.allRecordsList = this.recList;
+
+
+
+
         console.log('Object Name',this.objName);
         this.opt_showCalendar = (this.objName === 'Task' ? true : false);
         this.opt_list = true;
         this.opt_new = (this.objName === 'Employee__c' ? false : true);
         this.opt_newEmp = (this.objName === 'Employee__c' ? true : false);
-        this.opt_rec_csv = (this.objName === 'Supplier_Assessment__c' ? true : false);
-        this.opt_rec_pdf = (this.objName === 'Supplier_Assessment__c' ? true : false);
+        this.opt_rec_csv = (this.objName === 'Rythm__Assessment__c' ? true : false);
+        this.opt_rec_pdf = (this.objName === 'Rythm__Assessment__c' ? true : false);
         this.opt_rec_csv = (this.objName === 'Rythm__Assessment__c' ? true : false);
         this.opt_rec_pdf = (this.objName === 'Rythm__Assessment__c' ? true : false);
         console.log('this.objName',this.objName);
