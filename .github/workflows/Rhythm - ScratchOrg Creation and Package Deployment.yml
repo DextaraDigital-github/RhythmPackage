@@ -11,7 +11,7 @@ on:
       default: 'scratch-org'
       required: true
       
-     package_id: 
+     packageversion_id: 
       #package name to be deployed in the scratch-org
       required: true
 
@@ -90,13 +90,13 @@ jobs:
 
       # Install new package in scratch org
       - name: 'Install new package version in scratch org'
-        run: sfdx package:install --package ${{github.event.inputs.package_id}} -w 10 -r
+        run: sfdx package:install --package ${{github.event.inputs.packageversion_id}} -w 10 -r
         
       # Update package install link in readme
       - name: 'Update package install link in readme'
         run: |
                   packageName="${{ secrets.MANAGED_PACKAGE1 }}"
-                  packageVersionId="${{github.event.inputs.package_id}}"
+                  packageVersionId="${{github.event.inputs.packageversion_id}}"
                   packageLinkRegex="<a name=\"$packageName\" href=\"https:\/\/login\.salesforce\.com\/packaging\/installPackage\.apexp\?p0=[a-zA-ZA-ZA-Z0-9]{18}\">"
                   newPackageLink="<a name=\"${packageName}\" href=\"https://login.salesforce.com/packaging/installPackage.apexp?p0=${packageVersionId}\">"
                   sed -E -i "s,${packageLinkRegex},${newPackageLink}," README.md
