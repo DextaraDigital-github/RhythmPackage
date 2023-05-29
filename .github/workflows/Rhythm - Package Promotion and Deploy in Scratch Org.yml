@@ -1,5 +1,5 @@
 # Unique name for this workflow
-name: Rhythm - Managed Package Promotion YES Full Process
+name: Rhythm - Package Promotion and Deploy in Scratch Org
 
 # Definition when the workflow should run
 
