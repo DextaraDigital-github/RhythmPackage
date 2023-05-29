@@ -107,3 +107,16 @@ jobs:
       # Promote package version
       - name: 'Promote package version'
         run: sfdx force:package:version:promote --package ${{ steps.createPackageVersion.outputs.packageVersionId }} -n
+        
+      # Create PR for new package version
+      - name: 'Create PR for new package version'
+        id: create-pr
+        uses: peter-evans/create-pull-request@v3
+        with:
+             title: 'Package: ${{ secrets.MANAGED_PACKAGE1 }} - New version: ${{ steps.createPackageVersion.outputs.packageVersionId }}'
+             body: 'Released new package version ${{ steps.createPackageVersion.outputs.packageVersionId }} for package ${{ secrets.MANAGED_PACKAGE1 }}'
+             author: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>
+             commit-message: 'Package: ${{ secrets.MANAGED_PACKAGE1 }} - New version: ${{ steps.createPackageVersion.outputs.packageVersionId }}'
+             branch: 'Version-Storage'
+             token: ${{ secrets.BOT_ACCESS_TOKEN }}
+           
