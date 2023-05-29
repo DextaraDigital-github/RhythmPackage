@@ -87,19 +87,10 @@ jobs:
       - name: Display user information
         id: display_user
         run: sfdx force:user:display --targetusername=new-user --json
-
-      # Install new package in scratch org
-      - name: 'Install new package version in scratch org'
-        run: sfdx package:install --package ${{github.event.inputs.packageversion_id}} -w 10 -r
         
-      # Update package install link in readme
-      - name: 'Update package install link in readme'
-        run: |
-                  packageName="${{ secrets.MANAGED_PACKAGE1 }}"
-                  packageVersionId="${{github.event.inputs.packageversion_id}}"
-                  packageLinkRegex="<a name=\"$packageName\" href=\"https:\/\/login\.salesforce\.com\/packaging\/installPackage\.apexp\?p0=[a-zA-ZA-ZA-Z0-9]{18}\">"
-                  newPackageLink="<a name=\"${packageName}\" href=\"https://login.salesforce.com/packaging/installPackage.apexp?p0=${packageVersionId}\">"
-                  sed -E -i "s,${packageLinkRegex},${newPackageLink}," README.md
+      # Code Push to Scratch org
+      - name: 'code push'
+        run: sfdx force:source:push --targetusername=new-user --wait 20
                   
       # Revert namespace change in project config
       - name: 'Revert namespace change in project config'
