@@ -10,10 +10,6 @@ on:
       #friendly name to the scratch-org which needs to be created
       default: 'scratch-org'
       required: true
-      
-     packageversion_id: 
-      #package name to be deployed in the scratch-org
-      required: true
 
 # Jobs to be executed
 
