@@ -9,6 +9,7 @@ export default class RtmvpcAssessments extends LightningElement {
 @track recList= [];
 @track pageSize = 15;
 @track showgrid= false;
+@track showsurvey = false;
 @track relName='Rythm__Assessments__r';
 @track fieldsList=[];
 @track objName='Rythm__Assessment__c';
@@ -84,5 +85,10 @@ export default class RtmvpcAssessments extends LightningElement {
         }).catch(error => {
             //console.log('Error' + error);
         })
+    }
+
+    openSurveyHandler(event)
+    {
+        this.showsurvey = true;
     }
 }

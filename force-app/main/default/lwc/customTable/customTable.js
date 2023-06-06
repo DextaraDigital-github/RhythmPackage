@@ -61,6 +61,7 @@ export default class CustomTable extends LightningElement {
     @api defPageSize=15;
     @track recList=[];
     @track showTable;
+    @track accountsId;
     @track recordDetailId;
     @track search;
     @track showRecordDetail;
@@ -81,6 +82,7 @@ export default class CustomTable extends LightningElement {
     @track savedResponseMap = new Map();
     @track finalSection;
     @track opt_showCalendar;
+    @track assessmentsId;
     @track opt_list;
     @track opt_new;
     @track opt_delete;
@@ -437,11 +439,11 @@ export default class CustomTable extends LightningElement {
                 recDetails.rowClick = 'viewClickHandler';
                 //console.log(JSON.stringify(recDetails));
 
-                if (this.relName === 'Assessments__r') {
+                if (this.objName === 'Rythm__Assessment__c') {
                     recDetails.rowClick = 'takeSurveyHandler';
                     recDetails.viewButton = false;
                     recDetails.takeSurvey = true;
-                    if (relatedListRecords[i].fields['Assesment_Status__c'].value === 'Submitted') {
+                    if (relatedListRecords[i].fields['Rythm__Assesment_Status__c'].value === 'Submitted') {
                         recDetails.surveyLabel = 'View Survey';
                         recDetails.surveySymbol = 'utility:lock';
                     }
@@ -602,16 +604,21 @@ export default class CustomTable extends LightningElement {
         // }
         // this.spinner = false;
     */
-     this.takeSurvey = true;
+    //this.takeSurvey = true;
     console.log('In view click Handler');
+    const rowclick = new CustomEvent('rowclick',{
+        detail:{}
+    });
+    this.dispatchEvent(rowclick);
     }
 
     takeSurveyHandler(event) {
         this.showTable = false;
         this.takeSurvey = true;
-        this.recordDetailId = event.currentTarget.dataset.id;
         
-        //console.log(this.recordDetailId);
+        this.recordDetailId = event.currentTarget.dataset.id;
+        this.assessmentsId = this.recordDetailId;
+        console.log('record',this.recordDetailId);
     }
 
     backClickHandler(event) {
@@ -772,7 +779,7 @@ export default class CustomTable extends LightningElement {
         this.viewColList = this.colList;
         this.recList = this.assignData(currentPageRecords, this.viewColList);
         this.allRecordsList = this.recList;
-
+        this.accountsId = this.recId;
 
 
 

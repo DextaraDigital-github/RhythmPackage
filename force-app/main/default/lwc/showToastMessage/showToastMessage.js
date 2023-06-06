@@ -17,13 +17,13 @@ export default class ShowToastMessage extends LightningElement {
         this.dispatchEvent(selectEvent);
     }
     connectedCallback() {
-        if(this.messageFromComponent.split(':').length>1)
-        {
-            this.isSucess=false;
-        }
-        else
-        {
-            this.isSucess=true;
-        }
+        // if(this.messageFromComponent.split(':').length>1)
+        // {
+        //     this.isSucess=false;
+        // }
+        // else
+        // {
+        //     this.isSucess=true;
+        // }
     }
 }

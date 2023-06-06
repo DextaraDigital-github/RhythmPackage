@@ -14,17 +14,25 @@ export default class TabularReportQuestionnaire extends NavigationMixin(Lightnin
     connectedCallback() {
         this.showNextButton = JSON.parse(this.showNextButton);
         var assessmentTemplateId;
+        console.log('this.assessment',this.assessment);
         getSupplierAssessmentList({ assessmentId: this.assessment }).then(result => {
-            assessmentTemplateId = result[0].Assessment_Template__c;
+            console.log('result',result);
+            assessmentTemplateId = result[0].Rythm__Assessment_Template__c;
+            console.log('assessmentTemplateId',assessmentTemplateId);
             getQuestionsList({ templateId: assessmentTemplateId }).then(result => {
                 var resultMap = result;
+                console.log('getQuestionsList',result);
                 getSupplierResponseList({ assessmentId: this.assessment }).then(result => {
-                    console.log(JSON.stringify(result));
+                    console.log('result',result);
                     result.forEach(qres => {
-                        if(typeof qres != 'undefined' && typeof qres.Response__c != 'undefined')
-                        this.savedResponseMap.set(qres.Questionnaire__c, { "Response__c": qres.Response__c, "Flag__c": qres.Flag__c });
+                        console.log('qres',qres);
+                        if(typeof qres != 'undefined' && typeof qres.Rythm__Response__c != 'undefined')
+                        this.savedResponseMap.set(qres.Rythm__Question__c, { "Response__c": qres.Rythm__Response__c, "Flag__c": qres.Rythm__Flag__c });
+                    console.log('qres',qres);
                     });
+                    
                     this.finalSection = this.constructWrapper(resultMap, this.savedResponseMap);
+                    console.log('final section', this.finalSection);
                 }).catch(error => {
                     console.log('getSupplierResponseList Error' + error);
                 })
@@ -39,9 +47,11 @@ export default class TabularReportQuestionnaire extends NavigationMixin(Lightnin
     constructWrapper(questionResp, savedResp) {
         var questionMap = new Map();
         var sectionMap = [];
+        console.log('questionResp',questionResp);
         questionResp.forEach(qu => {
+            console.log('qu',qu);
             var quTemp = {};
-            quTemp.question = qu.questionId;
+            quTemp.question = qu.Rythm__Question__c;
 
             // console.log(qu);
             // if(qu.lastModifiedDate!=undefined)
@@ -59,20 +69,25 @@ export default class TabularReportQuestionnaire extends NavigationMixin(Lightnin
             // }
 
             if(savedResp.get(quTemp.question))
-            quTemp.value = savedResp.get(quTemp.question).Response__c;
+            quTemp.value = savedResp.get(quTemp.question).Rythm__Response__c;
             if(savedResp.get(quTemp.question))
-            quTemp.flag = savedResp.get(quTemp.question).Flag__c;
-            if (questionMap.has(qu.sectionName)) {
-                questionMap.get(qu.sectionName).push(quTemp);
+            quTemp.flag = savedResp.get(quTemp.question).Rythm__Flag__c;
+            if (questionMap.has(qu.Rythm__Section__r.Name)) {
+                questionMap.get(qu.Rythm__Section__r.Name).push(quTemp);
             } else {
                 var quesList = [];
+                console.log('quTemp',quTemp);
                 quesList.push(quTemp);
-                questionMap.set(qu.sectionName, quesList);
+                questionMap.set(qu.Rythm__Section__r, quesList);
             }
         });
         var sectioncount = 0;
+        var sectionname=[];
         for (const key of questionMap.keys()) {
             var secTemp = {};
+            if(!sectionname.includes(key.Name))
+            {
+            sectionname.push(key.Name);
             secTemp.section = key;
             var count = 0;
             var count_flag = 0;
@@ -100,18 +115,20 @@ export default class TabularReportQuestionnaire extends NavigationMixin(Lightnin
             secTemp.Review = '-';
             secTemp.Comments = '-';
             sectioncount += 1;
-            secTemp.SectionNumber = sectioncount;
+            //secTemp.SectionNumber = sectioncount;
 
             console.log('secTemp'+  secTemp);
 
             sectionMap.push(secTemp);
+            }
         };
+        console.log('sectionMap',sectionMap);
         return sectionMap;
 
     }
     handleclick(event) {
         var selectedevent = new CustomEvent('sectionclick', {
-            detail: { SectionNumber: event.currentTarget.dataset.id }
+            detail: { sectionId : event.currentTarget.dataset.id }
 
         });
         this.dispatchEvent(selectedevent);

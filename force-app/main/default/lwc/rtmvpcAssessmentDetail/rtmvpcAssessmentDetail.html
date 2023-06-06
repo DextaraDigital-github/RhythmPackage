@@ -135,10 +135,19 @@
 								<div class="cad-sec_vcontainer2_2" style="height: calc(100% - 42px)">
 									<div class="slds-scrollable_y">
 										<div
-											class="slds-text-align_center slds-p-around_xx-large slds-text-heading_large">
-											<strong>Assessment Component Placeholder</strong>
-											<h1>calling tabular report questionnaire</h1>
-											<c-tabular-report-questionnaire assessment="a04530000032N9zAAE"></c-tabular-report-questionnaire>										
+											class="slds-text-align_center slds-text-heading_large">
+											<!-- <strong>Assessment Component Placeholder</strong>
+											<h1>calling tabular report questionnaire</h1> -->
+											<template if:true={showSections}>
+											<c-tabular-report-questionnaire assessment={assessmentid} show-next-button="true" onsectionclick={showQuestionnaire}></c-tabular-report-questionnaire>										
+											</template>
+											<template if:false={showSections}>
+												<!-- <h1>Section Id {sectionId}</h1> -->
+												<c-Questionnaire vendor={accountid} assessment={assessmentid}  ></c-Questionnaire>
+											</template>
+											<template if:false={showFlag}>
+											    <c-rtmvpc-render-question-template onopenchathistory={handleChat}></c-rtmvpc-render-question-template>
+											</template>
 										</div>
 									</div>
 								</div>
@@ -151,9 +160,9 @@
 					</div>
 
 					<div class="cad-cel cad-w300 cad-disc cad-pl8 cadshowright" data-id="caddisc"> <!-- to show apply or remove class "cadshowright" -->
-						
-							<c-rtmvpc-assessment-chatter></c-rtmvpc-assessment-chatter>
-						
+						<template if:true={showChat}>
+							<c-rtmvpc-assessment-chatter ></c-rtmvpc-assessment-chatter>
+						</template>
 					</div>
 				</div>
 			</div>

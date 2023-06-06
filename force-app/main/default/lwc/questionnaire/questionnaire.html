@@ -1,16 +1,15 @@
 <template>
-	<div class="slds-p-around_medium" style="max-width:1800px; margin-bottom:16px;">
+	<div class="" style="max-width:1800px; margin-bottom:16px;">
 		<!-- <template if:true={showquestion}> -->
-		<lightning-card>
-			<div class="slds-p-horizontal_medium">
-				<center>
+		<div class="">
+			<div class="">
+				<!-- <center>
 					<h2>
 						<b style="font-size:22px"> {AssessmentName} </b>
-						<!-- <b> Contractor Management Pre-Job Form</b> -->
 					</h2>
-				</center>
+				</center> -->
 				<!-- <p class="slds-p-around_medium slds-border-top">{showDisclosure}</p> -->
-				<p class="slds-p-around_medium">
+				<p class="slds-p-bottom_medium slds-p-horizontal_medium ">
 					<lightning-formatted-rich-text value={showDisclosure}></lightning-formatted-rich-text>
 				</p>
 
@@ -32,7 +31,7 @@
 				<template if:true={needPagination}>
 					<template if:true={questionsAndAnswerss}>
 						<template if:true={showSummary}>
-							<div class="rtmvpc-card slds-p-around_medium">
+							<div class="rtmvpc-card">
 								<!-- Commented by Mani -->
 								<!--<div class="slds-p-around_medium slds-p-left_none slds-p-right_none"
 									style="display:flex; justify-content: flex-end; align-items: center">
@@ -67,7 +66,7 @@
 									<div key={questionaryEntry.section} class="rtmvpc-card"
 										data-id={questionaryEntry.section}>
 										<div class="slds-grid slds-wrap slds-p-top_medium slds-p-bottom_small">
-											<div class="slds-col slds-size_5-of-12">
+											<div class="slds-col slds-size_12-of-12">
 												<lightning-combobox class="section-select" name="progress"
 													label="All Sections" value={sectionValue}
 													placeholder="Select a Section" options={sectionsforpicklist}
@@ -110,7 +109,7 @@
 										<!-- </div> -->
 
 										<div style="display: flex">
-											<div style="width: 70%; min-height: 350px">
+											<div style="width: 100%; min-height: 350px">
 												<lightning-accordion allow-multiple-sections-open={multiple}
 													active-section-name={questionaryEntry.section}>
 													<lightning-accordion-section name={questionaryEntry.section}
@@ -302,10 +301,10 @@
 																	</div>
 																</div>
 															</template>
-															<template if:true={questionary.showUpload}>
+															<!-- <template if:true={questionary.showUpload}>
 																<lightning-button key={questionary.Id} variant="brand"
 																	label="Upload"></lightning-button>
-															</template>
+															</template> -->
 															<!-- Write Here for Conditional Questioning  -->
 															<template if:true={questionary.Children}
 																key={questionary.Id}>
@@ -324,12 +323,12 @@
 												data-id="caddisc">
 												<div class="cad-sec_container_nobdr cad-sec_vcontainer">
 													<div class="cad-top_back_container">
-													<button class="cad_actions" data-id="buttoncaddisc" onclick={handleRightButtonClick}>
+														<button class="cad_actions" data-id="buttoncaddisc" onclick={handleRightButtonClick}>
 														<i class="las la-chevron-circle-left"></i>
 														<span class="textstyle01"></span>
 													</button>
-												</div>
-												<div class="cad-tophead-details cad-sec_vcontainer1">
+													</div>
+													<!-- 	
 													<div class="slds-grid slds-wrap slds-gutters_small">
 
 														<div class="slds-col slds-size_12-of-12 slds-text-align_center">
@@ -339,7 +338,7 @@
 														</div>
 
 													</div>
-												</div>
+												</div> -->
 													<!-- <div class="cad-top_back_container">
 														<button class="cad_actions" data-id="buttoncaddisc" onclick={handleRightButtonClick}>
 														<i class="las la-chevron-circle-left"></i>
@@ -446,7 +445,7 @@
 				</template>
 				<template if:true={showToast}>
 					<c-Show-Toast-Message message-from-component={totastmessage} is-show-modal={showToast}
-						onclosetoast={closeToastHandler}></c-Show-Toast-Message>
+						is-sucess={success} onclosetoast={closeToastHandler}></c-Show-Toast-Message>
 				</template>
 
 				<template if:false={needPagination}>
@@ -491,319 +490,37 @@
 							</template> -->
 							<lightning-accordion allow-multiple-sections-open={multiple}
 								active-section-name={activeSection}>
-								<template if:true={questionsAndAnswerss}>
-									<div style="display:flex; width: 100%">
-										<div class="slds-p-around_medium" style="width: 70%; min-height: 350px">
-											<template for:each={questionsAndAnswerss} for:item="questionaryEntry">
-												<lightning-accordion-section name={questionaryEntry.section}
-													class="slds-section-title--divider" label={questionaryEntry.section}
-													key={questionaryEntry.section}
-													onsectiontoggle={handleSectionToggle}>
-													<template for:each={questionaryEntry.questions}
-														for:item="questionary">
-														<template if:true={questionary.isText}>
-															<div key={questionary.Id} style="display:flex">
-																<div style="width: 90%">
-																	<lightning-input key={questionary.Id}
-																		name={questionary.question}
-																		data-key={questionary.Id}
-																		data-con={questionary.conditional} type="text"
-																		label={questionary.question}
-																		onchange={handleChange}
-																		value={questionary.value}></lightning-input>
-																</div>
-																<div>
-																	<template if:true={questionary.Flag__c}>
-																		<lightning-icon key={questionary.Id}
-																			icon-name="action:priority" size="xx-small">
-																		</lightning-icon>
-																	</template>
-																</div>
-															</div>
-														</template>
-														<template if:true={questionary.isPicklist}>
-															<div key={questionary.Id} style="display:flex">
-																<div style="width: 90%">
-																	<lightning-combobox key={questionary.Id}
-																		data-key={questionary.Id}
-																		data-con={questionary.conditional}
-																		name={questionary.question}
-																		label={questionary.question}
-																		value={questionary.value}
-																		options={questionary.optionsWrapper.pickListOptions}
-																		onchange={handleChange}>
-																	</lightning-combobox>
-																</div>
-																<div>
-																	<template if:true={questionary.Flag__c}>
-																		<lightning-icon key={questionary.Id}
-																			icon-name="action:priority" size="xx-small">
-																		</lightning-icon>
-																	</template>
-																</div>
-															</div>
-														</template>
-														<template if:true={questionary.isMultiPicklist}>
-															<div key={questionary.Id} style="display:flex">
-																<div style="width: 90%">
-																	<lightning-dual-listbox key={questionary.Id}
-																		data-key={questionary.Id}
-																		data-con={questionary.conditional}
-																		name={questionary.question}
-																		label={questionary.question}
-																		options={questionary.optionsWrapper.multiPickListOptions}
-																		size="4" onchange={handleChange}
-																		value={questionary.optionsWrapper.selectedListOptions}>
-																	</lightning-dual-listbox>
-																</div>
-																<div>
-																	<template if:true={questionary.Flag__c}>
-																		<lightning-icon key={questionary.Id}
-																			icon-name="action:priority" size="xx-small">
-																		</lightning-icon>
-																	</template>
-																</div>
-															</div>
-														</template>
-														<template if:true={questionary.isDate}>
-															<div key={questionary.Id} style="display:flex">
-																<div style="width: 90%">
-																	<lightning-input key={questionary.Id}
-																		data-key={questionary.Id}
-																		data-con={questionary.conditional}
-																		name={questionary.question}
-																		value={questionary.value}
-																		label={questionary.question} type="date"
-																		onchange={handleChange}></lightning-input>
-																</div>
-																<div>
-																	<template if:true={questionary.Flag__c}>
-																		<lightning-icon key={questionary.Id}
-																			icon-name="action:priority" size="xx-small">
-																		</lightning-icon>
-																	</template>
-																</div>
-															</div>
-														</template>
-														<template if:true={questionary.isCheckbox}>
-															<div key={questionary.Id} style="display:flex">
-																<div style="width: 90%">
-																	<b key={questionary.Id}>
-														<lightning-formatted-text value={questionary.question} title={questionary.question} key={questionary.Id} data-con = {questionary.conditional} data-key={questionary.Id} name={questionary.question}></lightning-formatted-text>
-													</b>
-																	<template key={questionary.Id}
-																		data-key={questionary.Id}
-																		for:each={questionary.optionsWrapper.checkboxOptions}
-																		for:item="option">
-																		<div key={option.id}>
-																			<lightning-input type="checkbox"
-																				label={option.label}
-																				data-con={questionary.conditional}
-																				value={option.isChecked}
-																				onchange={handleChange}>
-																			</lightning-input>
-																		</div>
-																	</template></div>
-																<div>
-																	<template if:true={questionary.Flag__c}>
-																		<lightning-icon key={questionary.Id}
-																			icon-name="action:priority" size="xx-small">
-																		</lightning-icon>
-																	</template>
-																</div>
-															</div>
-														</template>
-														<template if:true={questionary.isNumber}>
-															<div key={questionary.Id} style="display:flex">
-																<div style="width: 90%">
-																	<lightning-input key={questionary.Id}
-																		data-key={questionary.Id}
-																		data-con={questionary.conditional}
-																		name={questionary.question}
-																		value={questionary.value}
-																		label={questionary.question} type="phone"
-																		onchange={handleChange}></lightning-input>
-																</div>
-																<div>
-																	<template if:true={questionary.Flag__c}>
-																		<lightning-icon key={questionary.Id}
-																			icon-name="action:priority" size="xx-small">
-																		</lightning-icon>
-																	</template>
-																</div>
-															</div>
-														</template>
-														<template if:true={questionary.isEmail}>
-															<div key={questionary.Id} style="display:flex">
-																<div style="width: 90%">
-																	<lightning-input key={questionary.Id}
-																		data-key={questionary.Id}
-																		data-con={questionary.conditional}
-																		name={questionary.question}
-																		value={questionary.value}
-																		label={questionary.question} type="email"
-																		onchange={handleChange}></lightning-input>
-																</div>
-																<div>
-																	<template if:true={questionary.Flag__c}>
-																		<lightning-icon key={questionary.Id}
-																			icon-name="action:priority" size="xx-small">
-																		</lightning-icon>
-																	</template>
-																</div>
-															</div>
-														</template>
-														<template if:true={questionary.isRadio}>
-															<div key={questionary.Id} style="display:flex">
-																<div style="">
-																	<lightning-radio-group key={questionary.Id}
-																		data-key={questionary.Id}
-																		data-con={questionary.conditional}
-																		name={questionary.question}
-																		onchange={handleChange}
-																		label={questionary.question}
-																		options={questionary.optionsWrapper.radioOptions}
-																		value={questionary.value} type="radio">
-																	</lightning-radio-group>
-																</div>
-																<div>
-																	<template if:true={questionary.Flag__c}>
-																		<lightning-icon key={questionary.Id}
-																			icon-name="action:priority" size="xx-small">
-																		</lightning-icon>
-																	</template>
-																</div>
+								<div style="display:flex; width: 100%">
+									<div class="" style="width: 100%; min-height: 350px">
 
-															</div>
+										<lightning-accordion-section name="C" label="Disclosure">
+											Contains Assessment templates data</lightning-accordion-section>
+
+										<template for:each={questionsAndAnswerss} for:item="questionaryEntry">
+											<lightning-accordion-section name={questionaryEntry.section}
+												class="slds-section-title--divider" label={questionaryEntry.section}
+												key={questionaryEntry.section} onsectiontoggle={handleSectionToggle}>
+												<c-rtmvpc-render-question-template responses={questionaryEntry.questions} onvaluechange={onResponseChange}>
+												</c-rtmvpc-render-question-template>
+												<!-- <template if:true={questionaryEntry.Children}>
+													<template for:each={questionaryEntry.Children} for:item="childquestion">
+														<template if:true={childquestion.isdisplay}>
+															<h1 key={childquestion.isdisplay}>Hello</h1>
+															<c-rtmvpc-render-question-template responses={childquestion} key={childquestion.isdisplay}>
+												</c-rtmvpc-render-question-template>
 														</template>
-														<template if:true={questionary.showUpload}>
-																<lightning-button key={questionary.Id} variant="brand"
-																	label="Upload"></lightning-button>
-															</template>
-														<!-- Write Here for Conditional Questioning  -->
-														<template if:true={questionary.Children} key={questionary.Id}>
-															<template if:true={visible} key={questionary.Id}>
-																<c-questionnaire-child-cmp key={questionary.Id}
-																	input={questionary.Children}>
-																</c-questionnaire-child-cmp>
-															</template>
+														<template if:false={childquestion.isdisplay}>
+															<h1 key={childquestion.isdisplay}>Hello world</h1>
+															<c-rtmvpc-render-question-template responses={childquestion} key={childquestion.isdisplay}>
+												</c-rtmvpc-render-question-template>
 														</template>
 													</template>
-												</lightning-accordion-section>
-											</template>
-										</div>
-										<div class="slds-m-top_large" style="width: 30%; height: 300px;" data-id="caddisc">
-											<div class="cad-sec_container_nobdr cad-sec_vcontainer">
-												<div class="cad-top_back_container">
-													<button class="cad_actions" data-id="buttoncaddisc" onclick={handleRightButtonClick}>
-														<i class="las la-chevron-circle-left"></i>
-														<span class="textstyle01"></span>
-													</button>
-												</div>
-												<div class="cad-tophead-details cad-sec_vcontainer1">
-													<div class="slds-grid slds-wrap slds-gutters_small">
 
-														<div class="slds-col slds-size_12-of-12 slds-text-align_center">
-															<h2 class="slds-p-top_medium slds-p-bottom_xx-small" style="font-size: 20px !important;">
-															<strong><b>Reviews/ Comments</b></strong>
-															</h2>
-														</div>
-
-													</div>
-												</div>
-												<div class="cad-sec_vcontainer2bdr">
-													<div class="slds-p-horizontal_small slds-scrollable_y">
-														<!-- <div class="slds-p-horizontal_small slds-scrollable_y" style="scroll-top: 100%;"> -->
-														<template if:true={Conversation_History__c}>
-															<template if:true={Conversation_History__c.chatHistory}>
-																<template for:each={Conversation_History__c.chatHistory}
-																	for:item="chatItem">
-																	<div key={chatItem}
-																		class="slds-p-around_small slds-m-bottom_small slds-border_bottom slds-is-relative">
-																		<div class="slds-text-align_right">
-																			<div class="cad-approved">
-																				{chatItem.recipient}</div>
-
-																		</div>
-																		<h3>{chatItem.subject}</h3>
-																		<div
-																			class="slds-text-align_right cad-datentime">
-																			{chatItem.date}
-																		</div>&nbsp;
-																	</div>
-																</template>
-															</template>
-															<template if:false={Conversation_History__c.chatHistory}>
-																<div
-																	style="width: 100%; height: 100%; display:flex; justify-content: center; align-items: center; padding-top: 50px">
-																	<span>No Conversation History</span>
-																</div>
-															</template>
-														</template>
-														<template if:false={Conversation_History__c}>
-															<div
-																style="width: 100%; height: 100%; display:flex; justify-content: center; align-items: center; padding-top: 50px">
-																<span>No Conversation History</span>
-															</div>
-														</template>
-													</div>
-												</div>
-												<div class="cad-sec_vcontainer3 slds-border_top slds-p-around_small">
-													<lightning-textarea placeholder="Type your response here..."
-														variant="label-hidden" onchange={chatChangeHandler}>
-													</lightning-textarea>
-													<lightning-button label="Send" onclick={sendButtonHandler}>
-													</lightning-button>
-												</div>
-											</div>
-										</div>
+												</template> -->
+											</lightning-accordion-section>
+										</template>
 									</div>
-									<!-- <div class="cad-cel cad-w300  cad-disc cad-pl8" data-id="caddisc">
-										<div class="cad-sec_container_nobdr cad-sec_vcontainer">
-											<div class="cad-top_back_container">
-												<button class="cad_actions" data-id="buttoncaddisc" onclick={handleRightButtonClick}>
-														<i class="las la-chevron-circle-left"></i>
-														<span class="textstyle01"></span>
-													</button>
-											</div>
-											<div class="cad-tophead-details cad-sec_vcontainer1">
-												<div class="slds-grid slds-wrap slds-gutters_small">
-
-													<div class="slds-col slds-size_12-of-12 slds-text-align_center">
-														<h4 class="slds-p-top_x-small slds-p-bottom_xx-small">
-															Selected Question Current Status
-														</h4>
-														<div class="">
-															<div class="cad-approved">Approved</div>
-														</div>
-													</div>
-
-												</div>
-											</div>
-											<div class="cad-sec_vcontainer2bdr">
-												<div class="slds-p-horizontal_small slds-scrollable_y">
-													<div
-														class="slds-p-around_small slds-m-bottom_small slds-border_bottom slds-is-relative">
-														<div class="slds-text-align_right">
-															<div class="cad-approved">Approved</div>
-															<div class="slds-text-align_right cad-datentime">
-																05/05/2023</div>&nbsp;
-														</div>
-														<h3>Perform Quarterly Business Review</h3>
-														<div>Perform Quarterly Business Review</div>
-													</div>
-												</div>
-											</div>
-											<div class="cad-sec_vcontainer3 slds-border_top slds-p-around_small">
-												<lightning-textarea placeholder="Type your response here..."
-													variant="label-hidden">
-												</lightning-textarea>
-												<lightning-button label="Send" onclick={handleRightButtonClick}>
-												</lightning-button>
-											</div>
-										</div>
-									</div> -->
-								</template>
+								</div>
 							</lightning-accordion>
 
 							<template if:true={isSubmitted}>
@@ -846,7 +563,7 @@
 				<span>SUBMITTED DATE: &nbsp;&nbsp;<b>{supplierAssCreatedDate}</b>
 				</span>
 			</div>
-		</lightning-card>
+		</div>
 
 
 
@@ -855,5 +572,8 @@
 			<c-tabular-report-questionnaire show-next-button="true" assessment={assessment} ongoto={handlegotoQuestion}>
 			</c-tabular-report-questionnaire>
 		</template> -->
+
+
 	</div>
+
 </template>

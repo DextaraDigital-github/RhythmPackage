@@ -1,98 +1,75 @@
 <template>
-    <div class="cad-sec_container_nobdr cad-sec_vcontainer">
-        <!-- <div class="cad-top_back_container">
-            <button class="cad_actions" data-id="buttoncaddisc" onclick={handleRightButtonClick}>
-                <i class="las la-chevron-circle-left"></i>
-                <span class="textstyle01"></span>
-            </button>
-        </div> -->
-        <div class="cad-tophead-details cad-sec_vcontainer1">
-            <div class="slds-grid slds-wrap slds-gutters_small">
-                <button class="cad_actions slds-float_right slds-is-absolute" style="right:0px;" data-id="buttoncaddisc" onclick={handleRightButtonClick}>
-                    <i class="las la-chevron-circle-right"></i>
-                    <span class="textstyle01"></span>
-                </button>
-                <div class="slds-col slds-size_12-of-12 slds-text-align_center">
-                    <h4 class="slds-p-top_x-small slds-p-bottom_xx-small">
-                        Selected Question Current Status
-                    </h4>
-                    <div class="">
-                        <div class="cad-approved">Approved</div>
-                    </div>
-                </div>
 
-            </div>
-        </div>
-    
-    <div class="cad-tophead-details cad-sec_vcontainer1a">
-        <div class="slds-text-align_center slds-p-vertical_x-small">
-            <h4> Review & Comments History</h4>
-        </div>
-    </div>
-    <div class="cad-sec_vcontainer2bdr">
-        <div class="slds-scrollable_y">
 
-            <div class="cad-ad-default"> <!-- classes: cad-ad-approved, cad-ad-rejected, cad-ad-submited, cad-ad-default -->
-                <div class="cad-ad-customer"> <!-- classes: cad-ad-customer,cad-ad-supplier -->
-                    <div class="cad-ad-base">
-                        <div class="cad-ad-datentime">05/12/2023 10:00 AM EST</div>
-                        <div class="cad-ad-message">ESG Assessment Received</div>
-                        <!-- <div class="cad-ad-sender">- Mel Gibbson</div> -->
-                    </div>
-                </div>
-            </div>
-            
+	<!-- to show apply or remove class "cadshowright" -->
+	<div class="cad-sec_container_nobdr cad-sec_vcontainer">
+		<!-- <div class="cad-top_back_container">
+								<button class="cad_actions" data-id="buttoncaddisc" onclick={handleRightButtonClick}>
+									<i class="las la-chevron-circle-left"></i>
+									<span class="textstyle01"></span>
+								</button>
+							</div> -->
+		<div class="cad-tophead-details cad-sec_vcontainer1">
+			<div class="slds-grid slds-wrap slds-gutters_small">
+				<button class="cad_actions slds-float_right slds-is-absolute" style="right:0px;" data-id="buttoncaddisc" >
+										<i class="las la-chevron-circle-right"></i>
+										<span class="textstyle01"></span>
+									</button>
+				<div class="slds-col slds-size_12-of-12 slds-text-align_center">
+					<h4 class="slds-p-top_x-small slds-p-bottom_xx-small">
+						Selected Question Current Status
+					</h4>
+					<div class="">
+						<div class="cad-approved">Approved</div>
+					</div>
+				</div>
 
-            <div class="cad-ad-submited"> <!-- classes: cad-ad-approved, cad-ad-rejected, cad-ad-submited, cad-ad-default -->
-                <div class="cad-ad-supplier"> <!-- classes: cad-ad-customer,cad-ad-supplier -->
-                    <div class="cad-ad-base">
-                        <div class="cad-ad-datentime">05/12/2023 10:00 AM EST</div>
-                        <div class="cad-ad-message">Assessment Submitted</div>
-                        <div class="cad-ad-sender">- Max Mullar</div>
-                    </div>
-                </div>
-            </div>
+			</div>
+		</div>
+		<div class="cad-tophead-details cad-sec_vcontainer1a">
+			<div class="slds-text-align_center slds-p-vertical_x-small">
+				<h4> Review & Comments History</h4>
+			</div>
+		</div>
+		<div class="cad-sec_vcontainer2bdr">
+			<div class="slds-scrollable_y">
 
-            <div class="cad-ad-rejected"> <!-- classes: cad-ad-approved, cad-ad-rejected, cad-ad-submited, cad-ad-default -->
-                <div class="cad-ad-customer"> <!-- classes: cad-ad-customer,cad-ad-supplier -->
-                    <div class="cad-ad-base">
-                        <div class="cad-ad-datentime">05/12/2023 10:00 AM EST</div>
-                        <div class="cad-ad-message">It is mandatory to have Air emissions
-                            management system. Will you be able to
-                            have it in a week?<br/>
-                            Without it we may not be able to proceed
-                            further.</div>
-                        <div class="cad-ad-sender">- Mel Gibbson</div>
-                    </div>
-                </div>
-            </div>
+                <template if:true={responseList}>
+					<template for:each={responseList} for:item="chatItem">
 
-            <div class="cad-ad-submited"> <!-- classes: cad-ad-approved, cad-ad-rejected, cad-ad-submited, cad-ad-default -->
-                <div class="cad-ad-supplier"> <!-- classes: cad-ad-customer,cad-ad-supplier -->
-                    <div class="cad-ad-base">
-                        <div class="cad-ad-datentime">05/12/2023 10:00 AM EST</div>
-                        <div class="cad-ad-message">Thanks for your response, we will install it in a week, and update the status.</div>
-                        <div class="cad-ad-sender">- Max Mullar</div>
-                    </div>
-                </div>
-            </div>
+                        <div class="cad-ad-default" key={chatItem}>
+                            <!-- classes: cad-ad-approved, cad-ad-rejected, cad-ad-submited, cad-ad-default -->
+                            <div class={chatItem.recipientType} key={chatItem}>
+                                <!-- classes: cad-ad-customer,cad-ad-supplier -->
+                                <div class="cad-ad-base" key={chatItem}>
+                                    <div key={chatItem} class="cad-ad-datentime">{chatItem.createdTime}</div>
+                                    <div key={chatItem} class="cad-ad-message">{chatItem.Text}</div>
+                                    <div key={chatItem} class="cad-ad-sender">- {chatItem.Name}</div>
+                                </div>
+                            </div>
+                        </div>
 
-            <div class="cad-ad-approved"> <!-- classes: cad-ad-approved, cad-ad-rejected, cad-ad-submited, cad-ad-default -->
-                <div class="cad-ad-customer"> <!-- classes: cad-ad-customer,cad-ad-supplier -->
-                    <div class="cad-ad-base">
-                        <div class="cad-ad-datentime">05/12/2023 10:00 AM EST</div>
-                        <div class="cad-ad-message">ESG Assessment Approved</div>
-                        <div class="cad-ad-sender">- Mel Gibbson</div>
-                    </div>
-                </div>
-            </div>
-    
-        </div>
-    </div>
-    <div class="cad-sec_vcontainer3 slds-border_top slds-p-around_small">
-        <lightning-textarea placeholder="Type your response here..." variant="label-hidden">
-        </lightning-textarea>
-        <lightning-button label="Send" onclick={handleRightButtonClick}></lightning-button>
-    </div>
-    </div>
+                    </template>
+				</template>
+
+
+			</div>
+		</div>
+		<div class="cad-sec_vcontainer3 slds-border_top slds-p-around_small">
+			<lightning-textarea placeholder="Type your response here..." value={newChat} variant="label-hidden"
+				onchange={chatChangeHandler}>
+			</lightning-textarea>
+			<lightning-button label="Send" onclick={handleRightButtonClick}></lightning-button>
+		</div>
+	</div>
+
+
+
+
+
+
+
+
+
+
 </template>
