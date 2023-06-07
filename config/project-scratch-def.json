@@ -1,13 +1,29 @@
 {
-  "orgName": "Demo company",
+  "orgName": "my company",
   "edition": "Developer",
-  "features": ["EnableSetPasswordInApi"],
+  "features": ["EnableSetPasswordInApi","Communities"],
+  "language": "en_US",
+  
   "settings": {
     "lightningExperienceSettings": {
       "enableS1DesktopEnabled": true
     },
     "mobileSettings": {
       "enableS1EncryptedStoragePref2": false
-    }
+    },
+    "communitiesSettings": {
+      "enableNetworksEnabled": true
+    },
+    "experienceBundleSettings": {
+      "enableExperienceBundleMetadata": true
+    },
+    "accountSettings": {
+      "enableRelateContactToMultipleAccounts": true,
+      "enableAccountTeams": true
+  },
+    "chatterSettings": {
+    "enableChatter": true
+  }
   }
 }
+
