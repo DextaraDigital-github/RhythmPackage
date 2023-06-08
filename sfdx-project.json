@@ -6,7 +6,8 @@
       "package": "RhythmTest",
       "versionName": "ver 0.1",
       "versionNumber": "0.1.0.0",
-      "versionDescription": ""
+      "versionDescription": "",
+      "definitionFile": "config/project-scratch-def.json"
     }
   ],
   "name": "RythmProject",
