@@ -187,7 +187,7 @@ public class AssessmentController {
              update responseRecords;
 
     }
-     @RemoteAction
+     @AuraEnabled
     public static void errorLogRecord(string componentName,string methodName,string className,string errorData)
     {
         System.debug('hhhh');

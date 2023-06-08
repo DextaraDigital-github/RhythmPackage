@@ -4,6 +4,15 @@
     <deleteConstraint>SetNull</deleteConstraint>
     <externalId>false</externalId>
     <label>Root Section</label>
+    <lookupFilter>
+        <active>true</active>
+        <filterItems>
+            <field>Section__c.Assessment_Template__c</field>
+            <operation>equals</operation>
+            <valueField>$Source.Assessment_Template__c</valueField>
+        </filterItems>
+        <isOptional>false</isOptional>
+    </lookupFilter>
     <referenceTo>Section__c</referenceTo>
     <relationshipLabel>Sections (Root Section)</relationshipLabel>
     <relationshipName>Sections1</relationshipName>

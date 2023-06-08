@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
-    <fullName>Parent_Section__c</fullName>
+    <fullName>Section__c</fullName>
     <deleteConstraint>SetNull</deleteConstraint>
     <externalId>false</externalId>
-    <label>Parent Section</label>
+    <label>Section</label>
     <lookupFilter>
         <active>true</active>
         <filterItems>
@@ -14,8 +14,8 @@
         <isOptional>false</isOptional>
     </lookupFilter>
     <referenceTo>Section__c</referenceTo>
-    <relationshipLabel>Sections</relationshipLabel>
-    <relationshipName>Sections</relationshipName>
+    <relationshipLabel>Questions</relationshipLabel>
+    <relationshipName>Questions</relationshipName>
     <required>false</required>
     <trackHistory>false</trackHistory>
     <trackTrending>false</trackTrending>

@@ -155,9 +155,10 @@
     <externalSharingModel>ReadWrite</externalSharingModel>
     <label>Question</label>
     <nameField>
+        <displayFormat>Q-{0000}</displayFormat>
         <label>Question Name</label>
         <trackHistory>false</trackHistory>
-        <type>Text</type>
+        <type>AutoNumber</type>
     </nameField>
     <pluralLabel>Questions</pluralLabel>
     <searchLayouts></searchLayouts>
