@@ -108,6 +108,14 @@ jobs:
       - name: 'Promote package version'
         run: sfdx force:package:version:promote --package ${{ steps.createPackageVersion.outputs.packageVersionId }} -n
         
+      # Install Plugin to install sfdx scanner
+      - name: 'SFDX scanner Install'
+        run: sfdx plugins:install @salesforce/sfdx-scanner
+        
+      # Generate Violation Report
+      - name: 'Scan for Violations and Generate report'
+        run: sfdx scanner:run:dfa --target "./**/*.cls" --projectdir "./"
+        
       # Create PR for new package version
       - name: 'Create PR for new package version'
         id: create-pr
