@@ -107,6 +107,14 @@ jobs:
         uses: maddox/actions/sleep@master
         with:
             args: 360
+            
+      # Install Plugin to install sfdx scanner
+      - name: 'SFDX scanner Install'
+        run: sfdx plugins:install @salesforce/sfdx-scanner
+        
+      # Generate Violation Report
+      - name: 'Scan for Violations and Generate report'
+        run: sfdx scanner:run:dfa --target "./**/*.cls" --projectdir "./"
 
       # Promote package version
       - name: 'Promote package version'
