@@ -8,6 +8,7 @@ import getRelatedTasks from '@salesforce/apex/rtmvpcRelatedListsController.getRe
 import getQuestionsList from '@salesforce/apex/AssessmentController.getQuestionsList'; //To fetch all the Questions from the Assessment_Template__c Id from the Supplier_Assessment__c record
 import getSupplierResponseList from '@salesforce/apex/AssessmentController.getSupplierResponseList'; //To fetch all the Supplier_Response__c records related to the Supplier_Assessment__c record
 import getSupplierAssessmentList from '@salesforce/apex/AssessmentController.getSupplierAssessmentList'; //To fetch the Assessment_Template__c Id from the Supplier_Assessment__c record
+//import SectionList from '@salesforce/apex/AssessmentController.updateSectionSequence';//To fetch the updated sequence of sections
 import deleteRecords from '@salesforce/apex/rtmvpcRelatedListsController.deleteRecords';
 // import getQuestionsCount from '@salesforce/apex/rtmvpcRelatedListsController.getQuestionsCount'; //Commented By Kushal
 // import getResponsesCount from '@salesforce/apex/rtmvpcRelatedListsController.getResponsesCount'; //Commented By Kushal
@@ -124,7 +125,7 @@ export default class CustomTablePlatform extends LightningElement {
     })
     getRelatedListRecordsList({ error, data }) {
         if (data) {
-            console.log('data', data);
+            console.log('data ', JSON.stringify(data));
             if (typeof this.relatedListRecords != undefined) {
                 this.relatedListRecords = JSON.parse(JSON.stringify(data.records));
                 if (this.ischilddetailpage === true) {
@@ -183,7 +184,19 @@ export default class CustomTablePlatform extends LightningElement {
             console.log('Wire Related List data', JSON.stringify(error));
         }
     }
+       
+        handlerecordclick(event){
+           let sectionrec= event.target.dataset.test;
+           console.log("datasettest "+sectionrec);
+            const questionevent = new CustomEvent("fetchquestions", {
+            detail: sectionrec
+            
+        });
 
+        // Dispatches the event.
+        this.dispatchEvent(questionevent);
+        return this.sectionrec;
+        }
     handlePageNumberChange(event) {
         if (!!event) {
             this.selectedPageNumber = event.detail.value;
@@ -1435,6 +1448,7 @@ export default class CustomTablePlatform extends LightningElement {
     }
      Drop(event) {
         event.stopPropagation()
+        
         const Element = this.template.querySelectorAll('.tr')
         const DragValName = this.template.querySelector('.drag').dataset.id;
         const DropValName = event.currentTarget.dataset.id;
@@ -1466,9 +1480,37 @@ export default class CustomTablePlatform extends LightningElement {
 
         Element.forEach(element => {
             element.classList.remove('drag')
-        })
-        return this.recList
+        });
+
+        //this.dragwrap(this.recList)
+        //console.log('this.dragwrap(this.recList)'+this.dragwrap(this.recList));
+        const selectedEvent = new CustomEvent("updatesections", {
+            detail: this.recList
+        });
+
+        // Dispatches the event.
+        this.dispatchEvent(selectedEvent);
+        return this.recList;
+    
      }
+
+     /*dragwrap(seclist){
+         let responselist = [];
+         for(var i = 0;i<seclist.length;i++){
+              var response={'sobjectType': 'Rythm__Section__c'};
+              response.Id=seclist[i].Id;
+              response.Rythm__Section_Sequence_Number__c=i+1;
+                responselist.push(response);
+            
+         }
+         getSectionList({secList:responselist}).then(result => {
+            console.log('sucessfully created Response result==>' + result);})
+            .catch(error => {
+            console.log('Error' + error);});
+            return responselist;
+     }*/
+
+
 
     //Column Resize: End
 }

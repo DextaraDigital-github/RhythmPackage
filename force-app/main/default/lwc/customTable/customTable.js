@@ -408,8 +408,8 @@ export default class CustomTable extends LightningElement {
                                 recJson.isHtml = true;
                                 recJson.classList = relatedListRecords[i].id + colList[j].fieldName + 'ContainsHtmlMarkUp';
                             }
-                            if (colList[j].fieldName === 'Assesment_Status__c') {
-                                if (relatedListRecords[i].fields['Assesment_Status__c'].value === 'Submitted') {
+                            if (colList[j].fieldName === 'Status__c') {
+                                if (relatedListRecords[i].fields['Status__c'].value === 'Submitted') {
                                     recJson.surveySymbol = 'utility:lock';
                                 }
                                 else {
@@ -443,7 +443,7 @@ export default class CustomTable extends LightningElement {
                     recDetails.rowClick = 'takeSurveyHandler';
                     recDetails.viewButton = false;
                     recDetails.takeSurvey = true;
-                    if (relatedListRecords[i].fields['Rythm__Assesment_Status__c'].value === 'Submitted') {
+                    if (relatedListRecords[i].fields['Rythm__Status__c'].value === 'Submitted') {
                         recDetails.surveyLabel = 'View Survey';
                         recDetails.surveySymbol = 'utility:lock';
                     }
@@ -1265,4 +1265,128 @@ export default class CustomTable extends LightningElement {
         // this.dispatchEvent(gotoParentTabset);
         // this.navListHandler.pop();
     }
+    //Column Resize: Start
+
+    columnResizeDetails = {
+        "initialPosition":0,
+        "lastPosition":0,
+        "fieldName":'',
+        "columnHeader":null,
+        "resizeHandleInitPosition":0,
+        "columnResizeHandle":null
+    };
+
+    handleResizeMouseDown(event)
+    {
+        this.clearColumnResizeDetails();
+        //console.log('handleResizeMouseDown -- ',event.currentTarget.dataset.resizefield);
+        
+        this.columnResizeDetails.initialPosition = event.clientX;
+        this.columnResizeDetails.resizeHandleInitPosition = event.clientX;
+        this.columnResizeDetails.fieldName = event.currentTarget.dataset.resizefield;
+        //console.log('this.columnResizeDetails -- ',this.columnResizeDetails);
+
+        let columnHeader = this.template.querySelectorAll('[data-columnheader="'+this.columnResizeDetails.fieldName+'"]');
+        let columnresizeHandle = this.template.querySelectorAll('[data-resizefield="'+this.columnResizeDetails.fieldName+'"]');
+        //let columnresizeHandle =event.currentTarget;
+
+        if(!!columnHeader && columnHeader.length > 0 && !!columnresizeHandle && columnresizeHandle.length > 0)
+        {
+            let cResizeDetails = this.columnResizeDetails;
+            //window.isResizingProgress = true;
+            cResizeDetails.columnHeader = columnHeader[0];
+            cResizeDetails.columnResizeHandle = columnresizeHandle[0];
+            //cResizeDetails.columnResizeHandle = columnresizeHandle;
+
+            let handleResizeMouseMoveHandler1 = this.handleResizeMouseMove;
+            let resizeMouseMoveHandler = function(event1)
+            {
+                //console.log('resizeMouseMoveHandler event1-- ',event1);
+                handleResizeMouseMoveHandler1(event1, cResizeDetails);
+            };
+
+            window.addEventListener('mouseup', (muEvent) => {
+                                                        this.handleColumnResizeMouseUp(muEvent, cResizeDetails, resizeMouseMoveHandler);
+                                                        },{ once: true });
+
+            //window.addEventListener('mousemove', resizeMouseMoveHandler,{ once: false });
+        }
+        //window.addEventListener('mousemove', this.elementDrag);
+    }
+
+    handleResizeMouseMove(mmEvent, mmResizeDetails) {
+        //console.log('handleResizeMouseMove');
+        // console.log('handleResizeMouseMove mmResizeDetails -- ',mmResizeDetails);
+       // console.log('window.isResizingProgress -- ',window.isResizingProgress);
+        //if(!!window.isResizingProgress && window.isResizingProgress)
+        //{
+            //event = event || window.event;
+            //event.preventDefault();
+            // calculate the new cursor position:
+
+            //console.log('mmResizeDetails.resizeHandleInitPosition -- ',mmResizeDetails.resizeHandleInitPosition);
+            //console.log('mmEvent.clientX -- ',mmEvent.clientX);
+            //console.log('mmResizeDetails.columnResizeHandle -- ', mmResizeDetails.columnResizeHandle);
+            let pos1 = mmResizeDetails.resizeHandleInitPosition  - mmEvent.clientX;
+            console.log('pos1 -- ', pos1);
+            mmResizeDetails.resizeHandleInitPosition = mmEvent.clientX;
+            let mmResizeHandle = mmResizeDetails.columnResizeHandle;
+            // set the element's new position:
+            mmResizeHandle.style.left = (mmResizeHandle.offsetLeft - pos1) + "px";
+
+             console.log('mmResizeHandle.offsetLeft -- ', mmResizeHandle.offsetLeft);
+
+            // console.log('-------------------------*********************----------------------------------');
+        //}
+  }
+
+    handleColumnResizeMouseUp(muEvent, muResizeDetails, handleResizeMouseMoveHandler) {
+        // calculate the new cursor position:
+        // pos1 = pos3 - e.clientX;
+        // pos3 = e.clientX;
+        //  pos4 = e.clientY;
+        window.isResizingProgress = false;
+        muResizeDetails.lastPosition = muEvent.clientX;
+        console.log('muResizeDetails -- ',muResizeDetails);
+        let differencePosition = muResizeDetails.lastPosition - muResizeDetails.initialPosition;
+
+        console.log('differencePosition -- ',differencePosition);
+        console.log('muResizeDetails.columnHeader.offsetWidth -- ',muResizeDetails.columnHeader.offsetWidth);
+        
+        let colWidth = muResizeDetails.columnHeader.offsetWidth + differencePosition;
+        muResizeDetails.columnHeader.setAttribute("style","width:"+colWidth+"px");
+
+        //window.removeEventListener('mousemove',handleResizeMouseMoveHandler);
+        //muResizeDetails.columnHeader.style.width= parseInt(muResizeDetails.columnHeader.style.width)+ differencePosition + 'px';
+        /* stop moving when mouse button is released:*/
+        //window.removeEventListener('mouseup', this.handleColumnResizeMouseUp);
+    }
+
+    clearColumnResizeDetails()
+    {
+        this.columnResizeDetails.initialPosition = 0;
+        this.columnResizeDetails.lastPosition = 0;
+        this.columnResizeDetails.fieldName = '';
+        this.columnResizeDetails.columnHeader = null;
+        this.columnResizeDetails.resizeHandleInitPosition = 0;
+        this.columnResizeDetails.columnResizeHandle= null;
+    }
+
+    setAllColumnHeadersWidth()
+    {
+        console.log('setAllColumnHeadersWidth');
+        let columnHeaders = this.template.querySelectorAll('[data-columnheader]');
+
+        if(!!columnHeaders && columnHeaders.length > 0)
+        {
+            for(var i=0;i<columnHeaders.length;i++)
+            {
+                let cWidth = columnHeaders[i].offsetWidth;
+                 console.log('columnHeaders[i].offsetWidth -- ', columnHeaders[i].offsetWidth);
+                columnHeaders[i].setAttribute("style","width:"+cWidth+"px");
+            }
+        }
+    }
+
+    //Column Resize: End
 }
