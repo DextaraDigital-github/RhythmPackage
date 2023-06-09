@@ -1,0 +1,24 @@
+<template>
+    <lightning-quick-action-panel header="Create New Version">
+       
+        <div class="slds-align_absolute-center">
+                <div if:true={isLoaded} class="slds-is-relative">
+                    <lightning-spinner
+                        alternative-text="Loading..." variant="brand">
+                    </lightning-spinner>
+                </div>
+            <p class="slds-text-title_bold">Existing Active Version will be Deactivated.</p>
+        </div>
+        <div slot="footer" class="slds-align_absolute-center">
+            <lightning-button
+                variant="neutral"
+                label="Close" onclick={closeModal}>
+            </lightning-button>
+            <lightning-button
+                variant="brand"
+                label="Confirm & Create" onclick={createNewVersion}
+                class="slds-m-left_x-small">
+            </lightning-button>
+        </div>
+    </lightning-quick-action-panel>
+</template>
