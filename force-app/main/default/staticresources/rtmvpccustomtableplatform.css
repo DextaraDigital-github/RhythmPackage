@@ -172,7 +172,7 @@
 	.dx-duallisthide lightning-dual-listbox .slds-dueling-list .slds-dueling-list__column:nth-child(3),
 	.dx-duallisthide lightning-dual-listbox .slds-dueling-list .slds-dueling-list__column:nth-child(4) { display:none; }
 	
-	div.cdgtitletoolbar { font-size:var(--fs-16); line-height:24px; background:var(--bg-primary-color1); padding:10px 15px 8px 10px; }
+	div.cdgtitletoolbar { font-size:var(--fs-16); line-height:24px; background:#f3f3f3; padding:10px 15px 8px 10px; }
 	div.cdgtitletoolbar h4 .slds-input_faux { border:0px solid transparent; background:transparent; }
 	div.cdgtitletoolbar h4 .slds-combobox__input:focus { box-shadow:none; }
 	div.cdgtitletoolbar h4 .slds-input_faux span { font-size:var(--fs-18); font-weight:var(--fw-600); }
@@ -184,7 +184,9 @@
 	button.cig_actions, button.cad_actions { background:transparent; font-size:var(--fs-18); word-break:keep-all; border:0px solid transparent; }
 	
 	.slds-utility-bar li.slds-utility-bar__item:first-child {display:none;}
-	
+	.cdgWrapper .slds-button { color:#747474!important;}
+	.cdgWrapper .slds-button:hover { color:#0176d3!important;}
+
 	@media screen and (max-width:992px) { 
 		.cdgWrapper { padding-bottom:20px; }
 		.cdgWrapperinner { max-width:calc(100vw - 28px); overflow-x:auto; }

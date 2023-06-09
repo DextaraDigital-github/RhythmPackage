@@ -1,75 +1,31 @@
-<template>
-
-
-	<!-- to show apply or remove class "cadshowright" -->
-	<div class="cad-sec_container_nobdr cad-sec_vcontainer">
-		<!-- <div class="cad-top_back_container">
-								<button class="cad_actions" data-id="buttoncaddisc" onclick={handleRightButtonClick}>
-									<i class="las la-chevron-circle-left"></i>
-									<span class="textstyle01"></span>
-								</button>
-							</div> -->
-		<div class="cad-tophead-details cad-sec_vcontainer1">
-			<div class="slds-grid slds-wrap slds-gutters_small">
-				<button class="cad_actions slds-float_right slds-is-absolute" style="right:0px;" data-id="buttoncaddisc" >
-										<i class="las la-chevron-circle-right"></i>
-										<span class="textstyle01"></span>
-									</button>
-				<div class="slds-col slds-size_12-of-12 slds-text-align_center">
-					<h4 class="slds-p-top_x-small slds-p-bottom_xx-small">
-						Selected Question Current Status
-					</h4>
-					<div class="">
-						<div class="cad-approved">Approved</div>
+<!-- This html is used to display the conversation history between vendor and customer in the converastion box -->
+ <template>
+	<div class="slds-scrollable_y">
+		<template if:true={showResponse}>
+			<template for:each={responseList} for:item="chatItem">
+				<div class="cad-ad-default" key={chatItem}>
+					<!-- classes: cad-ad-approved, cad-ad-rejected, cad-ad-submited, cad-ad-default -->
+					<div class={chatItem.recipientType} key={chatItem}>
+						<!-- classes: cad-ad-customer,cad-ad-supplier -->
+						<div class="cad-ad-base" key={chatItem}>
+							<div key={chatItem} class="cad-ad-datentime">{chatItem.createdTime}</div>
+							<div key={chatItem} class="cad-ad-message">{chatItem.Text}</div>
+							<div key={chatItem} class="cad-ad-sender">- {chatItem.Name}</div>
+						</div>
 					</div>
 				</div>
-
+			</template>
+		</template>
+		<template if:false={showResponse}>
+			<div style="width: 100%; height: 100%; display:flex; justify-content: center; align-items: center">
+				<center>No Conversation History</center>
 			</div>
-		</div>
-		<div class="cad-tophead-details cad-sec_vcontainer1a">
-			<div class="slds-text-align_center slds-p-vertical_x-small">
-				<h4> Review & Comments History</h4>
-			</div>
-		</div>
-		<div class="cad-sec_vcontainer2bdr">
-			<div class="slds-scrollable_y">
-
-                <template if:true={responseList}>
-					<template for:each={responseList} for:item="chatItem">
-
-                        <div class="cad-ad-default" key={chatItem}>
-                            <!-- classes: cad-ad-approved, cad-ad-rejected, cad-ad-submited, cad-ad-default -->
-                            <div class={chatItem.recipientType} key={chatItem}>
-                                <!-- classes: cad-ad-customer,cad-ad-supplier -->
-                                <div class="cad-ad-base" key={chatItem}>
-                                    <div key={chatItem} class="cad-ad-datentime">{chatItem.createdTime}</div>
-                                    <div key={chatItem} class="cad-ad-message">{chatItem.Text}</div>
-                                    <div key={chatItem} class="cad-ad-sender">- {chatItem.Name}</div>
-                                </div>
-                            </div>
-                        </div>
-
-                    </template>
-				</template>
-
-
-			</div>
-		</div>
-		<div class="cad-sec_vcontainer3 slds-border_top slds-p-around_small">
-			<lightning-textarea placeholder="Type your response here..." value={newChat} variant="label-hidden"
-				onchange={chatChangeHandler}>
-			</lightning-textarea>
-			<lightning-button label="Send" onclick={handleRightButtonClick}></lightning-button>
-		</div>
+		</template>
 	</div>
-
-
-
-
-
-
-
-
-
-
+	<div class="cad-sec_vcontainer3 slds-border_top slds-p-around_small">
+		<lightning-textarea placeholder="Type your response here..." value={newChat} variant="label-hidden"
+			onchange={chatChangeHandler}>
+		</lightning-textarea>
+		<lightning-button label="Send" onclick={handleRightButtonClick}></lightning-button>
+	</div>
 </template>

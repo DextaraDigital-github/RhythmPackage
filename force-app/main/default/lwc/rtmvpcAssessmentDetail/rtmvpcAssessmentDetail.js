@@ -12,12 +12,14 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
     @track showSections = true;
     @track showFlag = false;
     @track showChat;
-    
+    @track showData;
+    /*handleLeftButtonClick used to display records on page1*/
     handleLeftButtonClick(event) {
 
         var cadtype = this.template.querySelector('[data-id="cadtype"]');
         cadtype.classList.toggle('cadshowleft');
     }
+    /*handleLeftButtonClick used to display records on next page*/
     handleRightButtonClick(event) {
         var cadtype = this.template.querySelector('[data-id="caddisc"]');
         cadtype.classList.toggle('cadshowright');
@@ -31,20 +33,24 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
             console.log('showQuestionnaire', this.sectionid);
             this.showSections = false;
             this.showFlag=false;
-            setTimeout(()=>{
-                 console.log(" this.template.querySelectorAll('c-Questionnaire')", this.template.querySelectorAll('c-Questionnaire'));
-                this.template.querySelectorAll('c-Questionnaire')[0].getSectionId(this.sectionid);
+            // setTimeout(()=>{
+            //      console.log(" this.template.querySelectorAll('c-Questionnaire')", this.template.querySelectorAll('c-Questionnaire'));
+            //     this.template.querySelectorAll('c-Questionnaire')[0].getSectionId(this.sectionid);
                
-                console.log(this.sectionid);
-            },100);          
+            //     console.log(this.sectionid);
+            // },100);          
         }
     }
-    
-    handleChat(event)
+    /* This chatHistory is used to catch the value from parent and pass it to the child component(AssessmentChatter)*/
+    chatHistory(event)
     {
-        console.log('handleChat');
         this.showChat=event.detail;
+        
+        this.showData=this.showChat.openChat;
     }
-    
-    
+
+    showsummaryHandler(event)
+    {
+        this.showSections=true;
+    }
 }

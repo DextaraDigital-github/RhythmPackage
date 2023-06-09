@@ -155,9 +155,10 @@
     <externalSharingModel>Private</externalSharingModel>
     <label>Response</label>
     <nameField>
+        <displayFormat>R-{000000}</displayFormat>
         <label>Response Name</label>
         <trackHistory>false</trackHistory>
-        <type>Text</type>
+        <type>AutoNumber</type>
     </nameField>
     <pluralLabel>Responses</pluralLabel>
     <searchLayouts></searchLayouts>

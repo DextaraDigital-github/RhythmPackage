@@ -1,3 +1,9 @@
+/* Component Name   : TabularReportQuestionnaire
+* Developer         : Sai Koushik Nimmaturi and Reethika Velpula           
+* Created Date      : 
+* Description       : This component is used for loading the Sections template based on the sections
+* Last Modified Date: 
+*/
 import { LightningElement, api, track, wire } from 'lwc';
 import getQuestionsList from '@salesforce/apex/AssessmentController.getQuestionsList';
 import getSupplierResponseList from '@salesforce/apex/AssessmentController.getSupplierResponseList';
@@ -15,13 +21,16 @@ export default class TabularReportQuestionnaire extends NavigationMixin(Lightnin
         this.showNextButton = JSON.parse(this.showNextButton);
         var assessmentTemplateId;
         console.log('this.assessment',this.assessment);
+        /*getSupplierAssessmentList is used to get all the assessment related to particular account */
         getSupplierAssessmentList({ assessmentId: this.assessment }).then(result => {
             console.log('result',result);
-            assessmentTemplateId = result[0].Rythm__Assessment_Template__c;
+            assessmentTemplateId = result[0].Rythm__Template__c;
             console.log('assessmentTemplateId',assessmentTemplateId);
+            /*getQuestionsList is used to get all the Questions related to particular sections related to particular assessment */
             getQuestionsList({ templateId: assessmentTemplateId }).then(result => {
                 var resultMap = result;
                 console.log('getQuestionsList',result);
+                /*getQuestionsList is used to get all the Responses for a question related to particular sections and particular assessment */
                 getSupplierResponseList({ assessmentId: this.assessment }).then(result => {
                     console.log('result',result);
                     result.forEach(qres => {
@@ -43,7 +52,7 @@ export default class TabularReportQuestionnaire extends NavigationMixin(Lightnin
             console.log('getSupplierAssessmentList Error' + error);
         })
     }
-
+    /* constructWrapper is used to construct the wrapper for each and every sections based on assessment*/
     constructWrapper(questionResp, savedResp) {
         var questionMap = new Map();
         var sectionMap = [];
@@ -126,6 +135,7 @@ export default class TabularReportQuestionnaire extends NavigationMixin(Lightnin
         return sectionMap;
 
     }
+    /* handleclick methos is used to get the sectionId and send it to the parent component(Assessment Detail)*/
     handleclick(event) {
         var selectedevent = new CustomEvent('sectionclick', {
             detail: { sectionId : event.currentTarget.dataset.id }

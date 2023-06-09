@@ -2,187 +2,1486 @@
 	<header class="rtmvpc-pgheader">
 		<div class="rtmvpc-pghtitle">
 			<div class="rtmvpc-pgstitle">Welcome to the Supplier Portal </div>
-			<h1 class="rtmvpc-pgmtitle capitalize">Inbox</h1>
+			<h1 class="rtmvpc-pgmtitle capitalize">Inbox (Beta)</h1>
+			<!-- Comment by Kushal - Start -->
+			<!-- <h1 class="rtmvpc-pgmtitle capitalize">Inbox</h1> -->
+			<!-- Comment by Kushal - End -->
 		</div>
 	</header>
+
 	<div class="cib-cardbase slds-p-around_small">
 		<div class="cib-tbl">
 			<div class="cib-row">
 				<div class="cib-cel cib-w230 cib-type" data-id="cibtype" aura:id="cibtype">
 					<div class="cib-sec_container">
 						<div class="cib-sec_header">
-							<button class="cig_actions" onclick={handleLeftButtonClick}><i class="las la-chevron-circle-left"></i></button><span>CATEGORY</span>
+							<button class="cig_actions" onclick={handleLeftButtonClick}><i class="las la-chevron-circle-left"></i></button><span>CATEGORIES</span>
 						</div>
 						<div class="cib-sec_bodyfull1">
-							<div class="cib-sec_vcontainer2_1">
-								
-									<lightning-vertical-navigation selected-item="reports_recent">
-										<!-- <lightning-vertical-navigation-section label=""> -->
-										<ul class="cib-listul">
-
-											<template for:each={parentListRecords} for:item="item">
-											<li class="cib-mtype items" key={item.Id} data-id={item.Id} onclick={showDataHandler}>{item.Name}
-												<div class="cib-badge">
-														{item.Count}
-													</div>
-											</li>
-											
-											</template>
-											<!-- Commented by Mani -->
-											<!-- 
-												<li class="cib-mtype active items" data-id="Task" onclick={showDataHandler}>
-													<h4>Tasks</h4>
-													<div class="cib-badge">
-														3 / 15
-													</div>
-												</li>
-												<li class="cib-mtype items" data-id="Alert__c" onclick={showDataHandler}>
-													<h4>Alerts</h4>
-													<div class="cib-badge">
-														1 / 10
-													</div>
-												</li>
-												<li class="cib-mtype items" data-id="Incidents__c" onclick={showDataHandler}>
-													<h4>Incidents</h4>
-													<div class="cib-badge">
-														2 / 5
-													</div>
-												</li>
-											 -->
-
-											
-
-											<!-- <li class="cib-mtype items" data-id="Supplier_Inbox_Categ__c"
+							<div class="cib-sec_vcontainer2_2">
+								<lightning-vertical-navigation selected-item="reports_recent">
+									<!-- <lightning-vertical-navigation-section label=""> -->
+									<ul class="cib-listul">
+										<template for:each={relatedListRecords} for:item="rec">
+											<li key={rec.Id} class={rec.classList} data-id={rec.Id}
 												onclick={showDataHandler}>
-												<h4>GENERAL ANNOUNCEMENTS</h4>
-												<div class="cib-badge">2 / 5</div>
+												<h4>{rec.Name}</h4>
+												<div class="cib-badge">{rec.unreadCount}
+													<!-- / {rec.totalCount}-->
+												</div>
 											</li>
-											<li class="cib-mtype items" data-id="Supplier_Inbox_Categ__c"
-												onclick={showDataHandler}>
-												<h4>COMPLIANCE</h4>
-												<div class="cib-badge">1 / 5</div>
-											</li>
-											<li class="cib-mtype items" data-id="Supplier_Inbox_Categ__c"
-												onclick={showDataHandler}>
-												<h4>PROJECTS</h4>
-												<div class="cib-badge">1 / 5</div>
-											</li>
-											<li class="cib-mtype items" data-id="Supplier_Inbox_Categ__c"
-												onclick={showDataHandler}>
-												<h4>ASSESSMENTS</h4>
-												<div class="cib-badge">2 / 5</div>
-											</li>
-											<li class="cib-mtype items" data-id="Supplier_Inbox_Categ__c"
-												onclick={showDataHandler}>
-												<h4>RFPs</h4>
-												<div class="cib-badge">0 / 0</div>
-											</li>
-											<li class="cib-mtype items" data-id="Supplier_Inbox_Categ__c"
-												onclick={showDataHandler}>
-												<h4>CONTRACTS</h4>
-												<div class="cib-badge">0 / 0</div>
-											</li> -->
-										</ul><!-- </lightning-vertical-navigation-section> -->
-									</lightning-vertical-navigation>
-								
+										</template>
+									</ul>
+									<!-- </lightning-vertical-navigation-section> -->
+								</lightning-vertical-navigation>
 							</div>
 						</div>
 					</div>
 				</div>
-				<div class="cib-cel cib- cib-list cib-pl8">
+
+				<div class="cib-cel cib-w300 cib-list cib-pl8">
 					<div class="cib-sec_container">
+						<!-- 
 						<div class="cib-top_menu_container">
 							<div class="slds-float_left">
 								<button class="cig_actions" onclick={handleLeftButtonClick}><i class="las la-bars"></i></button>
 							</div>
 							<div class="slds-float_right">
-								<!-- 
-									<button class="cig_actions " data-id="Task" onclick={showDataHandler}>
-										<i class="las la-tasks"></i>
-									</button> 
-								-->
-								<button class="cig_actions " data-id="Supplier_Inbox_Categ__c" onclick={showDataHandler}>
-									<i class="las la-bell"></i>
-								</button>
-								<button class="cig_actions " data-id="Supplier_Task__c" onclick={showDataHandler}>
-									<i class="las la-exclamation-triangle"></i>
-								</button>
+								<button class="cig_actions " data-id="Task" onclick={showDataHandler}><i class="las la-tasks"></i></button>
+								<button class="cig_actions " data-id="Alert__c" onclick={showDataHandler}><i class="las la-bell"></i></button>
+								<button class="cig_actions " data-id="Incidents__c" onclick={showDataHandler}><i class="las la-exclamation-triangle"></i></button>
+							</div>
+
+						</div> 
+						-->
+
+						<div class="cib-sec_header">
+							<div class="cib-submenuhideshow slds-float_left">
+								<button class="cig_actions" onclick={handleLeftButtonClick}><i class="las la-bars"></i></button>
+							</div>
+							<span>MESSAGES</span>
+							<!-- <div class="cib-submenuhideshow slds-float_right">
+								<button class="cig_actions" onclick={handleRightButtonClick}><i class="las la-bars"></i></button>
+							</div> -->
+							<div class="slds-float_right">
+								<lightning-combobox name="progress" label="Status" variant="label-hidden" value={value}
+									placeholder="Select Progress" options={options} onchange={handleChange}>
+								</lightning-combobox>
 							</div>
 						</div>
+						<div class="cib-serch">
+							<input type="text" placeholder="Search" class="cib-serch-input" onkeyup={searchInputChangeHandler}/>
+						</div>
+							<div class="cib-sec_bodyfull2">
+								<template if:true={spin}>
+									<lightning-spinner alternative-text="Loading" size="medium">
+									</lightning-spinner>
+								</template>
+								<div class="cib-sec_vcontainer2_2">
+									<template if:false={spin}>
+										<template if:true={childRecords}>
+											<ul>
 
+												<template for:each={childRecords} for:item="childRec">
+													<template if:true={dynamicData}>
+														<li key={childRec.Id} class={childRec.classList}
+															data-id={childRec.Id} onclick={openChatHandler}>
+															<div class="cib-tasklist slds-p-around_small">
+																<div class="slds-grid slds-wrap">
+																	<div class="slds-col slds-size_7-of-12">
+																		<h4 title={childRec.Name}>
+																			<div class="slds-truncate">{childRec.Name}
+																			</div>
+																		</h4>
+																	</div>
+																	<div class="slds-col_bump-left cib-statusicons">
+																		<lightning-button-icon
+																			icon-name="utility:archive" variant="bare"
+																			alternative-text="Archive"
+																			class="cib-archive slds-m-left_xx-small"
+																			title="Archive"></lightning-button-icon>
+																		<lightning-button-icon
+																			icon-name="utility:delete" variant="bare"
+																			alternative-text="Delete"
+																			class="cib-delete slds-m-left_xx-small "
+																			title="Delete"></lightning-button-icon>
+																		<lightning-button-icon
+																			icon-name="utility:forward" variant="bare"
+																			alternative-text="Forward"
+																			class="cib-forward cib-dis-ib slds-m-left_xx-small"
+																			title="Forward"></lightning-button-icon>
+																		<lightning-button-icon icon-name="utility:reply"
+																			variant="bare" alternative-text="Reply"
+																			class="cib-reply cib-dis-no slds-m-left_xx-small"
+																			title="Reply"></lightning-button-icon>
+																		<lightning-button-icon
+																			icon-name="utility:priority" variant="bare"
+																			alternative-text="Flag"
+																			class="cib-flag slds-m-left_xx-small"
+																			title="Flag"></lightning-button-icon>
+																		<lightning-button-icon
+																			icon-name="utility:lower_flag"
+																			variant="bare" alternative-text="Flag"
+																			class="cib-archive slds-m-left_xx-small"
+																			title="Flag"></lightning-button-icon>
+																	</div>
+																</div>
+																<div class="slds-grid slds-wrap"
+																	title={childRec.Description__c}>
+																	<div class="slds-col slds-size_12-of-12">
+																		<div class="slds-truncate">
+																			{childRec.Description__c}</div>
+																	</div>
+																</div>
+																<div class="slds-grid slds-wrap">
+																	<div class="slds-col slds-size_7-of-12 cib-sender">
+																		<div class="cib-msgtype slds-truncate">Read only
+																			Notification</div>
+																	</div>
+																	<div class="slds-col_bump-left slds-size_5-of-12">
+																		<div class="cib-datentime">
+																			<div class="slds-truncate">
+																				{childRec.CreatedDate}</div>
+																		</div>
+																	</div>
+																</div>
+															</div>
+														</li>
+													</template>
+												</template>
 
-							<div class="cib-sec_header">
-								<span>LIST OF INCIDENTS</span>
-								<div class="slds-float_right">
-									<lightning-combobox name="progress" label="Status" variant="label-hidden"
-										value={value} placeholder="Select Progress" options={options}
-										onchange={handleChange}>
-									</lightning-combobox>
+												<template if:false={dynamicData}>
+													<li class="cib-current" data-id="cib-button_readonly"
+														onclick={handleTempActive}>
+
+														<div class="cib-tasklist slds-p-around_small">
+															<div class="slds-grid slds-wrap">
+																<div class="slds-col slds-size_7-of-12">
+																	<h4 title="Emergency preparedness notification">
+																		<div class="slds-truncate">Emergency
+																			preparedness
+																			notification</div>
+																	</h4>
+																</div>
+																<div class="slds-col_bump-left cib-statusicons">
+																	<lightning-button-icon icon-name="utility:archive"
+																		variant="bare" alternative-text="Archive"
+																		class="cib-archive slds-m-left_xx-small"
+																		title="Archive"></lightning-button-icon>
+																	<lightning-button-icon icon-name="utility:delete"
+																		variant="bare" alternative-text="Delete"
+																		class="cib-delete slds-m-left_xx-small "
+																		title="Delete"></lightning-button-icon>
+																	<lightning-button-icon icon-name="utility:forward"
+																		variant="bare" alternative-text="Forward"
+																		class="cib-forward cib-dis-ib slds-m-left_xx-small"
+																		title="Forward"></lightning-button-icon>
+																	<lightning-button-icon icon-name="utility:reply"
+																		variant="bare" alternative-text="Reply"
+																		class="cib-reply cib-dis-no slds-m-left_xx-small"
+																		title="Reply"></lightning-button-icon>
+																	<lightning-button-icon icon-name="utility:priority"
+																		variant="bare" alternative-text="Flag"
+																		class="cib-flag slds-m-left_xx-small"
+																		title="Flag">
+																	</lightning-button-icon>
+																	<!-- <lightning-button-icon icon-name="utility:lower_flag" variant="bare" alternative-text="Flag" class="cib-archive slds-m-left_xx-small" title="Flag"></lightning-button-icon> -->
+																</div>
+															</div>
+															<div class="slds-grid slds-wrap"
+																title="Is your business hurricane ready? Download our checklist to secure your operations from deadly impacts of hurricane. Stay safe and stay clear">
+																<div class="slds-col slds-size_12-of-12">
+																	<div class="slds-truncate">Is your business
+																		hurricane
+																		ready? Download our checklist to secure your
+																		operations from deadly impacts of hurricane.
+																		Stay
+																		safe and stay clear</div>
+																</div>
+															</div>
+															<div class="slds-grid slds-wrap">
+																<div class="slds-col slds-size_7-of-12 cib-sender">
+																	<div class="cib-msgtype slds-truncate">Read only
+																		Notification</div>
+																</div>
+																<div class="slds-col_bump-left slds-size_5-of-12">
+																	<div class="cib-datentime">
+																		<div class="slds-truncate">2023-05-22, 15:36 EST
+																		</div>
+																	</div>
+																</div>
+															</div>
+														</div>
+													</li>
+
+													<li class="cib-unread" data-id="cib-button_acknowledgement"
+														onclick={handleTempActive}>
+
+														<div class="cib-tasklist slds-p-around_small">
+															<div class="slds-grid slds-wrap">
+																<div class="slds-col slds-size_7-of-12">
+																	<h4 title="Policy revision notification">
+																		<div class="slds-truncate">Policy revision
+																			notification</div>
+																	</h4>
+																</div>
+																<div class="slds-col_bump-left cib-statusicons">
+																	<lightning-button-icon icon-name="utility:archive"
+																		variant="bare" alternative-text="Archive"
+																		class="cib-archive slds-m-left_xx-small"
+																		title="Archive"></lightning-button-icon>
+																	<lightning-button-icon icon-name="utility:delete"
+																		variant="bare" alternative-text="Delete"
+																		class="cib-delete slds-m-left_xx-small "
+																		title="Delete"></lightning-button-icon>
+																	<lightning-button-icon icon-name="utility:forward"
+																		variant="bare" alternative-text="Forward"
+																		class="cib-forward slds-m-left_xx-small"
+																		title="Forward"></lightning-button-icon>
+																	<lightning-button-icon icon-name="utility:reply"
+																		variant="bare" alternative-text="Reply"
+																		class="cib-reply slds-m-left_xx-small"
+																		title="Reply"></lightning-button-icon>
+																	<lightning-button-icon icon-name="utility:priority"
+																		variant="bare" alternative-text="Flag"
+																		class="cib-flag cib-dis-no slds-m-left_xx-small"
+																		title="Flag"></lightning-button-icon>
+																	<!-- <lightning-button-icon icon-name="utility:lower_flag" variant="bare" alternative-text="Flag" class="cib-archive slds-m-left_xx-small" title="Flag"></lightning-button-icon> -->
+																</div>
+															</div>
+															<div class="slds-grid slds-wrap"
+																title="Notification to all Suppliers on the revised Nondisclosure Agreement (effective May 01,2023)">
+																<div class="slds-col slds-size_12-of-12">
+																	<div class="slds-truncate">Notification to all
+																		Suppliers on the revised Nondisclosure Agreement
+																		(effective May 01,2023)</div>
+																</div>
+															</div>
+															<div class="slds-grid slds-wrap">
+																<div class="slds-col slds-size_7-of-12 cib-sender">
+																	<div class="cib-msgtype slds-truncate">Read only
+																		Acknowledgement Required</div>
+																</div>
+																<div class="slds-col_bump-left slds-size_5-of-12">
+																	<div class="cib-datentime">
+																		<div class="slds-truncate">2023-05-22, 15:36 EST
+																		</div>
+																	</div>
+																</div>
+															</div>
+														</div>
+													</li>
+
+													<li class="cib-read" data-id="cib-button_digitalsignature"
+														onclick={handleTempActive}>
+
+														<div class="cib-tasklist slds-p-around_small">
+															<div class="slds-grid slds-wrap">
+																<div class="slds-col slds-size_7-of-12">
+																	<h4 title="Policy revision notification">
+																		<div class="slds-truncate">Policy revision
+																			notification</div>
+																	</h4>
+																</div>
+																<div class="slds-col_bump-left cib-statusicons">
+																	<lightning-button-icon icon-name="utility:archive"
+																		variant="bare" alternative-text="Archive"
+																		class="cib-archive slds-m-left_xx-small"
+																		title="Archive"></lightning-button-icon>
+																	<lightning-button-icon icon-name="utility:delete"
+																		variant="bare" alternative-text="Delete"
+																		class="cib-delete slds-m-left_xx-small "
+																		title="Delete"></lightning-button-icon>
+																	<lightning-button-icon icon-name="utility:forward"
+																		variant="bare" alternative-text="Forward"
+																		class="cib-forward slds-m-left_xx-small"
+																		title="Forward"></lightning-button-icon>
+																	<lightning-button-icon icon-name="utility:reply"
+																		variant="bare" alternative-text="Reply"
+																		class="cib-reply cib-dis-no slds-m-left_xx-small"
+																		title="Reply"></lightning-button-icon>
+																	<lightning-button-icon icon-name="utility:priority"
+																		variant="bare" alternative-text="Flag"
+																		class="cib-flag slds-m-left_xx-small"
+																		title="Flag">
+																	</lightning-button-icon>
+																	<!-- <lightning-button-icon icon-name="utility:lower_flag" variant="bare" alternative-text="Flag" class="cib-archive slds-m-left_xx-small" title="Flag"></lightning-button-icon> -->
+																</div>
+															</div>
+															<div class="slds-grid slds-wrap"
+																title="Notification to all Suppliers on the revised Procurement Policy (effective May 01,2023). Download the latest copy and submit the following survey">
+																<div class="slds-col slds-size_12-of-12">
+																	<div class="slds-truncate">Notification to all
+																		Suppliers
+																		on the revised Procurement Policy (effective May
+																		01,2023). Download the latest copy and submit
+																		the
+																		following survey</div>
+																</div>
+															</div>
+															<div class="slds-grid slds-wrap">
+																<div class="slds-col slds-size_7-of-12 cib-sender">
+																	<div class="cib-msgtype slds-truncate">Read only
+																		Digital
+																		Signature Required</div>
+																</div>
+																<div class="slds-col_bump-left slds-size_5-of-12">
+																	<div class="cib-datentime">
+																		<div class="slds-truncate">2023-05-22, 15:36 EST
+																		</div>
+																	</div>
+																</div>
+															</div>
+														</div>
+													</li>
+
+													<li class="cib-read" data-id="cib-button_survey"
+														onclick={handleTempActive}>
+
+														<div class="cib-tasklist slds-p-around_small">
+															<div class="slds-grid slds-wrap">
+																<div class="slds-col slds-size_7-of-12">
+																	<h4 title="2022 ESG Survey">
+																		<div class="slds-truncate">2022 ESG Survey</div>
+																	</h4>
+																</div>
+																<div class="slds-col_bump-left cib-statusicons">
+																	<lightning-button-icon icon-name="utility:archive"
+																		variant="bare" alternative-text="Archive"
+																		class="cib-archive slds-m-left_xx-small"
+																		title="Archive"></lightning-button-icon>
+																	<lightning-button-icon icon-name="utility:delete"
+																		variant="bare" alternative-text="Delete"
+																		class="cib-delete slds-m-left_xx-small "
+																		title="Delete"></lightning-button-icon>
+																	<lightning-button-icon icon-name="utility:forward"
+																		variant="bare" alternative-text="Forward"
+																		class="cib-forward slds-m-left_xx-small"
+																		title="Forward"></lightning-button-icon>
+																	<lightning-button-icon icon-name="utility:reply"
+																		variant="bare" alternative-text="Reply"
+																		class="cib-reply slds-m-left_xx-small"
+																		title="Reply"></lightning-button-icon>
+																	<lightning-button-icon icon-name="utility:priority"
+																		variant="bare" alternative-text="Flag"
+																		class="cib-flag slds-m-left_xx-small"
+																		title="Flag">
+																	</lightning-button-icon>
+																	<!-- <lightning-button-icon icon-name="utility:lower_flag" variant="bare" alternative-text="Flag" class="cib-archive slds-m-left_xx-small" title="Flag"></lightning-button-icon> -->
+																</div>
+															</div>
+															<div class="slds-grid slds-wrap"
+																title="At Rhythm Industrials, we value your feedback.  That’s why we would like to invite you to participate in the compulsory annual survey on Environment Social Governance for 2022. Please share your response before 30/06/2023.">
+																<div class="slds-col slds-size_12-of-12">
+																	<div class="slds-truncate">At Rhythm Industrials, we
+																		value your feedback.  That’s why we would like
+																		to
+																		invite you to participate in the compulsory
+																		annual
+																		survey on Environment Social Governance for
+																		2022.
+																		Please share your response before 30/06/2023.
+																	</div>
+																</div>
+															</div>
+															<div class="slds-grid slds-wrap">
+																<div class="slds-col slds-size_7-of-12 cib-sender">
+																	<div class="cib-msgtype slds-truncate">Survey
+																		Notification</div>
+																</div>
+																<div class="slds-col_bump-left slds-size_5-of-12">
+																	<div class="cib-datentime">
+																		<div class="slds-truncate">2023-05-22, 15:36 EST
+																		</div>
+																	</div>
+																</div>
+															</div>
+														</div>
+													</li>
+
+													<li class="cib-read" data-id="cib-button_assessment"
+														onclick={handleTempActive}>
+
+														<div class="cib-tasklist slds-p-around_small">
+															<div class="slds-grid slds-wrap">
+																<div class="slds-col slds-size_7-of-12">
+																	<h4 title="2023 Supplier Quality Assessment">
+																		<div class="slds-truncate">2023 Supplier Quality
+																			Assessment</div>
+																	</h4>
+																</div>
+																<div class="slds-col_bump-left cib-statusicons">
+																	<lightning-button-icon icon-name="utility:archive"
+																		variant="bare" alternative-text="Archive"
+																		class="cib-archive slds-m-left_xx-small"
+																		title="Archive"></lightning-button-icon>
+																	<lightning-button-icon icon-name="utility:delete"
+																		variant="bare" alternative-text="Delete"
+																		class="cib-delete slds-m-left_xx-small "
+																		title="Delete"></lightning-button-icon>
+																	<lightning-button-icon icon-name="utility:forward"
+																		variant="bare" alternative-text="Forward"
+																		class="cib-forward slds-m-left_xx-small"
+																		title="Forward"></lightning-button-icon>
+																	<lightning-button-icon icon-name="utility:reply"
+																		variant="bare" alternative-text="Reply"
+																		class="cib-reply slds-m-left_xx-small"
+																		title="Reply"></lightning-button-icon>
+																	<lightning-button-icon icon-name="utility:priority"
+																		variant="bare" alternative-text="Flag"
+																		class="cib-flag slds-m-left_xx-small"
+																		title="Flag">
+																	</lightning-button-icon>
+																	<!-- <lightning-button-icon icon-name="utility:lower_flag" variant="bare" alternative-text="Flag" class="cib-archive slds-m-left_xx-small" title="Flag"></lightning-button-icon> -->
+																</div>
+															</div>
+															<div class="slds-grid slds-wrap"
+																title="At Rhythm Industrials, we value your feedback.  That’s why we would like to invite you to participate in the compulsory quarterly assessment  on Supplier’s Quality for 2023. Please share your response before 30/06/2023.">
+																<div class="slds-col slds-size_12-of-12">
+																	<div class="slds-truncate">At Rhythm Industrials, we
+																		value your feedback.  That’s why we would like
+																		to
+																		invite you to participate in the compulsory
+																		quarterly assessment on Supplier’s Quality for
+																		2023.
+																		Please share your response before 30/06/2023.
+																	</div>
+																</div>
+															</div>
+															<div class="slds-grid slds-wrap">
+																<div class="slds-col slds-size_7-of-12 cib-sender">
+																	<div class="cib-msgtype slds-truncate">Assessment
+																		Notification</div>
+																</div>
+																<div class="slds-col_bump-left slds-size_5-of-12">
+																	<div class="cib-datentime">
+																		<div class="slds-truncate">2023-05-22, 15:36 EST
+																		</div>
+																	</div>
+																</div>
+															</div>
+														</div>
+													</li>
+
+													<li class="cib-read" data-id="cib-button_followup"
+														onclick={handleTempActive}>
+
+														<div class="cib-tasklist slds-p-around_small">
+															<div class="slds-grid slds-wrap">
+																<div class="slds-col slds-size_7-of-12">
+																	<h4
+																		title="You have been assigned to a corrective action.">
+																		<div class="slds-truncate">You have been
+																			assigned to
+																			a corrective action.</div>
+																	</h4>
+																</div>
+																<div class="slds-col_bump-left cib-statusicons">
+																	<lightning-button-icon icon-name="utility:archive"
+																		variant="bare" alternative-text="Archive"
+																		class="cib-archive slds-m-left_xx-small"
+																		title="Archive"></lightning-button-icon>
+																	<lightning-button-icon icon-name="utility:delete"
+																		variant="bare" alternative-text="Delete"
+																		class="cib-delete slds-m-left_xx-small "
+																		title="Delete"></lightning-button-icon>
+																	<lightning-button-icon icon-name="utility:forward"
+																		variant="bare" alternative-text="Forward"
+																		class="cib-forward slds-m-left_xx-small"
+																		title="Forward"></lightning-button-icon>
+																	<lightning-button-icon icon-name="utility:reply"
+																		variant="bare" alternative-text="Reply"
+																		class="cib-reply slds-m-left_xx-small"
+																		title="Reply"></lightning-button-icon>
+																	<lightning-button-icon icon-name="utility:priority"
+																		variant="bare" alternative-text="Flag"
+																		class="cib-flag slds-m-left_xx-small"
+																		title="Flag">
+																	</lightning-button-icon>
+																	<!-- <lightning-button-icon icon-name="utility:lower_flag" variant="bare" alternative-text="Flag" class="cib-archive slds-m-left_xx-small" title="Flag"></lightning-button-icon> -->
+																</div>
+															</div>
+															<div class="slds-grid slds-wrap"
+																title="Marla from Rhythm Industrials, assigned the following action item to you. It’s your responsibility to review and complete the action">
+																<div class="slds-col slds-size_12-of-12">
+																	<div class="slds-truncate">Marla from Rhythm
+																		Industrials, assigned the following action item
+																		to
+																		you. It’s your responsibility to review and
+																		complete
+																		the action</div>
+																</div>
+															</div>
+															<div class="slds-grid slds-wrap">
+																<div class="slds-col slds-size_7-of-12 cib-sender">
+																	<div class="cib-msgtype slds-truncate">Follow up
+																		Notification</div>
+																</div>
+																<div class="slds-col_bump-left slds-size_5-of-12">
+																	<div class="cib-datentime">
+																		<div class="slds-truncate">2023-05-22, 15:36 EST
+																		</div>
+																	</div>
+																</div>
+															</div>
+														</div>
+													</li>
+
+													<li class="cib-read" data-id="cib-button_systemgenarated"
+														onclick={handleTempActive}>
+
+														<div class="cib-tasklist slds-p-around_small">
+															<div class="slds-grid slds-wrap">
+																<div class="slds-col slds-size_7-of-12">
+																	<h4 title="Expiration Reminder.">
+																		<div class="slds-truncate">Expiration Reminder.
+																		</div>
+																	</h4>
+																</div>
+																<div class="slds-col_bump-left cib-statusicons">
+																	<lightning-button-icon icon-name="utility:archive"
+																		variant="bare" alternative-text="Archive"
+																		class="cib-archive slds-m-left_xx-small"
+																		title="Archive"></lightning-button-icon>
+																	<lightning-button-icon icon-name="utility:delete"
+																		variant="bare" alternative-text="Delete"
+																		class="cib-delete slds-m-left_xx-small "
+																		title="Delete"></lightning-button-icon>
+																	<lightning-button-icon icon-name="utility:forward"
+																		variant="bare" alternative-text="Forward"
+																		class="cib-forward slds-m-left_xx-small"
+																		title="Forward"></lightning-button-icon>
+																	<lightning-button-icon icon-name="utility:reply"
+																		variant="bare" alternative-text="Reply"
+																		class="cib-reply slds-m-left_xx-small"
+																		title="Reply"></lightning-button-icon>
+																	<lightning-button-icon icon-name="utility:priority"
+																		variant="bare" alternative-text="Flag"
+																		class="cib-flag cib-dis-no slds-m-left_xx-small"
+																		title="Flag"></lightning-button-icon>
+																	<!-- <lightning-button-icon icon-name="utility:lower_flag" variant="bare" alternative-text="Flag" class="cib-archive slds-m-left_xx-small" title="Flag"></lightning-button-icon> -->
+																</div>
+															</div>
+															<div class="slds-grid slds-wrap"
+																title="This is a reminder to let you know that your Workers Compensation insurance is about to expire in 14 days.">
+																<div class="slds-col slds-size_12-of-12">
+																	<div class="slds-truncate">This is a reminder to let
+																		you
+																		know that your Workers Compensation insurance is
+																		about to expire in 14 days.</div>
+																</div>
+															</div>
+															<div class="slds-grid slds-wrap">
+																<div class="slds-col slds-size_7-of-12 cib-sender">
+																	<div class="cib-msgtype slds-truncate">System
+																		Generated
+																		Notification</div>
+																</div>
+																<div class="slds-col_bump-left slds-size_5-of-12">
+																	<div class="cib-datentime">
+																		<div class="slds-truncate">2023-05-22, 15:36 EST
+																		</div>
+																	</div>
+																</div>
+															</div>
+														</div>
+													</li>
+												</template>
+
+											</ul>
+										</template>
+										<template if:false={childRecords}>
+											<div
+												class="slds-text-align_center slds-p-around_xx-large slds-text-heading_large">
+												<strong>No Tasks Available</strong></div>
+										</template>
+									</template>
 								</div>
 							</div>
-							<div class="cib-serch">
-								<input type="text" placeholder="Search" class="cib-serch-input" onkeyup={searchInputChangeHandler}/>
+						</div>
+					</div>
+
+					<div class="cib-cel  cib-auto cib-disc" data-id="cibdisc">
+
+						<div class="cib-sec_container cib-sec_vcontainer">
+							<!-- <template if:true={rec}>
+								<template if:true={show.Task}>									
+								</template>
+							</template> -->
+
+							<div class="cib-top_back_container cib-sec_header">
+								<!-- cib-top_back_container-->
+								<span> &nbsp; TASK DETAILS</span>
+								<button class="cig_actions slds-float_right" data-id="buttoncibdisc" onclick={handleRightButtonClick}><i class="las la-chevron-circle-right"></i> <span class="textstyle01"></span></button>
 							</div>
-							<div class="cib-sec_bodyfull2">
-								<div class="cib-sec_vcontainer2_2">
-									<div class="slds-scrollable_y">
-										<ul>
-											<template for:each={relatedListRecords} for:item="item">
-											<li  class="cib-read" key={item.Id} data-id={item.Id}>
-											<div class="slds-p-around_small" >
-													<h4>
-														<div class="slds-truncate" >{item.Name}</div>
+
+							<div class="slds-show" data-id="cib-rightsec_readonly">
+								<div class="cib-tophead-details cib-sec_vcontainer1">
+									<div class="cib-details">
+
+										<div class="cib-tasklist slds-p-vertical_small">
+											<div class="slds-grid slds-wrap">
+												<div class="slds-col slds-size_6-of-12">
+													<h4 title="Emergency preparedness notification">
+														<div class="slds-truncate">Emergency preparedness notification
+														</div>
 													</h4>
-													<div class="cib-sender">
-														<div class="slds-truncate">{item.Description}</div>
-													</div>
 												</div>
-												</li>
-											</template>											
-											<!-- <li class="cib-read" onclick={openChatHandler}>
-												<div class="slds-p-around_small" onclick={handleRightButtonClick}>
-													<h4>
-														<div class="slds-truncate">Heading Record Name</div>
-													</h4>
-													<div class="cib-sender">
-														<div class="slds-truncate">Description should be here...</div>
+												<div class="slds-col_bump-left">
+													<div class="slds-grid slds-wrap">
+														<div class="slds-p-left_small">
+															<lightning-button-group style="margin-bottom:-3px; ">
+																<lightning-button variant="label-hidden" title="Reply"
+																	icon-name="utility:reply" icon-position="left"
+																	disabled>
+																</lightning-button>
+																<lightning-button variant="label-hidden" title="Forward"
+																	icon-name="utility:forward" icon-position="left">
+																</lightning-button>
+															</lightning-button-group>
+														</div>
+														<div class="slds-p-left_small">
+															<lightning-button-group style="margin-bottom:-3px; ">
+																<lightning-button variant="label-hidden" title="Archive"
+																	icon-name="utility:archive" icon-position="left">
+																</lightning-button>
+																<lightning-button variant="label-hidden" title="Flag"
+																	icon-name="utility:priority" icon-position="left">
+																</lightning-button>
+															</lightning-button-group>
+														</div>
+														<div class="slds-p-left_small">
+															<!-- <template if:true={opt_delete}> -->
+															<lightning-button title="Delete" icon-name="utility:delete"
+																icon-position="left" variant="Destructive"
+																onclick={deleteHandler}>
+															</lightning-button>
+															<!-- </template> -->
+														</div>
 													</div>
+
 												</div>
-											</li>
-											<li class="cib-unread">
-												<div class="slds-p-around_small" onclick={handleRightButtonClick}>
-													<h4>
-														<div class="slds-truncate">Heading Record Name</div>
-													</h4>
-													<div class="cib-sender">
-														<div class="slds-truncate">Description should be here...</div>
+											</div>
+											<!-- <div class="slds-grid slds-wrap" title="Is your business hurricane ready? Download our checklist to secure your operations from deadly impacts of hurricane. Stay safe and stay clear">
+														<div class="slds-col slds-size_12-of-12">
+															<div class="slds-truncate">Is your business hurricane ready? Download our checklist to secure your operations from deadly impacts of hurricane. Stay safe and stay clear</div>
+														</div>
+													</div> -->
+											<div class="slds-grid slds-wrap  slds-p-top_x-small">
+												<div class="slds-col slds-size_5-of-12 cib-sender">
+													<div class="slds-truncate">Mel Gibbson</div>
+												</div>
+												<div class="slds-col_bump-left slds-size_7-of-12">
+													<div class="slds-grid slds-wrap">
+														<div class="slds-col slds-size_8-of-12">
+															<div class="cib-msgtype slds-truncate">Read only
+																Notification
+															</div>
+														</div>
+														<div class="slds-col slds-size_4-of-12">
+															<div class="cib-datentime slds-truncate">2023-05-22, 15:36
+																EST
+															</div>
+														</div>
 													</div>
+
+
 												</div>
-											</li> -->
-										</ul>
+											</div>
+										</div>
 									</div>
 								</div>
+								<div class="cib-sec_vcontainer2">
+									<div class="slds-p-horizontal_small slds-scrollable_y">
+
+										<div class="slds-p-around_small slds-m-bottom_small slds-is-relative">
+
+											<h3>Is your business hurricane ready? Download our checklist to secure your
+												operations from deadly impacts of hurricane. Stay safe and stay clear
+											</h3>
+											<div class="slds-grid slds-wrap slds-gutters slds-grid_vertical-stretch">
+												<!-- <div
+													class="slds-col slds-size_12-of-12 slds-small-size_12-of-12 slds-medium-size_6-of-12 slds-large-size_4-of-12 slds-p-vertical_small">
+													<button title="Know your RISK" class="slds-button slds-button_outline-brand slds-button_stretch slds-p-vertical_small" style="line-height:normal; height:100%">Know your<br/>RISK </button>
+												</div>
+												<div
+													class="slds-col slds-size_12-of-12 slds-small-size_12-of-12 slds-medium-size_6-of-12 slds-large-size_4-of-12 slds-p-vertical_small">
+													<button title="Prepare before Hurricane Season" class="slds-button slds-button_outline-brand slds-button_stretch slds-p-vertical_small" style="line-height:normal; height:100%">Prepare Before<br/>Hurricane Season </button>
+												</div>
+
+												<div
+													class="slds-col slds-size_12-of-12 slds-small-size_12-of-12 slds-medium-size_6-of-12 slds-large-size_4-of-12 slds-p-vertical_small">
+													<button title="Understand forecast information" class="slds-button slds-button_outline-brand slds-button_stretch slds-p-vertical_small" style="line-height:normal; height:100%">Understand Forecast<br/>Information </button>
+												</div>
+												<div
+													class="slds-col slds-size_12-of-12 slds-small-size_12-of-12 slds-medium-size_6-of-12 slds-large-size_4-of-12 slds-p-vertical_small">
+													<button title="Get moving when a storm threatens" class="slds-button slds-button_outline-brand slds-button_stretch slds-p-vertical_small" style="line-height:normal; height:100%">Get Moving when a<br/>Storm Threatens </button>
+												</div>
+
+												<div
+													class="slds-col slds-size_12-of-12 slds-small-size_12-of-12 slds-medium-size_6-of-12 slds-large-size_4-of-12 slds-p-vertical_small">
+													<button title="Stay protected during storms" class="slds-button slds-button_outline-brand slds-button_stretch slds-p-vertical_small" style="line-height:normal; height:100%">Stay Protected<br/>During Storms </button>
+												</div>
+
+												<div
+													class="slds-col slds-size_12-of-12 slds-small-size_12-of-12 slds-medium-size_6-of-12 slds-large-size_4-of-12 slds-p-vertical_small">
+													<button title="Use caution after storms" class="slds-button slds-button_outline-brand slds-button_stretch slds-p-vertical_small" style="line-height:normal; height:100%">Use Caution<br/>After Storms </button>
+												</div>
+
+												<div
+													class="slds-col slds-size_12-of-12 slds-small-size_12-of-12 slds-medium-size_6-of-12 slds-large-size_4-of-12 slds-p-vertical_small">
+													<button title="Takeaction today" class="slds-button slds-button_outline-brand slds-button_stretch slds-p-vertical_small" style="line-height:normal; height:100%">Take Action<br/>Today </button>
+												</div> -->
+												<!-- <img src={hurricanePNG}></img> -->
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="cib-sec_vcontainer3 slds-border_top slds-p-around_small">
+									<!-- <lightning-textarea placeholder="Type your response here..." variant="label-hidden">
+									</lightning-textarea>
+									<lightning-button label="Send" onclick={handleRightButtonClick}>
+									</lightning-button> -->
+								</div>
 							</div>
-					
+
+							<div class="slds-hide" data-id="cib-rightsec_acknowledgement">
+								<div class="cib-tophead-details cib-sec_vcontainer1">
+									<div class="cib-details">
+
+										<div class="cib-tasklist slds-p-vertical_small">
+											<div class="slds-grid slds-wrap">
+												<div class="slds-col slds-size_6-of-12">
+													<h4 title="Policy revision notification">
+														<div class="slds-truncate">Policy revision notification</div>
+													</h4>
+												</div>
+												<div class="slds-col_bump-left">
+													<div class="slds-grid slds-wrap">
+														<div class="slds-p-left_small">
+															<lightning-button-group style="margin-bottom:-3px; ">
+																<lightning-button variant="label-hidden" title="Reply"
+																	icon-name="utility:reply" icon-position="left"
+																	disabled>
+																</lightning-button>
+																<lightning-button variant="label-hidden" title="Forward"
+																	icon-name="utility:forward" icon-position="left">
+																</lightning-button>
+															</lightning-button-group>
+														</div>
+														<div class="slds-p-left_small">
+															<lightning-button-group style="margin-bottom:-3px; ">
+																<lightning-button variant="label-hidden" title="Archive"
+																	icon-name="utility:archive" icon-position="left">
+																</lightning-button>
+																<lightning-button variant="label-hidden" title="Flag"
+																	icon-name="utility:priority" icon-position="left">
+																</lightning-button>
+															</lightning-button-group>
+														</div>
+														<div class="slds-p-left_small">
+															<!-- <template if:true={opt_delete}> -->
+															<lightning-button title="Delete" icon-name="utility:delete"
+																icon-position="left" variant="Destructive"
+																onclick={deleteHandler}>
+															</lightning-button>
+															<!-- </template> -->
+														</div>
+													</div>
+
+												</div>
+											</div>
+											<!-- <div class="slds-grid slds-wrap" title="Is your business hurricane ready? Download our checklist to secure your operations from deadly impacts of hurricane. Stay safe and stay clear">
+														<div class="slds-col slds-size_12-of-12">
+															<div class="slds-truncate">Is your business hurricane ready? Download our checklist to secure your operations from deadly impacts of hurricane. Stay safe and stay clear</div>
+														</div>
+													</div> -->
+											<div class="slds-grid slds-wrap  slds-p-top_x-small">
+												<div class="slds-col slds-size_5-of-12 cib-sender">
+													<div class="slds-truncate">Mel Gibbson</div>
+												</div>
+												<div class="slds-col_bump-left slds-size_7-of-12">
+													<div class="slds-grid slds-wrap">
+														<div class="slds-col slds-size_8-of-12">
+															<div class="cib-msgtype slds-truncate">Read only
+																Notification with Acknowledgement Required
+															</div>
+														</div>
+														<div class="slds-col slds-size_4-of-12">
+															<div class="cib-datentime slds-truncate">2023-05-22, 15:36
+																EST
+															</div>
+														</div>
+													</div>
+
+
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="cib-sec_vcontainer2">
+									<div class="slds-p-horizontal_small slds-scrollable_y">
+
+										<div class="slds-p-around_small slds-m-bottom_small slds-is-relative">
+
+											<h3>Notification to all Suppliers on the revised Nondisclosure Agreement
+												(effective May 01,2023)</h3><br/>
+
+
+											<strong>Supplier Rackmount systems.</strong><br/>
+											<strong>Supplier Site New York</strong><br/>
+											<strong>Supplier Contact Carl Ms Bibb</strong><br/>
+											<center><strong><u><h2>Terms and Conditions</h2></u></strong></center>
+
+											<p>
+												This Nondisclosure Agreement (the *Agreement") is entered into by and
+												between with its
+												principal offices at (‘Disclosing Party") and located at ("Receiving
+												Party") for the purpose of
+												preventing the unauthorized disclosure of Confidential Information as
+												defined below. The
+												parties agree to enter into a confidential relationship with respect to
+												the disclosure of certain
+												proprietary and confidential information ("Confidential Information").
+											</p>
+											<p>
+												1. Definition of Confidential Information. For purposes of this
+												Agreement, "Confidential
+												Information" shall Include all Information or material that has or could
+												have commercial
+												value or other utlity In the business In which Disclosing Party Is
+												engaged. If Confidential
+												Information is in written form, the Disclosing Party shall label or
+												stamp the materials with
+												the word “Confidential” or some similar warning. If Confidential
+												Information is transmitted
+												orally, the Disclosing Party shall promptly provide a writing Indicating
+												that such oral
+												communication constituted Confidential Information.</p>
+											<p>
+												2. Exclusions from Confidential Information. Receiving Party's
+												obligations under this
+												Agreement do not extend to information that is: (a) publicly known at
+												the time of disclosure
+												or subsequently becomes publicly known through no fault of the Receiving
+												Party; (b)
+											</p>
+											<!-- <div class="slds-grid slds-wrap slds-gutters">
+												<div
+													class="slds-col slds-size_12-of-12 slds-small-size_12-of-12 slds-p-vertical_small">
+													<lightning-button variant="brand-outline" label="Know your RISK"
+														title="Know your RISK" class="slds-button_stretch">
+													</lightning-button>
+												</div>
+												<div
+													class="slds-col slds-size_12-of-12 slds-small-size_12-of-12 slds-p-vertical_small">
+													<lightning-button variant="brand-outline"
+														label="Prepare before Hurricane Season"
+														title="Prepare before Hurricane Season" class="slds-button_stretch">
+													</lightning-button>
+												</div>
+											</div> -->
+										</div>
+									</div>
+								</div>
+								<div class="cib-sec_vcontainer3 slds-border_top slds-p-around_small">
+									<div class="slds-grid slds-wrap slds-gutters slds-p-horizontal_small">
+										<template if:true={showAcceptModal}>
+											<section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01"
+												aria-modal="true" aria-describedby="modal-content-id-1"
+												class="slds-modal slds-fade-in-open">
+												<div class="slds-modal__container">
+													<!-- <header class="slds-modal__header">
+														<h2 id="modal-heading-01"
+															class="slds-text-heading_medium slds-hyphenate">Modal Header
+														</h2>
+													</header> -->
+													<div class="slds-modal__content slds-p-around_medium"
+														id="modal-content-id-1">
+														By accepting, you agree to our terms and conditions
+													</div>
+													<footer class="slds-modal__footer">
+														<lightning-button label="Accept" variant="success" onclick={closeAcceptModalHandler}>
+														</lightning-button>
+													</footer>
+												</div>
+											</section>
+											<div class="slds-backdrop slds-backdrop_open"></div>
+											<!-- <lightning-modal-header label="My Modal Heading"></lightning-modal-header>
+												<lightning-modal-body>
+												</lightning-modal-body>
+												<lightning-modal-footer>
+													<lightning-button label="Accept" onclick={closeAcceptModalHandler} variant="success"></lightning-button>
+											</lightning-modal-footer> -->
+										</template>
+										<div
+											class="slds-col slds-size_12-of-12 slds-small-size_12-of-12 slds-medium-size_6-of-12 slds-large-size_6-of-12 slds-p-vertical_small">
+											<button title="Accept Terms" class="slds-button slds-button_success slds-button_stretch slds-p-around_small" onclick={openAcceptModalHandler}>Accept Terms </button>
+										</div>
+										<div
+											class="slds-col slds-size_12-of-12 slds-small-size_12-of-12 slds-medium-size_6-of-12 slds-large-size_6-of-12 slds-p-vertical_small">
+											<button title="Decline Terms" class="slds-button slds-button_destructive slds-button_stretch slds-p-around_small">Decline Terms </button>
+										</div>
+									</div>
+									<!-- <lightning-textarea placeholder="Type your response here..." variant="label-hidden">
+									</lightning-textarea>
+									<lightning-button label="Send" onclick={handleRightButtonClick}>
+									</lightning-button> -->
+								</div>
+							</div>
+
+
+							<div class="slds-hide" data-id="cib-rightsec_digitalsignature">
+								<div class="cib-tophead-details cib-sec_vcontainer1">
+									<div class="cib-details">
+
+										<div class="cib-tasklist slds-p-vertical_small">
+											<div class="slds-grid slds-wrap">
+												<div class="slds-col slds-size_6-of-12">
+													<h4 title="Emergency preparedness notification">
+														<div class="slds-truncate">Policy revision notification</div>
+													</h4>
+												</div>
+												<div class="slds-col_bump-left">
+													<div class="slds-grid slds-wrap">
+														<div class="slds-p-left_small">
+															<lightning-button-group style="margin-bottom:-3px; ">
+																<lightning-button variant="label-hidden" title="Reply"
+																	icon-name="utility:reply" icon-position="left"
+																	disabled>
+																</lightning-button>
+																<lightning-button variant="label-hidden" title="Forward"
+																	icon-name="utility:forward" icon-position="left">
+																</lightning-button>
+															</lightning-button-group>
+														</div>
+														<div class="slds-p-left_small">
+															<lightning-button-group style="margin-bottom:-3px; ">
+																<lightning-button variant="label-hidden" title="Archive"
+																	icon-name="utility:archive" icon-position="left">
+																</lightning-button>
+																<lightning-button variant="label-hidden" title="Flag"
+																	icon-name="utility:priority" icon-position="left">
+																</lightning-button>
+															</lightning-button-group>
+														</div>
+														<div class="slds-p-left_small">
+															<!-- <template if:true={opt_delete}> -->
+															<lightning-button title="Delete" icon-name="utility:delete"
+																icon-position="left" variant="Destructive"
+																onclick={deleteHandler}>
+															</lightning-button>
+															<!-- </template> -->
+														</div>
+													</div>
+
+												</div>
+											</div>
+											<!-- <div class="slds-grid slds-wrap" title="Is your business hurricane ready? Download our checklist to secure your operations from deadly impacts of hurricane. Stay safe and stay clear">
+														<div class="slds-col slds-size_12-of-12">
+															<div class="slds-truncate">Is your business hurricane ready? Download our checklist to secure your operations from deadly impacts of hurricane. Stay safe and stay clear</div>
+														</div>
+													</div> -->
+											<div class="slds-grid slds-wrap  slds-p-top_x-small">
+												<div class="slds-col slds-size_5-of-12 cib-sender">
+													<div class="slds-truncate">Mel Gibbson</div>
+												</div>
+												<div class="slds-col_bump-left slds-size_7-of-12">
+													<div class="slds-grid slds-wrap">
+														<div class="slds-col slds-size_8-of-12">
+															<div class="cib-msgtype slds-truncate">Read only Digital
+																Signature Required
+															</div>
+														</div>
+														<div class="slds-col slds-size_4-of-12">
+															<div class="cib-datentime slds-truncate">2023-05-22, 15:36
+																EST
+															</div>
+														</div>
+													</div>
+
+
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="cib-sec_vcontainer2">
+									<div class="slds-p-horizontal_small slds-scrollable_y">
+
+										<div class="slds-p-around_small slds-m-bottom_small slds-is-relative">
+
+											<h3>Notification to all Suppliers on the revised Procurement Policy
+												(effective May 01,2023). Download the latest copy and submit the
+												following survey</h3>
+											<div class="slds-grid slds-wrap slds-gutters">
+												<div
+													class="slds-col slds-size_12-of-12 slds-small-size_12-of-12 slds-p-vertical_small">
+													<lightning-button variant="brand-outline"
+														label="Download attachment" title="Download attachment"
+														class="slds-button_stretch">
+													</lightning-button>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="cib-sec_vcontainer3 slds-border_top slds-p-around_small">
+									<!-- <lightning-textarea placeholder="Type your response here..." variant="label-hidden">
+									</lightning-textarea>
+									<lightning-button label="Send" onclick={handleRightButtonClick}>
+									</lightning-button> -->
+								</div>
+							</div>
+
+
+							<div class="slds-hide" data-id="cib-rightsec_survey">
+								<div class="cib-tophead-details cib-sec_vcontainer1">
+									<div class="cib-details">
+
+										<div class="cib-tasklist slds-p-vertical_small">
+											<div class="slds-grid slds-wrap">
+												<div class="slds-col slds-size_6-of-12">
+													<h4 title="2022 ESG Survey">
+														<div class="slds-truncate">2022 ESG Survey</div>
+													</h4>
+												</div>
+												<div class="slds-col_bump-left">
+													<div class="slds-grid slds-wrap">
+														<div class="slds-p-left_small">
+															<lightning-button-group style="margin-bottom:-3px; ">
+																<lightning-button variant="label-hidden" title="Reply"
+																	icon-name="utility:reply" icon-position="left"
+																	disabled>
+																</lightning-button>
+																<lightning-button variant="label-hidden" title="Forward"
+																	icon-name="utility:forward" icon-position="left">
+																</lightning-button>
+															</lightning-button-group>
+														</div>
+														<div class="slds-p-left_small">
+															<lightning-button-group style="margin-bottom:-3px; ">
+																<lightning-button variant="label-hidden" title="Archive"
+																	icon-name="utility:archive" icon-position="left">
+																</lightning-button>
+																<lightning-button variant="label-hidden" title="Flag"
+																	icon-name="utility:priority" icon-position="left">
+																</lightning-button>
+															</lightning-button-group>
+														</div>
+														<div class="slds-p-left_small">
+															<!-- <template if:true={opt_delete}> -->
+															<lightning-button title="Delete" icon-name="utility:delete"
+																icon-position="left" variant="Destructive"
+																onclick={deleteHandler}>
+															</lightning-button>
+															<!-- </template> -->
+														</div>
+													</div>
+
+												</div>
+											</div>
+											<!-- <div class="slds-grid slds-wrap" title="Is your business hurricane ready? Download our checklist to secure your operations from deadly impacts of hurricane. Stay safe and stay clear">
+														<div class="slds-col slds-size_12-of-12">
+															<div class="slds-truncate">Is your business hurricane ready? Download our checklist to secure your operations from deadly impacts of hurricane. Stay safe and stay clear</div>
+														</div>
+													</div> -->
+											<div class="slds-grid slds-wrap  slds-p-top_x-small">
+												<div class="slds-col slds-size_5-of-12 cib-sender">
+													<div class="slds-truncate">Mel Gibbson</div>
+												</div>
+												<div class="slds-col_bump-left slds-size_7-of-12">
+													<div class="slds-grid slds-wrap">
+														<div class="slds-col slds-size_8-of-12">
+															<div class="cib-msgtype slds-truncate">Survey Notification
+															</div>
+														</div>
+														<div class="slds-col slds-size_4-of-12">
+															<div class="cib-datentime slds-truncate">2023-05-22, 15:36
+																EST
+															</div>
+														</div>
+													</div>
+
+
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="cib-sec_vcontainer2">
+									<div class="slds-p-horizontal_small slds-scrollable_y">
+
+										<div class="slds-p-around_small slds-m-bottom_small slds-is-relative">
+
+											<h3>At Rhythm Industrials, we value your feedback. That’s why we would like
+												to invite you to participate in the compulsory annual survey on
+												Environment Social Governance for 2022. Please share your response
+												before 30/06/2023.</h3>
+											<div class="slds-grid slds-wrap slds-gutters">
+												<div
+													class="slds-col slds-size_12-of-12 slds-small-size_12-of-12 slds-p-vertical_small">
+													<lightning-button variant="brand-outline" label="Take the Survey"
+														title="Take the Survey" class="slds-button_stretch" data-id="a135i000004tdDXAAY" onclick={openTaskHandler}>
+													</lightning-button>
+												</div>
+
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="cib-sec_vcontainer3 slds-border_top slds-p-around_small">
+									<!-- <lightning-textarea placeholder="Type your response here..." variant="label-hidden">
+									</lightning-textarea>
+									<lightning-button label="Send" onclick={handleRightButtonClick}>
+									</lightning-button> -->
+								</div>
+							</div>
+
+
+							<div class="slds-hide" data-id="cib-rightsec_assessment">
+								<div class="cib-tophead-details cib-sec_vcontainer1">
+									<div class="cib-details">
+
+										<div class="cib-tasklist slds-p-vertical_small">
+											<div class="slds-grid slds-wrap">
+												<div class="slds-col slds-size_6-of-12">
+													<h4 title="2023 Supplier Quality Assessment">
+														<div class="slds-truncate">2023 Supplier Quality Assessment
+														</div>
+													</h4>
+												</div>
+												<div class="slds-col_bump-left">
+													<div class="slds-grid slds-wrap">
+														<div class="slds-p-left_small">
+															<lightning-button-group style="margin-bottom:-3px; ">
+																<lightning-button variant="label-hidden" title="Reply"
+																	icon-name="utility:reply" icon-position="left"
+																	disabled>
+																</lightning-button>
+																<lightning-button variant="label-hidden" title="Forward"
+																	icon-name="utility:forward" icon-position="left">
+																</lightning-button>
+															</lightning-button-group>
+														</div>
+														<div class="slds-p-left_small">
+															<lightning-button-group style="margin-bottom:-3px; ">
+																<lightning-button variant="label-hidden" title="Archive"
+																	icon-name="utility:archive" icon-position="left">
+																</lightning-button>
+																<lightning-button variant="label-hidden" title="Flag"
+																	icon-name="utility:priority" icon-position="left">
+																</lightning-button>
+															</lightning-button-group>
+														</div>
+														<div class="slds-p-left_small">
+															<!-- <template if:true={opt_delete}> -->
+															<lightning-button title="Delete" icon-name="utility:delete"
+																icon-position="left" variant="Destructive"
+																onclick={deleteHandler}>
+															</lightning-button>
+															<!-- </template> -->
+														</div>
+													</div>
+
+												</div>
+											</div>
+											<!-- <div class="slds-grid slds-wrap" title="Is your business hurricane ready? Download our checklist to secure your operations from deadly impacts of hurricane. Stay safe and stay clear">
+														<div class="slds-col slds-size_12-of-12">
+															<div class="slds-truncate">Is your business hurricane ready? Download our checklist to secure your operations from deadly impacts of hurricane. Stay safe and stay clear</div>
+														</div>
+													</div> -->
+											<div class="slds-grid slds-wrap  slds-p-top_x-small">
+												<div class="slds-col slds-size_5-of-12 cib-sender">
+													<div class="slds-truncate">Mel Gibbson</div>
+												</div>
+												<div class="slds-col_bump-left slds-size_7-of-12">
+													<div class="slds-grid slds-wrap">
+														<div class="slds-col slds-size_8-of-12">
+															<div class="cib-msgtype slds-truncate">Assessment
+																Notification
+															</div>
+														</div>
+														<div class="slds-col slds-size_4-of-12">
+															<div class="cib-datentime slds-truncate">2023-05-22, 15:36
+																EST
+															</div>
+														</div>
+													</div>
+
+
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="cib-sec_vcontainer2">
+									<div class="slds-p-horizontal_small slds-scrollable_y">
+
+										<div class="slds-p-around_small slds-m-bottom_small slds-is-relative">
+
+											<h3>At Rhythm Industrials, we value your feedback.  That’s why we would like
+												to invite you to participate in the compulsory quarterly assessment on
+												Supplier’s Quality for 2023.
+												Please share your response before 30/06/2023.
+											</h3>
+											<div class="slds-grid slds-wrap slds-gutters">
+												<div
+													class="slds-col slds-size_12-of-12 slds-small-size_12-of-12 slds-p-vertical_small">
+													<lightning-button variant="brand-outline"
+														label="Take the Assessment" title="Take the Assessment"
+														class="slds-button_stretch">
+													</lightning-button>
+												</div>
+
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="cib-sec_vcontainer3 slds-border_top slds-p-around_small">
+									<!-- <lightning-textarea placeholder="Type your response here..." variant="label-hidden">
+									</lightning-textarea>
+									<lightning-button label="Send" onclick={handleRightButtonClick}>
+									</lightning-button> -->
+								</div>
+							</div>
+
+
+							<div class="slds-hide" data-id="cib-rightsec_followup">
+								<div class="cib-tophead-details cib-sec_vcontainer1">
+									<div class="cib-details">
+
+										<div class="cib-tasklist slds-p-vertical_small">
+											<div class="slds-grid slds-wrap">
+												<div class="slds-col slds-size_6-of-12">
+													<h4 title="You have been assigned to a corrective action.">
+														<div class="slds-truncate">You have been assigned to a
+															corrective action.</div>
+													</h4>
+												</div>
+												<div class="slds-col_bump-left">
+													<div class="slds-grid slds-wrap">
+														<div class="slds-p-left_small">
+															<lightning-button-group style="margin-bottom:-3px; ">
+																<lightning-button variant="label-hidden" title="Reply"
+																	icon-name="utility:reply" icon-position="left"
+																	disabled>
+																</lightning-button>
+																<lightning-button variant="label-hidden" title="Forward"
+																	icon-name="utility:forward" icon-position="left">
+																</lightning-button>
+															</lightning-button-group>
+														</div>
+														<div class="slds-p-left_small">
+															<lightning-button-group style="margin-bottom:-3px; ">
+																<lightning-button variant="label-hidden" title="Archive"
+																	icon-name="utility:archive" icon-position="left">
+																</lightning-button>
+																<lightning-button variant="label-hidden" title="Flag"
+																	icon-name="utility:priority" icon-position="left">
+																</lightning-button>
+															</lightning-button-group>
+														</div>
+														<div class="slds-p-left_small">
+															<!-- <template if:true={opt_delete}> -->
+															<lightning-button title="Delete" icon-name="utility:delete"
+																icon-position="left" variant="Destructive"
+																onclick={deleteHandler}>
+															</lightning-button>
+															<!-- </template> -->
+														</div>
+													</div>
+
+												</div>
+											</div>
+											<!-- <div class="slds-grid slds-wrap" title="Is your business hurricane ready? Download our checklist to secure your operations from deadly impacts of hurricane. Stay safe and stay clear">
+														<div class="slds-col slds-size_12-of-12">
+															<div class="slds-truncate">Is your business hurricane ready? Download our checklist to secure your operations from deadly impacts of hurricane. Stay safe and stay clear</div>
+														</div>
+													</div> -->
+											<div class="slds-grid slds-wrap  slds-p-top_x-small">
+												<div class="slds-col slds-size_5-of-12 cib-sender">
+													<div class="slds-truncate">Mel Gibbson</div>
+												</div>
+												<div class="slds-col_bump-left slds-size_7-of-12">
+													<div class="slds-grid slds-wrap">
+														<div class="slds-col slds-size_8-of-12">
+															<div class="cib-msgtype slds-truncate">Follow up
+																Notification
+															</div>
+														</div>
+														<div class="slds-col slds-size_4-of-12">
+															<div class="cib-datentime slds-truncate">2023-05-22, 15:36
+																EST
+															</div>
+														</div>
+													</div>
+
+
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="cib-sec_vcontainer2">
+									<div class="slds-p-horizontal_small slds-scrollable_y">
+
+										<div class="slds-p-around_small slds-m-bottom_small slds-is-relative">
+
+											<h3>Marla from Rhythm Industrials, assigned the following action item to
+												you. It’s your responsibility to review and complete the action.<br/><br/>
+
+												Action ID :  4<br/>
+												Due Date:   02/June/2020<br/><br/>
+												Description: Symptomatic workers are required to isolate for a minimum of 10 days. Ensure that Covid-19 company procedures for symptomatic worker is actioned.
+												</h3>
+												<div class="slds-grid slds-wrap slds-gutters">
+													<div
+														class="slds-col slds-size_12-of-12 slds-small-size_12-of-12 slds-p-vertical_small">
+														<lightning-button variant="brand-outline" label="See More"
+															title="See More" class="slds-button_stretch">
+														</lightning-button>
+													</div>
+
+												</div>
+										</div>
+									</div>
+								</div>
+								<div class="cib-sec_vcontainer3 slds-border_top slds-p-around_small">
+									<!-- <lightning-textarea placeholder="Type your response here..." variant="label-hidden">
+									</lightning-textarea>
+									<lightning-button label="Send" onclick={handleRightButtonClick}>
+									</lightning-button> -->
+								</div>
+							</div>
+
+
+							<div class="slds-hide" data-id="cib-rightsec_systemgenarated">
+								<div class="cib-tophead-details cib-sec_vcontainer1">
+									<div class="cib-details">
+
+										<div class="cib-tasklist slds-p-vertical_small">
+											<div class="slds-grid slds-wrap">
+												<div class="slds-col slds-size_6-of-12">
+													<h4 title="Expiration Reminder">
+														<div class="slds-truncate">Expiration Reminder</div>
+													</h4>
+												</div>
+												<div class="slds-col_bump-left">
+													<div class="slds-grid slds-wrap">
+														<div class="slds-p-left_small">
+															<lightning-button-group style="margin-bottom:-3px; ">
+																<lightning-button variant="label-hidden" title="Reply"
+																	icon-name="utility:reply" icon-position="left"
+																	disabled>
+																</lightning-button>
+																<lightning-button variant="label-hidden" title="Forward"
+																	icon-name="utility:forward" icon-position="left">
+																</lightning-button>
+															</lightning-button-group>
+														</div>
+														<div class="slds-p-left_small">
+															<lightning-button-group style="margin-bottom:-3px; ">
+																<lightning-button variant="label-hidden" title="Archive"
+																	icon-name="utility:archive" icon-position="left">
+																</lightning-button>
+																<lightning-button variant="label-hidden" title="Flag"
+																	icon-name="utility:priority" icon-position="left">
+																</lightning-button>
+															</lightning-button-group>
+														</div>
+														<div class="slds-p-left_small">
+															<!-- <template if:true={opt_delete}> -->
+															<lightning-button title="Delete" icon-name="utility:delete"
+																icon-position="left" variant="Destructive"
+																onclick={deleteHandler}>
+															</lightning-button>
+															<!-- </template> -->
+														</div>
+													</div>
+
+												</div>
+											</div>
+											<!-- <div class="slds-grid slds-wrap" title="Is your business hurricane ready? Download our checklist to secure your operations from deadly impacts of hurricane. Stay safe and stay clear">
+														<div class="slds-col slds-size_12-of-12">
+															<div class="slds-truncate">Is your business hurricane ready? Download our checklist to secure your operations from deadly impacts of hurricane. Stay safe and stay clear</div>
+														</div>
+													</div> -->
+											<div class="slds-grid slds-wrap  slds-p-top_x-small">
+												<div class="slds-col slds-size_5-of-12 cib-sender">
+													<div class="slds-truncate">System Administrator</div>
+												</div>
+												<div class="slds-col_bump-left slds-size_7-of-12">
+													<div class="slds-grid slds-wrap">
+														<div class="slds-col slds-size_8-of-12">
+															<div class="cib-msgtype slds-truncate">System Generated
+															</div>
+														</div>
+														<div class="slds-col slds-size_4-of-12">
+															<div class="cib-datentime slds-truncate">2023-05-22, 15:36
+																EST
+															</div>
+														</div>
+													</div>
+
+
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="cib-sec_vcontainer2">
+									<div class="slds-p-horizontal_small slds-scrollable_y">
+
+										<div class="slds-p-around_small slds-m-bottom_small slds-is-relative">
+
+											<h3>This is a reminder to let you know that your Workers Compensation
+												insurance is about to expire in 14 days.
+											</h3>
+											<div class="slds-grid slds-wrap slds-gutters">
+												<div
+													class="slds-col slds-size_12-of-12 slds-small-size_12-of-12 slds-p-vertical_small">
+													<lightning-button variant="brand-outline" label="See More"
+														title="See More" class="slds-button_stretch">
+													</lightning-button>
+												</div>
+
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="cib-sec_vcontainer3 slds-border_top slds-p-around_small">
+									<!-- <lightning-textarea placeholder="Type your response here..." variant="label-hidden">
+									</lightning-textarea>
+									<lightning-button label="Send" onclick={handleRightButtonClick}>
+									</lightning-button> -->
+								</div>
+							</div>
+
+
+						</div>
+
 					</div>
 				</div>
-			
 			</div>
 		</div>
-	</div>
-	<!-- 
-		<div class="slds-p-around_medium">
-			<div class="slds-grid slds-wrap slds-gutters_x-small">
-				<div class="slds-col slds-size_1-of-1 slds-small-size_12-of-12 slds-medium-size_3-of-12 slds-large-size_2-of-12">
-					<div class="rtmvpc-ib-card slds-scrollable_y">
-						<h4>Task Type</h4>
-					</div>
-				</div>
-				<div class="slds-col slds-size_1-of-1 slds-small-size_12-of-12 slds-medium-size_9-of-12 slds-large-size_10-of-12">
-					<div class="rtmvpc-ib-card slds-scrollable_y">
-					</div>
-				</div>
+
+		<!-- <div class="slds-p-around_medium">
+		<div class="slds-grid slds-wrap slds-gutters_x-small">
+			<div class="slds-col slds-size_1-of-1 slds-small-size_12-of-12 slds-medium-size_3-of-12 slds-large-size_2-of-12">
+                <div class="rtmvpc-ib-card slds-scrollable_y">
+					<h4>Task Type</h4>
+
+                </div>
 			</div>
-		</div>
-	 -->
+            <div class="slds-col slds-size_1-of-1 slds-small-size_12-of-12 slds-medium-size_9-of-12 slds-large-size_10-of-12">
+                <div class="rtmvpc-ib-card slds-scrollable_y">
+                    
+                </div>
+			</div>
+        </div>
+    </div> -->
+
+
 </template>
