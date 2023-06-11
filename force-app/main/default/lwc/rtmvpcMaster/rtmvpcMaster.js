@@ -1,4 +1,5 @@
-import { LightningElement, track } from 'lwc';
+import { LightningElement, track, wire, api  } from 'lwc';
+import { NavigationMixin } from 'lightning/navigation';
 import { loadStyle, loadScript } from 'lightning/platformResourceLoader';
 import RtmFonts from '@salesforce/resourceUrl/rtmfonts';
 import RtmvpcStylesCSS from '@salesforce/resourceUrl/rtmvpcstyles';
@@ -10,15 +11,14 @@ import RtmvpcLogofullPic1 from '@salesforce/resourceUrl/rtmlogofull';
 
 //import RtmvpcLogoPic1 from '@salesforce/contentAssetUrl/rtmvpclogo1';
 
-export default class RtmvpcMaster extends LightningElement {
-
+export default class RtmvpcMaster extends NavigationMixin(LightningElement) {
     
 
     rtmvpclogosymbolpic1Url = RtmvpcLogosymbolPic1;
     rtmvpclogotypepic1Url = '';//RtmvpcLogotypePic1;
     rtmvpclogofullpic1Url = RtmvpcLogofullPic1;
 
-    isHome = true;
+     isHome = true;
     isHome = false; 
     isInbox = false; 
     isCalendar = false; 
@@ -34,6 +34,8 @@ export default class RtmvpcMaster extends LightningElement {
     isReports = false; 
     isDashboard = false; 
     isSettings = false;
+    @api activeRecId;
+    @api activemenuitem;
 
     renderedCallback() {        
         Promise.all([            
@@ -42,6 +44,32 @@ export default class RtmvpcMaster extends LightningElement {
             loadStyle(this, RtmvpcStylesCSS ),
             //loadScript(this, leaflet + '/leaflet.js'),
             ]);
+    }
+
+    openTaskHandler(event)
+    {
+        this.activeRecId=event.detail.assessmentId;
+        this.activemenuitem=event.detail.category;
+        if(typeof this.activeRecId !='undefined')
+        {
+                this.isHome = false; 
+                this.isInbox = false; 
+                this.isCalendar = false; 
+                this.isAssessments = true; 
+                this.isProjects = false; 
+                this.isRFPs = false; 
+                this.isEmployees = false; 
+                this.isDocuments = false; 
+                this.isResources = false; 
+                this.isProfile = false; 
+                this.isCompilance = false; 
+                this.isAdmin = false; 
+                this.isReports = false; 
+                this.isDashboard = false; 
+                this.isSettings = false;
+        }
+        this.template.querySelector('c-rtmvpc-leftmenu').changeactivemenuitem();
+        console.log(this.activeRecId);
     }
 
     handleRenderUI(event){
@@ -63,8 +91,8 @@ export default class RtmvpcMaster extends LightningElement {
                 this.isDashboard = false; 
                 this.isSettings = false;
 
-                if(event.detail == 'Home') {this.isHome = true; }
-                else if(event.detail == 'Inbox'){ this.isInbox = true; }
+                if(event.detail == 'Inbox'){ this.isInbox = true; }
+                else if(event.detail == 'Home') {this.isHome = true; }
                 else if(event.detail == 'Calendar'){this.isCalendar = true; }
                 else if(event.detail == 'Assessments'){this.isAssessments = true; }
                 else if(event.detail == 'Projects'){this.isProjects = true; }
@@ -116,8 +144,8 @@ export default class RtmvpcMaster extends LightningElement {
     changeMenu(menuName)
     {
         alert(menuName);
-        if(menuName == 'Home') {this.isHome = true; }
-                else if(menuName == 'Inbox'){this.isInbox = true; }
+        if(event.detail == 'Inbox'){ this.isInbox = true; }
+                else if(event.detail == 'Home') {this.isHome = true; }
                 else if(menuName == 'Calendar'){alert('Calendar');this.isCalendar = true; }
                 else if(menuName == 'Assessments'){this.isAssessments = true; }
                 else if(menuName == 'Projects'){this.isProjects = true; }
@@ -136,9 +164,28 @@ export default class RtmvpcMaster extends LightningElement {
         leftMenu.classList.toggle('show');
       }
     connectedCallback(){
-        this.isHome = true;
+        this.isAssessments = true;
+        //this.isInbox = true;
+        //this.isHome = true;
         this.template.addEventListener('leftmenu', this.handleLeftMenu.bind(this));
+       // this.disableBackButton();
     }
+    
+    // disableBackButton() {
+    //     history.pushState(null, null, location.href);
+    //     window.onpopstate = () => {
+    //         history.go(1);
+    //     };
+    // }
+    // handleForward() {
+    //     this[NavigationMixin.Navigate]({
+    //         type: 'standard__forward',
+    //     });
+    // }
+
+    // handleContextMenu(event) {
+    //     event.preventDefault();
+    // }
 
     handleLeftMenu(event) {
         const targetId = event.detail;
