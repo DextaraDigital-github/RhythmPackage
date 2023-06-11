@@ -396,7 +396,7 @@ export default class CustomTable extends LightningElement {
                             }
                             if (colList[j].fieldName === 'Name') {
                                 recJson.isHyperlink = true;
-                                if (this.objName === 'Rythm__Assessment__c') {
+                                if (this.objName === 'Rhythm__Assessment__c') {
                                     //console.log(relatedListRecords[i].fields['Additional__c'].value);
                                     if (relatedListRecords[i].fields['Additional__c'] && Number(relatedListRecords[i].fields['Additional__c'].value) > 0) {
                                         console.log(relatedListRecords[i].fields['Additional__c'].value);
@@ -439,11 +439,11 @@ export default class CustomTable extends LightningElement {
                 recDetails.rowClick = 'viewClickHandler';
                 //console.log(JSON.stringify(recDetails));
 
-                if (this.objName === 'Rythm__Assessment__c') {
+                if (this.objName === 'Rhythm__Assessment__c') {
                     recDetails.rowClick = 'takeSurveyHandler';
                     recDetails.viewButton = false;
                     recDetails.takeSurvey = true;
-                    if (relatedListRecords[i].fields['Rythm__Status__c'].value === 'Submitted') {
+                    if (relatedListRecords[i].fields['Rhythm__Status__c'].value === 'Submitted') {
                         recDetails.surveyLabel = 'View Survey';
                         recDetails.surveySymbol = 'utility:lock';
                     }
@@ -649,7 +649,7 @@ export default class CustomTable extends LightningElement {
             this.takeSurvey = false;
             this.showRecordDetail = false;
             this.showTable = true;
-            if (this.objName != 'Rythm__Assessment__c') {
+            if (this.objName != 'Rhythm__Assessment__c') {
                 console.log(this.navListHandler);
                 var gotoparentTabsetonbackclick = new CustomEvent('getchildnavobjectonbackclick', {
                     detail: this.navListHandler
@@ -788,12 +788,12 @@ export default class CustomTable extends LightningElement {
         this.opt_list = true;
         this.opt_new = (this.objName === 'Employee__c' ? false : true);
         this.opt_newEmp = (this.objName === 'Employee__c' ? true : false);
-        this.opt_rec_csv = (this.objName === 'Rythm__Assessment__c' ? true : false);
-        this.opt_rec_pdf = (this.objName === 'Rythm__Assessment__c' ? true : false);
-        this.opt_rec_csv = (this.objName === 'Rythm__Assessment__c' ? true : false);
-        this.opt_rec_pdf = (this.objName === 'Rythm__Assessment__c' ? true : false);
+        this.opt_rec_csv = (this.objName === 'Rhythm__Assessment__c' ? true : false);
+        this.opt_rec_pdf = (this.objName === 'Rhythm__Assessment__c' ? true : false);
+        this.opt_rec_csv = (this.objName === 'Rhythm__Assessment__c' ? true : false);
+        this.opt_rec_pdf = (this.objName === 'Rhythm__Assessment__c' ? true : false);
         console.log('this.objName',this.objName);
-        if(this.objName!=undefined && this.objName=='Rythm__Assessment__c')
+        if(this.objName!=undefined && this.objName=='Rhythm__Assessment__c')
         {
             
         //     getAssesmentRecords().then(result=>{

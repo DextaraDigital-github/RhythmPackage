@@ -1497,9 +1497,9 @@ export default class CustomTablePlatform extends LightningElement {
      /*dragwrap(seclist){
          let responselist = [];
          for(var i = 0;i<seclist.length;i++){
-              var response={'sobjectType': 'Rythm__Section__c'};
+              var response={'sobjectType': 'Rhythm__Section__c'};
               response.Id=seclist[i].Id;
-              response.Rythm__Section_Sequence_Number__c=i+1;
+              response.Rhythm__Section_Sequence_Number__c=i+1;
                 responselist.push(response);
             
          }

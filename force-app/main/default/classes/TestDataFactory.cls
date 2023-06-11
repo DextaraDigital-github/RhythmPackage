@@ -156,12 +156,12 @@ return createRecords(prlList, doInsert, attributes);
         qlist.add(q);
         return createRecords(qlist,true,attributes);
     }
-   /* public static List<Rythm__Assessment_Template_Junction__c> createATJunction (Id tempid,Id sectionid,Id questionid,Map<String, Object> attributes){
-        List<Rythm__Assessment_Template_Junction__c> atjlist = new List<Rythm__Assessment_Template_Junction__c>();
-        Rythm__Assessment_Template_Junction__c atj =  new Rythm__Assessment_Template_Junction__c();
-        atj.Rythm__Assessment_Template__c = tempid;
-        atj.Rythm__Section__c = sectionid;
-        atj.Rythm__Question__c = questionid;
+   /* public static List<Rhythm__Assessment_Template_Junction__c> createATJunction (Id tempid,Id sectionid,Id questionid,Map<String, Object> attributes){
+        List<Rhythm__Assessment_Template_Junction__c> atjlist = new List<Rhythm__Assessment_Template_Junction__c>();
+        Rhythm__Assessment_Template_Junction__c atj =  new Rhythm__Assessment_Template_Junction__c();
+        atj.Rhythm__Assessment_Template__c = tempid;
+        atj.Rhythm__Section__c = sectionid;
+        atj.Rhythm__Question__c = questionid;
         atjlist.add(atj);
         return createRecords(atjlist,true,attributes);
     }*/

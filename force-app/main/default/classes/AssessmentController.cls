@@ -28,7 +28,7 @@ System.debug('SupplierAssessment'+SupplierAssessment);*/ // commented by koushik
       /*  List<Id> templateId = new List<Id>();
         for(Sobject assessmenttemplate :getAssementTemplate)
         {
-            Id assessmentTempId = (ID)assessmenttemplate.get('Rythm__Template__c');
+            Id assessmentTempId = (ID)assessmenttemplate.get('Rhythm__Template__c');
             templateId.add(assessmentTempId);
         }
         List<Sobject> getSectionsdata=[select id,name,Template__c,Template__r.Disclosure__c,Status__c from Assessment__c where Template__c IN :templateId];
@@ -128,9 +128,9 @@ return questionList;
         {
             Response__c response = new Response__c();
             response.Assessment__c = (Id)suppResponseList[i].get('Assessment__c');
-            response.Question__c =(Id)suppResponseList[i].get('Rythm__Question__c');
-            response.Account__c = (Id)suppResponseList[i].get('Rythm__Account__c');
-            response.Response__c = (String)suppResponseList[i].get('Rythm__Response__c');
+            response.Question__c =(Id)suppResponseList[i].get('Rhythm__Question__c');
+            response.Account__c = (Id)suppResponseList[i].get('Rhythm__Account__c');
+            response.Response__c = (String)suppResponseList[i].get('Rhythm__Response__c');
             responseList.add(response);
         }
         insert responseList;
@@ -248,22 +248,22 @@ return questionList;
         
         system.debug('secList  '+secList);
         update secList;
-        /* list<Rythm__Section__c> lst = new list<Rythm__Section__c>();
-for(Rythm__Section__c sec:secList)
+        /* list<Rhythm__Section__c> lst = new list<Rhythm__Section__c>();
+for(Rhythm__Section__c sec:secList)
 {    
 system.debug(sec.get('id'));
-Rythm__Section__c rc=new Rythm__Section__c();
+Rhythm__Section__c rc=new Rhythm__Section__c();
 rc.id=(Id)sec.get('id');
-rc.Rythm__Section_Sequence_Number__c=sec.Rythm__Section_Sequence_Number__c;
+rc.Rhythm__Section_Sequence_Number__c=sec.Rhythm__Section_Sequence_Number__c;
 lst.add(rc);
 }*/
         //system.debug('ids list :'+idlist);
-        /* List<Rythm__Section__c> lstww=[select Id,Rythm__Section_Sequence_Number__c from Rythm__Section__c where Id IN : idlist];
+        /* List<Rhythm__Section__c> lstww=[select Id,Rhythm__Section_Sequence_Number__c from Rhythm__Section__c where Id IN : idlist];
 for(Integer i=0;i<lstww.size();i++)
 {
-Rythm__Section__c rc=new Rythm__Section__c();
+Rhythm__Section__c rc=new Rhythm__Section__c();
 rc.id=(Id)lstww[i].get('id');
-rc.Rythm__Section_Sequence_Number__c=secList[i].Rythm__Section_Sequence_Number__c;
+rc.Rhythm__Section_Sequence_Number__c=secList[i].Rhythm__Section_Sequence_Number__c;
 lst.add(rc);
 }*/
         /*update lst;

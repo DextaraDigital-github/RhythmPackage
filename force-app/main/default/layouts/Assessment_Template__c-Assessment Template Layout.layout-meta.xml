@@ -137,10 +137,6 @@
     </relatedLists>
     <relatedLists>
         <fields>NAME</fields>
-        <relatedList>Assessment__c.Template__c</relatedList>
-    </relatedLists>
-    <relatedLists>
-        <fields>NAME</fields>
         <relatedList>Section__c.Assessment_Template__c</relatedList>
     </relatedLists>
     <relatedLists>

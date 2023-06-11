@@ -91,23 +91,23 @@ export default class Questionnaire extends LightningElement {
             /*This method is used to get all the assessments records*/
             getSupplierAssessmentList({ assessmentId: this.assessment }).then(result => {
                 var supplierAssessment = result[0];
-                var assessmentTemplateId = result[0].Rythm__Template__c;
-                this.showDisclosure = result[0].Rythm__Template__r.Rythm__Disclosure__c;
+                var assessmentTemplateId = result[0].Rhythm__Template__c;
+                this.showDisclosure = result[0].Rhythm__Template__r.Rhythm__Disclosure__c;
                 this.AssessmentName = result[0].Name;
                 var sectionidslist = [];
                 /*This method is used to get all the questions with particular section*/
                 getQuestionsList({ templateId: assessmentTemplateId }).then(result => {
                     var resultMap = result;
                     for (let i = 0; i < resultMap.length; i++) {
-                        if (!sectionidslist.includes(resultMap[i].Rythm__Section__r.Id)) {
-                            sectionidslist.push(resultMap[i].Rythm__Section__r.Id);
+                        if (!sectionidslist.includes(resultMap[i].Rhythm__Section__r.Id)) {
+                            sectionidslist.push(resultMap[i].Rhythm__Section__r.Id);
                         }
                     }
                     // for (let i = 0; i < resultMap.length; i++) {
                     //     let count = 0;
                     //     for (let j = i; j < resultMap.length; j++) {
-                    //         if (resultMap[i].Rythm__Section__r.Id == resultMap[j].Rythm__Section__r.Id) {
-                    //             this.responseCount[resultMap[i].Rythm__Section__r.Name] = count + 1;
+                    //         if (resultMap[i].Rhythm__Section__r.Id == resultMap[j].Rhythm__Section__r.Id) {
+                    //             this.responseCount[resultMap[i].Rhythm__Section__r.Name] = count + 1;
                     //         }
                     //     }
                     // }
@@ -125,7 +125,7 @@ export default class Questionnaire extends LightningElement {
                         }
                         console.log('getSupplierResponseList result', result);
                         result.forEach(qres => {
-                            this.savedResponseMap.set(qres.Rythm__Question__c, { "Id": qres.Id, "value": qres.Rythm__Response__c, "Files__c": qres.Rythm__Files__c, "Flag__c": qres.Rythm__Flag__c, "Conversation_History__c": qres.Rythm__Conversation_History__c });
+                            this.savedResponseMap.set(qres.Rhythm__Question__c, { "Id": qres.Id, "value": qres.Rhythm__Response__c, "Files__c": qres.Rhythm__Files__c, "Flag__c": qres.Rhythm__Flag__c, "Conversation_History__c": qres.Rhythm__Conversation_History__c });
                         });
 
                         console.log('this.savedResponseMap', this.savedResponseMap);
@@ -148,7 +148,7 @@ export default class Questionnaire extends LightningElement {
                         this.showButtons.Summary = false;
                         this.showButtons.Section_Navigation.show = false;
                         this.showButtons.Save_Submit = false;
-                        if (supplierAssessment.Rythm__Status__c === 'Submitted') {
+                        if (supplierAssessment.Rhythm__Status__c === 'Submitted') {
                             this.showButtons.Summary = true;
                         }
                         else {
@@ -210,8 +210,8 @@ export default class Questionnaire extends LightningElement {
             }
             if (this.questionsAndAnswerss.length > 0) {
                 if (typeof this.questionsAndAnswerss[0].questions[0] != "undefined" && typeof this.questionsAndAnswerss[0].questions[0].Id != "undefined" && typeof this.savedResponseMap.get(this.questionsAndAnswerss[0].questions[0].Id) != "undefined") {
-                    if (typeof this.savedResponseMap.get(this.questionsAndAnswerss[0].questions[0].Id).Rythm__Conversation_History__c != 'undefined') {
-                        this.Rythm__Conversation_History__c = { "Id": this.savedResponseMap.get(this.questionsAndAnswerss[0].questions[0].Id).Id, "AssessmentId": this.assessment, "QuestionnaireId": this.questionsAndAnswerss[0].questions[0].Id, "chatHistory": (this.savedResponseMap.get(this.questionsAndAnswerss[0].questions[0].Id).Rythm__Conversation_History__c ? JSON.parse(this.savedResponseMap.get(this.questionsAndAnswerss[0].questions[0].Id).Rythm__Conversation_History__c) : '') };
+                    if (typeof this.savedResponseMap.get(this.questionsAndAnswerss[0].questions[0].Id).Rhythm__Conversation_History__c != 'undefined') {
+                        this.Rhythm__Conversation_History__c = { "Id": this.savedResponseMap.get(this.questionsAndAnswerss[0].questions[0].Id).Id, "AssessmentId": this.assessment, "QuestionnaireId": this.questionsAndAnswerss[0].questions[0].Id, "chatHistory": (this.savedResponseMap.get(this.questionsAndAnswerss[0].questions[0].Id).Rhythm__Conversation_History__c ? JSON.parse(this.savedResponseMap.get(this.questionsAndAnswerss[0].questions[0].Id).Rhythm__Conversation_History__c) : '') };
                     }
                 }
             }
@@ -235,7 +235,7 @@ export default class Questionnaire extends LightningElement {
                         }
                     }
                  }
-                 if(duplicatequestionList[i].questions[j].Rythm__Flag__c == true)
+                 if(duplicatequestionList[i].questions[j].Rhythm__Flag__c == true)
                          {
                              displayFlag++;
                          }
@@ -384,14 +384,14 @@ export default class Questionnaire extends LightningElement {
 
         console.log('this.responseMap', this.responseMap);
         for (const seckey of this.responseMap.keys()) {
-            let reponse = { 'sobjectType': 'Rythm__Response__c' };
-            reponse.Rythm__Assessment__c = this.assessment;
-            reponse.Rythm__Question__c = seckey;
-            reponse.Rythm__Account__c = this.vendor;
-            reponse.Rythm__Response__c = this.responseMap.get(seckey);
+            let reponse = { 'sobjectType': 'Rhythm__Response__c' };
+            reponse.Rhythm__Assessment__c = this.assessment;
+            reponse.Rhythm__Question__c = seckey;
+            reponse.Rhythm__Account__c = this.vendor;
+            reponse.Rhythm__Response__c = this.responseMap.get(seckey);
 
             console.log('reponse in constructResponse', reponse);
-            if (this.requiredQuestionList.includes(reponse.Rythm__Question__c) && (reponse.Rythm__Response__c == '')) {
+            if (this.requiredQuestionList.includes(reponse.Rhythm__Question__c) && (reponse.Rhythm__Response__c == '')) {
                 isAssessmentValidated = true;
                 break;
             }
@@ -432,12 +432,12 @@ export default class Questionnaire extends LightningElement {
         console.log('savedResp', savedResp);
         var quTemp = this.getQuestionTemplate();
         quTemp.Id = qu.Id;
-        if (qu['Rythm__HelpText__c'] != 'undefined') {
-            console.log('qu[Rythm__HelpText__c]', qu['Rythm__HelpText__c']);
-            quTemp.helptext = qu.Rythm__HelpText__c;
+        if (qu['Rhythm__HelpText__c'] != 'undefined') {
+            console.log('qu[Rhythm__HelpText__c]', qu['Rhythm__HelpText__c']);
+            quTemp.helptext = qu.Rhythm__HelpText__c;
         }
-        quTemp.question = qu.Rythm__Question__c;
-        var qtype = qu.Rythm__Question_Type__c;
+        quTemp.question = qu.Rhythm__Question__c;
+        var qtype = qu.Rhythm__Question_Type__c;
         quTemp.sectionId = this.section;
         quTemp.isText = ('Text' == qtype);
         quTemp.isRadio = ('Radio' == qtype);
@@ -449,22 +449,22 @@ export default class Questionnaire extends LightningElement {
         quTemp.isEmail = ('Email' == qtype);
         quTemp.isTextArea = ('Text Area' == qtype);
         quTemp.type = qtype;
-        quTemp.required = qu.Rythm__Required__c;
+        quTemp.required = qu.Rhythm__Required__c;
         quTemp.inputId = qu.Id + '_inputId';
         quTemp.labelId = qu.Id + '_labelId';
         quTemp.spanId = qu.Id + '_spanId';
-        quTemp.parentQuestionId = qu.Rythm__Parent_Question__c;
-        if (qu.Rythm__Responses__r != null) {
-            quTemp.Rythm__Flag__c = qu.Rythm__Responses__r[0].Rythm__Flag__c;
+        quTemp.parentQuestionId = qu.Rhythm__Parent_Question__c;
+        if (qu.Rhythm__Responses__r != null) {
+            quTemp.Rhythm__Flag__c = qu.Rhythm__Responses__r[0].Rhythm__Flag__c;
         }
         else {
-            quTemp.Rythm__Flag__c = false;
+            quTemp.Rhythm__Flag__c = false;
         }
-        if (qu.Rythm__Required__c == true) {
+        if (qu.Rhythm__Required__c == true) {
             this.requiredQuestionList.push(qu.Id);
         }
-        quTemp.conditional = qu.Rythm__Conditional_Response__c == null ? '' : qu.Rythm__Conditional_Response__c;
-        quTemp.optionsValueSet = qu.Rythm__OptionValueSet__c;
+        quTemp.conditional = qu.Rhythm__Conditional_Response__c == null ? '' : qu.Rhythm__Conditional_Response__c;
+        quTemp.optionsValueSet = qu.Rhythm__OptionValueSet__c;
         if (quTemp.optionsValueSet) {
             var optionValues = quTemp.optionsValueSet.split("\r\n");
             var optionList = [];
@@ -479,7 +479,7 @@ export default class Questionnaire extends LightningElement {
         quTemp.optionsWrapper.pickListOptions = optionList;
         quTemp.optionsWrapper.radioOptions = optionList;
         quTemp.optionsWrapper.multiPickListOptions = optionList;
-        console.log('qu.Rythm__Question__c', qu.Id);
+        console.log('qu.Rhythm__Question__c', qu.Id);
         console.log(savedResp.get(qu.Id));
         if (typeof savedResp.get(qu.Id) != "undefined" && typeof savedResp.get(qu.Id).value != "undefined") {
             console.log(savedResp.get(qu.Id));
@@ -487,11 +487,11 @@ export default class Questionnaire extends LightningElement {
         }
         else
             quTemp.value = undefined;
-        if (typeof savedResp.get(qu.Id) != "undefined" && typeof savedResp.get(qu.Id).Rythm__Conversation_History__c != "undefined")
-            quTemp.Rythm__Conversation_History__c = savedResp.get(qu.Id).Rythm__Conversation_History__c;
+        if (typeof savedResp.get(qu.Id) != "undefined" && typeof savedResp.get(qu.Id).Rhythm__Conversation_History__c != "undefined")
+            quTemp.Rhythm__Conversation_History__c = savedResp.get(qu.Id).Rhythm__Conversation_History__c;
         else
-            quTemp.Rythm__Conversation_History__c = [];
-        quTemp.showUpload = qu.Rythm__Requires_File_Upload__c;
+            quTemp.Rhythm__Conversation_History__c = [];
+        quTemp.showUpload = qu.Rhythm__Requires_File_Upload__c;
         if (typeof savedResp.get(qu.Id) != "undefined" && typeof savedResp.get(qu.Id).Files__c != "undefined") {
             var responsedData = JSON.parse(savedResp.get(qu.Id).Files__c);
             console.log('(savedResp.get(qu.Id).Files__c)', (savedResp.get(qu.Id).Files__c));
@@ -512,12 +512,12 @@ export default class Questionnaire extends LightningElement {
         if (typeof savedResp.get(qu.Id) != "undefined" && typeof savedResp.get(qu.Id).value != "undefined")
             this.responseMap.set(qu.Id, savedResp.get(qu.Id).value);
         quTemp.Children = [];
-        if (this.questionMap.has(qu.Rythm__Section__r.Name)) {
-            this.questionMap.get(qu.Rythm__Section__r.Name).push(quTemp);
+        if (this.questionMap.has(qu.Rhythm__Section__r.Name)) {
+            this.questionMap.get(qu.Rhythm__Section__r.Name).push(quTemp);
         } else {
             var quesList = [];
             quesList.push(quTemp);
-            this.questionMap.set(qu.Rythm__Section__r.Name, quesList);
+            this.questionMap.set(qu.Rhythm__Section__r.Name, quesList);
         }
         console.log('this.questionMap', this.questionMap);
         return quTemp;
@@ -527,8 +527,8 @@ export default class Questionnaire extends LightningElement {
     constructMultilevelhierarchy(queryResults, savedResp) {
         console.log('queryResults', queryResults);
         console.log('constructMultilevelhierarchy savedResp', savedResp);
-        const children = queryResults.filter(result => typeof result['Rythm__Parent_Question__c'] != 'undefined');
-        const parent = queryResults.filter(result => typeof result['Rythm__Parent_Question__c'] === 'undefined');
+        const children = queryResults.filter(result => typeof result['Rhythm__Parent_Question__c'] != 'undefined');
+        const parent = queryResults.filter(result => typeof result['Rhythm__Parent_Question__c'] === 'undefined');
         console.log('topLevelChildren', children);
         children.forEach(child => {
             const hierarchyObj = this.constructWrapperConditionalQuestion(child, savedResp);

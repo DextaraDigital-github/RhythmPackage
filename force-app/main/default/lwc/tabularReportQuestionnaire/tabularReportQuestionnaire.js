@@ -24,7 +24,7 @@ export default class TabularReportQuestionnaire extends NavigationMixin(Lightnin
         /*getSupplierAssessmentList is used to get all the assessment related to particular account */
         getSupplierAssessmentList({ assessmentId: this.assessment }).then(result => {
             console.log('result',result);
-            assessmentTemplateId = result[0].Rythm__Template__c;
+            assessmentTemplateId = result[0].Rhythm__Template__c;
             console.log('assessmentTemplateId',assessmentTemplateId);
             /*getQuestionsList is used to get all the Questions related to particular sections related to particular assessment */
             getQuestionsList({ templateId: assessmentTemplateId }).then(result => {
@@ -35,8 +35,8 @@ export default class TabularReportQuestionnaire extends NavigationMixin(Lightnin
                     console.log('result',result);
                     result.forEach(qres => {
                         console.log('qres',qres);
-                        if(typeof qres != 'undefined' && typeof qres.Rythm__Response__c != 'undefined')
-                        this.savedResponseMap.set(qres.Rythm__Question__c, { "Response__c": qres.Rythm__Response__c, "Flag__c": qres.Rythm__Flag__c });
+                        if(typeof qres != 'undefined' && typeof qres.Rhythm__Response__c != 'undefined')
+                        this.savedResponseMap.set(qres.Rhythm__Question__c, { "Response__c": qres.Rhythm__Response__c, "Flag__c": qres.Rhythm__Flag__c });
                     console.log('qres',qres);
                     });
                     
@@ -60,7 +60,7 @@ export default class TabularReportQuestionnaire extends NavigationMixin(Lightnin
         questionResp.forEach(qu => {
             console.log('qu',qu);
             var quTemp = {};
-            quTemp.question = qu.Rythm__Question__c;
+            quTemp.question = qu.Rhythm__Question__c;
 
             // console.log(qu);
             // if(qu.lastModifiedDate!=undefined)
@@ -78,16 +78,16 @@ export default class TabularReportQuestionnaire extends NavigationMixin(Lightnin
             // }
 
             if(savedResp.get(quTemp.question))
-            quTemp.value = savedResp.get(quTemp.question).Rythm__Response__c;
+            quTemp.value = savedResp.get(quTemp.question).Rhythm__Response__c;
             if(savedResp.get(quTemp.question))
-            quTemp.flag = savedResp.get(quTemp.question).Rythm__Flag__c;
-            if (questionMap.has(qu.Rythm__Section__r.Name)) {
-                questionMap.get(qu.Rythm__Section__r.Name).push(quTemp);
+            quTemp.flag = savedResp.get(quTemp.question).Rhythm__Flag__c;
+            if (questionMap.has(qu.Rhythm__Section__r.Name)) {
+                questionMap.get(qu.Rhythm__Section__r.Name).push(quTemp);
             } else {
                 var quesList = [];
                 console.log('quTemp',quTemp);
                 quesList.push(quTemp);
-                questionMap.set(qu.Rythm__Section__r, quesList);
+                questionMap.set(qu.Rhythm__Section__r, quesList);
             }
         });
         var sectioncount = 0;

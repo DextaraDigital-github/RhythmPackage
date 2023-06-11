@@ -40,26 +40,28 @@
         <name>detailTabContent</name>
         <type>Facet</type>
     </flexiPageRegions>
-    <flexiPageRegions>
+    <!--<flexiPageRegions>
         <itemInstances>
             <componentInstance>
                 <componentName>sectionTablePlatform</componentName>
-                <identifier>Rythm_sectionTablePlatform</identifier>
+                <identifier>Rhythm_sectionTablePlatform</identifier>
             </componentInstance>
         </itemInstances>
         <name>Facet-fed541f9-0e41-47d5-b707-fd3f263077ce</name>
         <type>Facet</type>
     </flexiPageRegions>
-    <flexiPageRegions>
+    -->
+    <!--<flexiPageRegions>
         <itemInstances>
             <componentInstance>
                 <componentName>assessmentquestions</componentName>
-                <identifier>Rythm_assessmentquestions</identifier>
+                <identifier>Rhythm_assessmentquestions</identifier>
             </componentInstance>
         </itemInstances>
         <name>Facet-09503f2b-0a24-4909-9aba-00af00b735aa</name>
         <type>Facet</type>
     </flexiPageRegions>
+    -->
     <flexiPageRegions>
         <itemInstances>
             <componentInstance>
@@ -81,10 +83,11 @@
         </itemInstances>
         <itemInstances>
             <componentInstance>
-                <componentInstanceProperties>
+               <!-- <componentInstanceProperties>
                     <name>body</name>
                     <value>Facet-fed541f9-0e41-47d5-b707-fd3f263077ce</value>
                 </componentInstanceProperties>
+                -->
                 <componentInstanceProperties>
                     <name>title</name>
                     <value>Sections</value>
@@ -95,10 +98,11 @@
         </itemInstances>
         <itemInstances>
             <componentInstance>
-                <componentInstanceProperties>
+                <!--<componentInstanceProperties>
                     <name>body</name>
                     <value>Facet-09503f2b-0a24-4909-9aba-00af00b735aa</value>
                 </componentInstanceProperties>
+                -->
                 <componentInstanceProperties>
                     <name>title</name>
                     <value>Questions</value>

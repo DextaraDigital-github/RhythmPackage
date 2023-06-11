@@ -31,8 +31,8 @@ export default class RtmvpcAssessmentChatter extends LightningElement {
       /*getChatterResponse is used to get conversation history between vendor and customer on onload */
       getChatterResponse({ assessmentId: this.assessmentId, questionId: this.questionId }).then((result) => {
 
-         if (('Rythm__Conversation_History__c' in result[0])) {
-            this.newResponse = JSON.parse(result[0].Rythm__Conversation_History__c);
+         if (('Rhythm__Conversation_History__c' in result[0])) {
+            this.newResponse = JSON.parse(result[0].Rhythm__Conversation_History__c);
             this.responseList = this.newResponse;
             this.showResponse = true;
          }
@@ -63,8 +63,8 @@ export default class RtmvpcAssessmentChatter extends LightningElement {
    handleRightButtonClick(event) {
       /*This method is used to get conversation history between vendor and customer after firing the event */
       getChatterResponse({ assessmentId: this.assessmentId, questionId: this.questionId }).then((result1) => {
-         if (result1[0].Rythm__Conversation_History__c != null) {
-            this.newResponse = JSON.parse(result1[0].Rythm__Conversation_History__c);
+         if (result1[0].Rhythm__Conversation_History__c != null) {
+            this.newResponse = JSON.parse(result1[0].Rhythm__Conversation_History__c);
          }
          this.responseMap.Text = this.newChat;
          this.responseMap.createdTime = result1[0].CreatedDate;
