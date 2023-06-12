@@ -1,3 +1,5 @@
+<!-- This HTML is used to load both section(tabluar report questionnaire) and Questions(Quesstionnaire) in same component based on the selection of sectionId and AssessmentId
+	-->
 <template>
 	<!-- <header class="rtmvpc-pgheader">
 		<div class="rtmvpc-pghtitle">
@@ -11,7 +13,9 @@
 				<div class="cad-cel cad-w230 cad-type cad-pr8" data-id="cadtype" aura:id="cadtype">
 					<div class="cad-sec_container">
 						<div class="cad-sec_header">
-							<button class="cad_actions" onclick={handleLeftButtonClick} title="Close Timeline Panel"><i class="las la-chevron-circle-left"></i></button><span>Time Line</span>
+							<button class="cad_actions" onclick={handleLeftButtonClick} title="Close Timeline Panel" style="z-index:1; position:inherit;">
+								<i class="las la-chevron-circle-left"></i>
+							</button><span>Time Line</span>
 						</div>
 						<div class="cad-sec_bodyfull1">
 							<div class="cad-sec_vcontainer2_1">
@@ -97,12 +101,13 @@
 						</div> -->
 
 						<div class="cad-sec_header">
-							<div class="slds-float_left slds-is-absolute" style="width:100%; padding:4px 80px 0px 31px;" title="Details : ESG Assessment (Due date 05/14/2023)">
+							<div class="slds-float_left slds-is-absolute" style="width:100%; padding:4px 80px 0px 31px;"
+								title="Details : ESG Assessment (Due date 05/14/2023)">
 								<div class="slds-truncate">Details : ESG Assessment (Due date 05/14/2023)</div>
 							</div>
 							<div class="slds-float_left slds-is-relative">
 								<button class="cad_actions" onclick={handleLeftButtonClick} title="Show / Hide Timeline Panel"><i class="las la-bars"></i></button>
-							</div>							
+							</div>
 							<div class="slds-float_right slds-is-relative">
 								<!-- 
 								<lightning-combobox name="progress" label="Status" variant="label-hidden"
@@ -111,13 +116,11 @@
 								</lightning-combobox>
 								-->
 								<lightning-button-menu icon-name="utility:download" menu-alignment="right"
-									menu-size="medium" alternative-text="Export" variant="label-hidden"
-									title="Export" style="top:-3px;">
-									<lightning-menu-item label="PDF" title="PDF" value="PDF"
-										onclick={handleExportPDF}>
+									menu-size="medium" alternative-text="Export" variant="label-hidden" title="Export"
+									style="top:-3px;">
+									<lightning-menu-item label="PDF" title="PDF" value="PDF" onclick={handleExportPDF}>
 									</lightning-menu-item>
-									<lightning-menu-item label="CSV" title="CSV" value="CSV"
-										onclick={handleExportCSV}>
+									<lightning-menu-item label="CSV" title="CSV" value="CSV" onclick={handleExportCSV}>
 									</lightning-menu-item>
 									<!-- <lightning-menu-item label="Excel" title="Excel" value="Excel"></lightning-menu-item> -->
 								</lightning-button-menu>
@@ -128,46 +131,92 @@
 							<input type="text" placeholder="Search" class="cad-serch-input" onkeyup={searchInputChangeHandler}/>
 							</div>
 						 -->
-						 <!--
+						<!--
 							 ++ If Searc enabled use below Class "class="cad-sec_bodyfull2"" insted of  "class="cad-sec_bodyfull1"" ++ 
 						 -->
-							<div class="cad-sec_bodyfull1">
-								<div class="cad-sec_vcontainer2_2" style="height: calc(100% - 42px)">
-									<div class="slds-scrollable_y">
-										<div
-											class="slds-text-align_center slds-text-heading_large">
-											<!-- <strong>Assessment Component Placeholder</strong>
+						<div class="cad-sec_bodyfull1">
+							<div class="cad-sec_vcontainer2_2" style="height: calc(100% - 42px)">
+								<div class="slds-scrollable_y">
+									<div class="slds-text-align_center slds-text-heading_large">
+										<!-- <strong>Assessment Component Placeholder</strong>
 											<h1>calling tabular report questionnaire</h1> -->
-											<template if:true={showSections}>
-											<c-tabular-report-questionnaire assessment={assessmentid} show-next-button="true" onsectionclick={showQuestionnaire}></c-tabular-report-questionnaire>										
-											</template>
-											<template if:false={showSections}>
-												<!-- <h1>Section Id {sectionId}</h1> -->
-												<c-Questionnaire vendor={accountid} assessment={assessmentid}  ></c-Questionnaire>
-											</template>
-											<template if:false={showFlag}>
-											    <c-rtmvpc-render-question-template onopenchathistory={handleChat}></c-rtmvpc-render-question-template>
-											</template>
-										</div>
+										<template if:true={showSections}>
+											<c-tabular-report-questionnaire assessment={assessmentid}
+												show-next-button="true" onsectionclick={showQuestionnaire}>
+											</c-tabular-report-questionnaire>
+										</template>
+										<template if:false={showSections}>
+											<!-- <h1>Section Id {sectionId}</h1> -->
+											<c-Questionnaire vendor={accountid} assessment={assessmentid} section={sectionid}
+												onselectconversation={chatHistory} onshowsummary={showsummaryHandler}></c-Questionnaire>
+										</template>
+										<!-- <template if:false={showFlag}>
+												
+											    <c-rtmvpc-render-question-template onselectchange={chatHistory}></c-rtmvpc-render-question-template>
+											</template> -->
 									</div>
 								</div>
-								<div class="slds-is-absolute slds-border_top slds-p-vertical_x-small slds-p-horizontal_small slds-text-align_right" style="width:100%; bottom:0px;">
-									<lightning-button label="Save"></lightning-button>
-									<lightning-button label="Submit" variant="brand" class="slds-m-left_medium"></lightning-button>
+							</div>
+							<!-- <div class="slds-is-absolute slds-border_top slds-p-vertical_x-small slds-p-horizontal_small slds-text-align_right"
+								style="width:100%; bottom:0px;">
+								<lightning-button label="Save"></lightning-button>
+								<lightning-button label="Submit" variant="brand" class="slds-m-left_medium">
+								</lightning-button>
+							</div> -->
+						</div>
+					</div>
+				</div>
+
+				<div class="cad-cel cad-w300 cad-disc cad-pl8 cadshowright" data-id="caddisc">
+					<div class="cad-sec_container_nobdr cad-sec_vcontainer">
+						<!-- <div class="cad-top_back_container">
+							<button class="cad_actions" data-id="buttoncaddisc" onclick={handleRightButtonClick}>
+								<i class="las la-chevron-circle-left"></i>
+								<span class="textstyle01"></span>
+							</button>
+						</div> -->
+						<div class="cad-tophead-details cad-sec_vcontainer1">
+							<div class="slds-grid slds-wrap slds-gutters_small">
+								<button class="cad_actions slds-float_right slds-is-absolute" style="right:0px;" data-id="buttoncaddisc" onclick={handleRightButtonClick} >
+									<i class="las la-chevron-circle-right"></i>
+									<span class="textstyle01"></span>
+								</button>
+								<div class="slds-col slds-size_12-of-12 slds-text-align_center">
+									<h4 class="slds-p-top_x-small slds-p-bottom_xx-small">
+										Selected Question Current Status
+									</h4>
+									<div class="">
+										<div class="cad-approved">Approved</div>
+									</div>
 								</div>
 							</div>
 						</div>
-					</div>
-
-					<div class="cad-cel cad-w300 cad-disc cad-pl8 cadshowright" data-id="caddisc"> <!-- to show apply or remove class "cadshowright" -->
-						<template if:true={showChat}>
-							<c-rtmvpc-assessment-chatter ></c-rtmvpc-assessment-chatter>
-						</template>
+						<div class="cad-tophead-details cad-sec_vcontainer1a">
+							<div class="slds-text-align_center slds-p-vertical_x-small">
+								<h4> Review & Comments History</h4>
+							</div>
+						</div>
+						<div class="cad-sec_vcontainer2bdr">
+							<div class="slds-scrollable_y">
+								<!-- to show apply or remove class "cadshowright" -->
+								<template if:true={showData}>
+									<c-rtmvpc-assessment-chatter chattermap={showChat}></c-rtmvpc-assessment-chatter>
+								</template>
+							</div>
+						</div>
+						<!-- <div class="cad-sec_vcontainer3 slds-border_top slds-p-around_small">
+							<lightning-textarea placeholder="Type your response here..." variant="label-hidden"
+								onchange={chatChangeHandler}>
+							</lightning-textarea>
+							<lightning-button label="Send" onclick={sendButtonHandler}>
+							</lightning-button>
+						</div> -->
 					</div>
 				</div>
 			</div>
 		</div>
-		<!-- 
+	</div>
+	<!-- 
 		<div class="slds-p-around_medium">
 			<div class="slds-grid slds-wrap slds-gutters_x-small">
 				<div class="slds-col slds-size_1-of-1 slds-small-size_12-of-12 slds-medium-size_3-of-12 slds-large-size_2-of-12">

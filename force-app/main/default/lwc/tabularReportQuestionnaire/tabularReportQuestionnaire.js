@@ -1,3 +1,9 @@
+/* Component Name   : TabularReportQuestionnaire
+* Developer         : Sai Koushik Nimmaturi and Reethika Velpula           
+* Created Date      : 
+* Description       : This component is used for loading the Sections template based on the sections
+* Last Modified Date: 
+*/
 import { LightningElement, api, track, wire } from 'lwc';
 import getQuestionsList from '@salesforce/apex/AssessmentController.getQuestionsList';
 import getSupplierResponseList from '@salesforce/apex/AssessmentController.getSupplierResponseList';
@@ -15,19 +21,22 @@ export default class TabularReportQuestionnaire extends NavigationMixin(Lightnin
         this.showNextButton = JSON.parse(this.showNextButton);
         var assessmentTemplateId;
         console.log('this.assessment',this.assessment);
+        /*getSupplierAssessmentList is used to get all the assessment related to particular account */
         getSupplierAssessmentList({ assessmentId: this.assessment }).then(result => {
             console.log('result',result);
-            assessmentTemplateId = result[0].Rythm__Assessment_Template__c;
+            assessmentTemplateId = result[0].Rhythm__Template__c;
             console.log('assessmentTemplateId',assessmentTemplateId);
+            /*getQuestionsList is used to get all the Questions related to particular sections related to particular assessment */
             getQuestionsList({ templateId: assessmentTemplateId }).then(result => {
                 var resultMap = result;
                 console.log('getQuestionsList',result);
+                /*getQuestionsList is used to get all the Responses for a question related to particular sections and particular assessment */
                 getSupplierResponseList({ assessmentId: this.assessment }).then(result => {
                     console.log('result',result);
                     result.forEach(qres => {
                         console.log('qres',qres);
-                        if(typeof qres != 'undefined' && typeof qres.Rythm__Response__c != 'undefined')
-                        this.savedResponseMap.set(qres.Rythm__Question__c, { "Response__c": qres.Rythm__Response__c, "Flag__c": qres.Rythm__Flag__c });
+                        if(typeof qres != 'undefined' && typeof qres.Rhythm__Response__c != 'undefined')
+                        this.savedResponseMap.set(qres.Rhythm__Question__c, { "Response__c": qres.Rhythm__Response__c, "Flag__c": qres.Rhythm__Flag__c });
                     console.log('qres',qres);
                     });
                     
@@ -43,7 +52,7 @@ export default class TabularReportQuestionnaire extends NavigationMixin(Lightnin
             console.log('getSupplierAssessmentList Error' + error);
         })
     }
-
+    /* constructWrapper is used to construct the wrapper for each and every sections based on assessment*/
     constructWrapper(questionResp, savedResp) {
         var questionMap = new Map();
         var sectionMap = [];
@@ -51,7 +60,7 @@ export default class TabularReportQuestionnaire extends NavigationMixin(Lightnin
         questionResp.forEach(qu => {
             console.log('qu',qu);
             var quTemp = {};
-            quTemp.question = qu.Rythm__Question__c;
+            quTemp.question = qu.Rhythm__Question__c;
 
             // console.log(qu);
             // if(qu.lastModifiedDate!=undefined)
@@ -69,16 +78,16 @@ export default class TabularReportQuestionnaire extends NavigationMixin(Lightnin
             // }
 
             if(savedResp.get(quTemp.question))
-            quTemp.value = savedResp.get(quTemp.question).Rythm__Response__c;
+            quTemp.value = savedResp.get(quTemp.question).Rhythm__Response__c;
             if(savedResp.get(quTemp.question))
-            quTemp.flag = savedResp.get(quTemp.question).Rythm__Flag__c;
-            if (questionMap.has(qu.Rythm__Section__r.Name)) {
-                questionMap.get(qu.Rythm__Section__r.Name).push(quTemp);
+            quTemp.flag = savedResp.get(quTemp.question).Rhythm__Flag__c;
+            if (questionMap.has(qu.Rhythm__Section__r.Name)) {
+                questionMap.get(qu.Rhythm__Section__r.Name).push(quTemp);
             } else {
                 var quesList = [];
                 console.log('quTemp',quTemp);
                 quesList.push(quTemp);
-                questionMap.set(qu.Rythm__Section__r, quesList);
+                questionMap.set(qu.Rhythm__Section__r, quesList);
             }
         });
         var sectioncount = 0;
@@ -126,6 +135,7 @@ export default class TabularReportQuestionnaire extends NavigationMixin(Lightnin
         return sectionMap;
 
     }
+    /* handleclick methos is used to get the sectionId and send it to the parent component(Assessment Detail)*/
     handleclick(event) {
         var selectedevent = new CustomEvent('sectionclick', {
             detail: { sectionId : event.currentTarget.dataset.id }
