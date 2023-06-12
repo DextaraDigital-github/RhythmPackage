@@ -1,12 +1,6 @@
 <!-- This HTML is used to load both section(tabluar report questionnaire) and Questions(Quesstionnaire) in same component based on the selection of sectionId and AssessmentId
 	-->
 <template>
-	<!-- <header class="rtmvpc-pgheader">
-		<div class="rtmvpc-pghtitle">
-			<div class="rtmvpc-pgstitle">Welcome to the Supplier Portal </div>
-			<h1 class="rtmvpc-pgmtitle capitalize">Inbox</h1>
-		</div>
-	</header> -->
 	<div class="cad-cardbase slds-p-around_small">
 		<div class="cad-tbl">
 			<div class="cad-row">
@@ -80,26 +74,8 @@
 						</div>
 					</div>
 				</div>
-
 				<div class="cad-cel cad-auto cad-list">
 					<div class="cad-sec_container">
-						<!-- <div class="cad-top_menu_container">
-							<div class="slds-float_left">
-								<button class="cad_actions" onclick={handleLeftButtonClick}><i class="las la-bars"></i></button>
-							</div>
-							<div class="slds-float_right">
-								<button class="cad_actions " data-id="Task" onclick={showDataHandler}>
-										<i class="las la-tasks"></i>
-								</button>
-								<button class="cad_actions " data-id="Supplier_Inbox_Categ__c" onclick={showDataHandler}>
-									<i class="las la-bell"></i>
-								</button>
-								<button class="cad_actions " data-id="Supplier_Task__c" onclick={showDataHandler}>
-									<i class="las la-exclamation-triangle"></i>
-								</button>
-							</div>
-						</div> -->
-
 						<div class="cad-sec_header">
 							<div class="slds-float_left slds-is-absolute" style="width:100%; padding:4px 80px 0px 31px;"
 								title="Details : ESG Assessment (Due date 05/14/2023)">
@@ -109,12 +85,6 @@
 								<button class="cad_actions" onclick={handleLeftButtonClick} title="Show / Hide Timeline Panel"><i class="las la-bars"></i></button>
 							</div>
 							<div class="slds-float_right slds-is-relative">
-								<!-- 
-								<lightning-combobox name="progress" label="Status" variant="label-hidden"
-									value={value} placeholder="Select Progress" options={options}
-									onchange={handleChange}>
-								</lightning-combobox>
-								-->
 								<lightning-button-menu icon-name="utility:download" menu-alignment="right"
 									menu-size="medium" alternative-text="Export" variant="label-hidden" title="Export"
 									style="top:-3px;">
@@ -127,10 +97,7 @@
 								<button class="cad_actions" onclick={handleRightButtonClick} title="Show / Hide Info Panel"><i class="las la-bars"></i></button>
 							</div>
 						</div>
-						<!-- <div class="cad-serch">
-							<input type="text" placeholder="Search" class="cad-serch-input" onkeyup={searchInputChangeHandler}/>
-							</div>
-						 -->
+						
 						<!--
 							 ++ If Searc enabled use below Class "class="cad-sec_bodyfull2"" insted of  "class="cad-sec_bodyfull1"" ++ 
 						 -->

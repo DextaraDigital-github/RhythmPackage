@@ -47,7 +47,13 @@ public with sharing class AssessmentController {
     */
     @AuraEnabled(cacheable=true)
     Public static List<SObject> getSupplierResponseList(String assessmentId){
-        List<SObject> SupplierResponseList=  [select Id, Question__c,Assessment__c, Assessment__r.Name,Files__c, Response__c,CreatedBy.Name,CreatedDate, Flag__c, Conversation_History__c,LastModifiedDate,LastModifiedById from Response__c where Assessment__c=:assessmentId];
+        List<SObject> SupplierResponseList=  [SELECT Id, Question__c,Assessment__c, 
+                                                Assessment__r.Name,Files__c, Response__c,
+                                                CreatedBy.Name,CreatedDate, Flag__c, 
+                                                Conversation_History__c,LastModifiedDate,
+                                                LastModifiedById 
+                                                FROM Response__c 
+                                                WHERE Assessment__c=:assessmentId];
         return SupplierResponseList;
     }
 

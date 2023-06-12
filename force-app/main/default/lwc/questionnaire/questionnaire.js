@@ -1,4 +1,5 @@
-/* Component Name   : rtmvpcRenderQuestionTemplate
+/*
+* Component Name    : rtmvpcRenderQuestionTemplate
 * Developer         : Sai Koushik Nimmaturi and Reethika Velpula           
 * Created Date      : 
 * Description       : This component is used for loading the question template based on the sections and save the responses
@@ -103,15 +104,7 @@ export default class Questionnaire extends LightningElement {
                             sectionidslist.push(resultMap[i].Rhythm__Section__r.Id);
                         }
                     }
-                    // for (let i = 0; i < resultMap.length; i++) {
-                    //     let count = 0;
-                    //     for (let j = i; j < resultMap.length; j++) {
-                    //         if (resultMap[i].Rhythm__Section__r.Id == resultMap[j].Rhythm__Section__r.Id) {
-                    //             this.responseCount[resultMap[i].Rhythm__Section__r.Name] = count + 1;
-                    //         }
-                    //     }
-                    // }
-
+                   
                     /* This method is used to get all the responses of the questions in particular section*/
                     getSupplierResponseList({ assessmentId: this.assessment }).then(result => {
                         if (result && result.length > 0 && result[0] && result[0].CreatedBy && result[0].CreatedDate) {
@@ -130,13 +123,13 @@ export default class Questionnaire extends LightningElement {
 
                         console.log('this.savedResponseMap', this.savedResponseMap);
                         console.log('resultMap', resultMap);
+                        //
                         this.constructMultilevelhierarchy(resultMap, this.savedResponseMap);
                         var count = 0;
                         var sectionsList = [];
 
                         console.log('questionMap', this.questionMap);
                         for (const seckey of this.questionMap.keys()) {
-
                             console.log('seckey', seckey);
                             console.log('seckey', this.questionMap.get(seckey));
                             count++;
@@ -187,21 +180,18 @@ export default class Questionnaire extends LightningElement {
     constructQuestionsAndAnswers(questionsList) {
         var duplicatequestionList = questionsList;
         this.questionsAndAnswerss = [];
-        if (typeof this.section != "undefined") {
+        if (typeof this.section != 'undefined') {
             for (let i = 0; i < questionsList.length; i++) {
                 questionsList[i].numberOfQuestions = questionsList[i].questions.length;
                 if ((questionsList.length > this.sectionLimits && this.section != undefined && questionsList[i].sectionId == this.section) || questionsList.length <= this.sectionLimits) {
                     for (let j = 0; j < questionsList[i].questions.length; j++) {
                         questionsList[i].numberOfQuestions = questionsList[i].numberOfQuestions + questionsList[i].questions[j].Children.length;
-
                         console.log('this.childQuestionList', this.childQuestionList);
                         console.log('questionsList[i].questions[j].Id)', questionsList[i].questions[j].Id);
                         console.log(this.childQuestionList.includes(questionsList[i].questions[j].Id));
                         if ((this.childQuestionList.includes(questionsList[i].questions[j].Id))) {
-
                             console.log('questionsListinside', questionsList[i].questions[j].Id, 'JJJJ', j);
                             const deletedQues = questionsList[i].questions.splice(j, 1);
-
                             console.log('deletedQues', deletedQues);
                         }
                     }
@@ -209,17 +199,19 @@ export default class Questionnaire extends LightningElement {
                 }
             }
             if (this.questionsAndAnswerss.length > 0) {
-                if (typeof this.questionsAndAnswerss[0].questions[0] != "undefined" && typeof this.questionsAndAnswerss[0].questions[0].Id != "undefined" && typeof this.savedResponseMap.get(this.questionsAndAnswerss[0].questions[0].Id) != "undefined") {
+                if (typeof this.questionsAndAnswerss[0].questions[0] != 'undefined' && typeof this.questionsAndAnswerss[0].questions[0].Id != 'undefined' && typeof this.savedResponseMap.get(this.questionsAndAnswerss[0].questions[0].Id) != 'undefined') {
                     if (typeof this.savedResponseMap.get(this.questionsAndAnswerss[0].questions[0].Id).Rhythm__Conversation_History__c != 'undefined') {
-                        this.Rhythm__Conversation_History__c = { "Id": this.savedResponseMap.get(this.questionsAndAnswerss[0].questions[0].Id).Id, "AssessmentId": this.assessment, "QuestionnaireId": this.questionsAndAnswerss[0].questions[0].Id, "chatHistory": (this.savedResponseMap.get(this.questionsAndAnswerss[0].questions[0].Id).Rhythm__Conversation_History__c ? JSON.parse(this.savedResponseMap.get(this.questionsAndAnswerss[0].questions[0].Id).Rhythm__Conversation_History__c) : '') };
+                        this.Rhythm__Conversation_History__c = { 'Id': this.savedResponseMap.get(this.questionsAndAnswerss[0].questions[0].Id).Id, 'AssessmentId': this.assessment, 'QuestionnaireId': this.questionsAndAnswerss[0].questions[0].Id, 'chatHistory': (this.savedResponseMap.get(this.questionsAndAnswerss[0].questions[0].Id).Rhythm__Conversation_History__c ? JSON.parse(this.savedResponseMap.get(this.questionsAndAnswerss[0].questions[0].Id).Rhythm__Conversation_History__c) : '') };
                     }
                 }
             }
         }
+        //
        for(let i=0;i<duplicatequestionList.length;i++)
         {
             var numberOfResponses =0;
              var displayFlag=0;
+             //
              for (let j = 0; j < questionsList[i].questions.length; j++) {
                  if(typeof questionsList[i].questions[j].value !='undefined')
                  {
@@ -228,6 +220,7 @@ export default class Questionnaire extends LightningElement {
                  }
                  if(typeof questionsList[i].questions[j].Children !='undefined')
                  {
+                    //
                     for(let k=0;k<questionsList[i].questions[j].Children.length;k++)
                     {
                         if(typeof questionsList[i].questions[j].Children.value !='undefined')
@@ -236,10 +229,9 @@ export default class Questionnaire extends LightningElement {
                         }
                     }
                  }
-                 if(duplicatequestionList[i].questions[j].Rhythm__Flag__c == true)
-                         {
-                             displayFlag++;
-                         }
+                 if(duplicatequestionList[i].questions[j].Rhythm__Flag__c == true){
+                    displayFlag++;
+                }
              }
            questionsList[i].displayFlag=displayFlag;  
            questionsList[i].numberOfResponses=numberOfResponses;  
@@ -254,7 +246,9 @@ export default class Questionnaire extends LightningElement {
 
         console.log(' this.questionresponseafterchange', this.questionresponseafterchange);
         if (this.questionresponseafterchange != undefined) {
+            //
             for (let i = 0; i < this.questionsAndAnswerss.length; i++) {
+                //
                 for (let j = 0; j < this.questionsAndAnswerss[i].questions.length; j++) {
                     if (this.questionresponseafterchange.parent == null && this.questionresponseafterchange.questionId == this.questionsAndAnswerss[i].questions[j].Id) {
                         this.questionsAndAnswerss[i].questions[j].value = this.questionresponseafterchange.option;
@@ -262,6 +256,7 @@ export default class Questionnaire extends LightningElement {
 
                             console.log('Into if');
                             console.log('this.questionsAndAnswerss[i].questions[j].children.length', this.questionsAndAnswerss[i].questions[j].Children.length);
+                            //
                             for (let k = 0; k < this.questionsAndAnswerss[i].questions[j].Children.length; k++) {
                                 if (this.questionsAndAnswerss[i].questions[j].Children[k].conditional == this.questionsAndAnswerss[i].questions[j].value) {
                                     this.questionsAndAnswerss[i].questions[j].Children[k].isdisplay = true;
@@ -337,11 +332,14 @@ export default class Questionnaire extends LightningElement {
         console.log('In Questionnaire handledeletefile', deletefileData);
         deleteFileAttachment({ questionId: deletefileData.questionId, name: deletefileData.name }).then(result => {
             console.log('result', result);
+            //
             for (let i = 0; i < this.questionsAndAnswerss.length; i++) {
                 if (this.questionsAndAnswerss[i].sectionId == deletefileData.sectionId) {
+                    //
                     for (let j = 0; j < this.questionsAndAnswerss[i].questions.length; j++) {
                         if (this.questionsAndAnswerss[i].questions[j].Id == deletefileData.questionId &&
                             typeof this.questionsAndAnswerss[i].questions[j].Files__c != 'undefined') {
+                            //    
                             for (let k = 0; k < this.questionsAndAnswerss[i].questions[j].Files__c.length; k++) {
                                 if (this.questionsAndAnswerss[i].questions[j].Files__c[k].name == deletefileData.name) {
                                     var temp = this.questionsAndAnswerss[i].questions[j].Files__c.splice(k, 1); //Review for Optimization
@@ -365,8 +363,7 @@ export default class Questionnaire extends LightningElement {
             "optionsWrapper": {
                 "checkboxOptions": [],
                 "pickListOptions": [
-                    { "label": "Test1", "value": "Test1" },
-                    { "label": " Test11", "value": " Test11" }
+                    { "label": "", "value": "" }
                 ],
                 "radioOptions": [],
                 "multiPickListOptions": [],
@@ -490,7 +487,7 @@ export default class Questionnaire extends LightningElement {
         quTemp.optionsWrapper.multiPickListOptions = optionList;
         console.log('qu.Rhythm__Question__c', qu.Id);
         console.log(savedResp.get(qu.Id));
-        if (typeof savedResp.get(qu.Id) != "undefined" && typeof savedResp.get(qu.Id).value != "undefined") {
+        if (typeof savedResp.get(qu.Id) != 'undefined' && typeof savedResp.get(qu.Id).value != 'undefined') {
             console.log(savedResp.get(qu.Id));
             quTemp.value = savedResp.get(qu.Id).value;
         }
@@ -533,7 +530,8 @@ export default class Questionnaire extends LightningElement {
         return quTemp;
     }
 
-    //Used /* constructMultilevelhierarchy method is used to construct nested questions wrapper, based on condition of having parentQuestionId */
+    //Used // constructMultilevelhierarchy method is used to construct nested questions wrapper, 
+      //based on condition of having parentQuestionId
     constructMultilevelhierarchy(queryResults, savedResp) {
         console.log('queryResults', queryResults);
         console.log('constructMultilevelhierarchy savedResp', savedResp);
@@ -555,7 +553,8 @@ export default class Questionnaire extends LightningElement {
         });
     }
 
-    //Used /* createChildHierarchy method is used to construct nested questions wrapper for child questions accordingly with its parent Question */
+    //Used // createChildHierarchy method is used to construct nested questions wrapper 
+    //for child questions accordingly with its parent Question 
     createChildHierarchy(queryResults, childObj, savedResp) {
         console.log('createChildHierarchy queryResults', queryResults);
         console.log('createChildHierarchy parentObj', childObj);
@@ -615,7 +614,6 @@ export default class Questionnaire extends LightningElement {
 
     //Used /* selectquestionHandler is used to highlight the question when flag icon is clicked */
     selectquestionHandler(event) {
-
         console.log('selectquestionHandler');
         var x = this.template.querySelectorAll('c-rtmvpc-render-question-template');
         for (var i = 0; i < x.length; i++) {
