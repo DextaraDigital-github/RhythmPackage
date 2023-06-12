@@ -224,12 +224,13 @@ export default class Questionnaire extends LightningElement {
                  if(typeof questionsList[i].questions[j].value !='undefined')
                  {
                      numberOfResponses++;
+
                  }
                  if(typeof questionsList[i].questions[j].Children !='undefined')
                  {
                     for(let k=0;k<questionsList[i].questions[j].Children.length;k++)
                     {
-                        if(typeof questionsList[i].questions[j].Children.length !='undefined')
+                        if(typeof questionsList[i].questions[j].Children.value !='undefined')
                         {
                             numberOfResponses++;
                         }
@@ -292,10 +293,18 @@ export default class Questionnaire extends LightningElement {
         console.log('inQuestionnaire for file upload', event.detail);
         this.fileResponseData = event.detail;
 
-        console.log(',this.savedResponseMap.get(fileResponseData.questionId).Id', this.savedResponseMap);
-        console.log('this.saved', this.savedResponseMap.get(this.fileResponseData.questionId).Id);
+        let responseId='';
+        if(this.savedResponseMap!=null)
+        {
+           if(this.savedResponseMap.hasOwnProperty(this.fileResponseData.questionId))
+            {
+                responseId = this.savedResponseMap.get(this.fileResponseData.questionId).Id;
+            }
+            
+        }
+        console.log('responseId'+responseId);
         /*Apex method is used to store the uploaded attachments into response records */
-        uploadFile({ resId: this.savedResponseMap.get(this.fileResponseData.questionId).Id, fileBlob: this.fileResponseData.filedata, name: this.fileResponseData.name, quesId: this.fileResponseData.questionId, assesmentId: this.assessment }).then(result => {
+        uploadFile({ resId: responseId, fileBlob: this.fileResponseData.filedata, name: this.fileResponseData.name, quesId: this.fileResponseData.questionId, assessmentId: this.assessment }).then(result => {
             this.template.querySelectorAll('c-rtmvpc-render-question-template')[0].getShowUploadStatus();
 
             console.log('this.questionsAndAnswerss', this.questionsAndAnswerss);
@@ -495,6 +504,7 @@ export default class Questionnaire extends LightningElement {
         if (typeof savedResp.get(qu.Id) != "undefined" && typeof savedResp.get(qu.Id).Files__c != "undefined") {
             var responsedData = JSON.parse(savedResp.get(qu.Id).Files__c);
             console.log('(savedResp.get(qu.Id).Files__c)', (savedResp.get(qu.Id).Files__c));
+            console.log('nnnn',responsedData);
             for (let i = 0; i < responsedData.length; i++) {
                 console.log(' responsedData[i]', responsedData[i]);
                 console.log(' (savedResp.get(qu.Id).Files__c).type[i]', (savedResp.get(qu.Id).Files__c)[0].type);

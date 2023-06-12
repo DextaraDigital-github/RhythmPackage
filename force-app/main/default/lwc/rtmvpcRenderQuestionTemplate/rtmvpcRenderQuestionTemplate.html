@@ -7,6 +7,9 @@
 				<template if:true={questionary.isText}>
 					<div class="qactivelabelcont slds-p-around_medium" key={questionary.Id} data-id={questionary.Id}
 						onclick={highlightQuestionHandler} style="display:flex">
+						<template if:true={questionary.required}>
+                         		<abbr class="slds-required" title="required">*</abbr>
+								 </template>
 						<div style="width: 90% align:left">
 							<div>
 								<div class="slds-p-top_xx-small" style="float: left">{questionary.question}</div>
@@ -33,9 +36,12 @@
 				<template if:true={questionary.isPicklist}>
 					<div class="qactivelabelcont slds-p-around_medium" key={questionary.Id} data-id={questionary.Id}
 						onclick={highlightQuestionHandler} style="display:flex">
-
+						        <template if:true={questionary.required}>
+                         		<abbr class="slds-required" title="required">*</abbr>
+								 </template>
 						<div style="width: 90% align:left">
 							<div>
+						
 								<div class="slds-p-top_xx-small" style="float: left">{questionary.question}</div>
 								<div class="slds-p-left_small slds-p-bottom_xx-small" style="float: left">
 									<lightning-helptext content={questionary.helptext}></lightning-helptext>
@@ -60,8 +66,12 @@
 				<template if:true={questionary.isMultiPicklist}>
 					<div class="qactivelabelcont slds-p-around_medium" key={questionary.Id} data-id={questionary.Id}
 						onclick={highlightQuestionHandler} style="display:flex">
+						<template if:true={questionary.required}>
+                         		<abbr class="slds-required" title="required">*</abbr>
+								 </template>
 						<div style="width: 90% align:left">
 							<div>
+								
 								<div class="slds-p-top_xx-small" style="float: left">{questionary.question}</div>
 								<div class="slds-p-left_small slds-p-bottom_xx-small" style="float: left">
 									<lightning-helptext content={questionary.helptext}></lightning-helptext>
@@ -86,9 +96,11 @@
 				<template if:true={questionary.isDate}>
 					<div class="qactivelabelcont slds-p-around_medium" key={questionary.Id} data-id={questionary.Id}
 						onclick={highlightQuestionHandler} style="display:flex">
+						<template if:true={questionary.required}>
+                         		<abbr class="slds-required" title="required">*</abbr>
+								 </template>
 						<div style="width: 90% align:left">
 							<label class="slds-form-element__label">
-    						<abbr class="slds-required" title="required">*</abbr>
     						<span class="slds-m-right_x-small">{questionary.question}</span>
     						<lightning-helptext content={questionary.helptext}></lightning-helptext>
 						</label>
@@ -108,6 +120,9 @@
 				<template if:true={questionary.isCheckbox}>
 					<div class="qactivelabelcont slds-p-around_medium" key={questionary.Id} data-id={questionary.Id}
 						onclick={highlightQuestionHandler} style="display:flex">
+						<template if:true={questionary.required}>
+                         		<abbr class="slds-required" title="required">*</abbr>
+								 </template>
 						<div style="width: 90% align:left">
 							<b key={questionary.Id}>
 														<lightning-formatted-text value={questionary.question} title={questionary.question} key={questionary.Id} data-con = {questionary.conditional} data-key={questionary.Id} name={questionary.question}></lightning-formatted-text>
@@ -116,7 +131,6 @@
 								for:each={questionary.optionsWrapper.checkboxOptions} for:item="option">
 								<div key={option.id}>
 									<label class="slds-form-element__label">
-    						<abbr class="slds-required" title="required">*</abbr>
     						<span class="slds-m-right_x-small">{option.label}</span>
     						<lightning-helptext content={questionary.helptext}></lightning-helptext>
 						</label>
@@ -137,9 +151,11 @@
 				<template if:true={questionary.isNumber}>
 					<div class="qactivelabelcont slds-p-around_medium" key={questionary.Id} data-id={questionary.Id}
 						onclick={highlightQuestionHandler} style="display:flex">
+						<template if:true={questionary.required}>
+                         		<abbr class="slds-required" title="required">*</abbr>
+								 </template>
 						<div style="width: 90% align:left">
 							<label class="slds-form-element__label">
-    						<abbr class="slds-required" title="required">*</abbr>
     						<span class="slds-m-right_x-small">{questionary.question}</span>
     						<lightning-helptext content={questionary.helptext}></lightning-helptext>
 						</label>
@@ -159,9 +175,11 @@
 				<template if:true={questionary.isEmail}>
 					<div class="qactivelabelcont slds-p-around_medium" key={questionary.Id} data-id={questionary.Id}
 						onclick={highlightQuestionHandler} style="display:flex">
+						<template if:true={questionary.required}>
+                         		<abbr class="slds-required" title="required">*</abbr>
+								 </template>
 						<div style="width: 90% align:left">
 							<label class="slds-form-element__label">
-    						<abbr class="slds-required" title="required">*</abbr>
     						<span class="slds-m-right_x-small">{questionary.question}</span>
     						<lightning-helptext content={questionary.helptext}></lightning-helptext>
 						</label>
@@ -181,6 +199,9 @@
 				<template if:true={questionary.isRadio}>
 					<div class="qactivelabelcont slds-p-around_medium" key={questionary.Id} data-id={questionary.Id}
 						onclick={highlightQuestionHandler} style="display:flex">
+						<template if:true={questionary.required}>
+                         		<abbr class="slds-required" title="required">*</abbr>
+								 </template>
 						<div style="">
 							<lightning-radio-group key={questionary.Id} data-key={questionary.Id}
 								data-con={questionary.conditional} name={questionary.question} onchange={handleChange}
@@ -188,7 +209,6 @@
 								type="radio">
 							</lightning-radio-group>
 							<label class="slds-form-element__label">
-    						<abbr class="slds-required" title="required">*</abbr>
     						<span class="slds-m-right_x-small">{questionary.question}</span>
     						<lightning-helptext content={questionary.helptext}></lightning-helptext>
 						</label>

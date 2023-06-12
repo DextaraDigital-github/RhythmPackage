@@ -40,7 +40,7 @@ System.debug('SupplierAssessment'+SupplierAssessment);*/ // commented by koushik
     @AuraEnabled(cacheable=true)
     Public static List<SObject> getQuestionsList(String templateId){
         List<QuestionWrapper> questionListWrapper = new List<QuestionWrapper>();
-        List<Question__c> questionList = [select id,name,Section__c,Question_Type__c,
+        List<Question__c> questionList = [select id,name,Section__c,Question_Type__c,Required__c,
                                           Conditional_Response__c,OptionValueSet__c,Question__c,Requires_File_Upload__c,
                                           Parent_Question__c,HelpText__c,Section__r.Name,Section__r.Id,
                                           Assessment_Template__c,(select Flag__c from Responses__r) from Question__c where Assessment_Template__c =:templateId];
@@ -101,7 +101,7 @@ return questionListWrapper; */
     @AuraEnabled(cacheable=true)
     Public static List<SObject> getSupplierResponseList(String assessmentId){
         System.debug('assessmentId'+assessmentId);
-        List<Sobject> SupplierResponseList=  [select Id, Question__c, Assessment__r.Name,Files__c, Response__c,CreatedBy.Name,CreatedDate, Flag__c, Conversation_History__c,LastModifiedDate,LastModifiedById from Response__c where Assessment__c=:assessmentId];
+        List<Sobject> SupplierResponseList=  [select Id, Question__c,Assessment__c, Assessment__r.Name,Files__c, Response__c,CreatedBy.Name,CreatedDate, Flag__c, Conversation_History__c,LastModifiedDate,LastModifiedById from Response__c where Assessment__c=:assessmentId];
         System.debug('SupplierResponseList'+SupplierResponseList);
         return SupplierResponseList;
     }
@@ -123,7 +123,12 @@ return questionList;
         List<Response__c> responseList = new List<Response__c>();
         System.debug('assesmentId'+assesmentId);
          System.debug('suppResponseList'+suppResponseList);
-        
+        List<Id> questionIds = new List<Id>();
+        for(Integer i=0;i<suppResponseList.size();i++)
+        {
+            questionIds.add((Id)suppResponseList[i].get('Rhythm__Question__c'));
+        }
+
         for(Integer i=0;i<suppResponseList.size();i++)
         {
             Response__c response = new Response__c();
@@ -275,6 +280,9 @@ System.debug('section updated list '+lst);*/
     @AuraEnabled    
     public static List<sObject> uploadFile(String resId, String fileBlob, String name,string quesId,string assessmentId)
     {
+        //List<Response__c> responses =[select id,name,Question__c, Assessment__c from Response__c where Question__c=:quesId and Assessment__c=:assessmentId order by createddate];
+        
+        System.debug('assessmentId'+assessmentId);
         try
         {
             String baseUrl = URL.getSalesforceBaseUrl().toExternalForm();
@@ -285,11 +293,12 @@ System.debug('section updated list '+lst);*/
             insert cv;
             List<Response__c> srList = new List<Response__c>();
             List<ContentVersion> cvList=[Select Id, ContentDocumentId from ContentVersion where Id=:cv.Id];
+            System.debug('cvList'+cvList);
             String ftype = name.substringAfter('.');
-            if(resId !=null)
+            if(!String.isEmpty(resId))
             {
+                System.debug('into if condition'+resId);
                 srList = [Select Id,Files__c	from Response__c where Id=:resId];
-                
                 String fileUrl = baseUrl+'/sfc/servlet.shepherd/document/download/'+cvList[0].ContentDocumentId+'?operationContext=S1';
                 
                 String fileJson = '{"name":"'+name+'","url":"'+fileUrl+'","type":"'+ftype+'"}';
@@ -300,8 +309,9 @@ System.debug('section updated list '+lst);*/
                 Response__c res=new Response__c();
                 res.Question__c=quesId;
                 res.Assessment__c=assessmentId;
+                System.debug('into else condition'+resId);
                 String fileUrl = 'https://page-power-5077-dev-ed.scratch.lightning.force.com/sfc/servlet.shepherd/document/download/'+cvList[0].ContentDocumentId+'?operationContext=S1';
-                string fileJson = '{"name":"'+name+'","url":"'+fileUrl+'","type":"'+ftype+'"}';
+                string fileJson = '[{"name":"'+name+'","url":"'+fileUrl+'","type":"'+ftype+'"}]';
                 res.Files__c=fileJson;
                 srList.add(res);
                 insert srList;                
