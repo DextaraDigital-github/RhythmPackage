@@ -10,17 +10,17 @@ export default class RtmvpcAssessments extends LightningElement {
 @track pageSize = 15;
 @track showgrid= false;
 @track showsurvey = false;
-@track relName='Rythm__Assessments__r';
+@track relName='Rhythm__Assessments__r';
 @track fieldsList=[];
-@track objName='Rythm__Assessment__c';
+@track objName='Rhythm__Assessment__c';
 @api tablefieldList =  [
         { label: 'Assessment Name', fieldName: 'Name' },
-        { label: 'Target Completion Date', fieldName: 'Rythm__Target_Completion_Date__c',type:'date' },
-        { label: 'Assessment Status', fieldName: 'Rythm__Assesment_Status__c'},
-        { label: '#Additional Requests',fieldName:'Rythm__Additional_Requests__c'},
-        { label: 'Customer Review Status', fieldName: 'Rythm__Customer_Review__c'},
-        { label: '# Number of Questions', fieldName:'Rythm__Number_of_Questions__c'},
-        { label: '# Number of Responses', fieldName:'Rythm__Number_of_Responses__c'}
+        { label: 'Target Completion Date', fieldName: 'Rhythm__Target_Completion_Date__c',type:'date' },
+        { label: 'Assessment Status', fieldName: 'Rhythm__Assesment_Status__c'},
+        { label: '#Additional Requests',fieldName:'Rhythm__Additional_Requests__c'},
+        { label: 'Customer Review Status', fieldName: 'Rhythm__Customer_Review__c'},
+        { label: '# Number of Questions', fieldName:'Rhythm__Number_of_Questions__c'},
+        { label: '# Number of Responses', fieldName:'Rhythm__Number_of_Responses__c'}
         ];
 
     connectedCallback(){

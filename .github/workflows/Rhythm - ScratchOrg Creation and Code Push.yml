@@ -71,7 +71,7 @@ jobs:
       # Create scratch org
       - name: 'Create scratch org'
         run: |
-             echo 'y' | sfdx sf org create scratch --target-dev-hub ${{ secrets.HUB_ORG_USERNAME }} --definition-file config/project-scratch-def.json --set-default --no-namespace --duration-days 30 --name ${{github.event.inputs.scratch-org_name}}
+             echo 'y' | sfdx sf org create scratch --target-dev-hub ${{ secrets.HUB_ORG_USERNAME }} --definition-file config/project-scratch-def.json --set-default --duration-days 30 --name ${{github.event.inputs.scratch-org_name}}
         
       # Generate scratch org User and password
       - name: 'Create user'
@@ -87,15 +87,5 @@ jobs:
       # Code Push to Scratch org
       - name: 'code push'
         run: sfdx force:source:push --targetusername=new-user --wait 20
-                  
-      # Revert namespace change in project config
-      - name: 'Revert namespace change in project config'
-        run: |
-                  sed -i 's,"namespace": "autocomp","namespace": "",' sfdx-project.json
-                  
-      # Revert namespace changes in CPEs
-      - name: 'Revert namespace changes in Custom Property Editors'
-        run: git checkout **/*.js-meta.xml
-        
-    
-
+                
+  

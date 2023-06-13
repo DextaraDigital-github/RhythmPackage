@@ -1,11 +1,4 @@
-/* 
-* Class Name        : AssessmentController
-* Developer         : Sai Koushik Nimmaturi and Reethika Velpula           
-* Created Date      : 
-* Description       : AssessmentController class is used for SOQl on Question__c,Section__c,Assessment_Template__c and DML operations on the objects Assessment__c,Response__c.
-* Last Modified Date: 
-*/
-public with sharing class AssessmentController {
+public class AssessmentController {
     @Auraenabled
     Public static void QuestionarieList(){
     }
@@ -91,7 +84,7 @@ public with sharing class AssessmentController {
             UPDATE assessment;
         }
     }
-    
+   
     @AuraEnabled(cacheable=true)
     Public static List<SObject> getAssessmentlist(String assessmentTemplateId2){
         //return [select Id,Disclosure__c from Assessment_Template__c where id=:assessmentTemplateId2];
@@ -116,13 +109,11 @@ public with sharing class AssessmentController {
         //System.debug('AssessmentRecords'+AssessmentRecords);
         return AssessmentRecords;
     }
-    @AuraEnabled
-    public static List<Response__c> getResponseList(string assessmentId,string questionId)
+   @AuraEnabled
+    public static List<Rythm__Response__c> getResponseList(string assessmentId,string questionId)
     {
-        List<Response__c> responseRecords=[SELECT Conversation_History__c,createdDate 
-                                            FROM Response__c 
-                                            WHERE Assessment__c =:assessmentId AND Question__c=:questionId];
-        
+        List<Rythm__Response__c> responseRecords=[select Rythm__Conversation_History__c,createdDate	from Rythm__Response__c where Rythm__Assessment__c =:assessmentId AND Rythm__Question__c=:questionId];
+      
         return responseRecords;
     }
     /* getUserName method is used to get the username */
@@ -186,12 +177,13 @@ public with sharing class AssessmentController {
     @AuraEnabled
     public static void errorLogRecord(string componentName,string methodName,string className,string errorData)
     {
-        ErrorTransactionLog__c errorRecord=new ErrorTransactionLog__c();
-        errorRecord.Class_Name__c=className;
-        errorRecord.LWC_Component_Name__c=componentName;
-        errorRecord.Method_Name__c=methodName;
-        errorRecord.Error_Stack_Trace__c=errorData;
-        INSERT errorRecord;
+        System.debug('hhhh');
+        Rythm__ErrorTransactionLog__c errorRecord=new Rythm__ErrorTransactionLog__c();
+        errorRecord.Rythm__Class_Name__c=className;
+        errorRecord.Rythm__LWC_Component_Name__c=componentName;
+        errorRecord.Rythm__Method_Name__c=methodName;
+        errorRecord.Rythm__Error_Stack_Trace__c=errorData;
+        insert errorRecord;
     }
     @AuraEnabled
     public static Boolean updateSectionSequence(list<Section__c> secList){
