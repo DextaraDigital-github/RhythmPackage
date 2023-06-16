@@ -179,44 +179,30 @@ public with sharing class AssessmentController {
             UPDATE assessment;
         }
     }
-    
+   
     @AuraEnabled(cacheable=true)
     Public static List<SObject> getAssessmentlist(String assessmentTemplateId2){
         //return [select Id,Disclosure__c from Assessment_Template__c where id=:assessmentTemplateId2];
         return null;
         
     }
-     /**
-     * Gets the Assessment__History information of a Status__c field in Assessment__c.
-     * @param assessmentId This is a record id of an Assessment__c.  
-    */
- 	@AuraEnabled
-    public static List<Sobject> getAssessmentStatus(String assessmentId)
-    {
-        System.debug('getAssessmentStatus assessmentId'+assessmentId);
-        List<Sobject> assessmentstatus =[select Id, IsDeleted, ParentId, CreatedById, CreatedDate, Field, DataType, OldValue, NewValue  FROM Assessment__History WHERE ParentId=:assessmentId AND Field ='Rhythm__Status__c' order by createdDate desc ];
-        System.debug('getAssessmentStatus assessmentstatus'+assessmentstatus);
-        return assessmentstatus;
-    }
-   /**
-     * Gets the all Assessment__c records information of an Assessment__c.
-    */
+ 
     @AuraEnabled
     public static List<Object> getAssesmentRecords()
     {
         List<Assessment__c> AssessmentRecords= [SELECT Name,Target_Completion_Date__c,Status__c,
                                                 Additional_Requests__c,Customer_Review__c,Number_of_Questions__c,
-                                                Number_of_Suppliers_responded_back__c,Start_Date__c,End_Date__c,CreatedDate
+                                                Number_of_Suppliers_responded_back__c 
                                                 FROM Assessment__c];
         //System.debug('AssessmentRecords'+AssessmentRecords);
         return AssessmentRecords;
     }
-    @AuraEnabled
-    public static List<Response__c> getResponseList(string assessmentId,string questionId)
+   @AuraEnabled
+    public static List<Rythm__Response__c> getResponseList(string assessmentId,string questionId)
     {
         List<Response__c> responseRecords=[SELECT Conversation_History__c,createdDate 
                                             FROM Response__c 
-                                            WHERE Assessment__c =:assessmentId AND Question__c=:questionId AND Is_Latest_Response__c=true];
+                                            WHERE Assessment__c =:assessmentId AND Question__c=:questionId];
         
         return responseRecords;
     }
@@ -303,12 +289,13 @@ Assessment__r.Rhythm__Number_of_Suppliers_responded_back__c,Assessment__r.Rhythm
     @AuraEnabled
     public static void errorLogRecord(string componentName,string methodName,string className,string errorData)
     {
-        ErrorTransactionLog__c errorRecord=new ErrorTransactionLog__c();
-        errorRecord.Class_Name__c=className;
-        errorRecord.LWC_Component_Name__c=componentName;
-        errorRecord.Method_Name__c=methodName;
-        errorRecord.Error_Stack_Trace__c=errorData;
-        INSERT errorRecord;
+        System.debug('hhhh');
+        Rythm__ErrorTransactionLog__c errorRecord=new Rythm__ErrorTransactionLog__c();
+        errorRecord.Rythm__Class_Name__c=className;
+        errorRecord.Rythm__LWC_Component_Name__c=componentName;
+        errorRecord.Rythm__Method_Name__c=methodName;
+        errorRecord.Rythm__Error_Stack_Trace__c=errorData;
+        insert errorRecord;
     }
     @AuraEnabled
     public static Boolean updateSectionSequence(list<Section__c> secList){
@@ -372,216 +359,6 @@ Assessment__r.Rhythm__Number_of_Suppliers_responded_back__c,Assessment__r.Rhythm
             //use eror log
             return null;
         }
-    }
-
-    // get suppliers by Prudhvi
-    @AuraEnabled(cacheable=true)
-    public static List<Account> getAllSuppliers(string searchKey){
-        List<Account> supplierList = new List<Account>();
-        try{
-            string query = 'SELECT Id,Name FROM Account';
-            if(string.isBlank(searchKey)){
-                query = query+' Order By CreatedDate DESC limit 10';
-            }else{
-                string sKey = '%'+searchKey+'%';
-                query = query+' WHERE Name LIKE:sKey Order By CreatedDate DESC';
-            }
-            supplierList = safe.doQuery(query);
-        }catch(exception e){
-            String errorMsg = e.getMessage();
-            throw new AuraHandledException(ErrorMsg);
-        }
-        return supplierList;
-    }
-
-    @AuraEnabled
-    public static ResultWrapper sendAssessment(sObject assessmentRecord, string suppliers,string deleteList){
-        ResultWrapper resWrap = new ResultWrapper();
-        try{
-            if (sp == null) sp = Database.setSavepoint();
-            insert assessmentRecord;
-            Id assessmentId = assessmentRecord.Id;
-            if(string.isNotBlank(deleteList)){
-                List<string> deleteSupList = (List<string>) JSON.deserialize(deleteList, List<string>.class);
-                delete [SELECT Id FROM AccountAssessmentRelation__c WHERE Rhythm__Account__c IN:deleteSupList];
-            }
-            List<AccountAssessmentRelation__c> accountAssessRelnsList = new List<AccountAssessmentRelation__c>();
-            List<Rhythm__Assessment_Supplier__c> assessSupList = new List<Rhythm__Assessment_Supplier__c>();
-            List<string> suppliersList = (List<string>) JSON.deserialize(suppliers, List<string>.class);
-            set<string> suppliersIds = new set<string>();
-            for(string sId:suppliersList){
-                suppliersIds.add(sId);
-            }
-            for(Account acc:[SELECT Id,Name FROM Account WHERE ID IN:suppliersIds]){
-
-                Rhythm__Assessment_Supplier__c assessSup = new Rhythm__Assessment_Supplier__c();
-                assessSup.Rhythm__Account__c = acc.Id;
-                assessSup.Rhythm__Assessment__c = assessmentId;
-                assessSup.Rhythm__Status__c = 'Inactive';
-                assessSupList.add(assessSup);
-
-                AccountAssessmentRelation__c accAssessReln = new AccountAssessmentRelation__c();
-                accAssessReln.Name = acc.Name;
-                accAssessReln.Rhythm__Account__c = acc.Id;
-                accAssessReln.Rhythm__Assessment__c = assessmentId;
-                accountAssessRelnsList.add(accAssessReln);
-            }
-            set<Id> successRecordsIdSet = new set<Id>();
-            if(accountAssessRelnsList.isEmpty() == false){
-                Database.SaveResult[] results = safe.doInsert(accountAssessRelnsList);
-                List<String> errorsList = SecurityCheckController.safeClassExceptionHandlerInsert(results);
-                if(errorsList.size()>0){
-                    Database.rollback(sp);
-                    throw new SecurityControllerException(String.join(errorsList, ', ' ));
-                }
-                for(Database.SaveResult result : results) {
-                    if(result.isSuccess()){
-                        system.debug('insertedAssessments------>' + result.getId());
-                        successRecordsIdSet.add(result.getId());
-                    } else {
-                        for(Database.Error error : result.getErrors()) {
-                            system.debug('errorDetails----->'+ error.getStatusCode() + ' : ' + 'Error Fields : ' + error.getFields());
-                        }
-                    }
-                }
-            }
-            if(assessSupList.isEmpty() == false){
-                Database.SaveResult[] results = safe.doInsert(assessSupList);
-                List<String> errorsList = SecurityCheckController.safeClassExceptionHandlerInsert(results);
-                if(errorsList.size()>0){
-                    Database.rollback(sp);
-                    throw new SecurityControllerException(String.join(errorsList, ', ' ));
-                }
-            }
-            if(successRecordsIdSet.isEmpty() == false){
-                sendEmails(successRecordsIdSet);
-            }
-            resWrap.isSuccess = true;
-            resWrap.recordId = assessmentId;
-            resWrap.message = '';
-            resWrap.errorCode = '';
-        }catch(exception e){
-            resWrap.isSuccess = false;
-            resWrap.recordId = '';
-            resWrap.message = e.getMessage();
-            resWrap.errorCode = '';
-        }
-        return resWrap;
-    }
-    
- 
-
-    public static void sendEmails(Set<Id> recordIdsSet){
-        try{
-            List<Messaging.SingleEmailMessage> emailMessagesList = new List<Messaging.SingleEmailMessage>();
-            for(AccountAssessmentRelation__c assRelRec:[SELECT Id,Rhythm__Account__c,Rhythm__Account__r.Name,Rhythm__Account__r.Rhythm__Email__c,Rhythm__Assessment__c FROM AccountAssessmentRelation__c WHERE ID IN:recordIdsSet]){
-                Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
-                List<String> sendTo = new List<String>();
-                sendTo.add(assRelRec.Rhythm__Account__r.Rhythm__Email__c);
-                mail.setToAddresses(sendTo);
-                mail.setSubject('Sample Survey');
-                String body = '<html><body>'+
-                '<br><br>'+'Dear '+assRelRec.Rhythm__Account__r.Name+
-                '<br><br>'+'we’d like to complete a short survey.'+
-                '<br><br><a href="https://ruby-site-9073-dev-ed.scratch.my.site.com/">Take the survey now.</a>'+
-                                 '<br><br>'+'Kind regards,'+
-                                 '<br>'+'Rhythm';
-                mail.setHtmlBody(body);
-                emailMessagesList.add(mail);
-            }
-            if(emailMessagesList.isEmpty() == false){
-                Messaging.sendEmail(emailMessagesList);
-            }
-        }catch(exception e){
-            system.debug('sendEmails------>'+e.getMessage());
-        }
-    }
-    @AuraEnabled
-    public static ResultWrapper addSuppliers(string assesmentId, string suppliers){
-        ResultWrapper resWrap = new ResultWrapper();
-        try{
-            List<Rhythm__Assessment_Supplier__c> assessSupList = new List<Rhythm__Assessment_Supplier__c>();
-            List<string> suppliersList = (List<string>) JSON.deserialize(suppliers, List<string>.class);
-            for(string supplierId:suppliersList){
-                Rhythm__Assessment_Supplier__c assessSup = new Rhythm__Assessment_Supplier__c();
-                assessSup.Rhythm__Account__c = supplierId;
-                assessSup.Rhythm__Assessment__c = assesmentId;
-                assessSup.Rhythm__Status__c = 'Inactive';
-                assessSupList.add(assessSup);
-            }
-            if(assessSupList.isEmpty() ==false){
-                Database.SaveResult[] results = safe.doInsert(assessSupList);
-                List<String> errorsList = SecurityCheckController.safeClassExceptionHandlerInsert(results);
-                if(errorsList.size()>0){
-                    Database.rollback(sp);
-                    throw new SecurityControllerException(String.join(errorsList, ', ' ));
-                }
-            }
-            resWrap.isSuccess = true;
-            resWrap.recordId = '';
-            resWrap.message = '';
-            resWrap.errorCode = '';
-        }catch(exception e){
-            resWrap.isSuccess = false;
-            resWrap.recordId = '';
-            resWrap.message = e.getMessage();
-            resWrap.errorCode = '';
-        }
-        return resWrap;
-    }
-
-    @AuraEnabled
-    public static ResultWrapper updateAssessmentSuppliers(string assessmentId){
-        ResultWrapper resWrap = new ResultWrapper();
-        try{
-            system.debug('assesmentId----->'+assessmentId);
-            List<Rhythm__Assessment_Supplier__c> assessSuppList = new List<Rhythm__Assessment_Supplier__c>();
-            for(Rhythm__Assessment_Supplier__c assesSup:[SELECT Id FROM Rhythm__Assessment_Supplier__c WHERE Rhythm__Assessment__c=:assessmentId AND Rhythm__Status__c='Inactive']){
-                system.debug('InThe----->');
-                assesSup.Status__c = 'Active';
-                assessSuppList.add(assesSup);
-            }
-            if(assessSuppList.isEmpty() == false){
-                update assessSuppList;
-            }
-            resWrap.isSuccess = true;
-            resWrap.recordId = '';
-            resWrap.message = '';
-            resWrap.errorCode = '';
-        }catch(exception e){
-            resWrap.isSuccess = false;
-            resWrap.recordId = '';
-            resWrap.message = e.getMessage();
-            resWrap.errorCode = '';
-        }
-        return resWrap;
-    }
-
-    @AuraEnabled(cacheable=true)
-    public static List<Assessment__c> getAssessmentRecord(string assessmentId){
-        return [SELECT Id,Start_Date__c FROM Assessment__c WHERE Id=:assessmentId LIMIT 1];
-    }
-    
-    @AuraEnabled(cacheable=true)
-    public static List<AccountAssessmentRelation__c> getExistingSuppliersWithSearch(string assessmentId, string searchKey){
-        string query = 'SELECT Id,Account__c,Account__r.Name FROM AccountAssessmentRelation__c WHERE Rhythm__Assessment__c=:assessmentId';
-        if(string.isNotBlank(searchKey)){
-            string sKey = '%'+searchKey+'%';
-            query = query+' AND Account__r.Name LIKE:sKey';
-        }else{
-            query = query+' LIMIT 10';
-        }
-        return database.query(query);
-    }
-    
-    public class ResultWrapper{
-        @AuraEnabled public boolean isSuccess;
-        @AuraEnabled public string message;
-        @AuraEnabled public string errorCode;
-        @AuraEnabled public Id recordId;
-    }
-    public class SecurityControllerException extends Exception{
-        
     }
     
 }

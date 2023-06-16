@@ -1,0 +1,19 @@
+<template>
+	<div>
+        <div>
+            <lightning-layout multiple-rows>
+                <lightning-layout-item size="6" padding="">
+                    <div style="margin-right: 40px;">
+                        <lightning-input type="search" label="Search Supplier" onchange={handleSearch}>
+                        </lightning-input>
+                    </div>
+                </lightning-layout-item>
+            </lightning-layout>
+        </div>
+        <div>
+            <lightning-dual-listbox name="supplierSelection" source-label={availableSuppliersCount}
+                selected-label={selectedSuppliersCount} options={supplierData} value={values} onchange={handleChange}>
+            </lightning-dual-listbox>
+        </div>
+	</div>
+</template>
