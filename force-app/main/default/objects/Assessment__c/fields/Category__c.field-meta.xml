@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
-    <fullName>Status__c</fullName>
+    <fullName>Category__c</fullName>
     <externalId>false</externalId>
-    <label>Status</label>
+    <label>Category</label>
     <required>false</required>
-    <trackHistory>true</trackHistory>
+    <trackHistory>false</trackHistory>
     <trackTrending>false</trackTrending>
     <type>Picklist</type>
     <valueSet>
@@ -12,34 +12,34 @@
         <valueSetDefinition>
             <sorted>false</sorted>
             <value>
-                <fullName>New</fullName>
+                <fullName>ESG</fullName>
                 <default>false</default>
-                <label>New</label>
+                <label>ESG</label>
             </value>
             <value>
-                <fullName>Draft</fullName>
+                <fullName>Quality</fullName>
                 <default>false</default>
-                <label>Draft</label>
+                <label>Quality</label>
             </value>
             <value>
-                <fullName>Submitted</fullName>
+                <fullName>Safety</fullName>
                 <default>false</default>
-                <label>Submitted</label>
+                <label>Safety</label>
             </value>
             <value>
-                <fullName>Open</fullName>
+                <fullName>REACH</fullName>
                 <default>false</default>
-                <label>Open</label>
+                <label>REACH</label>
             </value>
             <value>
-                <fullName>Completed</fullName>
+                <fullName>Finance</fullName>
                 <default>false</default>
-                <label>Completed</label>
+                <label>Finance</label>
             </value>
             <value>
-                <fullName>Closed</fullName>
+                <fullName>Legal</fullName>
                 <default>false</default>
-                <label>Closed</label>
+                <label>Legal</label>
             </value>
         </valueSetDefinition>
     </valueSet>
