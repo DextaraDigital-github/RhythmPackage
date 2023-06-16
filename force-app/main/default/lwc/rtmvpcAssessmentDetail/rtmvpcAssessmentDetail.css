@@ -117,7 +117,7 @@
     .cad-disc.cadshowright {display:block; position:absolute; right:-320px; top:0; width:300px; height:100%; z-index:10; }
     .cad-top_back_container {display:block; height:30px;}
     .cad-tophead-details { border-bottom:0px solid rgba(0,0,0,0.2); margin-bottom:0px; }
-    .cad-sec_vcontainer1 { display:block; position:unset; top:0px; height:63px; }
+    .cad-sec_vcontainer1 { display:block; position:relative; z-index:2; top:0px; height:63px; }
     .cad-sec_vcontainer1a { display:block; position:unset; top:0px; height:37px; }
     .cad-sec_vcontainer2 { display:block; width:100%; position:absolute; height:calc(100% - 207px); margin:0px 0px 0px; overflow-y:auto; }
     .cad-sec_vcontainer2_1 { display:block; width:100%; position:absolute; height:calc(100% - 1px); margin:0px 0px 0px; overflow-y:auto; }
@@ -138,7 +138,7 @@
     .cad-top_menu_container{display:block; height:30px;}
     .cad-sec_bodyfull2 {height:calc(100% - 95px);}
     .cad-tophead-details { border-bottom:0px solid rgba(0,0,0,0.2); margin-bottom:0px; }
-    .cad-sec_vcontainer1 { display:block; position:unset; top:0px; height:63px; }
+    .cad-sec_vcontainer1 { display:block;  position:relative; z-index:2; top:0px; height:63px; }
     .cad-sec_vcontainer1a { display:block; position:unset; top:0px; height:37px; }
     .cad-sec_vcontainer2 { display:block; width:100%; position:absolute; height:calc(100% - 250px); margin:0px 0px 0px; overflow-y:auto; }
     .cad-sec_vcontainer2_1 { display:block; width:100%; position:absolute; height:calc(100% - 1px); margin:0px 0px 0px; overflow-y:auto; }

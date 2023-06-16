@@ -1,20 +1,139 @@
-/* 
-* Component Name    : rtmvpcRenderQuestionTemplate
+/* Component Name   : rtmvpcRenderQuestionTemplate
 * Developer         : Sai Koushik Nimmaturi and Reethika Velpula           
 * Created Date      : 
 * Description       : This component is used for loading the question template based on the sections
 * Last Modified Date: 
-*/ 
+*/
 import { LightningElement, track, api } from 'lwc';
+import getAssessmentStatus from '@salesforce/apex/AssessmentController.getAssessmentStatus';
+import getAssesmentRecords from '@salesforce/apex/AssessmentController.getAssesmentRecords';
+import getUserName from '@salesforce/apex/AssessmentController.getUserName';
+const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 export default class RtmvpcAssessmentDetail extends LightningElement {
-    @track sectionid; 
-    @api accountid; //record id of an Account(supplier)
-    @api assessmentid; //record id of an Assessment__c
+    @track sectionid;
+    @api accountid;
+    @api assessmentid;
+    @track showflagquestions = true;
+    @track userName;
     @track showSections = true;
     @track showFlag = false;
     @track showChat;
+    @track endDate;
+    @track showconverstion;
     @track showData;
-    
+    @track assessmentTimeline = [];
+    @track assessmentName;
+    @track showstatus;
+    @track chatterData;
+    @track filterflag = false;
+    connectedCallback() {
+        this.showconverstion = true;
+        /* To get the username */
+        getUserName({}).then(result => {
+            this.userName = result;
+            /* To get the assessment startdata, enddate and status */
+            getAssesmentRecords({}).then(result => {
+                for (var j = 0; j < result.length; j++) {
+                    if (result[j].Id == this.assessmentid) {
+                        this.statusassessment = result[j].Rhythm__Status__c;
+                        if (this.statusassessment == 'Submitted' || this.statusassessment == 'Open' || this.statusassessment == 'Completed' || this.statusassessment == 'Closed') {
+                            this.showstatus = true;
+                        }
+                        this.assessmentName = result[j].Name;
+                        if (typeof result[j].Rhythm__Start_Date__c != 'undefined') {
+                            var statustrack = {};
+                            var dateformat = result[j].Rhythm__Start_Date__c;
+                            var dateformats = months[Number(dateformat.split('-')[1]) - 1] + '-' + dateformat.split('-')[2] + '-' + dateformat.split('-')[0];
+                            statustrack['date'] = dateformats + ' ' + '00:00:00';
+                            statustrack['status'] = 'Start Date';
+                            statustrack['classlist'] = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_default';
+                            statustrack['name'] = this.userName;
+                            this.assessmentTimeline.push(statustrack);
+                        }
+                        else {
+                            var statustrack = {};
+                            var date = result[j].CreatedDate.split('T');
+                            var time = date[1].split('.');
+                            var dateformat = date[0];
+                            var dateformats = months[Number(dateformat.split('-')[1]) - 1] + '-' + dateformat.split('-')[2] + '-' + dateformat.split('-')[0];
+                            statustrack['date'] = dateformats + ' ' + time[0];
+                            statustrack['status'] = 'Start Date';
+                            statustrack['classlist'] = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_default';
+                            statustrack['name'] = this.userName;
+                            this.assessmentTimeline.push(statustrack);
+                        }
+                        if (typeof result[j].Rhythm__End_Date__c != 'undefined') {
+                            var statustrack = {};
+                            var dateformat = result[j].Rhythm__End_Date__c;
+                            var dateformats = months[Number(dateformat.split('-')[1]) - 1] + '-' + dateformat.split('-')[2] + '-' + dateformat.split('-')[0];
+                            statustrack['date'] = '(Due date ' + dateformats + ')';
+                            this.endDate = statustrack['date'];
+                            statustrack['status'] = 'End Date';
+                            statustrack['classlist'] = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_default';
+                            statustrack['name'] = this.userName;
+                            this.assessmentTimeline.push(statustrack);
+                        }
+                    }
+                }
+                /* To get the assessment tracking history to update on timeline*/
+                getAssessmentStatus({ assessmentId: this.assessmentid }).then(result => {
+                    var assessmentStatus = result;
+                    if (typeof result != 'undefined') {
+                        var oldvaluelst = [];
+                        for (var i = 0; i < assessmentStatus.length; i++) {
+                            if (typeof assessmentStatus[i].OldValue != 'undefined') {
+                                oldvaluelst.push(assessmentStatus[i].OldValue);
+                            }
+                        }
+                        for (var i = 0; i < assessmentStatus.length; i++) {
+                            var statustrack = {};
+                            if (typeof assessmentStatus[i].NewValue != 'undefined') {
+                                var date = assessmentStatus[i].CreatedDate.split('T');
+                                var dateformat = date[0];
+                                var time = date[1].split('.');
+                                var dateformats = months[Number(dateformat.split('-')[1]) - 1] + '-' + dateformat.split('-')[2] + '-' + dateformat.split('-')[0];
+                                statustrack['date'] = dateformats + ' ' + time[0];
+                                statustrack['status'] = assessmentStatus[i].NewValue;
+                                switch (assessmentStatus[i].NewValue) {
+                                    case "New": statustrack['classlist'] = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_approved'; break;
+                                    case "Submitted": statustrack['classlist'] = 'cad-timeline_slidebase cad-timeline_vendor cad-timeline_submited'; break;
+                                    case "Draft": statustrack['classlist'] = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_rejected'; break;
+                                    case "Open": statustrack['classlist'] = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_pending'; break;
+                                    case "Completed": statustrack['classlist'] = 'cad-timeline_slidebase cad-timeline_vendor cad-timeline_needmoreinfo'; break;
+                                    case "Closed": statustrack['classlist'] = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_rejected'; break;
+                                }
+                                statustrack['name'] = this.userName;
+                                this.assessmentTimeline.push(statustrack);
+                            }
+                        }
+                        var relocate = this.assessmentTimeline.splice(0, 1);
+                        this.assessmentTimeline.push(relocate[0]);
+                    }
+                }).catch(error => {
+                    errorLogRecord({ componentName: 'RtmvpcAssessmentChatter', methodName: 'getChatterResponse', className: 'AssessmentController', errorData: error.message }).then((result) => {
+                    });
+                });
+            }).catch(error => {
+                errorLogRecord({ componentName: 'RtmvpcAssessmentChatter', methodName: 'getChatterResponse', className: 'AssessmentController', errorData: error.message }).then((result) => {
+                });
+            });
+        });
+    }
+
+    /*To display only the flagged questions(flag colour- green) or all questions(flag colour- red) by clicking on flag */
+    handleChange(event) {
+        var dataId = event.currentTarget.dataset.id;
+        this.showflagquestions = !this.showflagquestions;
+        if (dataId == 'showlowerflag') {
+            this.template.querySelector('c-Questionnaire').handleFilterFlag(true);
+        }
+        if (dataId == 'showpriorityflag') {
+            this.template.querySelector('c-Questionnaire').handleFilterFlag(false);
+        }
+
+
+    }
+
     /*handleLeftButtonClick used to display records on page1*/
     handleLeftButtonClick(event) {
         var cadtype = this.template.querySelector('[data-id="cadtype"]');
@@ -27,26 +146,28 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
         cadtype.classList.toggle('cadshowright');
     }
 
-    /* This on click event is used to get section id and send it to the child component*/
-    showQuestionnaire(event)
-    {
-        if(event.detail.sectionId != null || typeof event.detail.sectionId != 'undefined')
-        {
+    /* showQuestionnaire is used to get section id and send it to the child component*/
+    showQuestionnaire(event) {
+        if (event.detail.sectionId != null || event.detail.sectionId != undefined) {
             this.sectionid = event.detail.sectionId;
-            console.log('showQuestionnaire', this.sectionid);
             this.showSections = false;
-            this.showFlag=false;        
+            this.showFlag = false;
         }
     }
-    /* This chatHistory is used to catch the value from parent and pass it to the child component(AssessmentChatter)*/
-    chatHistory(event)
-    {
-        this.showChat=event.detail;
-        this.showData=this.showChat.openChat;
+    /* chatHistory is used to get the question id, assessment id and flag boolean from the child component (Questionnaire) and pass it to the child component(AssessmentChatter)*/
+    chatHistory(event) {
+        this.showChat = event.detail;
+        this.showData = this.showChat.openChat;
+        this.showconverstion = this.showChat.disableSendButton;
     }
 
-    showsummaryHandler(event)
-    {
-        this.showSections=true;
+    showsummaryHandler(event) {
+        this.showSections = true;
+    }
+    /* handleChat is used to assign the chat history to the main wrapper in the questionnaire */
+    handleChat(event) {
+        this.chatterData = event.detail;
+        this.template.querySelector('c-Questionnaire').handleConversationData(this.chatterData);
+
     }
 }

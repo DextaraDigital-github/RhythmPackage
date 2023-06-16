@@ -1,10 +1,16 @@
 <!-- This HTML is used to load both section(tabluar report questionnaire) and Questions(Quesstionnaire) in same component based on the selection of sectionId and AssessmentId
 	-->
 <template>
+	<!-- <header class="rtmvpc-pgheader">
+		<div class="rtmvpc-pghtitle">
+			<div class="rtmvpc-pgstitle">Welcome to the Supplier Portal </div>
+			<h1 class="rtmvpc-pgmtitle capitalize">Inbox</h1>
+		</div>
+	</header> -->
 	<div class="cad-cardbase slds-p-around_small">
 		<div class="cad-tbl">
 			<div class="cad-row">
-				<div class="cad-cel cad-w230 cad-type cad-pr8" data-id="cadtype" aura:id="cadtype">
+				<div class="cad-cel cad-w230 cad-type cadshowleft cad-pr8" data-id="cadtype" aura:id="cadtype">
 					<div class="cad-sec_container">
 						<div class="cad-sec_header">
 							<button class="cad_actions" onclick={handleLeftButtonClick} title="Close Timeline Panel" style="z-index:1; position:inherit;">
@@ -15,76 +21,85 @@
 							<div class="cad-sec_vcontainer2_1">
 								<div class="cad-timeline_line"></div>
 								<div class="slds-scrollable_y">
-
-									<div class="cad-timeline_slidebase cad-timeline_customer cad-timeline_default">
-										<div class="cad-timeline_dot"></div>
-										<div class="cad-timeline_datetime">05/14/2023 10:00 AM EST</div>
-										<div class="cad-timeline_content">
-											<h2 class="cad-timeline_title">End Time</h2>
+									<template for:each={assessmentTimeline} for:item="assessment">
+										<div key={assessment.status} class={assessment.classlist}>
+											<div key={assessment.status} class="cad-timeline_dot"></div>
+											<div key={assessment.status} class="cad-timeline_datetime">{assessment.date}
+											</div>
+											<div key={assessment.status} class="cad-timeline_content">
+												<h2 key={assessment.status} class="cad-timeline_title">
+													{assessment.status}</h2>
+												<span>- {assessment.name}</span>
+											</div>
 										</div>
-									</div>
+									</template>
 
-									<div class="cad-timeline_slidebase cad-timeline_customer cad-timeline_approved">
-										<div class="cad-timeline_dot"></div>
-										<div class="cad-timeline_datetime">05/14/2023 10:00 AM EST</div>
-										<div class="cad-timeline_content">
-											<h2 class="cad-timeline_title">ESG Assessment</h2>
-											<span>- Mel Gibbson</span>
-										</div>
-									</div>
 
-									<div class="cad-timeline_slidebase cad-timeline_vendor cad-timeline_submited">
-										<div class="cad-timeline_dot"></div>
-										<div class="cad-timeline_datetime">05/14/2023 10:00 AM EST</div>
-										<div class="cad-timeline_content">
-											<h2 class="cad-timeline_title">ESG Assessment</h2>
-											<span>- Max Mullar</span>
-										</div>
-									</div>
-
-									<div class="cad-timeline_slidebase cad-timeline_customer cad-timeline_rejected">
-										<div class="cad-timeline_dot"></div>
-										<div class="cad-timeline_datetime">05/14/2023 10:00 AM EST</div>
-										<div class="cad-timeline_content">
-											<h2 class="cad-timeline_title">ESG Assessment</h2>
-											<span>- Mel Gibbson</span>
-										</div>
-									</div>
-
-									<div class="cad-timeline_slidebase cad-timeline_vendor cad-timeline_submited">
-										<div class="cad-timeline_dot"></div>
-										<div class="cad-timeline_datetime">05/14/2023 10:00 AM EST</div>
-										<div class="cad-timeline_content">
-											<h2 class="cad-timeline_title">ESG Assessment</h2>
-											<span>- Max Mullar</span>
-										</div>
-									</div>
-
-									<div class="cad-timeline_slidebase cad-timeline_customer cad-timeline_default">
-										<div class="cad-timeline_dot"></div>
-										<div class="cad-timeline_datetime">05/14/2023 10:00 AM EST</div>
-										<div class="cad-timeline_content">
-											<h2 class="cad-timeline_title">ESG Assessment</h2>
-											<span>- Mel Gibbson	</span>
-										</div>
-									</div>
 
 								</div>
 							</div>
 						</div>
 					</div>
 				</div>
+
 				<div class="cad-cel cad-auto cad-list">
 					<div class="cad-sec_container">
+						<!-- <div class="cad-top_menu_container">
+							<div class="slds-float_left">
+								<button class="cad_actions" onclick={handleLeftButtonClick}><i class="las la-bars"></i></button>
+							</div>
+							<div class="slds-float_right">
+								<button class="cad_actions " data-id="Task" onclick={showDataHandler}>
+										<i class="las la-tasks"></i>
+								</button>
+								<button class="cad_actions " data-id="Supplier_Inbox_Categ__c" onclick={showDataHandler}>
+									<i class="las la-bell"></i>
+								</button>
+								<button class="cad_actions " data-id="Supplier_Task__c" onclick={showDataHandler}>
+									<i class="las la-exclamation-triangle"></i>
+								</button>
+							</div>
+						</div> -->
+
 						<div class="cad-sec_header">
 							<div class="slds-float_left slds-is-absolute" style="width:100%; padding:4px 80px 0px 31px;"
 								title="Details : ESG Assessment (Due date 05/14/2023)">
-								<div class="slds-truncate">Details : ESG Assessment (Due date 05/14/2023)</div>
+								<div class="slds-truncate">Details : {assessmentName} (Due date {endDate})</div>
 							</div>
+
 							<div class="slds-float_left slds-is-relative">
 								<button class="cad_actions" onclick={handleLeftButtonClick} title="Show / Hide Timeline Panel"><i class="las la-bars"></i></button>
 							</div>
+
+
+
 							<div class="slds-float_right slds-is-relative">
+								<template if:true={showstatus}>
+									<template if:true={showflagquestions}>
+
+										<div class="slds-col cib-flag">
+											<lightning-icon key={assessmentid} data-id="showlowerflag"
+												icon-name="utility:lower_flag" size="xx-small" onclick={handleChange}>
+											</lightning-icon>
+										</div>
+									</template>
+									<template if:false={showflagquestions}>
+										<div class="slds-col cib-archive:hover">
+											<lightning-icon data-id="showpriorityflag" icon-name="utility:priority"
+												alternative-text="Additional Requests" size="x-small"
+												title="Additional Requests" onclick={handleChange}></lightning-icon>
+										</div>
+									</template>
+
+									<!-- <lightning-input type="Checkbox" key={assessmentid}
+										onchange={handleChange} unchecked="false"></lightning-input> -->
+								</template>
+								<!-- 
+								<lightning-combobox name="progress" label="Status" variant="label-hidden"
+									value={value} placeholder="Select Progress" options={options}
+									onchange={handleChange}>
+								</lightning-combobox>
+								-->
 								<lightning-button-menu icon-name="utility:download" menu-alignment="right"
 									menu-size="medium" alternative-text="Export" variant="label-hidden" title="Export"
 									style="top:-3px;">
@@ -97,7 +112,10 @@
 								<button class="cad_actions" onclick={handleRightButtonClick} title="Show / Hide Info Panel"><i class="las la-bars"></i></button>
 							</div>
 						</div>
-						
+						<!-- <div class="cad-serch">
+							<input type="text" placeholder="Search" class="cad-serch-input" onkeyup={searchInputChangeHandler}/>
+							</div>
+						 -->
 						<!--
 							 ++ If Searc enabled use below Class "class="cad-sec_bodyfull2"" insted of  "class="cad-sec_bodyfull1"" ++ 
 						 -->
@@ -108,14 +126,13 @@
 										<!-- <strong>Assessment Component Placeholder</strong>
 											<h1>calling tabular report questionnaire</h1> -->
 										<template if:true={showSections}>
-											<c-tabular-report-questionnaire assessment={assessmentid}
-												show-next-button="true" onsectionclick={showQuestionnaire}>
-											</c-tabular-report-questionnaire>
+											<c-Questionnaire vendor={accountid} assessment={assessmentid}
+												onselectconversation={chatHistory} onshowsummary={showsummaryHandler}>
+											</c-Questionnaire>
 										</template>
 										<template if:false={showSections}>
 											<!-- <h1>Section Id {sectionId}</h1> -->
-											<c-Questionnaire vendor={accountid} assessment={assessmentid} section={sectionid}
-												onselectconversation={chatHistory} onshowsummary={showsummaryHandler}></c-Questionnaire>
+
 										</template>
 										<!-- <template if:false={showFlag}>
 												
@@ -167,17 +184,20 @@
 							<div class="slds-scrollable_y">
 								<!-- to show apply or remove class "cadshowright" -->
 								<template if:true={showData}>
-									<c-rtmvpc-assessment-chatter chattermap={showChat}></c-rtmvpc-assessment-chatter>
+									<c-rtmvpc-assessment-chatter chattermap={showChat} onchatconversation={handleChat}>
+									</c-rtmvpc-assessment-chatter>
 								</template>
 							</div>
 						</div>
-						<!-- <div class="cad-sec_vcontainer3 slds-border_top slds-p-around_small">
-							<lightning-textarea placeholder="Type your response here..." variant="label-hidden"
-								onchange={chatChangeHandler}>
-							</lightning-textarea>
-							<lightning-button label="Send" onclick={sendButtonHandler}>
-							</lightning-button>
-						</div> -->
+						<template if:true={showconverstion}>
+							<div class="cad-sec_vcontainer3 slds-border_top slds-p-around_small">
+								<lightning-textarea placeholder="Type your response here..." variant="label-hidden"
+									disabled="true" onchange={chatChangeHandler}>
+								</lightning-textarea>
+								<lightning-button label="Send" onclick={sendButtonHandler} disabled="true">
+								</lightning-button>
+							</div>
+						</template>
 					</div>
 				</div>
 			</div>

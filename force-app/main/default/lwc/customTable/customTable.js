@@ -96,9 +96,10 @@ export default class CustomTable extends LightningElement {
     @track objHistoryList = [];
     @api tableLabel;
     @api activeTab = '';
+
     @api relatedListRecords = [];
     allRecordsList;
-    @api objectRecordData=[];
+    @api objectRecordData;
     @track pageSizeOptions = [
         // { label: '5', value: '5' },
         // { label: '10', value: '10' },
@@ -108,6 +109,9 @@ export default class CustomTable extends LightningElement {
         { label: '30', value: '30' }
     ];
 
+
+    @api records;
+
     //Start: Show/Hide/Shuffle Columns
     viewColList;
     columnsOptions = [];
@@ -116,32 +120,32 @@ export default class CustomTable extends LightningElement {
     //End: Show/Hide/Shuffle Columns
 
 
-    @wire(getRelatedListRecords, {
-        parentRecordId: '$recId',
-        relatedListId: '$relName',
-        fields: '$fieldsList'
-    })
-    getRelatedListRecordsList({ error, data }) {
-        if (data) {
-            //console.clear();
-            console.log('getRelatedListRecordsList',data);
-            if (typeof this.relatedListRecords != undefined) {
-                this.relatedListRecords = JSON.parse(JSON.stringify(data.records));
+    // @wire(getRelatedListRecords, {
+    //     parentRecordId: '$recId',
+    //     relatedListId: '$relName',
+    //     fields: '$fieldsList'
+    // })
+    // getRelatedListRecordsList({ error, data }) {
+    //     if (data) {
+    //         //console.clear();
+    //         console.log('getRelatedListRecordsList',data);
+    //         if (typeof this.relatedListRecords != undefined) {
+    //             this.relatedListRecords = JSON.parse(JSON.stringify(data.records));
 
-                this.preparePaginationControlsData();
-                let pageSizeDefaultValue = this.pageSizeOptions[0].value;
-                let currentPageRecords = this.getPageRecords(this.relatedListRecords, 1, pageSizeDefaultValue);
+    //             this.preparePaginationControlsData();
+    //             let pageSizeDefaultValue = this.pageSizeOptions[0].value;
+    //             let currentPageRecords = this.getPageRecords(this.relatedListRecords, 1, pageSizeDefaultValue);
 
-                this.viewColList = this.colList;
-                //this.recList = this.assignData(this.relatedListRecords, this.colList);
-                this.recList = this.assignData(currentPageRecords, this.viewColList);
-                this.allRecordsList = this.recList;
-            }
-        }
-        else if (error) {
-            console.log('Wire Related List data', JSON.stringify(error));
-        }
-    }
+    //             this.viewColList = this.colList;
+    //             //this.recList = this.assignData(this.relatedListRecords, this.colList);
+    //             this.recList = this.assignData(currentPageRecords, this.viewColList);
+    //             this.allRecordsList = this.recList;
+    //         }
+    //     }
+    //     else if (error) {
+    //         console.log('Wire Related List data', JSON.stringify(error));
+    //     }
+    // }
 
     
 
@@ -772,14 +776,26 @@ export default class CustomTable extends LightningElement {
 
     connectedCallback() {
 
-        this.relatedListRecords = JSON.parse(JSON.stringify(this.objectRecordData));
-        this.preparePaginationControlsData();
-        let pageSizeDefaultValue = this.pageSizeOptions[0].value;
-        let currentPageRecords = this.getPageRecords(this.relatedListRecords, 1, pageSizeDefaultValue);
-        this.viewColList = this.colList;
-        this.recList = this.assignData(currentPageRecords, this.viewColList);
-        this.allRecordsList = this.recList;
-        this.accountsId = this.recId;
+                console.log('this.objectRecordData',this.objectRecordData);
+                this.preparePaginationControlsData();
+                let pageSizeDefaultValue = this.pageSizeOptions[0].value;
+                let currentPageRecords = this.getPageRecords(this.objectRecordData, 1, pageSizeDefaultValue);
+                this.viewColList = this.colList;
+                //this.recList = this.assignData(this.relatedListRecords, this.colList);
+                this.recList = this.assignData(currentPageRecords, this.viewColList);
+
+                this.allRecordsList = this.recList;
+//KOUSHIK CHANGES
+
+
+        // this.relatedListRecords = JSON.parse(JSON.stringify(this.objectRecordData));
+        // this.preparePaginationControlsData();
+        // let pageSizeDefaultValue = this.pageSizeOptions[0].value;
+        // let currentPageRecords = this.getPageRecords(this.relatedListRecords, 1, pageSizeDefaultValue);
+        // this.viewColList = this.colList;
+        // this.recList = this.assignData(currentPageRecords, this.viewColList);
+        // this.allRecordsList = this.recList;
+        // this.accountsId = this.recId;
 
 
 
@@ -979,60 +995,94 @@ export default class CustomTable extends LightningElement {
         this.recList = this.assignData(currentPageRecords, this.viewColList);
         this.allRecordsList = this.recList;
     }
-
+    /* To generate Excel file which contains assessment questions, responses and conversation history. */
     csvClickHandler(event) {
-        var x = event.currentTarget.dataset.id;
-        getSupplierAssessmentList({ assessmentId: x }).then(result => {
-            var assessmentTemplateId = result[0].Assessment_Template__c;
+        var assessmentId = event.currentTarget.dataset.id;
+        getSupplierAssessmentList({ assessmentId: assessmentId }).then(resultData => {
+            var assessmentTemplateId = resultData[0].Rhythm__Template__c;           
             getQuestionsList({ templateId: assessmentTemplateId }).then(result => {
                 var resultMap = result;
-                getSupplierResponseList({ assessmentId: x }).then(result => {
-                    result.forEach(qres => {
-                        this.savedResponseMap.set(qres.Questionnaire__c, qres.Response__c);
+                getSupplierResponseList({ assessmentId: assessmentId }).then(result => {
+                    result.forEach(qres => { 
+                         var savedResponseList= new Map();
+                        savedResponseList.set('value',qres.Rhythm__Response__c);
+                        if(('Rhythm__Conversation_History__c' in qres))
+                        {
+                         savedResponseList.set('history',(qres.Rhythm__Conversation_History__c));
+                        }
+                        this.savedResponseMap.set(qres.Rhythm__Question__c, savedResponseList);
                     });
                     this.finalSection = this.constructWrapper(resultMap, this.savedResponseMap);
-                    //console.log(this.finalSection);
-                    //console.log('Download clicked');
-                    var str = 'Question,Answer\n';
-
+                    var str = 'Section,Question,Answer,ConversationHistory\n';
                     for (const key of this.finalSection.keys()) {
-                        str += 'Section: "' + key + '",""\n';
                         for (var i = 0; i < this.finalSection.get(key).length; i++) {
-                            str += '"' + this.finalSection.get(key)[i].question + '","' + this.finalSection.get(key)[i].value + '"\n';
+                             if(typeof this.finalSection.get(key)[i].conversationHistory != "undefined")
+                            {
+                                 var tempstr='';
+                                for( var j=0;j<JSON.parse(this.finalSection.get(key)[i].conversationHistory).length;j++)
+                                {
+                                    
+                                      tempstr=tempstr + JSON.parse(this.finalSection.get(key)[i].conversationHistory)[j].Name +':' + JSON.parse(this.finalSection.get(key)[i].conversationHistory)[j].Text+ '\n';
+                                }
+                               
+                            this.finalSection.get(key)[i].conversationHistory=tempstr;
+                            }
+                            str += '"'+key+ '","'+(i+1)+'.'+' '+ this.finalSection.get(key)[i].question + '","'  + this.finalSection.get(key)[i].value + '","' + this.finalSection.get(key)[i].conversationHistory + '"\n';
                         }
+                        str+='\n';
                     }
                     str = str.replaceAll('undefined', '').replaceAll('null', '');
                     var blob = new Blob([str], { type: 'text/plain' });
                     var url = window.URL.createObjectURL(blob);
                     var atag = document.createElement('a');
-                    atag.setAttribute('href', url);
-                    atag.setAttribute('download', result[0].Assessment__r.Name + '.csv');
+                    atag.setAttribute('href', url);                    
+                    atag.setAttribute('download', resultData[0].Name + '.csv');
                     atag.click();
                 }).catch(error => {
-                    //console.log('Error' + error);
-                })
+                   errorLogRecord({ componentName: 'CustomTable', methodName: 'getSupplierResponseList', className: 'AssessmentController', errorData: error.message }).then((result) => {
+                    });                
+                    })
 
             }).catch(error => {
-                //console.log('Error' + error);
+                errorLogRecord({ componentName: 'CustomTable', methodName: 'getQuestionsList', className: 'AssessmentController', errorData: error.message }).then((result) => {
+                    });
             })
         }).catch(error => {
-            //console.log('Error' + error);
+             errorLogRecord({ componentName: 'CustomTable', methodName: 'getSupplierAssessmentList', className: 'AssessmentController', errorData: error.message }).then((result) => {
+                    });    
         })
     }
+
+    /* constructWrapperis used to build the wrapper which contains question name,reponse and conversation data to generate the pdf*/
     constructWrapper(questionResp, savedResp) {
         var questionMap = new Map();
         questionResp.forEach(qu => {
-            var quTemp = {};
-            quTemp.questionId = qu.questionId;
-            quTemp.question = qu.Question;
-            if (questionMap.has(qu.sectionName)) {
-                questionMap.get(qu.sectionName).push(quTemp);
+            var quTemp = {};          
+            quTemp.questionId = qu.Id;          
+            quTemp.question = qu.Rhythm__Question__c;
+             if(qu.Rhythm__Required__c == true)
+            {
+                var str='';
+                str=str+ qu.Rhythm__Question__c+'*';
+                quTemp.question = str;
+            }
+            if (questionMap.has(qu.Rhythm__Section__r.Name)) {
+                questionMap.get(qu.Rhythm__Section__r.Name).push(quTemp);
             } else {
                 var quesList = [];
                 quesList.push(quTemp);
-                questionMap.set(qu.sectionName, quesList);
+                questionMap.set(qu.Rhythm__Section__r.Name, quesList);
+            }            
+            if(typeof (savedResp.get(quTemp.questionId)) != 'undefined' && savedResp.get(quTemp.questionId).conversationHistory == 'undefined')
+            {
+               quTemp.value = savedResp.get(quTemp.questionId).get('value');
             }
-            quTemp.value = savedResp.get(quTemp.questionId);
+            else if( typeof (savedResp.get(quTemp.questionId)) != 'undefined'){               
+                  quTemp.value = savedResp.get(quTemp.questionId).get('value');
+                     quTemp.conversationHistory = savedResp.get(quTemp.questionId).get('history');
+                
+            }
+            
         });
         return questionMap;
     }
@@ -1071,25 +1121,33 @@ export default class CustomTable extends LightningElement {
         // let win = window.open('https://power-drive-9933-dev-ed--c.scratch.vf.force.com/apex/customTablePdf?core.apexpages.request.devconsole=1', 'loginWindow', 'width=' + (window.innerWidth / 2) + ',height=' + (window.innerHeight / 2) + ',location=no, top=' + (window.innerHeight / 4) + ', left=' + (window.innerWidth / 4));
         // win.focus();
     }
+
+    /*To generate pdf which contains assessment questions,responses and conversation history */
     pdfClickHandler(event) {
         var x = event.currentTarget.dataset.id;
-        getSupplierAssessmentList({ assessmentId: x }).then(result => {
-            var assessmentTemplateId = result[0].Assessment_Template__c;
+        getSupplierAssessmentList({ assessmentId: x }).then(resultData => {
+            var assessmentTemplateId = resultData[0].Rhythm__Template__c;
             getQuestionsList({ templateId: assessmentTemplateId }).then(result => {
                 var resultMap = result;
                 getSupplierResponseList({ assessmentId: x }).then(result => {
                     result.forEach(qres => {
-                        this.savedResponseMap.set(qres.Questionnaire__c, qres.Response__c);
+                         var savedResponseList= new Map();
+
+                        savedResponseList.set('value',qres.Rhythm__Response__c);
+                        if(('Rhythm__Conversation_History__c' in qres))
+                        {
+                         savedResponseList.set('history',(qres.Rhythm__Conversation_History__c));
+                        }
+                        this.savedResponseMap.set(qres.Rhythm__Question__c, savedResponseList);
                     });
+                    console.log('savedmap',this.savedResponseMap);
                     this.finalSection = this.constructWrapper(resultMap, this.savedResponseMap);
-                    //console.log(this.finalSection);
                     var tableHtml = '<table><thead><tr>';
-                    tableHtml += '<th>Section</th><th>Question</th><th>Response</th>';
+                    tableHtml += '<th>Section</th><th colspan="2">Question</th><th>Response</th><th>ConversationHistory</th>';
                     tableHtml += '</tr></thead><tbody>';
-                    //console.log(this.finalSection);
+                    console.log('this.finalSection',this.finalSection);
                     var count = 0;
-                    for (const key of this.finalSection.keys()) {
-                        // tableHtml += '<tr><td>Section: ' + key + '</td><td></td></tr>';
+                    for (const key of this.finalSection.keys()) {                        
                         count += 1;
                         if (count % 2 === 0) {
                             tableHtml += '<tr><td class="evenLeftTd" rowspan=' + this.finalSection.get(key).length + '>' + key + '</td>';
@@ -1097,15 +1155,26 @@ export default class CustomTable extends LightningElement {
                         else {
                             tableHtml += '<tr><td class="oddLeftTd" rowspan=' + this.finalSection.get(key).length + '>' + key + '</td>';
                         }
-                        // tableHtml += '<tr><td rowspan='+this.finalSection.get(key).length+'>' + key + '</td>';
-                        for (var i = 0; i < this.finalSection.get(key).length; i++) {
-                            tableHtml += '<td>' + this.finalSection.get(key)[i].question + '</td><td>' + this.finalSection.get(key)[i].value + '</td></tr>';
+                        for (var i = 0; i < this.finalSection.get(key).length; i++) {                                                 
+                            if(typeof this.finalSection.get(key)[i].conversationHistory != "undefined")
+                            {
+                                 var str='';
+                                for( var j=0;j<JSON.parse(this.finalSection.get(key)[i].conversationHistory).length;j++)
+                                {                                    
+                                      str=str + JSON.parse(this.finalSection.get(key)[i].conversationHistory)[j].Name +':' + JSON.parse(this.finalSection.get(key)[i].conversationHistory)[j].Text+ '\n';
+                                }
+                               
+                            this.finalSection.get(key)[i].conversationHistory=str;
+                            }
+                            tableHtml += '<td class="align-to-top">'+ (i+1)+'.'+'</td><td>'+ this.finalSection.get(key)[i].question + '</td><td>' + this.finalSection.get(key)[i].value + '</td><td> ' + this.finalSection.get(key)[i].conversationHistory + '</td></tr>';
+                        
                         }
+                        tableHtml +='<tr><td></td><td></td><td></td><td></td></tr>';
                     }
                     tableHtml += '</tbody></table>';
-                    //console.log(tableHtml);
-                    var win = window.open('', '', 'width=' + (window.innerWidth * 0.9) + ',height=' + (window.innerHeight * 0.9) + ',location=no, top=' + (window.innerHeight * 0.1) + ', left=' + (window.innerWidth * 0.1));
-                    var style = '<style>@media print { * {-webkit-print-color-adjust:exact;}}} @page{ margin: 0px;} *{margin: 0px; padding: 0px; height: 0px; font-family: Source Sans Pro, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif !important;} .headerDiv{width: 100%; height: 56px; padding: 20px; background-color: #03314d;} .headerText{font-size: 40px; color: white; font-weight: bold} .tableDiv{padding: 20px;} table {border-collapse:collapse; font-size: 14px;} table td, th{ padding: 4px;} table tr:nth-child(odd) td {background-color: #F9F9F9;} .oddLeftTd{background-color: #E9E9E9 !important;} .evenLeftTd{background-color: #F1F1F1 !important;} table th{ border: 1px solid #E9E9E9; background-color:#B5BEC58F} table { page-break-inside:auto; } tr { page-break-inside:avoid; page-break-after:auto; }</style>';
+                   
+                   var win = window.open('', '', 'width=' + (window.innerWidth * 0.9) + ',height=' + (window.innerHeight * 0.9) + ',location=no, top=' + (window.innerHeight * 0.1) + ', left=' + (window.innerWidth * 0.1));
+                    var style = '<style>@media print { * {-webkit-print-color-adjust:exact;}}} @page{ margin: 0px;} *{margin: 0px; padding: 0px; height: 0px; font-family: Source Sans Pro, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif !important;} .headerDiv{width: 100%; height: 56px; padding: 20px; background-color: #03314d;} .headerText{font-size: 40px; color: white; font-weight: bold} .tableDiv{padding: 20px;} table {border-collapse:collapse; font-size: 14px;} table td, th{ padding: 4px;} table tr:nth-child(odd) td {background-color: #F9F9F9;} .oddLeftTd{background-color: #E9E9E9 !important;} .evenLeftTd{background-color: #F1F1F1 !important;} table th{ border: 1px solid #E9E9E9; background-color:#B5BEC58F} table { page-break-inside:auto; } tr { page-break-inside:avoid; page-break-after:auto; } .align-to-top{ vertical-align: top; }</style>';
                     win.document.getElementsByTagName('head')[0].innerHTML += style;
                     win.document.getElementsByTagName('body')[0].innerHTML += '<div class="headerDiv slds-p-around_small"><span class="headerText">Rhythm</span></div><br/>';
                     tableHtml = tableHtml.replaceAll('undefined', '').replaceAll('null', '');
@@ -1113,15 +1182,18 @@ export default class CustomTable extends LightningElement {
                     win.print();
                     win.close();
                 }).catch(error => {
-                    console.log('Error' + error);
+                    errorLogRecord({ componentName: 'CustomTable', methodName: 'getSupplierResponseList', className: 'AssessmentController', errorData: error.message }).then((result) => {
+                    });
                 })
 
             }).catch(error => {
-                console.log('Error' + error);
+                 errorLogRecord({ componentName: 'CustomTable', methodName: 'getQuestionsList', className: 'AssessmentController', errorData: error.message }).then((result) => {
+                    });
             })
         }).catch(error => {
-            console.log('Error' + error);
-        })
+                errorLogRecord({ componentName: 'CustomTable', methodName: 'getSupplierAssessmentList', className: 'AssessmentController', errorData: error.message }).then((result) => {
+                    });        
+                })
     }
 
 

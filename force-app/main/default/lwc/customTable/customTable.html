@@ -7,7 +7,7 @@
 			<div class="slds-p-around_small">
 				<div class="cdgtitletoolbar slds-grid slds-wrap ">
 					<div class="slds-col slds-small-size_12-of-12 slds-medium-size_6-of-12 slds-large-size_6-of-12">
-						<div class="slds-grid slds-wrap">
+						<div class="slds-grid slds-wrap slds-p-bottom_xx-small">
 
 							<div class="slds-text-left">
 								<lightning-icon icon-name="standard:budget" size="medium" title=""></lightning-icon>
@@ -48,7 +48,7 @@
 						</lightning-dual-listbox>
 						</div> 
 						</section>
-						</template> --> 
+						</template> -->
 
 							<!-- <lightning-combobox name="Column Selector" label="Column selector" value={viewColList.fieldName} options={viewColList} onchange={handleChange}></lightning-combobox> -->
 
@@ -159,7 +159,7 @@
 				</div>
 
 				<div class="cdgWrapperinner">
-					
+
 					<div class="cdg">
 						<div class="tr">
 							<div class="th">
@@ -174,34 +174,34 @@
 							<template for:each={viewColList} for:item="col">
 								<div key={col.fieldName} class="th" data-columnheader={col.fieldName}>
 
-								<div class="slds-truncate">{col.label}</div>
-								<i data-id={col.fieldName} onclick={sortClickHandler} data-sorticon class="las la-angle-down sort-inactive"></i>
-								<div>
-									<input type="text" data-filtertextbox data-id={col.fieldName} onchange={inputChangeHandler} class="slds-input"/>
+									<div class="slds-truncate">{col.label}</div>
+									<i data-id={col.fieldName} onclick={sortClickHandler} data-sorticon class="las la-angle-down sort-inactive"></i>
+									<div>
+										<input type="text" data-filtertextbox data-id={col.fieldName} onchange={inputChangeHandler} class="slds-input"/>
 								</div>
 
-									<div class="slds-resizable">
-										<span class="slds-resizable__handle" onmousedown={handleResizeMouseDown} data-resizefield={col.fieldName}>
+										<div class="slds-resizable">
+											<span class="slds-resizable__handle" onmousedown={handleResizeMouseDown} data-resizefield={col.fieldName}>
 											<span class="slds-resizable__divider"></span>
-										</span>
-									</div>
+											</span>
+										</div>
 
-								</div>
+									</div>
 							</template>
 
 
 
 							<template lwc:if={showProgressBar}>
 								<div class="th">
-									
-										% Completed
-									
-										<div class="slds-resizable">
-											<span class="slds-resizable__handle">
+
+									% Completed
+
+									<div class="slds-resizable">
+										<span class="slds-resizable__handle">
 												<span class="slds-resizable__divider"></span>
-											</span>
-										</div>
-									
+										</span>
+									</div>
+
 								</div>
 							</template>
 
@@ -251,8 +251,8 @@
 						<template for:each={recList} for:item="rec">
 							<div key={rec} class="tr" data-id={rec.id}>
 								<div class="td">
-									<lightning-input class="recCheckbox" data-id={rec.id} type="checkbox" variant="label-hidden"
-										onchange={checkboxChangeHandler}></lightning-input>
+									<lightning-input class="recCheckbox" data-id={rec.id} type="checkbox"
+										variant="label-hidden" onchange={checkboxChangeHandler}></lightning-input>
 									<!-- <input type="checkbox"/> &nbsp; <i class="las la-star"></i> -->
 								</div>
 								<template key={rec.id} for:each={rec.record} for:item="col">
@@ -300,8 +300,10 @@
 															style="float:right"></lightning-icon>
 													</template>
 													<template if:true={col.flagSymbol}>
-														<lightning-icon icon-name={col.flagSymbol} size="x-small" class="cib-flag"
-															style="margin:5px 5px 0px 10px; float:right"></lightning-icon>
+														<lightning-icon icon-name={col.flagSymbol} size="x-small"
+															class="cib-flag"
+															style="margin:5px 5px 0px 10px; float:right">
+														</lightning-icon>
 													</template>
 												</div>
 											</div>
@@ -332,9 +334,10 @@
 										<div class="slds-grid slds-wrap slds-gutters_xx-small">
 											<div class="slds-col slds-size_8-of-12 slds-p-top_x-small">
 												<lightning-progress-bar style="background-color: green "
-											value={rec.progressBarValue}></lightning-progress-bar>
+													value={rec.progressBarValue}></lightning-progress-bar>
 											</div>
-											<div class="slds-col slds-size_4-of-12 slds-col_bump-left"><span>{rec.progressBarValue}%</span></div>
+											<div class="slds-col slds-size_4-of-12 slds-col_bump-left">
+												<span>{rec.progressBarValue}%</span></div>
 										</div>
 									</div>
 								</template>
@@ -382,7 +385,7 @@
 							</div>
 						</template>
 					</div>
-				
+
 				</div>
 				<table style="width:auto; margin:auto; margin-top:8px;">
 					<tr>
@@ -436,27 +439,29 @@
 				</table>
 			</div>
 		</template>
-	
+
 		<template if:true={showRecordDetail}>
 			<template if:false={ischilddetailpage}>
 				<button class="slds-m-bottom_small cdg_actions" onclick={backClickHandler}><span
 				class="textstyle01"><i class="las la-chevron-circle-left"></i> Back</span></button>
 			</template>
-			
+
 			<c-rtmvpc-record-details-view record-id={recordDetailId} object-name={objName} record-type={recordType}
-				is-custom-detail-page={isCustomDetailPage} is-custom-design-page={isCustomDesignPage} active-tabtwo={activeTab}
-				field-list={customRecordPageCol} tabs-data={tabsData} ongetdetailpagedetails={assignChildProperties}
-				is-child-record-page={isChildTable} childdetailrecpage={ischilddetailpage}>
+				is-custom-detail-page={isCustomDetailPage} is-custom-design-page={isCustomDesignPage}
+				active-tabtwo={activeTab} field-list={customRecordPageCol} tabs-data={tabsData}
+				ongetdetailpagedetails={assignChildProperties} is-child-record-page={isChildTable}
+				childdetailrecpage={ischilddetailpage}>
 			</c-rtmvpc-record-details-view>
 			<!-- <c-rtmvpc-record-detail-page rec-id={recordDetailId} obj-name={objName}></c-rtmvpc-record-detail-page> -->
-			
+
 		</template>
 		<template if:true={takeSurvey}>
 			<button class="slds-m-bottom_small cdg_actions" onclick={backClickHandler}><span
 				class="textstyle01"><i class="las la-chevron-circle-left"></i> Back</span></button>
-				<c-rtmvpc-assessment-detail accountid={accountsId} assessmentid={assessmentsId}></c-rtmvpc-assessment-detail>
-				<!-- <c-rtmvpc-Assessment-Detail accountid={accountsId} assessmentid={assessmentsId}></c-rtmvpc-Assessment-Detail> -->
-				<!-- <c-Questionnaire vendor={recId} assessment={recordDetailId}></c-Questionnaire> -->
+			<c-rtmvpc-assessment-detail accountid={accountsId} assessmentid={assessmentsId}>
+			</c-rtmvpc-assessment-detail>
+			<!-- <c-rtmvpc-Assessment-Detail accountid={accountsId} assessmentid={assessmentsId}></c-rtmvpc-Assessment-Detail> -->
+			<!-- <c-Questionnaire vendor={recId} assessment={recordDetailId}></c-Questionnaire> -->
 
 		</template>
 

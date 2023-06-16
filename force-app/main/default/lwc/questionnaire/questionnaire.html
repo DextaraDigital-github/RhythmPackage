@@ -39,6 +39,7 @@
 					<div>
 						<ul class="slds-accordion">
 							<li class="slds-accordion__list-item">
+								<template if:false={isTemplate}>
 								<section class={showAccordion}>
 									<div class="slds-accordion__summary">
 										<h2 class="slds-accordion__summary-heading">
@@ -54,17 +55,21 @@
 											</button>
 										</h2>
 									</div>
-									<div class="slds-accordion__content" id="referenceId-21">Contains Assessment
-										templates data</div>
-								</section>
+									<div class="slds-accordion__content" id="referenceId-21">{showDisclosure}</div>
+								</section></template>
+								<template if:true={isTemplate}>
+									<button class="slds-button slds-button_reset slds-accordion__summary-action" onclick={closeAccordionSection} aria-controls="referenceId-21" aria-expanded="true">{buttonlabel}</button>
+									</br></br></br>
+								</template>
 							</li>
 
 							<li class="slds-accordion__list-item">
-								<section class={showAccordionQuestions}>
-									<template for:each={questionsAndAnswerss} for:item="questionaryEntry">
+								<template for:each={questionsAndAnswerss} for:item="questionaryEntry">
+									<section data-accordian={questionaryEntry.sectionId} key={questionaryEntry.section}>
+
 										<div class="slds-accordion__summary" key={questionaryEntry.section}>
 											<h2 class="slds-accordion__summary-heading">
-												<button class="slds-button slds-button_reset slds-accordion__summary-action" data-id={questionaryEntry.section} onclick={handleAccordionQuestion} aria-controls="referenceId-22" aria-expanded="true">
+												<button  class="slds-button slds-button_reset slds-accordion__summary-action" data-id={questionaryEntry.sectionId} onclick={handleAccordionQuestion} aria-controls="referenceId-22" aria-expanded="true">
 													<span class="slds-accordion__summary-action-icon slds-button__icon slds-button__icon_left" style="margin-top:-5px;" aria-hidden="true">
 														<lightning-icon icon-name="utility:chevrondown" size="x-small"></lightning-icon>
 													</span>
@@ -72,6 +77,7 @@
 														<div style="width:100%; display:flex; justify-content:space-between">
 															<div key={questionaryEntry.section}>{questionaryEntry.section}</div>
 															<div class="slds-accordion__summary-contentrht" key={questionaryEntry.section}>
+															<template if:false={isTemplate}>
 																<div class="slds-grid slds-wrap slds-gutters slds-p-right_small" key={questionaryEntry.section}>
 																	<div class="slds-col" title="Responses" key={questionaryEntry.section}>
 																		<lightning-icon icon-name="utility:number_input" alternative-text="Responses" size="x-small" title="Responses"></lightning-icon>
@@ -85,7 +91,7 @@
 																		<lightning-icon icon-name="utility:priority" alternative-text="Additional Requests" size="x-small" title="Additional Requests"></lightning-icon>
 																		&nbsp;<span> :{questionaryEntry.displayFlag}</span>
 																	</div>
-																</div>
+																</div></template>
 															</div>
 														</div>
 													</span>
@@ -97,11 +103,13 @@
 											<c-rtmvpc-render-question-template responses={questionaryEntry.questions}
 												sectionid={questionaryEntry.sectionId} onvaluechange={onResponseChange}
 												onfileupload={handleFileUpload} onselectchange={handlechatHistory}
-												ondeleteattachment={handledeletefile} onselectquestion={selectquestionHandler}>
+												ondeleteattachment={handledeletefile}
+												onselectquestion={selectquestionHandler}>
 											</c-rtmvpc-render-question-template>
 										</div>
-									</template>
-								</section>
+
+									</section>
+								</template>
 							</li>
 						</ul>
 					</div>
@@ -127,13 +135,17 @@
 					<!-- Displays Save, Save & Submit buttons if the Assessment is not Submitted --END-->
 				</div>
 			</div>
-
+			<template if:true={showspinner}>
+				<div class="exampleHolder">
+					<lightning-spinner alternative-text="Loading" size="large"></lightning-spinner>
+				</div>
+			</template>
 			<!-- Footer --START-->
-			<div class="slds-p-horizontal_large slds-p-top_small">
+			<!-- <div class="slds-p-horizontal_large slds-p-top_small">
 				<span>SUBMITTED BY: &nbsp;&nbsp;<b>{supplierAssessmentName}</b></span><br/>
 				<span>SUBMITTED DATE: &nbsp;&nbsp;<b>{supplierAssCreatedDate}</b>
 				</span>
-			</div>
+			</div> -->
 			<!-- Footer --END-->
 		</div>
 	</div>
