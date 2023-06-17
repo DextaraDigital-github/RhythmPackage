@@ -4,6 +4,40 @@
         <application>Customer_Portal</application>
         <visible>true</visible>
     </applicationVisibilities>
+    <classAccesses>
+        <apexClass>AssessmentController</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>AccountAssessmentRelation__c.Customer_Review_Status__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>AccountAssessmentRelation__c.Follow_Up_Requests__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>AccountAssessmentRelation__c.Number_of_Questions__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>AccountAssessmentRelation__c.Number_of_Responses__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>AccountAssessmentRelation__c.Status__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>AccountAssessmentRelation__c.Submission_Date__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
         <field>Assessment_Template__c.Disclosure__c</field>
@@ -12,11 +46,6 @@
     <fieldPermissions>
         <editable>true</editable>
         <field>Assessment_Template__c.Historical_Id__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
-        <field>Assessment_Template__c.Name__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>

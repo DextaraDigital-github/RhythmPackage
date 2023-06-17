@@ -1,51 +1,120 @@
-import { LightningElement,track } from 'lwc';
+import { LightningElement,track,wire } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
-import addSuppliers from '@salesforce/apex/AssessmentController.addSuppliers';
+import addSuppliers from '@salesforce/apex/AssessmentController.sendAssessment';
+import { CurrentPageReference } from 'lightning/navigation';
 
 export default class CreateAssessmentWithSuppliers extends NavigationMixin(LightningElement) {
     showNewAssessment=true;
     showModal = true;
     showSuppliers = false;
-    @track suppliersList;
+    @track suppliersList=[];
     modalHeading = 'New Assessment';
-    assesmentId ='';
+    assessmentId ='';
+    templateId = '';
+    dateValue;
+    frequencyValue = 'One Time';
+    isTempRO = false;
+    @track assessmentRecord;
 
-    handleNext(event){
-        try{
-            console.log('IntheSubmit------>');
-            const fields = event.detail.fields;
-            this.template.querySelector('lightning-record-edit-form').submit(fields);
-        }catch(e){
-            console.log('SubmitError------->',e);
+    get startDate(){
+        if(this.dateValue == undefined){
+          this.dateValue = new Date().toISOString().substring(0, 10);
+        }
+        return this.dateValue;
+    }
+
+    @wire(CurrentPageReference)
+    getPageReferenceParameters(currentPageReference) {
+       if (currentPageReference) {
+            if(currentPageReference.state.c__templateId != undefined){
+                this.templateId = currentPageReference.state.c__templateId;
+                this.isTempRO = true;
+            }
+          console.log('pageParms----->',currentPageReference.state.c__templateId);
         }
     }
-    handleSuccess(event){
-        console.log('NewAssessmentRecordId------->',event.detail.id);
-        this.assesmentId = event.detail.id;
-        this.showNotification('Success','New Assessment Created Successfully.','success');
-        this.showNewAssessment = false;
-        this.showSuppliers = true;
-        this.modalHeading = 'Add Suppliers';
+    
+    handleNext(event){
+        try{
+            event.preventDefault();
+            let isSave = this.validateData(); // can be removed
+            if(isSave){
+                let fields = event.detail.fields;
+                console.log('refFields--------->',JSON.stringify(fields));
+                fields = Object.assign( { 'sobjectType': 'Rhythm__Assessment__c'}, fields );
+                this.assessmentRecord = fields;
+                this.showNewAssessment = false;
+                this.showSuppliers = true;
+                this.modalHeading = 'Add Suppliers';
+            }else{
+                this.showNotification('Error','Please fill all the required fields','error');
+            }
+        }catch(e){
+            console.log('handleNextError----->',e)
+        }
     }
 
-    addSuppliers(){
-        console.log('AddSuppliersMethod------->',JSON.stringify(this.suppliersList));
-        addSuppliers({assesmentId:this.assesmentId,suppliers:JSON.stringify(this.suppliersList)})
-        .then(result => {
-            console.log('addSuppliers Result------->'+JSON.stringify(result));
-            if(result.isSuccess == true){
-                this.showModal = false;
-                this.showNotification('Success','Suppliers Added to Assessments Successfully.','success');
-                this.navigateToObjectHome();
+    validateData(){
+        let isSave = true;
+        if(this.template.querySelector(`[data-id="name"]`).value == null||
+        (!this.template.querySelector(`[data-id="template"]`).value) || 
+        (!this.template.querySelector(`[data-id="category"]`).value) ||
+        this.template.querySelector(`[data-id="startdate"]`).value == null){
+            isSave = false;
+        }
+        return isSave;
+    }
+
+    addSuppliers(event){
+        try{
+            console.log('AddSuppliersMethod------->',JSON.stringify(this.suppliersList));
+            console.log('assessmentRecord--------->',JSON.stringify(this.assessmentRecord));
+            if(this.suppliersList.length > 0){
+                addSuppliers({assessmentRecord:this.assessmentRecord,suppliers:JSON.stringify(this.suppliersList),deleteList:''})
+                .then(result => {
+                    console.log('addSuppliers Result------->'+JSON.stringify(result));
+                    if(result.isSuccess == true){
+                        this.showModal = false;
+                        this.assessmentId = result.recordId;
+                        this.showNotification('Success','Assessment created and suppliers added successfully.','success');
+                        this.navigateToRecordPage();
+                    }else{
+                        //this.showNotification('Error',result.message,'error');
+                    }
+                })
+                .catch(error => {
+                    this.error = error;
+                    //this.showNotification('Error',error,'error');
+                });
             }else{
-                //this.showNotification('Error',result.message,'error');
+                this.showNotification('Error','Please select atleast one supplier to proceed.','error');
             }
-        })
-        .catch(error => {
-            this.error = error;
-            //this.showNotification('Error',error,'error');
+        }catch(e){
+            console.log('error----->',e);
+        }
+    }
+
+    updateSupplierData(event){
+        console.log('updatedSupplierData------>'+JSON.stringify(event.detail));
+        this.suppliersList = event.detail.newSuppliers;
+    }
+
+    closeModal(){
+        this.showModal = false;
+        if(this.templateId != undefined && this.templateId){
+            this.navigateRelatedListView();
+        }else{
+            this.navigateToObjectHome();
+        }
+    }
+    showNotification(title,message,variant) {
+        const evt = new ShowToastEvent({
+            title: title,
+            message: message,
+            variant: variant,
         });
+        this.dispatchEvent(evt);
     }
 
     navigateToObjectHome(){
@@ -57,22 +126,26 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
             },
         });
     }
-
-    updateSupplierData(event){
-        console.log('updatedSupplierData------>'+JSON.stringify(event.detail));
-        this.suppliersList = event.detail;
-    }
-
-    closeModal(){
-        this.showModal = false;
-        this.navigateToObjectHome();
-    }
-    showNotification(title,message,variant) {
-        const evt = new ShowToastEvent({
-            title: title,
-            message: message,
-            variant: variant,
+    navigateToRecordPage(){
+        this[NavigationMixin.Navigate]({
+            type: "standard__recordPage",
+            attributes: {
+              objectApiName: "Rhythm__Assessment__c",
+              actionName: "view",
+              recordId: this.assessmentId
+            }
         });
-        this.dispatchEvent(evt);
+    }
+    // Navigation to Related list 
+    navigateRelatedListView() {
+        this[NavigationMixin.Navigate]({
+            type: 'standard__recordRelationshipPage',
+            attributes: {
+                recordId: this.templateId,
+                objectApiName: 'Rhythm__Assessment_Template__c',
+                relationshipApiName: 'Rhythm__Assessments__r',
+                actionName: 'view'
+            },
+        });
     }
 }
