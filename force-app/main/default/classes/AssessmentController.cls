@@ -11,10 +11,10 @@ public with sharing class AssessmentController {
     private static Savepoint sp;
     
     @Auraenabled
-    public static void QuestionarieList(){
+    Public static void QuestionarieList(){
     }
     
-    public static List<SObject> getAssessmentList(){
+    Public static List<SObject> getAssessmentList(){
         return null;
     }
 
@@ -38,7 +38,7 @@ public with sharing class AssessmentController {
      * @param templateId This is a record id of an Assessment_Template__c.  
     */
     @AuraEnabled(cacheable=true)
-    public static List<SObject> getQuestionsList(String templateId){
+    Public static List<SObject> getQuestionsList(String templateId){
         List<Question__c> questionList = [SELECT Id,Name,Section__c,Question_Type__c,Required__c,
                                           Conditional_Response__c,OptionValueSet__c,Question__c,Requires_File_Upload__c,
                                           Parent_Question__c,HelpText__c,Section__r.Name,Section__r.Id,
@@ -65,7 +65,7 @@ public with sharing class AssessmentController {
 	
 
     @AuraEnabled(cacheable=true)
-    public static List<SObject> getQuestionsListSectionList(String templateId){
+    Public static List<SObject> getQuestionsListSectionList(String templateId){
         return null;
     }
 
@@ -81,17 +81,16 @@ public with sharing class AssessmentController {
     public static void createSupplierResponse(List<SObject> suppResponseList,String vendorId,String assesmentId, Boolean isSubmit){
         
         List<Id> questionIds = new List<Id>();
+        System.debug('suppResponseList'+suppResponseList);
         for(Integer i=0;i<suppResponseList.size();i++)
         {
             questionIds.add((Id)suppResponseList[i].get('Rhythm__Question__c'));
         }
+        System.debug('questionIds'+questionIds);
         List<Response__c> existingResponses = new List<Response__c>();
         if(questionIds.size()>0)
         {
-            existingResponses = [SELECT Id,Name,Question__c,Response__c,Files__c,Assessment__c,Flag__c,Is_Latest_Response__c 
-                                    FROM Response__c 
-                                    WHERE Question__c IN:questionIds
-                                    LIMIT 50000];  
+            existingResponses = [select Id,Name,Question__c,Response__c,Files__c,Assessment__c,Flag__c,Is_Latest_Response__c from Response__c where Question__c IN:questionIds];  
         }
         for(Response__c resp :existingResponses)
         {
@@ -100,10 +99,7 @@ public with sharing class AssessmentController {
         UPDATE existingResponses;
         INSERT suppResponseList;
         
-        List<Assessment__c> assessment=[SELECT Id,Name,Status__c 
-                                        FROM Assessment__c 
-                                        WHERE Id=:assesmentId 
-                                        LIMIT 50000];
+        List<Assessment__c> assessment=[SELECT Id,Name,Status__c from Assessment__c WHERE Id=:assesmentId ];
         if(isSubmit)
         {
             assessment[0].Status__c ='Submitted';
@@ -115,8 +111,9 @@ public with sharing class AssessmentController {
         }
     }
     
+    
     @AuraEnabled(cacheable=true)
-    public static List<SObject> getAssessmentlist(String assessmentTemplateId2){
+    Public static List<SObject> getAssessmentlist(String assessmentTemplateId2){
         //return [select Id,Disclosure__c from Assessment_Template__c where id=:assessmentTemplateId2];
         return null;
         
@@ -146,7 +143,6 @@ public with sharing class AssessmentController {
                                                 FROM Assessment__c LIMIT 50000];
         return AssessmentRecords;
     }
-
     @AuraEnabled
     public static List<Response__c> getResponseList(string assessmentId,string questionId)
     {
@@ -156,7 +152,6 @@ public with sharing class AssessmentController {
         
         return responseRecords;
     }
-
     /* getUserName method is used to get the username */
     @AuraEnabled
     public static string getUserName()
@@ -168,7 +163,8 @@ public with sharing class AssessmentController {
     @AuraEnabled
     public static string getAccountId()
     {
-        List<User> strAccId = [SELECT Contact.AccountId FROM User WHERE id=:userinfo.getuserid()];
+        List<User> strAccId = [select Contact.AccountId from User where id=:userinfo.getuserid()];
+        System.debug('sss'+strAccId[0].Contact.AccountId);
         return strAccId[0].Contact.AccountId;
     }
     
@@ -211,12 +207,15 @@ public with sharing class AssessmentController {
                                                 WHERE Question__c=:questionId AND Is_Latest_Response__c = true
                                                 LIMIT 50000];
         
-        List<Object> responseFilesData= (List<Object>)JSON.deserializeUntyped(responseRecords[0].Files__c);
+            List<Object> responseFilesData= (List<Object>)JSON.deserializeUntyped(responseRecords[0].Files__c);
         List<object>duplicate=new List<object>();
         for(Integer i=0;i<responseFilesData.size();i++)
         {
             Map<String,Object> mp = (Map<String,Object>)responseFilesData[i];
             String responseurl = (String)mp.get('name');
+            System.debug('name'+name);
+            System.debug('responseurl'+responseurl);
+            System.debug('responseurl==name'+responseurl==name);
             if(responseurl==name)
             {
                 Object obj = responseFilesData.remove(i);
@@ -238,10 +237,7 @@ public with sharing class AssessmentController {
     @AuraEnabled
     public static void saveChatterResponse(string responseList,string assessmentId,string questionId)
     {
-        List<Response__c> responseRecords=[SELECT Conversation_History__c,createdDate	
-                                            FROM Response__c 
-                                            WHERE Assessment__c =:assessmentId AND Question__c=:questionId And Is_Latest_Response__c=true 
-                                            LIMIT 50000];
+        List<Response__c> responseRecords=[SELECT Conversation_History__c,createdDate	FROM Response__c WHERE Assessment__c =:assessmentId AND Question__c=:questionId And Is_Latest_Response__c=true ];
         responseRecords[0].Conversation_History__c=responseList;
         UPDATE responseRecords;
         
@@ -286,6 +282,9 @@ public with sharing class AssessmentController {
     {
         try
         {
+            System.debug('resId'+resId);
+            System.debug('quesId'+quesId);
+            System.debug('assessmentId'+assessmentId);
             String baseUrl = URL.getSalesforceBaseUrl().toExternalForm();
             Blob file=EncodingUtil.base64Decode(fileBlob.split(',')[1]);
             ContentVersion cv=new ContentVersion();
@@ -303,9 +302,11 @@ public with sharing class AssessmentController {
                 String fileUrl = baseUrl+'/sfc/servlet.shepherd/document/download/'+cvList[0].ContentDocumentId+'?operationContext=S1';
                 String fileJson = '{"name":"'+name+'","url":"'+fileUrl+'","type":"'+ftype+'"}';
                 srList[0].Files__c = (srList[0].Files__c == null || srList[0].Files__c.trim().length() == 0 || srList[0].Files__c=='[]') ? '['+fileJson+']' : '['+fileJson+','+srList[0].Files__c.substring(1,srList[0].Files__c.length());
+                System.debug('srList'+srList);
                 UPDATE srList;
             }
             else{
+                System.debug('Into else condition');
                 Response__c res=new Response__c();
                 res.Question__c=quesId;
                 res.Assessment__c=assessmentId;
@@ -319,6 +320,8 @@ public with sharing class AssessmentController {
         }
         catch(Exception e)
         {
+            //System.debug(e.getLineNumber()+' : '+e.getMessage());
+            //use eror log
             return null;
         }
     }

@@ -18,27 +18,39 @@
                 <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
                     <template if:true={showNewAssessment}>
                         <div>
-                            <lightning-record-edit-form object-api-name="Rhythm__Assessment__c" onsuccess={handleSuccess}>
+                            <lightning-record-edit-form object-api-name="Rhythm__Assessment__c" onsubmit ={handleNext}>
+                                <lightning-messages></lightning-messages>
                                 <lightning-layout multiple-rows>
                                     <lightning-layout-item size="6" padding="around-small">
-                                        <lightning-input-field field-name="Name"></lightning-input-field>
+                                        <lightning-input-field field-name="Name" data-id="name" name="name" required></lightning-input-field>
                                     </lightning-layout-item>
                                     <lightning-layout-item size="6" padding="around-small">
-                                        <lightning-input-field field-name="Rhythm__Template__c" value="" name="template"></lightning-input-field>
+                                        <lightning-input-field field-name="Rhythm__Template__c" value={templateId} data-id="template" name="template" required></lightning-input-field>
                                     </lightning-layout-item>
                                     <lightning-layout-item size="6" padding="around-small">
-                                        <lightning-input-field field-name="Rhythm__Start_Date__c" value="" name="startdate"></lightning-input-field>
+                                        <lightning-input-field field-name="Rhythm__Start_Date__c" value={startDate} data-id="startdate" name="startdate" required></lightning-input-field>
                                     </lightning-layout-item>
                                     <lightning-layout-item size="6" padding="around-small">
                                         <lightning-input-field field-name="Rhythm__End_Date__c" value="" name="enddate"></lightning-input-field>
                                     </lightning-layout-item>
                                     <lightning-layout-item size="6" padding="around-small">
-                                        <lightning-input-field field-name="Rhythm__Status__c" value="" name="status"></lightning-input-field>
+                                        <lightning-input-field field-name="Rhythm__Category__c" value="" data-id="category" name="category" required></lightning-input-field>
                                     </lightning-layout-item>
                                     <lightning-layout-item size="6" padding="around-small">
-                                        <lightning-input-field field-name="Rhythm__Frequency__c" value="" name="frequency"></lightning-input-field>
+                                        <lightning-input-field field-name="Rhythm__Frequency__c" value={frequencyValue} name="frequency"></lightning-input-field>
+                                    </lightning-layout-item>
+                                    <lightning-layout-item size="6" padding="around-small">
+                                        <lightning-input-field field-name="Rhythm__Disclosure__c" value="" name="disclosure"></lightning-input-field>
+                                    </lightning-layout-item>
+                                    <lightning-layout-item size="6" padding="around-small">
+                                        <lightning-input-field field-name="Rhythm__Description__c" value="" name="desciption"></lightning-input-field>
                                     </lightning-layout-item>
                                 </lightning-layout>
+                                
+                                <footer class="slds-modal__footer">
+                                    <lightning-button label="Cancel" title="Cancel" onclick={closeModal}></lightning-button>
+                                    <lightning-button variant="brand" label="Next" title="Next" type="submit" class="slds-m-left_xx-small"></lightning-button>
+                                </footer>
                             </lightning-record-edit-form>
                         </div>
                     </template>
@@ -48,17 +60,12 @@
                 </div>
 
                 <!-- modal footer start-->
-                <template if:true={showNewAssessment}>
-                    <footer class="slds-modal__footer">
-                        <lightning-button label="Cancel" title="Cancel" onclick={closeModal}></lightning-button>
-                        <lightning-button variant="brand" label="Next" title="Next" onclick={handleNext} class="slds-m-left_xx-small"></lightning-button>
-                    </footer>
-                </template>
+                
 
                 <template if:true={showSuppliers}>
                     <footer class="slds-modal__footer">
                         <lightning-button label="Cancel" title="Cancel" onclick={closeModal}></lightning-button>
-                        <lightning-button variant="brand" label="Add" title="Add" onclick={addSuppliers} class="slds-m-left_xx-small"></lightning-button>
+                        <lightning-button variant="brand" label="Save" title="Save" onclick={addSuppliers} class="slds-m-left_xx-small"></lightning-button>
                     </footer>
                 </template>
             </div>
