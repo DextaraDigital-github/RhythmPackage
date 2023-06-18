@@ -77,23 +77,24 @@
 								<template if:true={showstatus}>
 									<template if:true={showflagquestions}>
 
-										<div class="slds-col cib-flag">
+										<span class="cib-flag">
 											<lightning-icon key={assessmentid} data-id="showlowerflag"
-												icon-name="utility:lower_flag" size="xx-small" onclick={handleChange}>
+												icon-name="utility:lower_flag" size="x-small" onclick={handleChange}>
 											</lightning-icon>
-										</div>
+										</span>
 									</template>
 									<template if:false={showflagquestions}>
-										<div class="slds-col cib-archive:hover">
+										<span class="cib-archive:hover">
 											<lightning-icon data-id="showpriorityflag" icon-name="utility:priority"
 												alternative-text="Additional Requests" size="x-small"
 												title="Additional Requests" onclick={handleChange}></lightning-icon>
-										</div>
+										</span>
 									</template>
 
 									<!-- <lightning-input type="Checkbox" key={assessmentid}
 										onchange={handleChange} unchecked="false"></lightning-input> -->
 								</template>
+								&nbsp; &nbsp;
 								<!-- 
 								<lightning-combobox name="progress" label="Status" variant="label-hidden"
 									value={value} placeholder="Select Progress" options={options}
@@ -120,8 +121,8 @@
 							 ++ If Searc enabled use below Class "class="cad-sec_bodyfull2"" insted of  "class="cad-sec_bodyfull1"" ++ 
 						 -->
 						<div class="cad-sec_bodyfull1">
-							<div class="cad-sec_vcontainer2_2" style="height: calc(100% - 42px)">
-								<div class="slds-scrollable_y">
+							<div class="cad-sec_vcontainer2_2" style="height:calc(100% - 0px)"> <!--  style="height:calc(100% - 42px)" -->
+								<div class="slds-scrollable_y" style="max-height:calc(100% - 40px);">
 									<div class="slds-text-align_center slds-text-heading_large">
 										<!-- <strong>Assessment Component Placeholder</strong>
 											<h1>calling tabular report questionnaire</h1> -->
@@ -180,16 +181,14 @@
 								<h4> Review & Comments History</h4>
 							</div>
 						</div>
+						<template if:true={showconverstion}>
 						<div class="cad-sec_vcontainer2bdr">
 							<div class="slds-scrollable_y">
 								<!-- to show apply or remove class "cadshowright" -->
-								<template if:true={showData}>
-									<c-rtmvpc-assessment-chatter chattermap={showChat} onchatconversation={handleChat}>
-									</c-rtmvpc-assessment-chatter>
-								</template>
+								
 							</div>
 						</div>
-						<template if:true={showconverstion}>
+						
 							<div class="cad-sec_vcontainer3 slds-border_top slds-p-around_small">
 								<lightning-textarea placeholder="Type your response here..." variant="label-hidden"
 									disabled="true" onchange={chatChangeHandler}>
@@ -198,6 +197,12 @@
 								</lightning-button>
 							</div>
 						</template>
+
+						<template if:true={showData}>
+							<c-rtmvpc-assessment-chatter chattermap={showChat} onchatconversation={handleChat}>
+							</c-rtmvpc-assessment-chatter>
+						</template>
+						
 					</div>
 				</div>
 			</div>

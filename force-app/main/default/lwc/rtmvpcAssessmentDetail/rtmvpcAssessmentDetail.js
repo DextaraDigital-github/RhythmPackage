@@ -95,12 +95,12 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
                                 statustrack['date'] = dateformats + ' ' + time[0];
                                 statustrack['status'] = assessmentStatus[i].NewValue;
                                 switch (assessmentStatus[i].NewValue) {
-                                    case "New": statustrack['classlist'] = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_approved'; break;
+                                    case "New": statustrack['classlist'] = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_submited'; break;
                                     case "Submitted": statustrack['classlist'] = 'cad-timeline_slidebase cad-timeline_vendor cad-timeline_submited'; break;
-                                    case "Draft": statustrack['classlist'] = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_rejected'; break;
-                                    case "Open": statustrack['classlist'] = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_pending'; break;
+                                    case "Draft": statustrack['classlist'] = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_pending'; break;
+                                    case "Open": statustrack['classlist'] = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_default'; break;
                                     case "Completed": statustrack['classlist'] = 'cad-timeline_slidebase cad-timeline_vendor cad-timeline_needmoreinfo'; break;
-                                    case "Closed": statustrack['classlist'] = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_rejected'; break;
+                                    case "Closed": statustrack['classlist'] = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_approved'; break;
                                 }
                                 statustrack['name'] = this.userName;
                                 this.assessmentTimeline.push(statustrack);

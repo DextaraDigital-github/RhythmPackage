@@ -171,7 +171,7 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
         var labelsList = this.template.querySelectorAll('.qactivelabelcont');
         for (var i = 0; i < labelsList.length; i++) {
             if (labelsList[i].dataset.id.toString() === event.currentTarget.dataset.id.toString()) {
-                labelsList[i].style.color = "blue";
+                labelsList[i].style.color = "#2D67C5";
                 labelsList[i].style.backgroundColor = "#f4f6f9";
                 labelsList[i].style.fontWeight = "500";
             }

@@ -37,7 +37,7 @@
 .cad-read {background:rgba(248,249,250,1);}
 .cad-unread {background:var(--cibcadcdg-bgh-color); cursor:pointer;}
 
-.cad-datentime {position:absolute; top:10px; right:10px; font-size:var(--fs-10); color:#999999; }
+.cad-datentime {position:absolute; top:10px; right:10px; font-size:var(--fs-12); color:#999999; }
 .cad-status { text-align:right;float:right;}
 .cad-approved,.cad-rejected,.cad-pending,.cad-inprogress,.cad-needmoreinfo {border-radius:3px; padding:0px 6px; font-size:var(--fs-13); text-align:center; display:inline-block; background:#d1f7c4; min-width:98px; color:rgba(0,0,0,0.8)}
 
@@ -67,10 +67,10 @@
 .cad-timeline_line { position:absolute; border:1px solid var(--pbtn-bdr); background:var(--pbtn-bgh); width:0px; height:100%; margin-left:10px; }
 .cad-timeline_slidebase { position:relative; margin-left:22px; width:87%; padding:12px 0px 0px 0px; line-height:normal; }
 .cad-timeline_dot { position:absolute; top:18px; left:-16px; height:10px; width:10px; border-radius:5px; background:var(--bg-primary-color1); border:4px solid #999999; }
-.cad-timeline_datetime { font-size:var(--fs-11); color:#999999;padding-left:3px; }
+.cad-timeline_datetime { font-size:var(--fs-12); color:#999999;padding-left:3px; }
 .cad-timeline_content { padding:1px 10px; background:#e5e4e4; color:#707070; border-radius:4px; border:1px solid var(--cibcadcdg-bdr-color); }
-.cad-timeline_title { font-size:var(--fs-14); font-weight:var(--fw-600); }
-.cad-timeline_content span{font-size:var(--fs-11); }
+.cad-timeline_title { font-size:var(--fs-14); font-weight:var(--fw-600); margin-bottom:-3px; }
+.cad-timeline_content span{font-size:var(--fs-12); }
 
 .cad-approved, .cad-timeline_approved .cad-timeline_content {background:#d1f7c4; border:1px solid #a6cf98;}
 .cad-rejected, .cad-timeline_rejected .cad-timeline_content {background:#ffbdc7; border:1px solid #e0a2ab;}
@@ -95,9 +95,9 @@
 .cad-ad-submited .cad-ad-base { border-color:#b6ddeb; }
 .cad-ad-default .cad-ad-base { border-color:#e5e4e4; }
 
-.cad-ad-datentime { text-align:center; font-size:var(--fs-10); padding:5px 0px 0px; color:rgba(0,0,0,0.45); }
+.cad-ad-datentime { text-align:center; font-size:var(--fs-12); padding:5px 0px 0px; color:rgba(0,0,0,0.45); }
 .cad-ad-message { font-size:var(--fs-14); padding:5px 10px 5px 10px; line-height:normal; color:rgba(0,0,0,0.85); }
-.cad-ad-sender { font-size:var(--fs-11); font-style:italic; padding:0px 10px 5px; color:rgba(0,0,0,0.55); }
+.cad-ad-sender { font-size:var(--fs-12); font-style:italic; padding:0px 10px 5px; color:rgba(0,0,0,0.55); }
 
 .cad-sender {}
 .cad-tnailcard {width:100px ; height:90px ; border-radius:5px; box-shadow:rgb(57 100 255) 0px 0px 3px; display:flex; justify-content:center; align-items:center;}

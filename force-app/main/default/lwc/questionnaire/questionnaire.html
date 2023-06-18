@@ -1,5 +1,5 @@
 <template>
-	<div class="" style="max-width:1800px; margin-bottom:16px;">
+	<div class="" style="margin-bottom:16px;">
 		<div class="">
 			<div class="">
 				<!-- <p class="slds-p-bottom_medium slds-p-horizontal_medium ">
@@ -13,9 +13,9 @@
 				</template>
 				<!-- Displays status message when an assessment is saved/ submitted --END-->
 
-				<div class="rtmvpc-card slds-p-around_medium">
+				<div class="rtmvpc-card slds-p-around_x-small">
 					<!-- Displays button and picklist for navigations --START-->
-					<div class="temp_flexbox_space-between slds-m-bottom_small">
+					<div class="temp_flexbox_space-between">
 						<div>
 							<template lwc:if={showButtons.Section_Navigation.show}>
 								<lightning-combobox name="Section Navigation" variant="label-hidden"
@@ -26,11 +26,11 @@
 							</template>
 						</div>
 						<div>
-							<template lwc:if={showButtons.Summary}>
+							<!-- <template lwc:if={showButtons.Summary}>
 								<lightning-button label="Summary" title="Summary" name="Summary" variant="brand"
 									onclick={summaryClickHandler}>
 								</lightning-button>
-							</template>
+							</template> -->
 						</div>
 					</div>
 					<!-- Displays button and picklist for navigations --END-->
@@ -40,11 +40,11 @@
 						<ul class="slds-accordion">
 							<li class="slds-accordion__list-item">
 								<template if:false={isTemplate}>
-								<section class={showAccordion}>
-									<div class="slds-accordion__summary">
-										<h2 class="slds-accordion__summary-heading">
-											<button class="slds-button slds-button_reset slds-accordion__summary-action" onclick={handleAccordionSection} aria-controls="referenceId-21" aria-expanded="true">
-											<span class="slds-accordion__summary-action-icon slds-button__icon slds-button__icon_left" style="margin-top:-5px;" aria-hidden="true">
+									<section class={showAccordion}>
+										<div class="slds-accordion__summary">
+											<h2 class="slds-accordion__summary-heading">
+												<button class="slds-button slds-button_reset slds-accordion__summary-action" onclick={handleAccordionSection} aria-controls="referenceId-21" aria-expanded="true">
+											<span class="slds-accordion__summary-action-icon slds-button__icon slds-button__icon_left" aria-hidden="true">
 												<lightning-icon icon-name="utility:chevrondown" size="x-small"></lightning-icon>
 												</span>
 												<span class="slds-accordion__summary-content" style="width:100%">
@@ -53,24 +53,25 @@
 													</div>
 												</span>
 											</button>
-										</h2>
-									</div>
-									<div class="slds-accordion__content" id="referenceId-21">{showDisclosure}</div>
-								</section></template>
+											</h2>
+										</div>
+										<div class="slds-accordion__content" id="referenceId-21">{showDisclosure}</div>
+									</section>
+								</template>
 								<template if:true={isTemplate}>
 									<button class="slds-button slds-button_reset slds-accordion__summary-action" onclick={closeAccordionSection} aria-controls="referenceId-21" aria-expanded="true">{buttonlabel}</button>
 									</br></br></br>
 								</template>
 							</li>
 
-							<li class="slds-accordion__list-item">
-								<template for:each={questionsAndAnswerss} for:item="questionaryEntry">
+							<template for:each={questionsAndAnswerss} for:item="questionaryEntry">
+								<li class="slds-accordion__list-item" key={questionaryEntry.section}>
 									<section data-accordian={questionaryEntry.sectionId} key={questionaryEntry.section}>
 
 										<div class="slds-accordion__summary" key={questionaryEntry.section}>
 											<h2 class="slds-accordion__summary-heading">
 												<button  class="slds-button slds-button_reset slds-accordion__summary-action" data-id={questionaryEntry.sectionId} onclick={handleAccordionQuestion} aria-controls="referenceId-22" aria-expanded="true">
-													<span class="slds-accordion__summary-action-icon slds-button__icon slds-button__icon_left" style="margin-top:-5px;" aria-hidden="true">
+													<span class="slds-accordion__summary-action-icon slds-button__icon slds-button__icon_left" aria-hidden="true">
 														<lightning-icon icon-name="utility:chevrondown" size="x-small"></lightning-icon>
 													</span>
 													<span class="slds-accordion__summary-content" style="width:100%">
@@ -81,25 +82,25 @@
 																<div class="slds-grid slds-wrap slds-gutters slds-p-right_small" key={questionaryEntry.section}>
 																	<div class="slds-col" title="Responses" key={questionaryEntry.section}>
 																		<lightning-icon icon-name="utility:number_input" alternative-text="Responses" size="x-small" title="Responses"></lightning-icon>
-																		&nbsp;<span> : {questionaryEntry.numberOfResponses}/{questionaryEntry.numberOfQuestions}</span>
+																		&nbsp;<span>:&nbsp; {questionaryEntry.numberOfResponses}/{questionaryEntry.numberOfQuestions}</span>
 																	</div>
 																	<div class="slds-col" title="% Completed" key={questionaryEntry.section}>
 																		<lightning-icon icon-name="utility:success" alternative-text="% Completed" size="x-small" title="% Completed"></lightning-icon>
-																		&nbsp;<span> :{questionaryEntry.responsesPercentage}%</span>
+																		&nbsp;<span>:&nbsp; {questionaryEntry.responsesPercentage}%</span>
 																	</div>
 																	<div class="slds-col cib-flag" title="Additional Requests" key={questionaryEntry.section}>
 																		<lightning-icon icon-name="utility:priority" alternative-text="Additional Requests" size="x-small" title="Additional Requests"></lightning-icon>
-																		&nbsp;<span> :{questionaryEntry.displayFlag}</span>
+																		&nbsp;<span>:&nbsp; {questionaryEntry.displayFlag}</span>
 																	</div>
-																</div></template>
+																</div>
+															</template>
 															</div>
 														</div>
 													</span>
 											    </button>
 											</h2>
 										</div>
-										<div class="slds-accordion__content" key={questionaryEntry.section}
-											id="referenceId-22">
+										<div class="slds-accordion__content" key={questionaryEntry.section} id="referenceId-22">
 											<c-rtmvpc-render-question-template responses={questionaryEntry.questions}
 												sectionid={questionaryEntry.sectionId} onvaluechange={onResponseChange}
 												onfileupload={handleFileUpload} onselectchange={handlechatHistory}
@@ -109,8 +110,9 @@
 										</div>
 
 									</section>
-								</template>
-							</li>
+								</li>
+							</template>
+
 						</ul>
 					</div>
 
@@ -122,7 +124,7 @@
 					<!-- <div class="slds-border_top slds-m-top_small"></div> -->
 
 					<!-- Displays Save, Save & Submit buttons if the Assessment is not Submitted --START-->
-					<template lwc:if={showButtons.Save_Submit}>
+					<!-- <template lwc:if={showButtons.Save_Submit}>
 						<br>
 						<lightning-button variant="Brand" label="Save & Submit" title="Save Response"
 							onclick={handleSubmit} flexibility="auto" class="slds-float--right slds-button_neutral">
@@ -131,7 +133,7 @@
 						<lightning-button variant="Brand" label="Save" title="Save Response" onclick={handleSave}
 							flexibility="auto" class="slds-float--right" style="margin-right: 5px;"></lightning-button>
 						&nbsp;&nbsp;</br>
-					</template>
+					</template> -->
 					<!-- Displays Save, Save & Submit buttons if the Assessment is not Submitted --END-->
 				</div>
 			</div>
@@ -148,5 +150,19 @@
 			</div> -->
 			<!-- Footer --END-->
 		</div>
+	</div> <br/><br/>
+	<div class="slds-p-horizontal_medium slds-p-vertical_x-small slds-border-top" 
+	style="position:absolute; width:100%; height:40px; bottom:0px; text-align:right; background:#e8eaed; border-top:1px solid #c9c9c9;">
+		<!-- Displays Save, Save & Submit buttons if the Assessment is not Submitted --START-->
+		<template lwc:if={showButtons.Save_Submit}>
+			<lightning-button variant="Brand" label="Save & Submit" title="Save Response"
+				onclick={handleSubmit} flexibility="auto" class="slds-float--right slds-button_neutral">
+			</lightning-button>
+			&nbsp;&nbsp;
+			<lightning-button variant="Brand" label="Save" title="Save Response" onclick={handleSave}
+				flexibility="auto" class="slds-float--right" style="margin-right:5px;"></lightning-button>
+			&nbsp;&nbsp;
+		</template>
+		<!-- Displays Save, Save & Submit buttons if the Assessment is not Submitted --END-->
 	</div>
 </template>
