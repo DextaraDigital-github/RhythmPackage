@@ -10,6 +10,7 @@ export default class RtmvpcAssessments extends LightningElement {
 //@track parentId;
 @track recList= [];
 @track accId='0017i00001QBzehAAD';
+//@track accId;
 @track pageSize = 15;
 @track showgrid= false;
 @track showsurvey = false;
@@ -31,16 +32,26 @@ export default class RtmvpcAssessments extends LightningElement {
         for (let i = 0; i < this.tablefieldList.length; i++) {
             this.fieldsList.push(this.objName + '.' + this.tablefieldList[i].fieldName);
         }
+        getAssessmentJunctionRecords({ accountId: this.accId}).then(result=>{
+              this.recList = result;
+              console.log('result',result);
+            this.showgrid=true;
+         });
+    //      getAccountId({}).then((result) => {
+
+    //      this.accId = result;
+    //      this.fetchingRecords();
+    //   });    
         
-         console.log('this.accId',this.accId);
+    }
+    fetchingRecords()
+    {
+        console.log('this.accId',this.accId);
          getAssessmentJunctionRecords({ accountId: this.accId}).then(result=>{
               this.recList = result;
               console.log('result',result);
             this.showgrid=true;
          });
-     
-        
-        
     }
 //    @wire(getRelatedListRecords, {
 //         parentRecordId: '$parentId',

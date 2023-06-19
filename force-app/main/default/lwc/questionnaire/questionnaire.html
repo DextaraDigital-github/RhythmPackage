@@ -40,6 +40,7 @@
 						<ul class="slds-accordion">
 							<li class="slds-accordion__list-item">
 								<template if:false={isTemplate}>
+									<template if:true={showDisclosure}>
 									<section class={showAccordion}>
 										<div class="slds-accordion__summary">
 											<h2 class="slds-accordion__summary-heading">
@@ -56,7 +57,7 @@
 											</h2>
 										</div>
 										<div class="slds-accordion__content" id="referenceId-21">{showDisclosure}</div>
-									</section>
+									</section></template>
 								</template>
 								<template if:true={isTemplate}>
 									<button class="slds-button slds-button_reset slds-accordion__summary-action" onclick={closeAccordionSection} aria-controls="referenceId-21" aria-expanded="true">{buttonlabel}</button>
@@ -93,6 +94,23 @@
 																		&nbsp;<span>:&nbsp; {questionaryEntry.displayFlag}</span>
 																	</div>
 																</div>
+															</template>
+															<template if:true={isTemplate}>
+															<template if:true={isAccountAssessment}>
+																<div class="slds-grid slds-wrap slds-gutters slds-p-right_small" key={questionaryEntry.section}>
+																	<div class="slds-col" title="Responses" key={questionaryEntry.section}>
+																		<lightning-icon icon-name="utility:number_input" alternative-text="Responses" size="x-small" title="Responses"></lightning-icon>
+																		&nbsp;<span>:&nbsp; {questionaryEntry.numberOfResponses}/{questionaryEntry.numberOfQuestions}</span>
+																	</div>
+																	<div class="slds-col" title="% Completed" key={questionaryEntry.section}>
+																		<lightning-icon icon-name="utility:success" alternative-text="% Completed" size="x-small" title="% Completed"></lightning-icon>
+																		&nbsp;<span>:&nbsp; {questionaryEntry.responsesPercentage}%</span>
+																	</div>
+																	<div class="slds-col cib-flag" title="Additional Requests" key={questionaryEntry.section}>
+																		<lightning-icon icon-name="utility:priority" alternative-text="Additional Requests" size="x-small" title="Additional Requests"></lightning-icon>
+																		&nbsp;<span>:&nbsp; {questionaryEntry.displayFlag}</span>
+																	</div>
+																</div></template>
 															</template>
 															</div>
 														</div>
@@ -150,7 +168,7 @@
 			</div> -->
 			<!-- Footer --END-->
 		</div>
-	</div> <br/><br/>
+	</div> <template if:false={isTemplate}>
 	<div class="slds-p-horizontal_medium slds-p-vertical_x-small slds-border-top" 
 	style="position:absolute; width:100%; height:40px; bottom:0px; text-align:right; background:#e8eaed; border-top:1px solid #c9c9c9;">
 		<!-- Displays Save, Save & Submit buttons if the Assessment is not Submitted --START-->
@@ -164,5 +182,5 @@
 			&nbsp;&nbsp;
 		</template>
 		<!-- Displays Save, Save & Submit buttons if the Assessment is not Submitted --END-->
-	</div>
+	</div></template>
 </template>

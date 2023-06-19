@@ -276,113 +276,42 @@ export default class CustomTable extends LightningElement {
     }
 
     exportAsCSV() {
-          console.log('setpss',this.recList);
         if (!(!!this.recList && this.recList.length > 0)) {
             return;
         }
         // console.log('mmmm',this.recList);
-        // let csvHeader = '';
-        // for (var colIndex = 0; colIndex < this.recList[0].record.length; colIndex++) {
-        //     csvHeader = csvHeader + this.recList[0].record[colIndex].label + ',';
-        // }
+        let csvHeader = '';
+        for (var colIndex = 0; colIndex < this.recList[0].record.length; colIndex++) {
+            csvHeader = csvHeader + this.recList[0].record[colIndex].label + ',';
+        }
 
-        // csvHeader = csvHeader.substring(0, csvHeader.length - 1) + '\n';
+        csvHeader = csvHeader.substring(0, csvHeader.length - 1) + '\n';
 
-        // let csvRows = '';
-        // for (var i = 0; i < this.recList.length; i++) {
-        //     let recordDetails = this.recList[i];
-        //     if (!!recordDetails.record && recordDetails.record.length > 0) {
-        //         let csvRow = '';
-        //         for (var j = 0; j < recordDetails.record.length; j++) {
-        //             csvRow += recordDetails.record[j].value + ',';
-        //         }
-        //         csvRow = csvRow.substring(0, csvRow.length - 1) + '\n';
-        //         csvRows += csvRow;
-        //     }
-
-        // }
-         var str='';
-         
+        let csvRows = '';
         for (var i = 0; i < this.recList.length; i++) {
-             console.log('kkkk',this.sample) ; 
-            var assessmentid=this.recList[i].id ;
-            this.handledata(assessmentid);                    
-           }
-          console.log('kkkkjj',this.sample) ; 
-        // str = str.replaceAll('undefined', '').replaceAll('null', '');
-        // var blob = new Blob([str], { type: 'text/plain' });
-        //             var url = window.URL.createObjectURL(blob);
-        //             var atag = document.createElement('a');
-        //             atag.setAttribute('href', url);                    
-        //            atag.setAttribute('download', 'assessments' + '.csv');
-                   // atag.click();
-                    if(this.count==3)
-                    {
-                        console.log('kkkhhhk',this.sample) ; 
-                    }
-    }
+            let recordDetails = this.recList[i];
+            if (!!recordDetails.record && recordDetails.record.length > 0) {
+                let csvRow = '';
+                for (var j = 0; j < recordDetails.record.length; j++) {
+                    csvRow += recordDetails.record[j].value + ',';
+                }
+                csvRow = csvRow.substring(0, csvRow.length - 1) + '\n';
+                csvRows += csvRow;
+            }
 
-    handledata(assessmentid)
-    {
-         var str='';
-          getSupplierAssessmentList({ assessmentId: assessmentid }).then(resultData => {
-            var assessmentTemplateId = resultData[0].Rhythm__Template__c;           
-            getQuestionsList({ templateId: assessmentTemplateId }).then(result => {
-                var resultMap = result;
-                console.log('mmmm',assessmentid);
-                getSupplierResponseList({ assessmentId: assessmentid }).then(result => {
-                    console.log('setpx',result);
-                    result.forEach(qres => { 
-                        console.log('setp1');
-                         var savedResponseList= new Map();
-                        savedResponseList.set('value',qres.Rhythm__Response__c);
-                        if(('Rhythm__Conversation_History__c' in qres))
-                        {
-                         savedResponseList.set('history',(qres.Rhythm__Conversation_History__c));
-                        }
-                        this.savedResponseMap.set(qres.Rhythm__Question__c, savedResponseList);
-                    });
-                     console.log('setp2');
-                    this.finalSection = this.constructWrapper(resultMap, this.savedResponseMap);
-                     console.log('setp3');
-                    str=str+resultData[0].Name+"\n";
-                     str = str+'Section,Question,Answer,ConversationHistory\n';
-                    for (const key of this.finalSection.keys()) {
-                        for (var i = 0; i < this.finalSection.get(key).length; i++) {
-                             if(typeof this.finalSection.get(key)[i].conversationHistory != "undefined")
-                            {
-                                 var tempstr='';
-                                for( var j=0;j<JSON.parse(this.finalSection.get(key)[i].conversationHistory).length;j++)
-                                {
-                                    
-                                      tempstr=tempstr + JSON.parse(this.finalSection.get(key)[i].conversationHistory)[j].Name +':' + JSON.parse(this.finalSection.get(key)[i].conversationHistory)[j].Text+ '\n';
-                                }
-                               
-                            this.finalSection.get(key)[i].conversationHistory=tempstr;
-                            }
-                            str += '"'+key+ '","'+(i+1)+'.'+' '+ this.finalSection.get(key)[i].question + '","'  + this.finalSection.get(key)[i].value + '","' + this.finalSection.get(key)[i].conversationHistory + '"\n';
-                        }
-                        str+='\n';
-                    }
-                    this.count= this.count+1;
-                    console.log('this.count',this.count);
-                    this.sample +=str;
+        }
+       csvHeader=csvHeader+csvRows;
+        csvHeader = csvHeader.replaceAll('undefined', '').replaceAll('null', '');
+        var blob = new Blob([csvHeader], { type: 'text/plain' });
+       var url = window.URL.createObjectURL(blob);
+                    var atag = document.createElement('a');
+                    atag.setAttribute('href', url);                    
+                   atag.setAttribute('download', 'assessments' + '.csv');
+                   atag.click();
                    
-                }).catch(error => {
-                   errorLogRecord({ componentName: 'CustomTable', methodName: 'getSupplierResponseList', className: 'AssessmentController', errorData: error.message }).then((result) => {
-                    });                
-                    })
-
-            }).catch(error => {
-                errorLogRecord({ componentName: 'CustomTable', methodName: 'getQuestionsList', className: 'AssessmentController', errorData: error.message }).then((result) => {
-                    });
-            })
-        }).catch(error => {
-             errorLogRecord({ componentName: 'CustomTable', methodName: 'getSupplierAssessmentList', className: 'AssessmentController', errorData: error.message }).then((result) => {
-                    });    
-        })
     }
 
+   
     assignData(relatedListRecords, colList) {
 
         var recDataList = [];
@@ -1088,7 +1017,6 @@ export default class CustomTable extends LightningElement {
     csvClickHandler(event) {
         var assessmentId = event.currentTarget.dataset.id;
         getSupplierAssessmentList({ assessmentId: assessmentId }).then(resultData => {
-            console.log('resultData',resultData);
             var assessmentTemplateId = resultData[0].Rhythm__Template__c;           
             getQuestionsList({ templateId: assessmentTemplateId }).then(result => {
                 var resultMap = result;
@@ -1100,10 +1028,14 @@ export default class CustomTable extends LightningElement {
                         {
                          savedResponseList.set('history',(qres.Rhythm__Conversation_History__c));
                         }
+                        if(('Rhythm__Files__c' in qres))
+                        {
+                         savedResponseList.set('files',(qres.Rhythm__Files__c));
+                        }
                         this.savedResponseMap.set(qres.Rhythm__Question__c, savedResponseList);
                     });
                     this.finalSection = this.constructWrapper(resultMap, this.savedResponseMap);
-                    var str = 'Section,Question,Answer,ConversationHistory\n';
+                    var str = 'Section,Question,Answer,ConversationHistory,NumberOfAttachments\n';
                     for (const key of this.finalSection.keys()) {
                         for (var i = 0; i < this.finalSection.get(key).length; i++) {
                              if(typeof this.finalSection.get(key)[i].conversationHistory != "undefined")
@@ -1117,7 +1049,12 @@ export default class CustomTable extends LightningElement {
                                
                             this.finalSection.get(key)[i].conversationHistory=tempstr;
                             }
-                            str += '"'+key+ '","'+(i+1)+'.'+' '+ this.finalSection.get(key)[i].question + '","'  + this.finalSection.get(key)[i].value + '","' + this.finalSection.get(key)[i].conversationHistory + '"\n';
+                              if(typeof this.finalSection.get(key)[i].files != "undefined")
+                            {
+                                this.finalSection.get(key)[i].files=JSON.parse(this.finalSection.get(key)[i].files).length;
+                            }
+                            
+                            str += '"'+key+ '","'+(i+1)+'.'+' '+ this.finalSection.get(key)[i].question + '","'  + this.finalSection.get(key)[i].value + '","' + this.finalSection.get(key)[i].conversationHistory + '","'+this.finalSection.get(key)[i].files+ '"\n';
                         }
                         str+='\n';
                     }
@@ -1146,6 +1083,7 @@ export default class CustomTable extends LightningElement {
     /* constructWrapperis used to build the wrapper which contains question name,reponse and conversation data to generate the pdf*/
     constructWrapper(questionResp, savedResp) {
         var questionMap = new Map();
+        console.log('responsemap',savedResp);
         questionResp.forEach(qu => {
             var quTemp = {};          
             quTemp.questionId = qu.Id;          
@@ -1170,6 +1108,7 @@ export default class CustomTable extends LightningElement {
             else if( typeof (savedResp.get(quTemp.questionId)) != 'undefined'){               
                   quTemp.value = savedResp.get(quTemp.questionId).get('value');
                      quTemp.conversationHistory = savedResp.get(quTemp.questionId).get('history');
+                     quTemp.files = savedResp.get(quTemp.questionId).get('files');
                 
             }
             
@@ -1228,12 +1167,16 @@ export default class CustomTable extends LightningElement {
                         {
                          savedResponseList.set('history',(qres.Rhythm__Conversation_History__c));
                         }
+                        if(('Rhythm__Files__c' in qres))
+                        {
+                         savedResponseList.set('files',(qres.Rhythm__Files__c));
+                        }
                         this.savedResponseMap.set(qres.Rhythm__Question__c, savedResponseList);
                     });
                     console.log('savedmap',this.savedResponseMap);
                     this.finalSection = this.constructWrapper(resultMap, this.savedResponseMap);
                     var tableHtml = '<table><thead><tr>';
-                    tableHtml += '<th>Section</th><th colspan="2">Question</th><th>Response</th><th>ConversationHistory</th>';
+                    tableHtml += '<th>Section</th><th colspan="2">Question</th><th>Response</th><th>ConversationHistory</th><th>NumberOfAttachments</th>';
                     tableHtml += '</tr></thead><tbody>';
                     console.log('this.finalSection',this.finalSection);
                     var count = 0;
@@ -1256,7 +1199,11 @@ export default class CustomTable extends LightningElement {
                                
                             this.finalSection.get(key)[i].conversationHistory=str;
                             }
-                            tableHtml += '<td class="align-to-top">'+ (i+1)+'.'+'</td><td>'+ this.finalSection.get(key)[i].question + '</td><td>' + this.finalSection.get(key)[i].value + '</td><td> ' + this.finalSection.get(key)[i].conversationHistory + '</td></tr>';
+                             if(typeof this.finalSection.get(key)[i].files != "undefined")
+                            {
+                                this.finalSection.get(key)[i].files=JSON.parse(this.finalSection.get(key)[i].files).length;
+                            }
+                            tableHtml += '<td class="align-to-top">'+ (i+1)+'.'+'</td><td>'+ this.finalSection.get(key)[i].question + '</td><td>' + this.finalSection.get(key)[i].value + '</td><td> ' + this.finalSection.get(key)[i].conversationHistory +'</td><td> ' + this.finalSection.get(key)[i].files + '</td></tr>';
                         
                         }
                         tableHtml +='<tr><td></td><td></td><td></td><td></td></tr>';

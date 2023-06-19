@@ -64,7 +64,7 @@
 						<div class="cad-sec_header">
 							<div class="slds-float_left slds-is-absolute" style="width:100%; padding:4px 80px 0px 31px;"
 								title="Details : ESG Assessment (Due date 05/14/2023)">
-								<div class="slds-truncate">Details : {assessmentName} (Due date {endDate})</div>
+								<div class="slds-truncate">Details : {assessmentName} {endDate}</div>
 							</div>
 
 							<div class="slds-float_left slds-is-relative">
@@ -127,7 +127,8 @@
 										<!-- <strong>Assessment Component Placeholder</strong>
 											<h1>calling tabular report questionnaire</h1> -->
 										<template if:true={showSections}>
-											<c-Questionnaire vendor={accountid} assessment={assessmentid}
+											<c-Questionnaire vendor={accountid} assessment={assessmentid} object-api-name={objectApiName}
+											record-id={recordId}
 												onselectconversation={chatHistory} onshowsummary={showsummaryHandler}>
 											</c-Questionnaire>
 										</template>
@@ -160,7 +161,7 @@
 								<span class="textstyle01"></span>
 							</button>
 						</div> -->
-						<div class="cad-tophead-details cad-sec_vcontainer1">
+						<!-- <div class="cad-tophead-details cad-sec_vcontainer1">
 							<div class="slds-grid slds-wrap slds-gutters_small">
 								<button class="cad_actions slds-float_right slds-is-absolute" style="right:0px;" data-id="buttoncaddisc" onclick={handleRightButtonClick} >
 									<i class="las la-chevron-circle-right"></i>
@@ -175,9 +176,13 @@
 									</div>
 								</div>
 							</div>
-						</div>
+						</div> -->
 						<div class="cad-tophead-details cad-sec_vcontainer1a">
 							<div class="slds-text-align_center slds-p-vertical_x-small">
+								<button class="cad_actions slds-float_right slds-is-absolute" style="right:0px;top:3px;" data-id="buttoncaddisc" onclick={handleRightButtonClick} >
+									<i class="las la-chevron-circle-right"></i>
+									<span class="textstyle01"></span>
+								</button>
 								<h4> Review & Comments History</h4>
 							</div>
 						</div>
@@ -199,7 +204,7 @@
 						</template>
 
 						<template if:true={showData}>
-							<c-rtmvpc-assessment-chatter chattermap={showChat} onchatconversation={handleChat}>
+							<c-rtmvpc-assessment-chatter chattermap={showChat} onchatconversation={handleChat} recordid={customerId}>
 							</c-rtmvpc-assessment-chatter>
 						</template>
 						

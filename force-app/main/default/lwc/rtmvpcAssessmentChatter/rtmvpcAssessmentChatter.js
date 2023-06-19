@@ -20,10 +20,12 @@ export default class RtmvpcAssessmentChatter extends LightningElement {
    @track showResponse = false;
    @track responseMap = {};
    @track newResponse = [];
+   @api recordid;
 
    connectedCallback() {
       this.questionId = this.chattermap.questionId;
       this.assessmentId = this.chattermap.assesmentId;
+      this.accountType = this.chattermap.accountType;
 
       /*getUserName is used to get the username */
       getUserName({}).then((result) => {
@@ -32,9 +34,37 @@ export default class RtmvpcAssessmentChatter extends LightningElement {
 
       /*getChatterResponse is used to get conversation history between vendor and customer on onload */
       getChatterResponse({ assessmentId: this.assessmentId, questionId: this.questionId }).then((result) => {
-
+            console.log('Chatter result',result);
          if (('Rhythm__Conversation_History__c' in result[0])) {
             this.newResponse = JSON.parse(result[0].Rhythm__Conversation_History__c);
+            if(typeof this.recordid!='undefined')
+            {
+               for(let i=0;i<this.newResponse.length;i++)
+               {
+                  if(this.newResponse[i].accountType=='customer')
+                  {
+                     this.newResponse[i].recipientType='cad-cd-customer';
+                  }
+                  else
+                  {
+                     this.newResponse[i].recipientType='cad-cd-supplier';
+                  }
+               }
+            }
+            else
+            {
+               for(let i=0;i<this.newResponse.length;i++)
+               {
+                  if(this.newResponse[i].accountType=='customer')
+                  {
+                     this.newResponse[i].recipientType='cad-ad-customer';
+                  }
+                  else
+                  {
+                     this.newResponse[i].recipientType='cad-ad-supplier';
+                  }
+               }
+            }
             this.responseList = this.newResponse;
             this.showResponse = true;
          }
@@ -73,22 +103,43 @@ export default class RtmvpcAssessmentChatter extends LightningElement {
          this.responseMap.Text = this.newChat;
          this.responseMap.createdTime = result1[0].CreatedDate;
          this.responseMap.Name = this.userName;
-         this.responseMap.recipientType = 'cad-ad-supplier';
+         console.log('this.recordid',this.recordid);
+         if (this.recordid != null || typeof this.recordid != 'undefined') {
+            this.responseMap.accountType = 'customer';
+            if (this.accountType == 'vendor') {
+               this.responseMap.recipientType = 'cad-cd-customer';
+            }
+            else if (this.accountType == 'supplier') {
+               this.responseMap.recipientType = 'cad-cd-supplier';
+            }
+         }
+         else {
+            this.responseMap.accountType = 'supplier';
+            if (this.accountType == 'vendor') {
+               this.responseMap.recipientType = 'cad-ad-customer';
+            }
+            else if (this.accountType == 'supplier') {
+               this.responseMap.recipientType = 'cad-ad-supplier';
+            }
+
+         }
+
+
          this.newResponse.push(this.responseMap);
          this.callChatterResponse(this.newResponse);
          this.responseList = this.newResponse;
          this.showResponse = true;
          this.newChat = '';
          console.log('newResponse', this.newResponse);
-         this.chatDataMap.conversationHistory=JSON.stringify(this.responseList);
-         this.chatDataMap.questionId=this.questionId;
+         this.chatDataMap.conversationHistory = JSON.stringify(this.responseList);
+         this.chatDataMap.questionId = this.questionId;
 
          /* This dispatch event is used to assign the conversation data to the main wrapper (questionnaire) to update the data in the latest records. */
-          const selectedEvent = new CustomEvent('chatconversation', {
+         const selectedEvent = new CustomEvent('chatconversation', {
             detail: this.chatDataMap
-        });
-        /* Dispatches the event.*/
-        this.dispatchEvent(selectedEvent);
+         });
+         /* Dispatches the event.*/
+         this.dispatchEvent(selectedEvent);
       }).catch((err) => {
          errorLogRecord({ componentName: 'RtmvpcAssessmentChatter', methodName: 'getChatterResponse', className: 'AssessmentController', errorData: err.message }).then((result) => {
          });

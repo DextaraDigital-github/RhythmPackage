@@ -5,6 +5,8 @@
 * Last Modified Date: 
 */
 import { LightningElement, api, track } from 'lwc';
+import getResponseFlag from '@salesforce/apex/AssessmentController.getResponseFlag';
+
 export default class RtmvpcRenderQuestionTemplate extends LightningElement {
     @api responses; /*questions related to particular section will be stored in this JSON wrapper */
     @track chatterMap = {};
@@ -15,6 +17,7 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
     @api assessmentId;
     @track checkedLabel;
     @api sectionid;
+    @api issupplier;
     @track deletefiledata = {};
     connectedCallback() {
         console.log('responses', this.responses);
@@ -30,6 +33,31 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
                 }
             }
         }
+    }
+    openReview(event)
+    {
+        console.log('openReview',event.currentTarget.dataset.id);
+        getResponseFlag({questionId : event.currentTarget.dataset.id}).then((result)=>{
+
+        }).catch(error=>{
+
+        });
+        this.chatterMap.questionId = event.currentTarget.dataset.id;
+        this.chatterMap.accountType = 'vendor';
+        console.log('this.chatterMap',this.chatterMap);
+        if (this.chatterMap.openChat == false) {
+            this.chatterMap.openChat = true;
+            this.chatterMap.disableSendButton = false;
+        }
+        else {
+            this.chatterMap.openChat = false;
+            this.chatterMap.disableSendButton = true;
+        }
+        const selectedEvent = new CustomEvent('selectchange', {
+            detail: this.chatterMap
+        });
+        // Dispatches the event.
+        this.dispatchEvent(selectedEvent);
     }
 
     /*handleChange is used to dispatch an event to its parent component(Questionnaire) and change the response and send back to the parent component*/
@@ -63,7 +91,9 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
     /* openChatHandler is used to dispatch an event to its parent component(Questionnaire) by sending
        the questionId to parent component to open chat conversation */
     openChatHandler(event) {
-        this.chatterMap.questionId = event.target.dataset.id;
+        this.chatterMap.questionId = event.currentTarget.dataset.id;
+        console.log('event.cuurentTarget.dataset.id',event.currentTarget.dataset.id);
+        this.chatterMap.accountType = 'supplier';
         if (this.chatterMap.openChat == false) {
             this.chatterMap.openChat = true;
             this.chatterMap.disableSendButton = false;
