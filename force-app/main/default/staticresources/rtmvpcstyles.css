@@ -161,8 +161,10 @@
 	section.layoutContent .rtmvpc { width:calc(100vw - 0px); height:calc(100vh - 85px); background:var(--bg-section-rtmvpc); overflow-x:hidden; overflow-y:auto; margin:-11px; }
 	a, a:visited { color:var(--link-primary-n); }
 	a:hover, a:active, a:focus { color:var(--link-primary-h); }
-	.slds-button--brand, .slds-button_brand { background:var(--pbtn-bg); border-color:var(--pbtn-bdr); }
-	.slds-button--brand:active, .slds-button_brand:active, .slds-button--brand:focus, .slds-button_brand:focus, .slds-button--brand:hover, .slds-button_brand:hover, .slds-button--brand:visited, .slds-button_brand:visited { background:var(--pbtn-bgh); border-color:var(--pbtn-bdrh); }
+	.slds-button--brand, .slds-button_brand, .comm-login-form__login-button { background:var(--pbtn-bg)!important; border-color:var(--pbtn-bdr)!important; }
+	.slds-button--brand:active, .slds-button_brand:active, .slds-button--brand:focus, .slds-button_brand:focus, .slds-button--brand:hover, .slds-button_brand:hover, .slds-button--brand:visited, .slds-button_brand:visited,
+	.comm-login-form__login-button:active, .comm-login-form__login-button:active, .comm-login-form__login-button:focus, .comm-login-form__login-button:focus, .comm-login-form__login-button:hover, .comm-login-form__login-button:hover, .comm-login-form__login-button:visited, .comm-login-form__login-button:visited 
+	{ background:var(--pbtn-bgh)!important; border-color:var(--pbtn-bdrh)!important; }
 	
 	.slds-button--neutral, .slds-button_neutral { color:var(--dbtn-ico); background:var(--dbtn-bg); border:1px solid var(--dbtn-bdr); }
 	.slds-button--neutral:active, .slds-button_neutral:active, .slds-button--neutral:focus, .slds-button_neutral:focus, .slds-button--neutral:hover, .slds-button_neutral:hover, .slds-button--neutral:visited, .slds-button_neutral:visited { color:var(--dbtn-icoh); background:var(--dbtn-bgh); border:1px solid var(--dbtn-bdrh); }
@@ -288,6 +290,7 @@
 	.rtmvpc .field-element .container { padding-left:0rem; padding-bottom:0rem;}
 	.rtmvpc .slds-form-element fieldset { padding-left:0rem; padding-bottom:0rem;}
 	.rtmvpc .slds-form-element__label {font-size:var(--fs-12); text-transform:uppercase; color:unset !important; min-width: 22px; max-width:96%; }
+	.rtmvpc .slds-form-element__labelttnor {font-size:var(--fs-14); text-transform:unset !important; color:unset !important; min-width: 22px; max-width:96%; }
 	.rtmvpc .slds-form-element__label.no-wordbreak{ word-break:keep-all; }
 	.rtmvpc .slds-form-element__icon { padding-top:0.1rem!important; }
 	.rtmvpc .slds-form-element__static {font-size:var(--fs-14); font-weight:var(--fw-600); }
@@ -372,6 +375,12 @@
 		background-image:linear-gradient(90deg, var(--pbtn-bgh), var(--pbtn-bgh) 0.125rem, transparent 0.125rem); }
 	.slds-path__nav .slds-is-current:first-child:hover:before, .slds-path__nav .slds-is-current:first-child:hover:after {background:var(--pbtn-bgh);}
 	.slds-path__nav .slds-is-current:first-child:before, .slds-path__nav .slds-is-current:first-child:after { background:var(--pbtn-bg);}
+
+	.comm-login-form__container, .comm-forgot-password__container {padding:45px 30px 16px !important; background:#f3f3f3!important; box-shadow:0px 0px 6px rgba(0,0,0,0.2); border:none; border-radius:10px; font-size:16px !important; position:absolute; width:100%; max-width:350px; left:50%; top:50%; transform:translate(-50%, 50%); }
+	.comm-login-form__container:before, .comm-forgot-password__container:before {content:''; position:absolute; width:220px; height:60px; top:-30px; left:50%; transform:translatex(-50%); z-index:9; background:#ffffff url(/resource/rtmlogofull) no-repeat; background-position:center 10px; border-width: var(--slds-c-card-sizing-border,var(--sds-c-card-sizing-border,1px));
+    border-radius:8px; box-shadow:0px 0px 6px rgba(0,0,0,0.2); }
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
+	.comm-login-form__container .slds-form-element__label { font-size:unset;}
 	
 	@keyframes edit-in { from { opacity:0; transform:rotateZ(-70deg); }
 	 to { opacity:1; transform:rotateZ(0deg); }
