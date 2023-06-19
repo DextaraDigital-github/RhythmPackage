@@ -1,12 +1,15 @@
 import { LightningElement, api,wire,track } from 'lwc';
 import getSupplierAssessmentList from '@salesforce/apex/AssessmentController.getSupplierAssessmentList';
 import getSupplierResponseList from '@salesforce/apex/AssessmentController.getSupplierResponseList';
+import getAccountId from '@salesforce/apex/AssessmentController.getAccountId';
+import getAssessmentJunctionRecords from '@salesforce/apex/AssessmentController.getAssessmentJunctionRecords';
 import { getRelatedListRecords } from 'lightning/uiRelatedListApi';
-
 export default class RtmvpcAssessments extends LightningElement {
     
-@api parentId='0015300000NfNRTAA3';
+@api parentId='0017i00001QBzehAAD';
+//@track parentId;
 @track recList= [];
+@track accId='0017i00001QBzehAAD';
 @track pageSize = 15;
 @track showgrid= false;
 @track showsurvey = false;
@@ -16,11 +19,11 @@ export default class RtmvpcAssessments extends LightningElement {
 @api tablefieldList =  [
         { label: 'Assessment Name', fieldName: 'Name' },
         { label: 'Target Completion Date', fieldName: 'Rhythm__Target_Completion_Date__c',type:'date' },
-        { label: 'Assessment Status', fieldName: 'Rhythm__Assesment_Status__c'},
+        { label: 'Assessment Status', fieldName: 'Rhythm__Status__c'},
         { label: '#Additional Requests',fieldName:'Rhythm__Additional_Requests__c'},
         { label: 'Customer Review Status', fieldName: 'Rhythm__Customer_Review__c'},
         { label: '# Number of Questions', fieldName:'Rhythm__Number_of_Questions__c'},
-        { label: '# Number of Responses', fieldName:'Rhythm__Number_of_Responses__c'}
+        { label: '# Number of Responses', fieldName:'Rhythm__Number_of_Suppliers_responded_back__c'}
         ];
 
     connectedCallback(){
@@ -29,23 +32,32 @@ export default class RtmvpcAssessments extends LightningElement {
             this.fieldsList.push(this.objName + '.' + this.tablefieldList[i].fieldName);
         }
         
-    }
-   @wire(getRelatedListRecords, {
-        parentRecordId: '$parentId',
-        relatedListId: '$relName',
-        fields: '$fieldsList'
-    })
-    getRelatedListRecordsList({ error, data }) {
-        if (data) {
-            console.log('getRelatedListRecordsList',data);
-            this.recList = JSON.parse(JSON.stringify(data.records));
+         console.log('this.accId',this.accId);
+         getAssessmentJunctionRecords({ accountId: this.accId}).then(result=>{
+              this.recList = result;
+              console.log('result',result);
             this.showgrid=true;
-        }
-        else if (error) {
-            console.log('Wire Related List data', JSON.stringify(error));
-            this.showgrid=true;
-        }
+         });
+     
+        
+        
     }
+//    @wire(getRelatedListRecords, {
+//         parentRecordId: '$parentId',
+//         relatedListId: '$relName',
+//         fields: '$fieldsList'
+//     })
+//     getRelatedListRecordsList({ error, data }) {
+//         if (data) {
+//             console.log('getRelatedListRecordsList',data);
+//             this.recList = JSON.parse(JSON.stringify(data.records));
+//             this.showgrid=true;
+//         }
+//         else if (error) {
+//             console.log('Wire Related List data', JSON.stringify(error));
+//             this.showgrid=true;
+//         }
+ //   }
 
     csvClickHandler(event) {
         var x = event.currentTarget.dataset.id;

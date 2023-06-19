@@ -10,7 +10,7 @@
 		<div class="">
 			<div  class="cdgWrapper">
 				<template if:true={showgrid}>
-					<c-custom-table  rec-id={parentId} obj-name='Rhythm__Assessment__c' rel-name='Rhythm__Assessments__r' object-record-data={recList} 
+					<c-custom-table   obj-name='Rhythm__Assessment__c' rel-name='Rhythm__Assessments__r' object-record-data={recList} 
 						def-page-size={pageSize} col-list={tablefieldList} show-progress-bar="true" show-survey="true" onrowclick={openSurveyHandler}></c-custom-table>
 				</template>
 				<template if:true={showsurvey}>

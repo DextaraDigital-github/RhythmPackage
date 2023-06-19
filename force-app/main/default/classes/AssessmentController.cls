@@ -24,9 +24,11 @@ public with sharing class AssessmentController {
      * @param assessmentId This is a record id of an Assessment__c.  
     */
     @AuraEnabled(cacheable=true)
-    Public static List<SObject> getSupplierAssessmentList(String assessmentId){
-        List<Sobject> getAssementTemplate = [SELECT Id,Name,Template__c,Disclosure__c,Status__c FROM Assessment__c WHERE Id =:assessmentId];
-        System.debug('getAssementTemplate'+getAssementTemplate);
+    public static List<SObject> getSupplierAssessmentList(String assessmentId){
+        List<Sobject> getAssementTemplate = [SELECT Id,Name,Template__c,Disclosure__c,Status__c 
+                                                FROM Assessment__c 
+                                                WHERE Id =:assessmentId
+                                                LIMIT 50000];
         return getAssementTemplate;
     }
 
@@ -42,7 +44,8 @@ public with sharing class AssessmentController {
                                           Parent_Question__c,HelpText__c,Section__r.Name,Section__r.Id,
                                           Assessment_Template__c 
                                           FROM Question__c 
-                                          WHERE Assessment_Template__c =:templateId];
+                                          WHERE Assessment_Template__c =:templateId
+                                          LIMIT 50000];
         return questionList;
     }
 
@@ -51,19 +54,15 @@ public with sharing class AssessmentController {
      * @param assessmentId This is a record id of an Assessment__c.  
     */
     @AuraEnabled(cacheable=true)
-    Public static List<SObject> getSupplierResponseList(String assessmentId){
-        List<SObject> SupplierResponseList=  [SELECT Id, Question__c,Assessment__c,Question__r.Question_Type__c, Assessment__r.Name,Files__c, Response__c,CreatedBy.Name,CreatedDate, Flag__c, 
-                                              Conversation_History__c,LastModifiedDate,LastModifiedById FROM Response__c WHERE Assessment__c=:assessmentId and Is_Latest_Response__c= true];
+    public static List<SObject> getSupplierResponseList(String assessmentId){
+        List<SObject> SupplierResponseList=  [SELECT Id, Question__c,Assessment__c,Question__r.Question_Type__c, 
+                                              Assessment__r.Name,Files__c, Response__c,CreatedBy.Name,CreatedDate, Flag__c, 
+                                              Conversation_History__c,LastModifiedDate,LastModifiedById 
+                                              FROM Response__c 
+                                              WHERE Assessment__c=:assessmentId AND Is_Latest_Response__c= true];
         return SupplierResponseList;
     }
-	/*@AuraEnabled
-    public static void getSectionsandAnswers(String templateId)
-    {
-        List<Sobject> sectionsAndQuestions = [select id,name,(select id,name,Section__c,Section__r.Name,Question_Type__c,Question__c,Requires_File_Upload__c,
-                                                              Required__c,Parent_Question__c,OptionValueSet__c,Default_Value__c,Name__c,HelpText__c
-                                                              from Questions__r) from Assessment_Template__c];
-    }*/
-
+	
 
     @AuraEnabled(cacheable=true)
     Public static List<SObject> getQuestionsListSectionList(String templateId){
@@ -79,76 +78,8 @@ public with sharing class AssessmentController {
      * @param isSubmit true:save & submit(update the Assessment__c status to submitted), false: only save (update the Assessment__c status to Draft)
     */
     @AuraEnabled
-    Public static void createSupplierResponse(List<SObject> suppResponseList,String vendorId,String assesmentId, Boolean isSubmit){
-        /*List<Response__c> responseList = new List<Response__c>();
-        List<Response__c> finalresponse = new List<Response__c>();
-        List<Id> questionIds = new List<Id>();
-        List<Id> fileResponseId = new List<Id>();
-        Map<Id,SObject> responseMap = new Map<Id,SObject>();
-        List<Response__c> existingResponses = new List<Response__c>();
-        System.debug('suppResponseList'+suppResponseList);
-        for(Integer i=0;i<suppResponseList.size();i++)
-        {
-            questionIds.add((Id)suppResponseList[i].get('Rhythm__Question__c'));
-        }
-        System.debug('questionIds'+questionIds);
-        if(questionIds.size()>0)
-        {
-            existingResponses = [select Id,Name,Question__c,Response__c,Files__c,Assessment__c from Response__c where Question__c IN:questionIds];
-            questionIds = new List<Id>();
-            for(Response__c resp :existingResponses)
-            {
-                if(resp.Files__c !=null)
-                {
-                    responseList.add(resp);
-                    fileResponseId.add(resp.Question__c);
-                    responseMap.put(resp.Question__c,resp);
-                }
-            }
-        }
-        System.debug('responseMap'+responseMap);
-        System.debug('suppResponseList'+suppResponseList);
-        System.debug('fileResponseId'+fileResponseId);
-        for(Integer i=0;i<suppResponseList.size();i++)
-        {
-            if(fileResponseId.contains((Id)suppResponseList[i].get('Rhythm__Question__c')))
-            {
-                System.debug('Frst if'+responseMap.get((Id)suppResponseList[i].get('Rhythm__Question__c')));
-                Response__c resp =(Response__c) responseMap.get((Id)suppResponseList[i].get('Rhythm__Question__c'));
-                System.debug('resp'+resp);
-                System.debug('suppResponseList'+suppResponseList[i]);
-                System.debug(resp.Rhythm__Question__c ==(Id)suppResponseList[i].get('Rhythm__Question__c'));
-                    if(resp.Rhythm__Question__c ==(Id)suppResponseList[i].get('Rhythm__Question__c'))
-                    {
-                        System.debug('Into if'+ resp.Rhythm__Files__c);
-                        Response__c response = new Response__c();
-            			response.Assessment__c = (Id)suppResponseList[i].get('Rhythm__Assessment__c');
-            			response.Question__c =(Id)suppResponseList[i].get('Rhythm__Question__c');
-            			response.Account__c = (Id)suppResponseList[i].get('Rhythm__Account__c');
-            			response.Response__c = (String)suppResponseList[i].get('Rhythm__Response__c');
-                        response.Is_Latest_Response__c = True;
-                        response.Files__c = resp.Rhythm__Files__c;
-                        finalresponse.add(response);
-                    }
-            }
-            else
-            {
-                System.debug('Into else');
-                	Response__c response = new Response__c();
-            		response.Assessment__c = (Id)suppResponseList[i].get('Rhythm__Assessment__c');
-            		response.Question__c =(Id)suppResponseList[i].get('Rhythm__Question__c');
-            		response.Account__c = (Id)suppResponseList[i].get('Rhythm__Account__c');
-            		response.Response__c = (String)suppResponseList[i].get('Rhythm__Response__c');
-                	response.Is_Latest_Response__c = True;
-                finalresponse.add(response);
-            }
-        }
-      	for(Response__c resp : existingResponses)
-        {
-            resp.Is_Latest_Response__c = false;
-        }
-        UPDATE existingResponses;
-        INSERT finalresponse;*/
+    public static void createSupplierResponse(List<SObject> suppResponseList,String vendorId,String assesmentId, Boolean isSubmit){
+        
         List<Id> questionIds = new List<Id>();
         System.debug('suppResponseList'+suppResponseList);
         for(Integer i=0;i<suppResponseList.size();i++)
@@ -180,6 +111,7 @@ public with sharing class AssessmentController {
         }
     }
     
+    
     @AuraEnabled(cacheable=true)
     Public static List<SObject> getAssessmentlist(String assessmentTemplateId2){
         //return [select Id,Disclosure__c from Assessment_Template__c where id=:assessmentTemplateId2];
@@ -193,11 +125,12 @@ public with sharing class AssessmentController {
  	@AuraEnabled
     public static List<Sobject> getAssessmentStatus(String assessmentId)
     {
-        System.debug('getAssessmentStatus assessmentId'+assessmentId);
-        List<Sobject> assessmentstatus =[select Id, IsDeleted, ParentId, CreatedById, CreatedDate, Field, DataType, OldValue, NewValue  FROM Assessment__History WHERE ParentId=:assessmentId AND Field ='Rhythm__Status__c' order by createdDate desc ];
-        System.debug('getAssessmentStatus assessmentstatus'+assessmentstatus);
+        List<Sobject> assessmentstatus =[SELECT Id, IsDeleted, ParentId, CreatedById, CreatedDate, Field, DataType, OldValue, NewValue  
+                                         FROM Assessment__History 
+                                         WHERE ParentId=:assessmentId AND Field ='Rhythm__Status__c' order by createdDate desc ];
         return assessmentstatus;
     }
+
    /**
      * Gets the all Assessment__c records information of an Assessment__c.
     */
@@ -207,8 +140,7 @@ public with sharing class AssessmentController {
         List<Assessment__c> AssessmentRecords= [SELECT Name,Target_Completion_Date__c,Status__c,
                                                 Additional_Requests__c,Customer_Review__c,Number_of_Questions__c,
                                                 Number_of_Suppliers_responded_back__c,Start_Date__c,End_Date__c,CreatedDate
-                                                FROM Assessment__c];
-        //System.debug('AssessmentRecords'+AssessmentRecords);
+                                                FROM Assessment__c LIMIT 50000];
         return AssessmentRecords;
     }
     @AuraEnabled
@@ -227,21 +159,37 @@ public with sharing class AssessmentController {
         string userName=UserInfo.getName();
         return userName;
     }
-     @AuraEnabled
+    
+    @AuraEnabled
     public static string getAccountId()
     {
         List<User> strAccId = [select Contact.AccountId from User where id=:userinfo.getuserid()];
         System.debug('sss'+strAccId[0].Contact.AccountId);
         return strAccId[0].Contact.AccountId;
     }
-@AuraEnabled
+    
+    @AuraEnabled
     public static List<SObject> getAssessmentJunctionRecords(String accountId)
     {
-        System.debug('accountId'+accountId);
-        List<SObject> assessmentData = [select Id, IsDeleted, Name,Account__c,Assessment__c, Assessment__r.name ,Assessment__r.Rhythm__Status__c,Assessment__r.Rhythm__Customer_Review__c,Assessment__r.Rhythm__Number_of_Questions__c,
-Assessment__r.Rhythm__Number_of_Suppliers_responded_back__c,Assessment__r.Rhythm__Additional_Requests__c,Number_of_Questions__c, Number_of_Responses__c from AccountAssessmentRelation__c where Account__c=:accountId ];
-        System.debug('assessmentData'+assessmentData);
+        List<SObject> assessmentData = [SELECT Id, IsDeleted, Name,Account__c,Assessment__c, Assessment__r.name ,Assessment__r.Status__c,Assessment__r.Customer_Review__c,Assessment__r.Number_of_Questions__c,
+                                        Assessment__r.Number_of_Suppliers_responded_back__c,Assessment__r.Additional_Requests__c,Number_of_Questions__c, Number_of_Responses__c 
+                                        FROM AccountAssessmentRelation__c 
+                                        WHERE Account__c=:accountId 
+                                        LIMIT 50000];
         return assessmentData;
+    }
+    
+    @AuraEnabled
+    public static List<Sobject> getAccountAssessmentRecordData(String assrecordId)
+    {
+        List<Sobject> accountassessment = [SELECT Id, IsDeleted, Name,Account__c,Assessment__c, Assessment__r.name ,
+                                            Assessment__r.Status__c,Assessment__r.Customer_Review__c,
+                                            Assessment__r.Number_of_Questions__c,Assessment__r.Number_of_Suppliers_responded_back__c,
+                                            Assessment__r.Additional_Requests__c,Number_of_Questions__c,
+                                            Assessment__r.Template__c, Number_of_Responses__c 
+                                            FROM AccountAssessmentRelation__c 
+                                            WHERE Id=:assrecordId ];
+        return accountassessment;
     }
 
     /**
@@ -252,8 +200,12 @@ Assessment__r.Rhythm__Number_of_Suppliers_responded_back__c,Assessment__r.Rhythm
     @AuraEnabled
     public static Object deleteFileAttachment(String questionId,String name)
     {
-        List<Response__c> responseRecords = [SELECT Id, Question__c,Question__r.Name, Assessment__r.Name,Files__c, Response__c,CreatedBy.Name,CreatedDate, Flag__c, Conversation_History__c,LastModifiedDate,LastModifiedById FROM Response__c WHERE Question__c=:questionId
-                                            and Rhythm__Is_Latest_Response__c = true];
+        List<Response__c> responseRecords = [SELECT Id, Question__c,Question__r.Name, Assessment__r.Name,Files__c, Response__c,
+                                                CreatedBy.Name,CreatedDate, Flag__c, Conversation_History__c,
+                                                LastModifiedDate,LastModifiedById 
+                                                FROM Response__c 
+                                                WHERE Question__c=:questionId AND Is_Latest_Response__c = true
+                                                LIMIT 50000];
         
             List<Object> responseFilesData= (List<Object>)JSON.deserializeUntyped(responseRecords[0].Files__c);
         List<object>duplicate=new List<object>();
@@ -344,9 +296,9 @@ Assessment__r.Rhythm__Number_of_Suppliers_responded_back__c,Assessment__r.Rhythm
             String ftype = name.substringAfter('.');
             if(quesId!=null)
             {
-                System.debug('Into if condition'+resId);
-                srList = [SELECT Id,Files__c,Question__c FROM Response__c WHERE Question__c =:quesId and Is_Latest_Response__c = true];
-                System.debug('srList'+srList);
+                srList = [SELECT Id,Files__c,Question__c 
+                          FROM Response__c 
+                          WHERE Question__c =:quesId AND Is_Latest_Response__c = true];
                 String fileUrl = baseUrl+'/sfc/servlet.shepherd/document/download/'+cvList[0].ContentDocumentId+'?operationContext=S1';
                 String fileJson = '{"name":"'+name+'","url":"'+fileUrl+'","type":"'+ftype+'"}';
                 srList[0].Files__c = (srList[0].Files__c == null || srList[0].Files__c.trim().length() == 0 || srList[0].Files__c=='[]') ? '['+fileJson+']' : '['+fileJson+','+srList[0].Files__c.substring(1,srList[0].Files__c.length());
@@ -428,23 +380,23 @@ Assessment__r.Rhythm__Number_of_Suppliers_responded_back__c,Assessment__r.Rhythm
                 }
             }
             List<AccountAssessmentRelation__c> accountAssessRelnsList = new List<AccountAssessmentRelation__c>();
-            List<Rhythm__Assessment_Supplier__c> assessSupList = new List<Rhythm__Assessment_Supplier__c>();
+            List<Assessment_Supplier__c> assessSupList = new List<Assessment_Supplier__c>();
             List<string> suppliersList = (List<string>) JSON.deserialize(suppliers, List<string>.class);
             set<string> suppliersIds = new set<string>();
             for(string sId:suppliersList){
                 suppliersIds.add(sId);
             }
             for(Account acc:[SELECT Id,Name FROM Account WHERE ID IN:suppliersIds]){
-                Rhythm__Assessment_Supplier__c assessSup = new Rhythm__Assessment_Supplier__c();
-                assessSup.Rhythm__Account__c = acc.Id;
-                assessSup.Rhythm__Assessment__c = assessmentId;
-                assessSup.Rhythm__Status__c = 'Inactive';
+                Assessment_Supplier__c assessSup = new Assessment_Supplier__c();
+                assessSup.Account__c = acc.Id;
+                assessSup.Assessment__c = assessmentId;
+                assessSup.Status__c = 'Inactive';
                 assessSupList.add(assessSup);
 
                 AccountAssessmentRelation__c accAssessReln = new AccountAssessmentRelation__c();
                 accAssessReln.Name = acc.Name;
-                accAssessReln.Rhythm__Account__c = acc.Id;
-                accAssessReln.Rhythm__Assessment__c = assessmentId;
+                accAssessReln.Account__c = acc.Id;
+                accAssessReln.Assessment__c = assessmentId;
                 accountAssessRelnsList.add(accAssessReln);
             }
             set<Id> successRecordsIdSet = new set<Id>();
@@ -496,14 +448,14 @@ Assessment__r.Rhythm__Number_of_Suppliers_responded_back__c,Assessment__r.Rhythm
     public static void sendEmails(Set<Id> recordIdsSet){
         try{
             List<Messaging.SingleEmailMessage> emailMessagesList = new List<Messaging.SingleEmailMessage>();
-            for(AccountAssessmentRelation__c assRelRec:[SELECT Id,Rhythm__Account__c,Rhythm__Account__r.Name,Rhythm__Account__r.Rhythm__Email__c,Rhythm__Assessment__c FROM AccountAssessmentRelation__c WHERE ID IN:recordIdsSet]){
+            for(AccountAssessmentRelation__c assRelRec:[SELECT Id,Account__c,Account__r.Name,Account__r.Email__c,Assessment__c FROM AccountAssessmentRelation__c WHERE ID IN:recordIdsSet]){
                 Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
                 List<String> sendTo = new List<String>();
-                sendTo.add(assRelRec.Rhythm__Account__r.Rhythm__Email__c);
+                sendTo.add(assRelRec.Account__r.Email__c);
                 mail.setToAddresses(sendTo);
                 mail.setSubject('Sample Survey');
                 String body = '<html><body>'+
-                '<br><br>'+'Dear '+assRelRec.Rhythm__Account__r.Name+
+                '<br><br>'+'Dear '+assRelRec.Account__r.Name+
                 '<br><br>'+'we’d like to complete a short survey.'+
                 '<br><br><a href="https://ruby-site-9073-dev-ed.scratch.my.site.com/">Take the survey now.</a>'+
                                  '<br><br>'+'Kind regards,'+
@@ -528,13 +480,13 @@ Assessment__r.Rhythm__Number_of_Suppliers_responded_back__c,Assessment__r.Rhythm
     public static ResultWrapper addSuppliers(string assesmentId, string suppliers){
         ResultWrapper resWrap = new ResultWrapper();
         try{
-            List<Rhythm__Assessment_Supplier__c> assessSupList = new List<Rhythm__Assessment_Supplier__c>();
+            List<Assessment_Supplier__c> assessSupList = new List<Assessment_Supplier__c>();
             List<string> suppliersList = (List<string>) JSON.deserialize(suppliers, List<string>.class);
             for(string supplierId:suppliersList){
-                Rhythm__Assessment_Supplier__c assessSup = new Rhythm__Assessment_Supplier__c();
-                assessSup.Rhythm__Account__c = supplierId;
-                assessSup.Rhythm__Assessment__c = assesmentId;
-                assessSup.Rhythm__Status__c = 'Inactive';
+                Assessment_Supplier__c assessSup = new Assessment_Supplier__c();
+                assessSup.Account__c = supplierId;
+                assessSup.Assessment__c = assesmentId;
+                assessSup.Status__c = 'Inactive';
                 assessSupList.add(assessSup);
             }
             if(assessSupList.isEmpty() ==false){
@@ -568,8 +520,8 @@ Assessment__r.Rhythm__Number_of_Suppliers_responded_back__c,Assessment__r.Rhythm
     public static ResultWrapper updateAssessmentSuppliers(string assessmentId){
         ResultWrapper resWrap = new ResultWrapper();
         try{
-            List<Rhythm__Assessment_Supplier__c> assessSuppList = new List<Rhythm__Assessment_Supplier__c>();
-            for(Rhythm__Assessment_Supplier__c assesSup:[SELECT Id FROM Rhythm__Assessment_Supplier__c WHERE Rhythm__Assessment__c=:assessmentId AND Rhythm__Status__c='Inactive']){
+            List<Assessment_Supplier__c> assessSuppList = new List<Assessment_Supplier__c>();
+            for(Assessment_Supplier__c assesSup:[SELECT Id FROM Assessment_Supplier__c WHERE Assessment__c=:assessmentId AND Status__c='Inactive']){
                 assesSup.Status__c = 'Active';
                 assessSuppList.add(assesSup);
             }
@@ -619,7 +571,7 @@ Assessment__r.Rhythm__Number_of_Suppliers_responded_back__c,Assessment__r.Rhythm
     */
     @AuraEnabled(cacheable=true)
     public static List<AccountAssessmentRelation__c> getExistingSuppliersWithSearch(string assessmentId, string searchKey){
-        string query = 'SELECT Id,Account__c,Account__r.Name FROM AccountAssessmentRelation__c WHERE Rhythm__Assessment__c=:assessmentId';
+        string query = 'SELECT Id,Account__c,Account__r.Name FROM AccountAssessmentRelation__c WHERE Assessment__c=:assessmentId';
         if(string.isNotBlank(searchKey)){
             string sKey = '%'+searchKey+'%';
             query = query+' AND Account__r.Name LIKE:sKey';

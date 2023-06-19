@@ -6,6 +6,7 @@ import getQuestionsList from '@salesforce/apex/AssessmentController.getQuestions
 import getSupplierResponseList from '@salesforce/apex/AssessmentController.getSupplierResponseList'; //To fetch all the Supplier_Response__c records related to the Supplier_Assessment__c record
 import getSupplierAssessmentList from '@salesforce/apex/AssessmentController.getSupplierAssessmentList'; //To fetch the Assessment_Template__c Id from the Supplier_Assessment__c record
 import deleteRecords from '@salesforce/apex/rtmvpcRelatedListsController.deleteRecords';
+import errorLogRecord from '@salesforce/apex/AssessmentController.errorLogRecord';
 // import getQuestionsCount from '@salesforce/apex/rtmvpcRelatedListsController.getQuestionsCount'; //Commented By Kushal
 // import getResponsesCount from '@salesforce/apex/rtmvpcRelatedListsController.getResponsesCount'; //Commented By Kushal
 
@@ -35,6 +36,8 @@ export default class CustomTable extends LightningElement {
 
     @track spinner = false;
     @api record;
+    @track sample='';
+    @track count=0;
     @track iconName = 'utility:pin';
 
     handleClick(event) {
@@ -273,43 +276,115 @@ export default class CustomTable extends LightningElement {
     }
 
     exportAsCSV() {
+          console.log('setpss',this.recList);
         if (!(!!this.recList && this.recList.length > 0)) {
             return;
         }
+        // console.log('mmmm',this.recList);
+        // let csvHeader = '';
+        // for (var colIndex = 0; colIndex < this.recList[0].record.length; colIndex++) {
+        //     csvHeader = csvHeader + this.recList[0].record[colIndex].label + ',';
+        // }
 
-        let csvHeader = '';
-        for (var colIndex = 0; colIndex < this.recList[0].record.length; colIndex++) {
-            csvHeader = csvHeader + this.recList[0].record[colIndex].label + ',';
-        }
+        // csvHeader = csvHeader.substring(0, csvHeader.length - 1) + '\n';
 
-        csvHeader = csvHeader.substring(0, csvHeader.length - 1) + '\n';
+        // let csvRows = '';
+        // for (var i = 0; i < this.recList.length; i++) {
+        //     let recordDetails = this.recList[i];
+        //     if (!!recordDetails.record && recordDetails.record.length > 0) {
+        //         let csvRow = '';
+        //         for (var j = 0; j < recordDetails.record.length; j++) {
+        //             csvRow += recordDetails.record[j].value + ',';
+        //         }
+        //         csvRow = csvRow.substring(0, csvRow.length - 1) + '\n';
+        //         csvRows += csvRow;
+        //     }
 
-        let csvRows = '';
+        // }
+         var str='';
+         
         for (var i = 0; i < this.recList.length; i++) {
-            let recordDetails = this.recList[i];
-            if (!!recordDetails.record && recordDetails.record.length > 0) {
-                let csvRow = '';
-                for (var j = 0; j < recordDetails.record.length; j++) {
-                    csvRow += recordDetails.record[j].value + ',';
-                }
-                csvRow = csvRow.substring(0, csvRow.length - 1) + '\n';
-                csvRows += csvRow;
-            }
+             console.log('kkkk',this.sample) ; 
+            var assessmentid=this.recList[i].id ;
+            this.handledata(assessmentid);                    
+           }
+          console.log('kkkkjj',this.sample) ; 
+        // str = str.replaceAll('undefined', '').replaceAll('null', '');
+        // var blob = new Blob([str], { type: 'text/plain' });
+        //             var url = window.URL.createObjectURL(blob);
+        //             var atag = document.createElement('a');
+        //             atag.setAttribute('href', url);                    
+        //            atag.setAttribute('download', 'assessments' + '.csv');
+                   // atag.click();
+                    if(this.count==3)
+                    {
+                        console.log('kkkhhhk',this.sample) ; 
+                    }
+    }
 
-        }
+    handledata(assessmentid)
+    {
+         var str='';
+          getSupplierAssessmentList({ assessmentId: assessmentid }).then(resultData => {
+            var assessmentTemplateId = resultData[0].Rhythm__Template__c;           
+            getQuestionsList({ templateId: assessmentTemplateId }).then(result => {
+                var resultMap = result;
+                console.log('mmmm',assessmentid);
+                getSupplierResponseList({ assessmentId: assessmentid }).then(result => {
+                    console.log('setpx',result);
+                    result.forEach(qres => { 
+                        console.log('setp1');
+                         var savedResponseList= new Map();
+                        savedResponseList.set('value',qres.Rhythm__Response__c);
+                        if(('Rhythm__Conversation_History__c' in qres))
+                        {
+                         savedResponseList.set('history',(qres.Rhythm__Conversation_History__c));
+                        }
+                        this.savedResponseMap.set(qres.Rhythm__Question__c, savedResponseList);
+                    });
+                     console.log('setp2');
+                    this.finalSection = this.constructWrapper(resultMap, this.savedResponseMap);
+                     console.log('setp3');
+                    str=str+resultData[0].Name+"\n";
+                     str = str+'Section,Question,Answer,ConversationHistory\n';
+                    for (const key of this.finalSection.keys()) {
+                        for (var i = 0; i < this.finalSection.get(key).length; i++) {
+                             if(typeof this.finalSection.get(key)[i].conversationHistory != "undefined")
+                            {
+                                 var tempstr='';
+                                for( var j=0;j<JSON.parse(this.finalSection.get(key)[i].conversationHistory).length;j++)
+                                {
+                                    
+                                      tempstr=tempstr + JSON.parse(this.finalSection.get(key)[i].conversationHistory)[j].Name +':' + JSON.parse(this.finalSection.get(key)[i].conversationHistory)[j].Text+ '\n';
+                                }
+                               
+                            this.finalSection.get(key)[i].conversationHistory=tempstr;
+                            }
+                            str += '"'+key+ '","'+(i+1)+'.'+' '+ this.finalSection.get(key)[i].question + '","'  + this.finalSection.get(key)[i].value + '","' + this.finalSection.get(key)[i].conversationHistory + '"\n';
+                        }
+                        str+='\n';
+                    }
+                    this.count= this.count+1;
+                    console.log('this.count',this.count);
+                    this.sample +=str;
+                   
+                }).catch(error => {
+                   errorLogRecord({ componentName: 'CustomTable', methodName: 'getSupplierResponseList', className: 'AssessmentController', errorData: error.message }).then((result) => {
+                    });                
+                    })
 
-        let csvAllRows = csvHeader + csvRows;
-        csvAllRows = csvAllRows.replaceAll('undefined', '').replaceAll('null', '');
-        var blob = new Blob([csvAllRows], { type: 'text/plain' });
-        //var blob = new Blob([csvAllRows], {type:'application/pdf'});
-        var url = window.URL.createObjectURL(blob);
-        var atag = document.createElement('a');
-        atag.setAttribute('href', url);
-        atag.setAttribute('download', this.relName.replace('__r', '') + '.csv');
-        atag.click();
+            }).catch(error => {
+                errorLogRecord({ componentName: 'CustomTable', methodName: 'getQuestionsList', className: 'AssessmentController', errorData: error.message }).then((result) => {
+                    });
+            })
+        }).catch(error => {
+             errorLogRecord({ componentName: 'CustomTable', methodName: 'getSupplierAssessmentList', className: 'AssessmentController', errorData: error.message }).then((result) => {
+                    });    
+        })
     }
 
     assignData(relatedListRecords, colList) {
+
         var recDataList = [];
         if (typeof this.objName != undefined && this.objName === 'Task') {
             for (var i = 0; i < relatedListRecords.length; i++) {
@@ -358,31 +433,33 @@ export default class CustomTable extends LightningElement {
             //console.log('recDataList-->', recDataList);
         }
         else {
+            console.log('relatedListRecords',relatedListRecords);
+            console.log('colList',colList);
             for (var i = 0; i < relatedListRecords.length; i++) {
                 var recDetails = {};
                 var recArray = [];
                 if (relatedListRecords[i] != null) {
                     for (var j = 0; j < colList.length; j++) {
-                        if (relatedListRecords[i].fields) {
+                        if (typeof relatedListRecords[i].Rhythm__Assessment__r!='undefined') {
                             let recJson = {};
                             recJson.fieldName = colList[j].fieldName;
                             recJson.label = colList[j].label;
-                            if (colList[j].type === 'date' && relatedListRecords[i].fields[colList[j].fieldName].value) {
-                                var x = relatedListRecords[i].fields[colList[j].fieldName].value.split('T')[0];
-                                // recJson.value = x.split('-')[2] + '-' + x.split('-')[1] + '-' + x.split('-')[0];
-                                var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-                                recJson.value = months[Number(x.split('-')[1]) - 1] + '-' + x.split('-')[2] + '-' + x.split('-')[0];
-                            }
-                            else if (colList[j].type === 'lookup' && typeof relatedListRecords[i].fields != 'undefined' && typeof relatedListRecords[i].fields[colList[j].fieldName.split('.')[0]] != 'undefined') {
-                                if (typeof relatedListRecords[i].fields[colList[j].fieldName.split('.')[0]].value != 'undefined' && relatedListRecords[i].fields[colList[j].fieldName.split('.')[0]].value != null) {
-                                    recJson.value = relatedListRecords[i].fields[colList[j].fieldName.split('.')[0]].value.fields[colList[j].fieldName.split('.')[1]].value;
+                            if (colList[j].type === 'date' ) {
+                                if(typeof relatedListRecords[i].Rhythm__Assessment__r.Rhythm__Target_Completion_Date__c!='undefined')
+                                {
+                                    var x = relatedListRecords[i].Rhythm__Assessment__r.Rhythm__Target_Completion_Date__c.split('T')[0];
+                                    // recJson.value = x.split('-')[2] + '-' + x.split('-')[1] + '-' + x.split('-')[0];
+                                    var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                                    recJson.value = months[Number(x.split('-')[1]) - 1] + '-' + x.split('-')[2] + '-' + x.split('-')[0];
                                 }
-                            }
-                            else if (colList[j].type === 'html' && relatedListRecords[i].fields && relatedListRecords[i].fields[colList[j].fieldName].value) {
-                                recJson.value = relatedListRecords[i].fields[colList[j].fieldName].value.replaceAll('/servlet/servlet.FileDownload?file', 'https://rhythm-dev1-ed-dev-ed.develop.file.force.com/servlet/servlet.FileDownload?file');
+                                
                             }
                             else {
-                                recJson.value = relatedListRecords[i].fields[colList[j].fieldName].value;
+                                if(typeof relatedListRecords[i].Rhythm__Assessment__r[colList[j].fieldName]!='undefined')
+                                {
+                                    recJson.value = relatedListRecords[i].Rhythm__Assessment__r[colList[j].fieldName];
+                                }
+                                
                             }
                             //Project 'Completed' 'In progress' 'On Hold' 'Open' 'Overdue' null
                             //Employee 'Active' 'Inactive' null
@@ -402,18 +479,17 @@ export default class CustomTable extends LightningElement {
                                 recJson.isHyperlink = true;
                                 if (this.objName === 'Rhythm__Assessment__c') {
                                     //console.log(relatedListRecords[i].fields['Additional__c'].value);
-                                    if (relatedListRecords[i].fields['Additional__c'] && Number(relatedListRecords[i].fields['Additional__c'].value) > 0) {
-                                        console.log(relatedListRecords[i].fields['Additional__c'].value);
+                                    if(typeof relatedListRecords[i].Rhythm__Assessment__r.Rhythm__Additional_Requests__c!='undefined'
+                                    && Number(relatedListRecords[i].Rhythm__Assessment__r.Rhythm__Additional_Requests__c)>0)
+                                    {
                                         recJson.flagSymbol = 'action:priority';
                                     }
                                 }
                             }
-                            if (colList[j].type === 'html') {
-                                recJson.isHtml = true;
-                                recJson.classList = relatedListRecords[i].id + colList[j].fieldName + 'ContainsHtmlMarkUp';
-                            }
-                            if (colList[j].fieldName === 'Status__c') {
-                                if (relatedListRecords[i].fields['Status__c'].value === 'Submitted') {
+
+                            if (colList[j].fieldName === 'Rhythm__Status__c') {
+                                if(typeof relatedListRecords[i].Rhythm__Assessment__r.Rhythm__Status__c!='undefined')
+                                if (relatedListRecords[i].Rhythm__Assessment__r.Rhythm__Status__c === 'Submitted') {
                                     recJson.surveySymbol = 'utility:lock';
                                 }
                                 else {
@@ -424,20 +500,31 @@ export default class CustomTable extends LightningElement {
                             if (this.showProgressBar === "true") {
                                 console.log('I appeared');
                                 //colList.push({fieldName:'PercentageCompleted', label:'% Completed', value:0});
-                                // recDetails=this.progressBarData[relatedListRecords[i].id]?(this.progressBarData[relatedListRecords[i].id].toString().split('.')[0]+'%'):'0%';
-                                if (relatedListRecords[i].fields['Number_of_Questions__c'] && relatedListRecords[i].fields['Number_of_Responses__c'] && relatedListRecords[i].fields['Number_of_Responses__c'].value && relatedListRecords[i].fields['Number_of_Questions__c'].value) {
-                                    console.log(relatedListRecords[i].fields['Number_of_Questions__c'].value + ' : ' + relatedListRecords[i].fields['Number_of_Responses__c'].value);
-                                    recDetails.progressBarValue = (Number(relatedListRecords[i].fields['Number_of_Responses__c'].value) * 100 / Number(relatedListRecords[i].fields['Number_of_Questions__c'].value)) ? (Number(relatedListRecords[i].fields['Number_of_Responses__c'].value) * 100 / Number(relatedListRecords[i].fields['Number_of_Questions__c'].value)).toString().split('.')[0] : 0;
-                                } else
+                                //recDetails=this.progressBarData[relatedListRecords[i].Rhythm__Assessment__r.Id]?(this.progressBarData[relatedListRecords[i].Rhythm__Assessment__r.Id].toString().split('.')[0]+'%'):'0%';
+                                // if (relatedListRecords[i].fields['Number_of_Questions__c'] && relatedListRecords[i].fields['Number_of_Responses__c'] && relatedListRecords[i].fields['Number_of_Responses__c'].value && relatedListRecords[i].fields['Number_of_Questions__c'].value) {
+                                //     console.log(relatedListRecords[i].fields['Number_of_Questions__c'].value + ' : ' + relatedListRecords[i].fields['Number_of_Responses__c'].value);
+                                //     recDetails.progressBarValue = (Number(relatedListRecords[i].fields['Number_of_Responses__c'].value) * 100 / Number(relatedListRecords[i].fields['Number_of_Questions__c'].value)) ? (Number(relatedListRecords[i].fields['Number_of_Responses__c'].value) * 100 / Number(relatedListRecords[i].fields['Number_of_Questions__c'].value)).toString().split('.')[0] : 0;
+                                // } else
+                                //     recDetails.progressBarValue = '0';
+                                if(typeof relatedListRecords[i].Rhythm__Assessment__r.Rhythm__Number_of_Questions__c!='undefined' &&
+                                typeof relatedListRecords[i].Rhythm__Assessment__r.Rhythm__Number_of_Suppliers_responded_back__c )
+                                {
+                                    recDetails.progressBarValue = ((Number(relatedListRecords[i].fields['Number_of_Responses__c'].value) * 100 / Number(relatedListRecords[i].fields['Number_of_Questions__c'].value)) ? (Number(relatedListRecords[i].fields['Number_of_Responses__c'].value) * 100 / Number(relatedListRecords[i].fields['Number_of_Questions__c'].value)).toString().split('.')[0] : 0);
+                                }
+                                else
+                                {
                                     recDetails.progressBarValue = '0';
-
-                                console.log(recDetails);
+                                }
+                                console.log('Executed upto line 436 without error');
                             }
+                            recDetails.id = relatedListRecords[i].Rhythm__Assessment__r.Id;
 
                         }
                     }
+                    
+                    
                 }
-                recDetails.id = relatedListRecords[i].id;
+                
                 recDetails.viewButton = true;
                 recDetails.takeSurvey = false;
                 recDetails.rowClick = 'viewClickHandler';
@@ -447,20 +534,20 @@ export default class CustomTable extends LightningElement {
                     recDetails.rowClick = 'takeSurveyHandler';
                     recDetails.viewButton = false;
                     recDetails.takeSurvey = true;
-                    if (relatedListRecords[i].fields['Rhythm__Status__c'].value === 'Submitted') {
-                        recDetails.surveyLabel = 'View Survey';
-                        recDetails.surveySymbol = 'utility:lock';
-                    }
-                    else {
-                        recDetails.surveyLabel = 'Take Survey';
-                        recDetails.surveySymbol = 'utility:unlock';
-                    }
+                    // if (typeof relatedListRecords[i].Rhythm__Assessment__r['Rhythm__Status__c']!='undefined'&& relatedListRecords[i].Rhythm__Assessment__r['Rhythm__Status__c'] === 'Submitted') {
+                    //     recDetails.surveyLabel = 'View Survey';
+                    //     recDetails.surveySymbol = 'utility:lock';
+                    // }
+                    // else {
+                    //     recDetails.surveyLabel = 'Take Survey';
+                    //     recDetails.surveySymbol = 'utility:unlock';
+                    // }
                 }
                 recDetails.record = recArray;
                 recDataList.push(recDetails);
             }
         }
-        //console.log(JSON.stringify(recDataList));
+        console.log('recDataList',JSON.stringify(recDataList));
         return recDataList;
     }
 
@@ -785,6 +872,8 @@ export default class CustomTable extends LightningElement {
                 this.recList = this.assignData(currentPageRecords, this.viewColList);
 
                 this.allRecordsList = this.recList;
+                console.log('this.recList',this.recList);
+                console.log('this.allRecordsList',this.allRecordsList);
 //KOUSHIK CHANGES
 
 
@@ -999,6 +1088,7 @@ export default class CustomTable extends LightningElement {
     csvClickHandler(event) {
         var assessmentId = event.currentTarget.dataset.id;
         getSupplierAssessmentList({ assessmentId: assessmentId }).then(resultData => {
+            console.log('resultData',resultData);
             var assessmentTemplateId = resultData[0].Rhythm__Template__c;           
             getQuestionsList({ templateId: assessmentTemplateId }).then(result => {
                 var resultMap = result;

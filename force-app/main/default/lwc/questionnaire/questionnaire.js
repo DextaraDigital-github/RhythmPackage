@@ -15,6 +15,7 @@ import uploadFile from '@salesforce/apex/AssessmentController.uploadFile';
 import getSurveyValues from '@salesforce/apex/rtmvpcRelatedListsController.getSurveyValues';
 //import createChatterItem from '@salesforce/apex/rtmvpcRelatedListsController.createChatterItem';
 import deleteFileAttachment from '@salesforce/apex/AssessmentController.deleteFileAttachment';
+import getAccountAssessmentRecordData from '@salesforce/apex/AssessmentController.getAccountAssessmentRecordData';
 
 export default class Questionnaire extends LightningElement {
 
@@ -64,6 +65,8 @@ export default class Questionnaire extends LightningElement {
     sectionidslist = [];
     @track buttonlabel = 'Expand all';
     assessmentStatus;
+    @api objectApiName;
+
 
     //Used /* handleAccordionSection is used to handle opening and closing of a disclosure */
     handleAccordionSection() {
@@ -115,6 +118,8 @@ export default class Questionnaire extends LightningElement {
         if (this.assessment == null || this.assessment == '') {
             this.assessment = this.recordId;
         }
+        console.log('recordId', this.recordId);
+        console.log('Object Name', this.objectApiName);
         if (typeof this.recordId != 'undefined') {
             this.isTemplate = true;
             console.log('this.isTemplate', this.isTemplate);
@@ -126,65 +131,154 @@ export default class Questionnaire extends LightningElement {
             console.log('this.recordId', this.recordId);
         }
         if (this.isTemplate) {
-            this.savedResponseMap = {};
+            if (this.objectApiName == 'Rhythm__AccountAssessmentRelation__c') {
+                //this.savedResponseMap = {};
+                getAccountAssessmentRecordData({ assrecordId: this.recordId }).then(result => {
+                    if (typeof result[0].Rhythm__Assessment__r != 'undefined' && typeof result[0].Rhythm__Assessment__r.Rhythm__Template__c);
+                    {
+                        var assessmentJunctionId = result[0].Rhythm__Assessment__r.Id;
+                        var assessmentTemplateId = result[0].Rhythm__Assessment__r.Rhythm__Template__c;
+                        getQuestionsList({ templateId: assessmentTemplateId }).then(result => {
+                            var resultMap = result;
+                            for (var i = 0; i < resultMap.length; i++) {
+                                if (!this.sectionidslist.includes(resultMap[i].Rhythm__Section__r.Id)) {
+                                    this.sectionidslist.push(resultMap[i].Rhythm__Section__r.Id);
+                                }
+                            }
+                            console.log('getQuestionsList', resultMap);
+                            console.log('result[0].Rhythm__Assessment__r.Id',assessmentJunctionId);
+                            /* This method is used to get all the responses of the questions in particular section*/
+                            getSupplierResponseList({ assessmentId: assessmentJunctionId }).then(result => {
+                                if (result && result.length > 0 && result[0] && result[0].CreatedBy && result[0].CreatedDate) {
+                                    this.supplierAssessmentName = result[0].CreatedBy.Name;
+                                    this.supplierAssCreatedDate = result[0].CreatedDate;
+                                    var x = this.supplierAssCreatedDate.split('T')[0];
+                                    var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                                    this.supplierAssCreatedDate = months[Number(x.split('-')[1]) - 1] + '-' + x.split('-')[2] + '-' + x.split('-')[0];
+                                    console.log('this.supplierAssCreatedDate===>' + this.supplierAssCreatedDate);
+                                    // }
+                                }
+                                console.log('getSupplierResponseList result', result);
+                                result.forEach(qres => {
+                                    this.savedResponseMap.set(qres.Rhythm__Question__c, { "Id": qres.Id, "questionType": qres.Rhythm__Question__r.Rhythm__Question_Type__c, "value": qres.Rhythm__Response__c, "Files__c": qres.Rhythm__Files__c, "Flag__c": qres.Rhythm__Flag__c, "Conversation_History__c": qres.Rhythm__Conversation_History__c });
+                                });
 
-            getQuestionsList({ templateId: this.recordId }).then(result => {
-                var resultMap = result;
-                for (var i = 0; i < resultMap.length; i++) {
-                    if (!this.sectionidslist.includes(resultMap[i].Rhythm__Section__r.Id)) {
-                        this.sectionidslist.push(resultMap[i].Rhythm__Section__r.Id);
+                                console.log('this.savedResponseMap', this.savedResponseMap);
+                                console.log('resultMap', resultMap);
+                                //
+                                this.constructMultilevelhierarchy(resultMap, this.savedResponseMap);
+                                var count = 0;
+                                var sectionsList = [];
+                                console.log('questionMap', this.questionMap);
+                                for (const seckey of this.questionMap.keys()) {
+                                    console.log('seckey', seckey);
+                                    console.log('seckey', this.questionMap.get(seckey));
+                                    count++;
+                                    sectionsList.push({ label: seckey, value: this.sectionidslist[count - 1] });
+                                    this.questionsList.push({ "sectionId": this.sectionidslist[count - 1], "section": seckey, "numberOfQuestions": '', "numberOfResponses": '', "displayFlag": '', "questions": this.questionMap.get(seckey), "showNext": true, "show": false });
+                                }
+                                console.log('this.questionsList>>>', this.questionsList);
+                                this.showButtons.Summary = false;
+                                this.showButtons.Section_Navigation.show = false;
+                                this.showButtons.Save_Submit = false;
+
+                                if (this.questionsList.length > this.sectionLimits) {
+                                    this.showButtons.Summary = true;
+                                    this.showButtons.Section_Navigation.show = true;
+                                    this.showButtons.Section_Navigation.options = sectionsList;
+                                    //this.showButtons.Section_Navigation.value = this.section;
+                                }
+                                this.constructQuestionsAndAnswers(this.questionsList);
+                                for (var i = 0; i < this.questionsList.length; i++) {
+                                    var sequence = 0;
+                                    for (var j = 0; j < this.questionsList[i].questions.length; j++) {
+                                        sequence++;
+                                        this.questionsList[i].questions[j]['snumber'] = sequence;
+                                        var childsequence = 0;
+                                        for (var k = 0; k < this.questionsList[i].questions[j].Children.length; k++) {
+                                            childsequence++;
+                                            var sequencenum = sequence + '.' + childsequence;
+                                            this.questionsList[i].questions[j].Children[k]['snumber'] = sequencenum;
+                                        }
+                                    }
+                                    this.questionsList[i]['responsesPercentage'] = Math.floor((Number(this.questionsList[i].numberOfResponses) / Number(this.questionsList[i].numberOfQuestions)) * 100);
+                                }
+                                console.log('this.questionsAndAnswerss', this.questionsAndAnswerss);
+                                console.log('this.questionsvaluemap', this.questionsvaluemap);
+                            }).catch(error => {
+                                console.log('Error' + error);
+                            })
+                        }).catch(error => {
+                            console.log('Error' + error);
+                        });
+                        console.log('result getAccountAssessmentRecordData', result);
                     }
-                }
-                console.log('resultMap', resultMap);
-                //
-                this.constructMultilevelhierarchy(resultMap, this.savedResponseMap);
-                var count = 0;
-                var sectionsList = [];
 
-                console.log('questionMap', this.questionMap);
-                for (const seckey of this.questionMap.keys()) {
-                    console.log('seckey', seckey);
-                    console.log('seckey', this.questionMap.get(seckey));
-                    count++;
-                    sectionsList.push({ label: seckey, value: this.sectionidslist[count - 1] });
-                    this.questionsList.push({ "sectionId": this.sectionidslist[count - 1], "section": seckey, "questions": this.questionMap.get(seckey), "showNext": true, "show": false });
-                }
-                console.log('this.questionsList>>>', this.questionsList);
-                // this.showButtons.Summary = false;
-                // this.showButtons.Section_Navigation.show = false;
-                // this.showButtons.Save_Submit = false;
-                // if (supplierAssessment.Rhythm__Status__c === 'Submitted') {
-                //     this.showButtons.Summary = true;
-                // }
-                // else {
-                //     this.showButtons.Save_Submit = true;
-                // }
-                // if (this.questionsList.length > this.sectionLimits) {
-                //     this.showButtons.Summary = true;
-                //     this.showButtons.Section_Navigation.show = true;
-                //     this.showButtons.Section_Navigation.options = sectionsList;
-                //     //this.showButtons.Section_Navigation.value = this.section;
-                // }
-                this.constructQuestionsAndAnswers(this.questionsList);
-                for (var i = 0; i < this.questionsList.length; i++) {
-                    var sequence = 0;
-                    for (var j = 0; j < this.questionsList[i].questions.length; j++) {
-                        sequence++;
-                        this.questionsList[i].questions[j]['snumber'] = sequence;
-                        var childsequence = 0;
-                        for (var k = 0; k < this.questionsList[i].questions[j].Children.length; k++) {
-                            childsequence++;
-                            var sequencenum = sequence + '.' + childsequence;
-                            this.questionsList[i].questions[j].Children[k]['snumber'] = sequencenum;
+                }).catch(error => {
+                    console.log('Error', error);
+                });
+            }
+            else {
+                this.savedResponseMap = {};
+
+                getQuestionsList({ templateId: this.recordId }).then(result => {
+                    var resultMap = result;
+                    for (var i = 0; i < resultMap.length; i++) {
+                        if (!this.sectionidslist.includes(resultMap[i].Rhythm__Section__r.Id)) {
+                            this.sectionidslist.push(resultMap[i].Rhythm__Section__r.Id);
                         }
                     }
-                    //this.questionsList[i]['responsesPercentage'] = Math.floor((Number(this.questionsList[i].numberOfResponses) / Number(this.questionsList[i].numberOfQuestions)) * 100);
-                }
-                console.log('this.questionsAndAnswerss', this.questionsAndAnswerss);
-                console.log('this.questionsvaluemap', this.questionsvaluemap);
-            }).catch(error => {
+                    console.log('resultMap', resultMap);
+                    //
+                    this.constructMultilevelhierarchy(resultMap, this.savedResponseMap);
+                    var count = 0;
+                    var sectionsList = [];
 
-            });
+                    console.log('questionMap', this.questionMap);
+                    for (const seckey of this.questionMap.keys()) {
+                        console.log('seckey', seckey);
+                        console.log('seckey', this.questionMap.get(seckey));
+                        count++;
+                        sectionsList.push({ label: seckey, value: this.sectionidslist[count - 1] });
+                        this.questionsList.push({ "sectionId": this.sectionidslist[count - 1], "section": seckey, "questions": this.questionMap.get(seckey), "showNext": true, "show": false });
+                    }
+                    console.log('this.questionsList>>>', this.questionsList);
+                    // this.showButtons.Summary = false;
+                    // this.showButtons.Section_Navigation.show = false;
+                    // this.showButtons.Save_Submit = false;
+                    // if (supplierAssessment.Rhythm__Status__c === 'Submitted') {
+                    //     this.showButtons.Summary = true;
+                    // }
+                    // else {
+                    //     this.showButtons.Save_Submit = true;
+                    // }
+                    // if (this.questionsList.length > this.sectionLimits) {
+                    //     this.showButtons.Summary = true;
+                    //     this.showButtons.Section_Navigation.show = true;
+                    //     this.showButtons.Section_Navigation.options = sectionsList;
+                    //     //this.showButtons.Section_Navigation.value = this.section;
+                    // }
+                    this.constructQuestionsAndAnswers(this.questionsList);
+                    for (var i = 0; i < this.questionsList.length; i++) {
+                        var sequence = 0;
+                        for (var j = 0; j < this.questionsList[i].questions.length; j++) {
+                            sequence++;
+                            this.questionsList[i].questions[j]['snumber'] = sequence;
+                            var childsequence = 0;
+                            for (var k = 0; k < this.questionsList[i].questions[j].Children.length; k++) {
+                                childsequence++;
+                                var sequencenum = sequence + '.' + childsequence;
+                                this.questionsList[i].questions[j].Children[k]['snumber'] = sequencenum;
+                            }
+                        }
+                        //this.questionsList[i]['responsesPercentage'] = Math.floor((Number(this.questionsList[i].numberOfResponses) / Number(this.questionsList[i].numberOfQuestions)) * 100);
+                    }
+                    console.log('this.questionsAndAnswerss', this.questionsAndAnswerss);
+                    console.log('this.questionsvaluemap', this.questionsvaluemap);
+                }).catch(error => {
+
+                });
+            }
         }
         else {
             getSurveyValues({}).then(result => {
@@ -710,7 +804,7 @@ export default class Questionnaire extends LightningElement {
         quTemp.labelId = qu.Id + '_labelId';
         quTemp.spanId = qu.Id + '_spanId';
         quTemp.parentQuestionId = qu.Rhythm__Parent_Question__c;
-        if (!this.isTemplate) {
+        if (this.objectApiName=='Rhythm__AccountAssessmentRelation__c' || !this.isTemplate) {
             if (typeof savedResp.get(qu.Id) != 'undefined' && typeof savedResp.get(qu.Id).value != 'undefined') {
                 quTemp.Rhythm__Flag__c = savedResp.get(qu.Id).Flag__c;
             }
@@ -726,16 +820,9 @@ export default class Questionnaire extends LightningElement {
             else {
                 quTemp.isEditable = false;
             }
-            if (this.assessmentStatus == 'Submitted' || this.assessmentStatus == 'Open' || this.assessmentStatus == 'Completed' || this.assessmentStatus == 'Closed') {
-                if (quTemp.Rhythm__Flag__c) {
-                    quTemp.isEditable = false;
-                }
-                else {
-                    quTemp.isEditable = true;
-                }
-            }
-            else {
-                quTemp.isEditable = false;
+            if(this.objectApiName=='Rhythm__AccountAssessmentRelation__c')
+            {
+                quTemp.isEditable = true;
             }
 
             if (qu.Rhythm__Required__c == true) {
