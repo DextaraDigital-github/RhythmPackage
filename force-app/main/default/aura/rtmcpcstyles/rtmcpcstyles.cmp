@@ -1,0 +1,6 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global">
+<ltng:require styles = "{!$Resource.rtmfonts +'/line-awesome/line-awesome.css'}"/>
+<ltng:require styles = "{!$Resource.rtmfonts +'/SourceSansPro/SourceSansPro.css'}"/>
+<ltng:require styles = "{!$Resource.rtmcpcsldscustomstyles}"/>
+<ltng:require styles = "{!$Resource.rtmvpcquestionnaireplatform}"/>
+</aura:component>
