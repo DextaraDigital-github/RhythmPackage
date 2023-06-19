@@ -130,7 +130,7 @@
 	
 
 	html { scroll-behavior:smooth;}
-
+	.slds-text-heading_large, .slds-text-heading--large {font-size:unset!important;}
 	* { scrollbar-width:thin; scrollbar-color:var(--sb-sc); }
 	*::-webkit-scrollbar { width:8px; height:8px; z-index:7; line-height:0; }
 	*::-webkit-scrollbar-track { background:var(--sb-track); z-index:8; font-size:var(--fs-0); line-height:0; border-radius:5px; }
@@ -138,10 +138,10 @@
 	
 	.slds-utility-bar li.slds-utility-bar__item:first-child {display:none;}
 	.utility-bar--right .utilitybar { height:18px; }
-	.utility-bar--right .utilitybar:after { content:'© 2023 Rhythm Innovations. All Rights Reserved.'; position:absolute; right: 15px; bottom:1px; font-size:12px; }
+	.utility-bar--right .utilitybar:after { content:'&copy; 2023 Rhythm Innovations. All Rights Reserved.'; position:absolute; right: 15px; bottom:1px; font-size:12px; }
 	.slds-utility-bar__item { height:18px; }
-
-	
+	.cad-cardbase.slds-p-around_small { padding:0px; }
+	.slds-accordion__list-item {border-top:0px none; }
 	.column.region-main {width:75%!important; max-width:100%;}
 	.column.region-sidebar-right {width:25%!important; max-width:25%;}
 	.column.region-sidebar-right article.slds-card {background:#e6eef6; }
