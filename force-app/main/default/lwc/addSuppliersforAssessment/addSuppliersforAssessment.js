@@ -11,6 +11,7 @@ export default class AddSuppliersforAssessment extends LightningElement {
     @wire(getAssessmentRecord, { assessmentId: '$recordId'})
     assessmentRecord(result) {
         if (result.data) {
+            this.assessmentRecord = result.data[0];
             console.log('assessmentRecord---->',JSON.stringify(result.data));
             this.startDate = result.data[0].Rhythm__Start_Date__c;
         } else if (result.error) {
@@ -37,7 +38,7 @@ export default class AddSuppliersforAssessment extends LightningElement {
         if(new Date(this.startDate) >= new Date(dateValue)){
             console.log('AddSuppliersMethod------->',JSON.stringify(this.suppliersList));
             if(this.suppliersList.length > 0){
-                addSuppliers({assesmentId:this.recordId,suppliers:JSON.stringify(this.suppliersList),deleteList:deleteListStr})
+                addSuppliers({assessmentRecord:this.assessmentRecord,operationType:'update',suppliers:JSON.stringify(this.suppliersList),deleteList:deleteListStr})
                 .then(result => {
                     console.log('addSuppliers Result------->'+JSON.stringify(result));
                     if(result.isSuccess == true){
