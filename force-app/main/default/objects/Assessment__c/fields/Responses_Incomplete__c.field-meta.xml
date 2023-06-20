@@ -2,7 +2,7 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Responses_Incomplete__c</fullName>
     <externalId>false</externalId>
-    <label># of Responses In Progress</label>
+    <label># Incomplete Responses</label>
     <precision>18</precision>
     <required>false</required>
     <scale>0</scale>

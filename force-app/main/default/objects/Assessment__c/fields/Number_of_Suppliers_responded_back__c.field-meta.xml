@@ -2,7 +2,7 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Number_of_Suppliers_responded_back__c</fullName>
     <externalId>false</externalId>
-    <label># of Responses Submitted</label>
+    <label># Responded Suppliers</label>
     <precision>18</precision>
     <required>false</required>
     <scale>0</scale>

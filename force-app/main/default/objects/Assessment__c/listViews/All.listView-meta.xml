@@ -3,7 +3,6 @@
     <fullName>All</fullName>
     <columns>NAME</columns>
     <columns>Template__c</columns>
-    <columns>CREATED_DATE</columns>
     <columns>Start_Date__c</columns>
     <columns>End_Date__c</columns>
     <columns>Frequency__c</columns>
@@ -11,7 +10,6 @@
     <columns>Number_of_invited_Suppliers__c</columns>
     <columns>Number_of_Suppliers_responded_back__c</columns>
     <columns>Responses_Incomplete__c</columns>
-    <columns>Incomplete_Responses__c</columns>
     <filterScope>Everything</filterScope>
     <label>All</label>
 </ListView>

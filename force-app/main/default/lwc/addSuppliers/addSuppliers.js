@@ -89,7 +89,7 @@ export default class AddSuppliers extends LightningElement {
 
     handleSearch(event){
         try{
-            const searchKey = event.target.value;
+            let searchKey = event.target.value;
             this.searchKey = searchKey;
             refreshApex(this.latestSuppliers);
         }catch(error){
@@ -98,7 +98,7 @@ export default class AddSuppliers extends LightningElement {
     }
     handleExSearch(event){
         try{
-            const searchKey = event.target.value;
+            let searchKey = event.target.value;
             this.exSearchKey = searchKey;
             refreshApex(this.latestExSuppliers);
         }catch(error){
