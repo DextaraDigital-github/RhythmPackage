@@ -66,6 +66,7 @@ export default class Questionnaire extends LightningElement {
     @track buttonlabel = '[ + ]';
     assessmentStatus;
     @api objectApiName;
+    @api accid;
     @track isAccountAssessment;
     @track isSupplier;
 
@@ -140,6 +141,7 @@ export default class Questionnaire extends LightningElement {
 
     //Used /* Connectedcallback is used to get data on onload */
     connectedCallback() {
+        console.log('this.accid',this.accid);
         //this.showspinner = true;
         if (this.assessment == null || this.assessment == '') {
             this.assessment = this.recordId;
@@ -548,9 +550,7 @@ export default class Questionnaire extends LightningElement {
         /*Apex method is used to store the uploaded attachments into response records */
         uploadFile({ fileResp: JSON.stringify(filemap)}).then(result => {
             this.template.querySelectorAll('c-rtmvpc-render-question-template')[0].getShowUploadStatus();
-
             console.log('this.questionsAndAnswerss', this.questionsAndAnswerss);
-            //console.log('uploadFile Result', JSON.parse(result));
             for (var i = 0; i < this.questionsAndAnswerss.length; i++) {
                 if (this.questionsAndAnswerss[i].sectionId == this.fileResponseData.sectionId) {
                     for (var j = 0; j < this.questionsAndAnswerss[i].questions.length; j++) {
@@ -567,7 +567,7 @@ export default class Questionnaire extends LightningElement {
                     }
                 }
             }
-
+            
             console.log('this.questionsAndAnswerss>>>', this.questionsAndAnswerss);
         });
     }
@@ -579,7 +579,7 @@ export default class Questionnaire extends LightningElement {
         console.log('In Questionnaire handledeletefile', deletefileData);
         deleteFileAttachment({ questionId: deletefileData.questionId, name: deletefileData.name }).then(result => {
             console.log('result', result);
-            //
+            
             for (var i = 0; i < this.questionsAndAnswerss.length; i++) {
                 if (this.questionsAndAnswerss[i].sectionId == deletefileData.sectionId) {
                     //
@@ -768,6 +768,7 @@ export default class Questionnaire extends LightningElement {
 
             console.log('responseList', responseList);
             var responseQueryMap={};
+            responseQueryMap.accountId = this.accid;
             responseQueryMap.assesmentId = this.assessment;
             if(isSubmit)
             {
@@ -777,6 +778,8 @@ export default class Questionnaire extends LightningElement {
             {
                 responseQueryMap.status = 'Draft';
             }
+
+            console.log('this.accid',this.accid);
             /* This method is used to create the response for the questions*/
             createSupplierResponse({ suppResponseList: responseList, paramMap: JSON.stringify(responseQueryMap) }).then(result => {
 
@@ -1074,8 +1077,10 @@ export default class Questionnaire extends LightningElement {
             {
                 if(this.questionsAndAnswerss[i].questions[j].Id==this.showChat.questionId)
                 {
-                    console.log('Into if');
+                    if(typeof this.showChat.responseflag != 'undefined')
+                    {
                     this.questionsAndAnswerss[i].questions[j].Rhythm__Flag__c=this.showChat.responseflag;
+                    }
                 }
             }
         }

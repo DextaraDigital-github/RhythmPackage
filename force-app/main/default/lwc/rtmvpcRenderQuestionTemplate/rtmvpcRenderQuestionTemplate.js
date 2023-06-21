@@ -154,7 +154,9 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
     /* getShowUploadStatus  is used to show progressbar while uploading the file.This method will be invoked from Questionnaire component.*/
     @api
     getShowUploadStatus() {
+        console.log('this.showUploadProgress',this.showUploadProgress);
         this.showUploadProgress = false;
+        console.log('this.showUploadProgress',this.showUploadProgress);
     }
 
     /* handlechildchange is used to dispatch the value to parent component(Questionnaire) on value change*/
