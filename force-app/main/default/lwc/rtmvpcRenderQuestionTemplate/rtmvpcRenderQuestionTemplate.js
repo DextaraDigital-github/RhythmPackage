@@ -14,7 +14,7 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
     @track responsemap = {};
     @track fileresponsemap = {};
     @track showUploadProgress;
-    @api assessmentId;
+    @api assessmentid;
     @track checkedLabel;
     @api sectionid;
     @api issupplier;
@@ -34,30 +34,53 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
             }
         }
     }
-    openReview(event)
-    {
-        console.log('openReview',event.currentTarget.dataset.id);
-        getResponseFlag({questionId : event.currentTarget.dataset.id}).then((result)=>{
+    openReview(event) {
 
-        }).catch(error=>{
+        var quesId = event.currentTarget.dataset.id;
+        var flagresponse;
+        if(!this.issupplier)
+        {
 
-        });
-        this.chatterMap.questionId = event.currentTarget.dataset.id;
-        this.chatterMap.accountType = 'vendor';
-        console.log('this.chatterMap',this.chatterMap);
-        if (this.chatterMap.openChat == false) {
-            this.chatterMap.openChat = true;
-            this.chatterMap.disableSendButton = false;
+        for(var i=0;i<this.responses.length;i++)
+        {
+            if(this.responses[i].Id==quesId)
+            {
+                flagresponse = !(this.responses[i].Rhythm__Flag__c);
+            }
         }
-        else {
-            this.chatterMap.openChat = false;
-            this.chatterMap.disableSendButton = true;
-        }
-        const selectedEvent = new CustomEvent('selectchange', {
-            detail: this.chatterMap
+
+        console.log('openReview', quesId);
+        console.log('this.responses', this.responses);
+        getResponseFlag({ questionId: quesId, assessmentId:this.assessmentid }).then((result) => {
+            console.log('result', result);
+            if(result.length>0)
+            {  
+                flagresponse = JSON.parse(JSON.stringify(result[0].Rhythm__Flag__c));
+            }
+            
+            this.chatterMap.questionId = quesId;
+            this.chatterMap.accountType = 'vendor';
+            this.chatterMap.responseflag = flagresponse;
+            console.log('this.chatterMap', this.chatterMap);
+            if (this.chatterMap.openChat == false) {
+                this.chatterMap.openChat = true;
+                this.chatterMap.disableSendButton = false;
+            }
+            else {
+                this.chatterMap.openChat = false;
+                this.chatterMap.disableSendButton = true;
+            }
+            const selectedEvent = new CustomEvent('selectchange', {
+                detail: this.chatterMap
+            });
+            // Dispatches the event.
+            this.dispatchEvent(selectedEvent);
+
+        }).catch(error => {
+            console.log('error', error);
         });
-        // Dispatches the event.
-        this.dispatchEvent(selectedEvent);
+        }
+
     }
 
     /*handleChange is used to dispatch an event to its parent component(Questionnaire) and change the response and send back to the parent component*/
@@ -91,17 +114,36 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
     /* openChatHandler is used to dispatch an event to its parent component(Questionnaire) by sending
        the questionId to parent component to open chat conversation */
     openChatHandler(event) {
-        this.chatterMap.questionId = event.currentTarget.dataset.id;
-        console.log('event.cuurentTarget.dataset.id',event.currentTarget.dataset.id);
-        this.chatterMap.accountType = 'supplier';
+        var quesId = event.currentTarget.dataset.id;
+        console.log('event.cuurentTarget.dataset.id', event.currentTarget.dataset.id);
+        if(this.issupplier)
+        {
+            this.chatterMap.accountType = 'supplier';
+        }
+        else
+        {
+            this.chatterMap.accountType = 'vendor';
+
+        }
+        
         if (this.chatterMap.openChat == false) {
             this.chatterMap.openChat = true;
             this.chatterMap.disableSendButton = false;
         }
         else {
-            this.chatterMap.openChat = false;
-            this.chatterMap.disableSendButton = true;
+            if(this.chatterMap.questionId!=quesId)
+            {
+                this.chatterMap.openChat = true;
+                this.chatterMap.disableSendButton = false;
+            }
+            else
+            {
+                this.chatterMap.openChat = false;
+                this.chatterMap.disableSendButton = true;
+            }
+            
         }
+        this.chatterMap.questionId = quesId;
         const selectedEvent = new CustomEvent('selectchange', {
             detail: this.chatterMap
         });

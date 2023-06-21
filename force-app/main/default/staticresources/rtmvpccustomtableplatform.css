@@ -186,8 +186,8 @@
 	button.cig_actions, button.cad_actions { background:transparent; font-size:var(--fs-18); word-break:keep-all; border:0px solid transparent; }
 	
 	.slds-utility-bar li.slds-utility-bar__item:first-child {display:none;}
-	.cdgWrapper .slds-button { color:#747474!important;}
-	.cdgWrapper .slds-button:hover { color:#0176d3!important;}
+	/*.cdgWrapper .slds-button { color:#747474!important;}
+	.cdgWrapper .slds-button:hover { color:#0176d3!important;}*/
 
 	@media screen and (max-width:992px) { 
 		.cdgWrapper { padding-bottom:20px; }
