@@ -39,8 +39,9 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
     handleNext(event){
         try{
             event.preventDefault();
-            let isSave = this.validateData(); // can be removed
-            if(isSave){
+            let validatedData = this.validateData();
+            console.log('validatedData------>',JSON.stringify(validatedData));
+            if(validatedData.isSave){
                 let fields = event.detail.fields;
                 console.log('refFields--------->',JSON.stringify(fields));
                 fields = Object.assign( { 'sobjectType': 'Rhythm__Assessment__c'}, fields );
@@ -49,7 +50,7 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
                 this.showSuppliers = true;
                 this.modalHeading = 'Add Suppliers';
             }else{
-                this.showNotification('Error','Please fill all the required fields','error');
+                this.showNotification('Error',validatedData.message,'error');
             }
         }catch(e){
             console.log('handleNextError----->',e)
@@ -57,14 +58,18 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
     }
 
     validateData(){
-        let isSave = true;
-        if(this.template.querySelector(`[data-id="name"]`).value == null||
-        (!this.template.querySelector(`[data-id="template"]`).value) || 
-        (!this.template.querySelector(`[data-id="category"]`).value) ||
-        this.template.querySelector(`[data-id="startdate"]`).value == null){
-            isSave = false;
+        let validatedDetails = {};
+        validatedDetails.isSave = true;
+        validatedDetails.message = '';
+        let startDate = this.template.querySelector(`[data-id="startdate"]`).value;
+        let todayDate = new Date().toISOString().substring(0, 10);
+        console.log('startDate----->',startDate);
+        console.log('todayDate----->',todayDate);
+        if(new Date(startDate) < new Date(todayDate)){
+            validatedDetails.isSave = false;
+            validatedDetails.message = 'Start Date Cannot be the past date.'
         }
-        return isSave;
+        return validatedDetails;
     }
 
     addSuppliers(event){
@@ -108,6 +113,7 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
         }else{
             this.navigateToObjectHome();
         }
+        eval("$A.get('e.force:refreshView').fire();");
     }
     showNotification(title,message,variant) {
         const evt = new ShowToastEvent({

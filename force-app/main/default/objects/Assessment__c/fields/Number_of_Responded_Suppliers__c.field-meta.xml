@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
-    <fullName>Number_of_Invited_Suppliers__c</fullName>
+    <fullName>Number_of_Responded_Suppliers__c</fullName>
     <externalId>false</externalId>
-    <label># Invited Suppliers</label>
+    <label># Responded Suppliers</label>
+    <summaryFilterItems>
+        <field>AccountAssessmentRelation__c.Status__c</field>
+        <operation>equals</operation>
+        <value>Submitted, In review, Accepted</value>
+    </summaryFilterItems>
     <summaryForeignKey>AccountAssessmentRelation__c.Assessment__c</summaryForeignKey>
     <summaryOperation>count</summaryOperation>
     <trackHistory>false</trackHistory>

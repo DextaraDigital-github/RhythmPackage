@@ -63,7 +63,7 @@ public with sharing class AssessmentController {
     */
     @AuraEnabled
     public static void createSupplierResponse(List<SObject> suppResponseList,String paramMap){
-        Map<String,String> queryMap = (Map<String,String>)JSON.deserializeUntyped(paramMap);
+        Map<String,object> queryMap = (Map<String,Object>)JSON.deserializeUntyped(paramMap);
         List<Id> questionIds = new List<Id>();
         for(SObject response:suppResponseList){
             questionIds.add((Id)response.get('Rhythm__Question__c'));
@@ -87,9 +87,9 @@ public with sharing class AssessmentController {
         
         List<Assessment__c> assessment=[SELECT Id,Name,Status__c 
                                         FROM Assessment__c 
-                                        WHERE Id=:queryMap.get('assesmentId')];
+                                        WHERE Id=:(Id)queryMap.get('assesmentId')];
         if(assessment.isEmpty()){
-            assessment[0].Status__c =queryMap.get('status');
+            assessment[0].Status__c =(string)queryMap.get('status');
             UPDATE assessment;
         }
         
@@ -116,7 +116,7 @@ public with sharing class AssessmentController {
     {
         List<Assessment__c> AssessmentRecords= [SELECT Name,Target_Completion_Date__c,Status__c,
                                                 Additional_Requests__c,Customer_Review__c,Number_of_Questions__c,
-                                                Number_of_Suppliers_responded_back__c,Start_Date__c,End_Date__c,CreatedDate
+                                                Start_Date__c,End_Date__c,CreatedDate,CreatedUser__c
                                                 FROM Assessment__c LIMIT 100];
         return AssessmentRecords;
     }
@@ -128,12 +128,16 @@ public with sharing class AssessmentController {
     @AuraEnabled
     public static List<Response__c> getResponseList(String responseWrapper)
     {
-        Map<String,String> responseMap = (Map<String,String>)JSON.deserializeUntyped(responseWrapper);
+        
+        Map<String,Object> responseMap = (Map<String,Object>)JSON.deserializeUntyped(responseWrapper);
+        System.debug('responseMap'+responseMap);
+        System.debug((String)responseMap.get('assessmentId'));
+        System.debug((String)responseMap.get('questionId'));
         List<Response__c> responseRecords=[SELECT Conversation_History__c,createdDate 
                                             FROM Response__c 
-                                            WHERE Assessment__c =:responseMap.get('assessmentId') AND Question__c=:responseMap.get('questionId') 
-                                            AND Is_Latest_Response__c=true];
-        
+                                            WHERE Assessment__c =:(String)responseMap.get('assessmentId') AND Question__c=:(String)responseMap.get('questionId') 
+                                            ];
+        System.debug('responseRecords'+responseRecords);
         return responseRecords;
     }
 
@@ -152,6 +156,7 @@ public with sharing class AssessmentController {
     {
         List<User> strAccId = [SELECT Contact.AccountId FROM User WHERE id=:userinfo.getuserid()];
         return strAccId[0].Contact.AccountId;
+        //return null;
     }
     /**
      * Gets the AccountAssessmentRelation__c information of all fields in AccountAssessmentRelation__c for a particular Account__c.
@@ -160,11 +165,13 @@ public with sharing class AssessmentController {
     @AuraEnabled
     public static List<SObject> getAssessmentJunctionRecords(String accountId)
     {
+        System.debug('accountId'+accountId);
         List<SObject> assessmentData = [SELECT Id, IsDeleted, Name,Account__c,Assessment__c, Assessment__r.name ,Assessment__r.Status__c,Assessment__r.Customer_Review__c,Assessment__r.Number_of_Questions__c,
-                                        Assessment__r.Number_of_Suppliers_responded_back__c,Assessment__r.Additional_Requests__c,Number_of_Questions__c, Number_of_Responses__c 
+                                        Assessment__r.Additional_Requests__c,Number_of_Questions__c, Number_of_Responses__c,
+                                        Assessment__r.CreatedBy.Name
                                         FROM AccountAssessmentRelation__c 
-                                        WHERE Account__c=:accountId
-                                       ];
+                                        WHERE Account__c=:accountId];
+        System.debug('assessmentData'+assessmentData);
         return assessmentData;
     }
     /**
@@ -176,9 +183,9 @@ public with sharing class AssessmentController {
     {
         List<Sobject> accountassessment = [SELECT Id, IsDeleted, Name,Account__c,Assessment__c, Assessment__r.name ,
                                             Assessment__r.Status__c,Assessment__r.Customer_Review__c,
-                                            Assessment__r.Number_of_Questions__c,Assessment__r.Number_of_Suppliers_responded_back__c,
+                                            Assessment__r.Number_of_Questions__c,
                                             Assessment__r.Additional_Requests__c,Number_of_Questions__c,Assessment__r.CreatedDate,
-                                            Assessment__r.Template__c, Number_of_Responses__c 
+                                            Assessment__r.Template__c, Number_of_Responses__c,Assessment__r.CreatedBy.Name
                                             FROM AccountAssessmentRelation__c 
                                             WHERE Id=:assrecordId ];
         return accountassessment;
@@ -188,19 +195,38 @@ public with sharing class AssessmentController {
      * @param questionId record id of a Question__c.
     */
     @AuraEnabled
-    public static List<SObject> getResponseFlag(String questionId)
+    public static List<SObject> getResponseFlag(String questionId, String assessmentId)
     {
+        System.debug('questionId'+questionId);
+        System.debug('assessmentId'+assessmentId);
         List<Response__c> SupplierResponseList=  [SELECT Id, Question__c,Assessment__c,Question__r.Question_Type__c, 
                                                   Assessment__r.Name,Files__c, Response__c,CreatedBy.Name,CreatedDate, Flag__c, 
                                                   Conversation_History__c,LastModifiedDate,LastModifiedById 
                                                   FROM Response__c 
-                                                  WHERE Question__c=:questionId AND Is_Latest_Response__c= true];
-        for(Response__c response :SupplierResponseList)
+                                                  WHERE Question__c=:questionId AND Assessment__c=:assessmentId AND Is_Latest_Response__c= true];
+        System.debug('SupplierResponseList'+SupplierResponseList);
+        if(!SupplierResponseList.isEmpty())
         {
-            response.Flag__c = !(response.Flag__c);
+            for(Response__c response :SupplierResponseList)
+        	{
+            	response.Flag__c = !(response.Flag__c);
+        	}	
+        	System.debug('Flag__c'+SupplierResponseList);
+        	update SupplierResponseList;
+            return SupplierResponseList;
         }
-        update SupplierResponseList;
-        return SupplierResponseList;
+        else
+        {
+            System.debug('Into else');
+			Response__c response = new Response__c();
+            response.Question__c = questionId;
+            response.Assessment__c = assessmentId;
+            response.Flag__c = True;
+            response.Is_Latest_Response__c = true;
+            INSERT response;
+            return (new List<Response__c>());
+        }
+        
     }
 
     /**
@@ -245,16 +271,28 @@ public with sharing class AssessmentController {
     @AuraEnabled
     public static void saveChatterResponse(String chatWrapperstring)// responseList,string assessmentId,string questionId)
     {
-        Map<String,String> chatMap = (Map<String,String>)JSON.deserializeUntyped(chatWrapperstring);
+        Map<String,Object> chatMap = (Map<String,Object>)JSON.deserializeUntyped(chatWrapperstring);
+        System.debug('chatMap'+chatMap);
         List<Response__c> responseRecords=[SELECT Conversation_History__c,createdDate	
                                             FROM Response__c 
-                                            WHERE Assessment__c =:chatMap.get('assessmentId')
-                                            AND Question__c=:chatMap.get('questionId')
+                                            WHERE Assessment__c =:(String)chatMap.get('assessmentId')
+                                            AND Question__c=:(String)chatMap.get('questionId')
                                             AND Is_Latest_Response__c=true 
                                           ];
+        
         if(!responseRecords.isEmpty()){
-            responseRecords[0].Conversation_History__c=chatMap.get('responseList');
+            responseRecords[0].Conversation_History__c=JSON.serialize(chatMap.get('responseList'));
             UPDATE responseRecords;
+        }
+        else
+        {
+            System.debug('into else');
+            Response__c response = new Response__c();
+            response.Question__c = (String)chatMap.get('questionId');
+            response.Assessment__c = (String)chatMap.get('assessmentId');
+            response.Conversation_History__c = JSON.serialize(chatMap.get('responseList'));
+            response.Is_Latest_Response__c = true;
+            INSERT response;
         }
         
     }
@@ -271,12 +309,12 @@ public with sharing class AssessmentController {
     @AuraEnabled
     public static void errorLogRecord(String errorLogWrapper)
     {
-        Map<String,String> errorLogMap = (Map<String,String>)JSON.deserializeUntyped(errorLogWrapper);
+        Map<String,Object> errorLogMap = (Map<String,Object>)JSON.deserializeUntyped(errorLogWrapper);
         ErrorTransactionLog__c errorRecord=new ErrorTransactionLog__c();
-        errorRecord.Class_Name__c=errorLogMap.get('className');
-        errorRecord.LWC_Component_Name__c=errorLogMap.get('componentName');
-        errorRecord.Method_Name__c=errorLogMap.get('methodName');
-        errorRecord.Error_Stack_Trace__c=errorLogMap.get('errorData');
+        errorRecord.Class_Name__c=(String)errorLogMap.get('className');
+        errorRecord.LWC_Component_Name__c=(String)errorLogMap.get('componentName');
+        errorRecord.Method_Name__c=(String)errorLogMap.get('methodName');
+        errorRecord.Error_Stack_Trace__c=(String)errorLogMap.get('errorData');
         INSERT errorRecord;
     }
     @AuraEnabled
@@ -297,34 +335,43 @@ public with sharing class AssessmentController {
     @AuraEnabled    
     public static List<sObject> uploadFile(String fileResp)
     {
-        Map<String,String> filemap = (Map<String,String>) JSON.deserializeUntyped(fileResp);
+        System.debug('uploadFile '+fileResp);
+        Map<String,Object> filemap = (Map<String,Object>) JSON.deserializeUntyped(fileResp);
+        System.debug('filemap '+filemap);
         try
         {
             String baseUrl = URL.getSalesforceBaseUrl().toExternalForm();
-            Blob file=EncodingUtil.base64Decode((String)(filemap.get('fileBlob')).split(',')[1]);
+            System.debug('Before blob');
+            String fileblob = (String)filemap.get('fileBlob');
+            Blob file=EncodingUtil.base64Decode(fileblob.split(',')[1]);
+            System.debug('After blob');
             ContentVersion cv=new ContentVersion();
             cv.VersionData=file;
-            cv.PathOnClient=filemap.get('name');
+            cv.PathOnClient=(String)filemap.get('name');
             INSERT cv;
             List<Response__c> srList = new List<Response__c>();
             List<ContentVersion> cvList=[SELECT Id, ContentDocumentId FROM ContentVersion WHERE Id=:cv.Id];
-            String ftype = (filemap.get('name')).substringAfter('.');
-            if(filemap.get('quesId')!=null)
+            String ftype = ((String)filemap.get('name')).substringAfter('.');
+            System.debug('filemap'+filemap.get('quesId'));
+            if((String)filemap.get('quesId')!=null)
             {
+                
                 srList = [SELECT Id,Files__c,Question__c 
                           FROM Response__c 
-                          WHERE Question__c =:filemap.get('quesId') AND Is_Latest_Response__c = true];
+                          WHERE Question__c =:(String)filemap.get('quesId') AND Is_Latest_Response__c = true];
+                System.debug('Into if'+srList);
                 String fileUrl = baseUrl+'/sfc/servlet.shepherd/document/download/'+cvList[0].ContentDocumentId+'?operationContext=S1';
-                String fileJson = '{"name":"'+filemap.get('name')+'","url":"'+fileUrl+'","type":"'+ftype+'"}';
+                String fileJson = '{"name":"'+(String)filemap.get('name')+'","url":"'+fileUrl+'","type":"'+ftype+'"}';
                 srList[0].Files__c = (srList[0].Files__c == null || srList[0].Files__c.trim().length() == 0 || srList[0].Files__c=='[]') ? '['+fileJson+']' : '['+fileJson+','+srList[0].Files__c.substring(1,srList[0].Files__c.length());
                 UPDATE srList;
             }
             else{
                 Response__c res=new Response__c();
-                res.Question__c=filemap.get('quesId');
-                res.Assessment__c=filemap.get('assessmentId');
+                res.Question__c=(String)filemap.get('quesId');
+                res.Assessment__c=(String)filemap.get('assessmentId');
+                System.debug('Into else');
                 String fileUrl = baseUrl+'/sfc/servlet.shepherd/document/download/'+cvList[0].ContentDocumentId+'?operationContext=S1';
-                string fileJson = '[{"name":"'+filemap.get('name')+'","url":"'+fileUrl+'","type":"'+ftype+'"}]';
+                string fileJson = '[{"name":"'+(String)filemap.get('name')+'","url":"'+fileUrl+'","type":"'+ftype+'"}]';
                 res.Files__c=fileJson;
                 srList.add(res);
                 INSERT srList;
@@ -579,21 +626,39 @@ public with sharing class AssessmentController {
         return [SELECT Id,Start_Date__c,Name FROM Assessment__c WHERE Account__c=:accountId ];
     }
 
+/* getSectionsRecCount method is used to get all the Sections count to particular Assessment Template */
+   @AuraEnabled
+    Public static Integer getSectionsRecCount(String templateId){
+        Integer totalRecsCount=0;
+        try{
+           List<Section__c> sectionList=[select Id  from Section__c where Assessment_Template__c =: templateId ];
+        //  List<Section__c> sectionList=safe.doQuery(query);
+          totalRecsCount=sectionList.size();
+        } catch(Exception e)
+        {
+            System.debug('Exception e=='+e.getmessage());
+        }
+        return totalRecsCount;
+    }
 
-/* getAssessmentSections method is used to get all the Sections related to particular Assessment Template */
+/* getTemplateSections method is used to get all the Sections related to particular Assessment Template */
   @AuraEnabled
-    Public static List<SectionWrapper> getAssessmentSections(String assessmenttemplateId){
+    Public static List<SectionWrapper> getTemplateSections(String templateId,Integer recslimit){
         List<SectionWrapper> sectionwraplist=new List<SectionWrapper>();
         try{
-         List<Assessment_Template__c> AssessmentList= [Select Status__c from Assessment_Template__c where ID=:assessmenttemplateId LIMIT 1];
+         List<Assessment_Template__c> AssessmentList= [Select Status__c from Assessment_Template__c where ID=:templateId LIMIT 1];
          Assessment_Template__c assessmenttemp=(AssessmentList.size()==1)?AssessmentList[0]:null;
-         List<Section__c> SectionList=  [select Id,Name,Parent_Section__c, Root_Section__c, Assessment_Template__c, Assessment_Template_Version__c, Section_Sequence_Number__c, Historical_Id__c, Cloned_Record_Id__c from Section__c where Assessment_Template__c=:assessmenttemplateId order by Section_Sequence_Number__c ASC];
-         for(Section__c sec:SectionList){
+            String query='select Id,Name,Parent_Section__c, Root_Section__c, Assessment_Template__c, Assessment_Template_Version__c,No_of_Questions__c, Section_Sequence_Number__c, Historical_Id__c, Cloned_Record_Id__c from Section__c where Assessment_Template__c = \'' + templateId + '\' order by Section_Sequence_Number__c ASC LIMIT '+recslimit;
+        // List<Section__c> SectionList=  [select Id,Name,Parent_Section__c, Root_Section__c, Assessment_Template__c, Assessment_Template_Version__c,No_of_Questions__c, Section_Sequence_Number__c, Historical_Id__c, Cloned_Record_Id__c from Section__c where Assessment_Template__c=:assessmenttemplateId order by Section_Sequence_Number__c ASC LIMIT +'recslimit'];
+       List<Section__c> SectionList=safe.doQuery(query);
+            for(Section__c sec:SectionList){
               SectionWrapper sectionwrap=new SectionWrapper();
               sectionwrap.name=sec.name;
+              sectionwrap.noofqustns=(Integer)sec.No_of_Questions__c;
+              sectionwrap.colfield2=(Integer)sec.No_of_Questions__c;
               sectionwrap.sequencenumber=sec.Section_Sequence_Number__c;
               sectionwrap.assessmenttemplateId=sec.Assessment_Template__c;
-              sectionwrap.sectionId=sec.Id;
+              sectionwrap.recId=sec.Id;
               if(assessmenttemp!=null ){
                   if(assessmenttemp.Status__c=='New')
               sectionwrap.assessmentstatus=true;
@@ -619,11 +684,12 @@ public with sharing class AssessmentController {
                                           Assessment_Template__c,(select Flag__c from Responses__r) from Question__c where Assessment_Template__c =:templateId];
       for(Question__c question:questionList){
            QuestionWrapper questionwrapper = new QuestionWrapper();
-           questionwrapper.questionId=question.Id;
+           questionwrapper.recId=question.Id;
+           questionwrapper.colfield2=question.name;
            questionwrapper.assessmentTemplateId=question.Assessment_Template__c;
            questionwrapper.sectionId=question.Section__c;
-           questionwrapper.question=question.Question__c;
-       questionListWrapper.add(questionwrapper);
+           questionwrapper.name=question.Question__c;
+           questionListWrapper.add(questionwrapper);
       }
          }
         catch(Exception e)
@@ -707,11 +773,13 @@ public with sharing class AssessmentController {
  
     public class QuestionWrapper{
         @AuraEnabled
-        public Id questionId{get;set;}
+        public Id recId{get;set;}
+        @AuraEnabled
+        public String name{get;set;}
+        @AuraEnabled
+        public String colfield2{get;set;}
         @AuraEnabled
         public String question{get;set;}
-        @AuraEnabled
-        public String Name{get;set;}
           @AuraEnabled
         public String sectionId{get;set;}
          @AuraEnabled
@@ -749,7 +817,11 @@ public with sharing class AssessmentController {
     } 
       public class SectionWrapper{
          @AuraEnabled
-        public Id sectionId{get;set;}
+        public Id recId{get;set;}
+         @AuraEnabled
+        public Integer colfield2{get;set;}
+           @AuraEnabled
+        public Integer noofqustns{get;set;}
          @AuraEnabled
         public Id assessmenttemplateId{get;set;}
         @AuraEnabled
