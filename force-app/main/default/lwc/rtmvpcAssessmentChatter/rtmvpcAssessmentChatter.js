@@ -46,10 +46,13 @@ export default class RtmvpcAssessmentChatter extends LightningElement {
                if (typeof this.recordid != 'undefined') {
                   for (let i = 0; i < this.newResponse.length; i++) {
                      if (this.newResponse[i].accountType == 'customer') {
+                        console.log('hhhh');
                         this.newResponse[i].recipientType = 'cad-cd-customer';
                      }
                      else {
+                         console.log('hhhhfff');
                         this.newResponse[i].recipientType = 'cad-cd-supplier';
+                        console.log('hhhhfff',this.newResponse[i].recipientType);
                      }
                   }
                }
@@ -127,7 +130,35 @@ export default class RtmvpcAssessmentChatter extends LightningElement {
          this.responseMap.Text = this.newChat;
          this.responseMap.Name = this.userName;
          console.log('this.recordid', this.recordid);
+
+         if (typeof this.recordid != 'undefined') {
+                  for (let i = 0; i < this.newResponse.length; i++) {
+                     if (this.newResponse[i].accountType == 'customer') {
+                        console.log('hhhh');
+                        this.newResponse[i].recipientType = 'cad-cd-customer';
+                     }
+                     else {
+                         console.log('hhhhfff');
+                        this.newResponse[i].recipientType = 'cad-cd-supplier';
+                        console.log('hhhhfff',this.newResponse[i].recipientType);
+                     }
+                  }
+               }
+               else {
+                  for (let i = 0; i < this.newResponse.length; i++) {
+                     if (this.newResponse[i].accountType == 'customer') {
+                        this.newResponse[i].recipientType = 'cad-ad-customer';
+                     }
+                     else {
+                        this.newResponse[i].recipientType = 'cad-ad-supplier';
+                     }
+                  }
+               }
+
+
+
          if (this.recordid != null || typeof this.recordid != 'undefined') {
+            
             console.log('this.accountType',this.accountType);
             this.responseMap.accountType = 'customer';
             if (this.accountType == 'vendor') {
@@ -136,6 +167,7 @@ export default class RtmvpcAssessmentChatter extends LightningElement {
             else if (this.accountType == 'supplier') {
                this.responseMap.recipientType = 'cad-cd-supplier';
             }
+         
          }
          else {
             this.responseMap.accountType = 'supplier';
@@ -147,6 +179,8 @@ export default class RtmvpcAssessmentChatter extends LightningElement {
             }
 
          }
+
+         
          console.log('Hello i am at 145');
 
          this.newResponse.push(this.responseMap);
