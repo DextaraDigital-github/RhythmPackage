@@ -11,6 +11,6 @@
     <summaryForeignKey>AccountAssessmentRelation__c.Assessment__c</summaryForeignKey>
     <summaryOperation>count</summaryOperation>
     <trackHistory>false</trackHistory>
-    <trackTrending>false</trackTrending>
+    <trackTrending>false</trackTrending>  
     <type>Summary</type>
 </CustomField>

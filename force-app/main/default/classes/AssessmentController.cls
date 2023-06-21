@@ -116,7 +116,7 @@ public with sharing class AssessmentController {
     {
         List<Assessment__c> AssessmentRecords= [SELECT Name,Target_Completion_Date__c,Status__c,
                                                 Additional_Requests__c,Customer_Review__c,Number_of_Questions__c,
-                                                Number_of_Suppliers_responded_back__c,Start_Date__c,End_Date__c,CreatedDate
+                                                Start_Date__c,End_Date__c,CreatedDate
                                                 FROM Assessment__c LIMIT 100];
         return AssessmentRecords;
     }
@@ -167,7 +167,7 @@ public with sharing class AssessmentController {
     {
         System.debug('accountId'+accountId);
         List<SObject> assessmentData = [SELECT Id, IsDeleted, Name,Account__c,Assessment__c, Assessment__r.name ,Assessment__r.Status__c,Assessment__r.Customer_Review__c,Assessment__r.Number_of_Questions__c,
-                                        Assessment__r.Number_of_Suppliers_responded_back__c,Assessment__r.Additional_Requests__c,Number_of_Questions__c, Number_of_Responses__c 
+                                        Assessment__r.Additional_Requests__c,Number_of_Questions__c, Number_of_Responses__c 
                                         FROM AccountAssessmentRelation__c 
                                         WHERE Account__c=:accountId];
         System.debug('assessmentData'+assessmentData);
@@ -655,7 +655,7 @@ public with sharing class AssessmentController {
               sectionwrap.name=sec.name;
               sectionwrap.sequencenumber=sec.Section_Sequence_Number__c;
               sectionwrap.assessmenttemplateId=sec.Assessment_Template__c;
-              sectionwrap.recId=sec.Id;
+              //sectionwrap.recId=sec.Id;
               if(assessmenttemp!=null ){
                   if(assessmenttemp.Status__c=='New')
               sectionwrap.assessmentstatus=true;
