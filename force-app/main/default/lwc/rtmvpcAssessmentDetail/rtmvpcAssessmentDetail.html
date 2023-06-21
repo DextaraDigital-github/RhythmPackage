@@ -101,12 +101,25 @@
 									onchange={handleChange}>
 								</lightning-combobox>
 								-->
-								<lightning-button-menu icon-name="utility:download" menu-alignment="right"
-									menu-size="medium" alternative-text="Export" variant="label-hidden" title="Export"
-									style="top:-3px;">
-									<lightning-menu-item label="PDF" title="PDF" value="PDF" onclick={handleExportPDF}>
+								<template if:true={isRecordPage}>
+									<template if:true={showExpand}>
+								<lightning-button-icon icon-name="utility:expand_all" variant="bare" onclick={handleAccordian} data-id="[ + ]"
+									alternative-text="Close window">
+								</lightning-button-icon></template>
+								<template if:false={showExpand}>
+								<lightning-button-icon icon-name="utility:collapse_all" variant="bare" data-id="[ - ]" onclick={handleAccordian}
+									alternative-text="Close window">
+								</lightning-button-icon></template>
+								</template>
+								
+								
+								<lightning-button-menu icon-name="utility:download" data-id={assessmentid}
+									menu-alignment="right" menu-size="medium" alternative-text="Export"
+									variant="label-hidden" title="Export" style="top:-3px;">
+									<lightning-menu-item data-id={assessmentid} label="PDF" title="PDF" value="PDF" onclick={handleExportPDF}>
 									</lightning-menu-item>
-									<lightning-menu-item label="CSV" title="CSV" value="CSV" onclick={handleExportCSV}>
+									<lightning-menu-item data-id={assessmentid} label="CSV" title="CSV" value="CSV"
+										onclick={handleExportCSV}>
 									</lightning-menu-item>
 									<!-- <lightning-menu-item label="Excel" title="Excel" value="Excel"></lightning-menu-item> -->
 								</lightning-button-menu>
@@ -121,15 +134,18 @@
 							 ++ If Searc enabled use below Class "class="cad-sec_bodyfull2"" insted of  "class="cad-sec_bodyfull1"" ++ 
 						 -->
 						<div class="cad-sec_bodyfull1">
-							<div class="cad-sec_vcontainer2_2" style="height:calc(100% - 0px)"> <!--  style="height:calc(100% - 42px)" -->
+							<div class="cad-sec_vcontainer2_2" style="height:calc(100% - 0px)">
+								<!--  style="height:calc(100% - 42px)" -->
 								<div class="slds-scrollable_y" style="max-height:calc(100% - 40px);">
 									<div class="slds-text-align_center slds-text-heading_large">
 										<!-- <strong>Assessment Component Placeholder</strong>
 											<h1>calling tabular report questionnaire</h1> -->
 										<template if:true={showSections}>
-											<c-Questionnaire vendor={accountid} assessment={assessmentid} object-api-name={objectApiName}
-											record-id={recordId}
-												onselectconversation={chatHistory} onshowsummary={showsummaryHandler}>
+											<c-Questionnaire vendor={accountid} assessment={assessmentid}
+												object-api-name={objectApiName} record-id={recordId}
+												onselectconversation={chatHistory} onshowsummary={showsummaryHandler}
+												onexpandcollapse={handleExpandCollapse}
+												ontimelinehandle={handleTimeLine}>
 											</c-Questionnaire>
 										</template>
 										<template if:false={showSections}>
@@ -187,13 +203,13 @@
 							</div>
 						</div>
 						<template if:true={showconverstion}>
-						<div class="cad-sec_vcontainer2bdr">
-							<div class="slds-scrollable_y">
-								<!-- to show apply or remove class "cadshowright" -->
-								
+							<div class="cad-sec_vcontainer2bdr">
+								<div class="slds-scrollable_y">
+									<!-- to show apply or remove class "cadshowright" -->
+
+								</div>
 							</div>
-						</div>
-						
+
 							<div class="cad-sec_vcontainer3 slds-border_top slds-p-around_small">
 								<lightning-textarea placeholder="Type your response here..." variant="label-hidden"
 									disabled="true" onchange={chatChangeHandler}>
@@ -204,10 +220,11 @@
 						</template>
 
 						<template if:true={showData}>
-							<c-rtmvpc-assessment-chatter chattermap={showChat} onchatconversation={handleChat} recordid={customerId}>
+							<c-rtmvpc-assessment-chatter chattermap={showChat} onchatconversation={handleChat}
+								recordid={customerId}>
 							</c-rtmvpc-assessment-chatter>
 						</template>
-						
+
 					</div>
 				</div>
 			</div>

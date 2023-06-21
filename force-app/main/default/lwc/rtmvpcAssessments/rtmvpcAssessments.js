@@ -9,8 +9,8 @@ export default class RtmvpcAssessments extends LightningElement {
 @api parentId='0017i00001QBzehAAD';
 //@track parentId;
 @track recList= [];
-@track accId='0017i00001QBzehAAD';
-//@track accId;
+//@track accId='0017i00001QBzehAAD';
+@track accId;
 @track pageSize = 15;
 @track showgrid= false;
 @track showsurvey = false;
@@ -23,8 +23,8 @@ export default class RtmvpcAssessments extends LightningElement {
         { label: 'Assessment Status', fieldName: 'Rhythm__Status__c'},
         { label: '#Additional Requests',fieldName:'Rhythm__Additional_Requests__c'},
         { label: 'Customer Review Status', fieldName: 'Rhythm__Customer_Review__c'},
-        { label: '# Number of Questions', fieldName:'Rhythm__Number_of_Questions__c'},
-        { label: '# Number of Responses', fieldName:'Rhythm__Number_of_Suppliers_responded_back__c'}
+        // { label: '# Number of Questions', fieldName:'Rhythm__Number_of_Questions__c'},
+        // { label: '# Number of Responses', fieldName:'Rhythm__Number_of_Suppliers_responded_back__c'}
         ];
 
     connectedCallback(){
@@ -32,16 +32,16 @@ export default class RtmvpcAssessments extends LightningElement {
         for (let i = 0; i < this.tablefieldList.length; i++) {
             this.fieldsList.push(this.objName + '.' + this.tablefieldList[i].fieldName);
         }
-        getAssessmentJunctionRecords({ accountId: this.accId}).then(result=>{
-              this.recList = result;
-              console.log('result',result);
-            this.showgrid=true;
-         });
-    //      getAccountId({}).then((result) => {
+        // getAssessmentJunctionRecords({ accountId: this.accId}).then(result=>{
+        //       this.recList = result;
+        //       console.log('result',result);
+        //     this.showgrid=true;
+        //  });
+         getAccountId({}).then((result) => {
 
-    //      this.accId = result;
-    //      this.fetchingRecords();
-    //   });    
+         this.accId = result;
+         this.fetchingRecords();
+      });    
         
     }
     fetchingRecords()

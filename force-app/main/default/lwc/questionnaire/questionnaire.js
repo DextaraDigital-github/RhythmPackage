@@ -63,11 +63,11 @@ export default class Questionnaire extends LightningElement {
     @track accordionQuestionFlag = false;
     @track showspinner;
     sectionidslist = [];
-    @track buttonlabel = 'Expand all';
+    @track buttonlabel = '[ + ]';
     assessmentStatus;
     @api objectApiName;
     @track isAccountAssessment;
-
+    @track isSupplier;
 
     //Used /* handleAccordionSection is used to handle opening and closing of a disclosure */
     handleAccordionSection() {
@@ -80,21 +80,45 @@ export default class Questionnaire extends LightningElement {
             this.showAccordion = 'slds-accordion__section slds-is-close';
         }
     }
-    closeAccordionSection(event) {
-        console.log(this.buttonlabel);
-        if (this.buttonlabel == 'collapse all') {
+    @api
+    handleCollapseExpand(accordianId) {
+        console.log(accordianId);
+        if (accordianId == '[ - ]') {
             for (var i = 0; i < this.sectionidslist.length; i++) {
 
                 this.template.querySelector('[data-accordian="' + this.sectionidslist[i] + '"]').classList = 'slds-accordion__section slds-is-close';
             }
-            this.buttonlabel = 'Expand all';
+            accordianId = '[ + ]';
         }
-        else if (this.buttonlabel == 'Expand all') {
+        else if (accordianId == '[ + ]') {
             for (var i = 0; i < this.sectionidslist.length; i++) {
 
                 this.template.querySelector('[data-accordian="' + this.sectionidslist[i] + '"]').classList = 'slds-accordion__section slds-is-open';
             }
-            this.buttonlabel = 'collapse all';
+            accordianId = '[ - ]';
+        }
+            const selectedEvent = new CustomEvent('expandcollapse', {
+                detail: accordianId
+            });
+            // Dispatches the event.
+            this.dispatchEvent(selectedEvent);
+
+    }
+    closeAccordionSection(event) {
+        console.log(this.buttonlabel);
+        if (this.buttonlabel == '[ - ]') {
+            for (var i = 0; i < this.sectionidslist.length; i++) {
+
+                this.template.querySelector('[data-accordian="' + this.sectionidslist[i] + '"]').classList = 'slds-accordion__section slds-is-close';
+            }
+            this.buttonlabel = '[ + ]';
+        }
+        else if (this.buttonlabel == '[ + ]') {
+            for (var i = 0; i < this.sectionidslist.length; i++) {
+
+                this.template.querySelector('[data-accordian="' + this.sectionidslist[i] + '"]').classList = 'slds-accordion__section slds-is-open';
+            }
+            this.buttonlabel = '[ - ]';
         }
 
     }
@@ -112,6 +136,7 @@ export default class Questionnaire extends LightningElement {
             // this.showAccordionQuestions = 'slds-accordion__section slds-is-close';
         }
     }
+    
 
     //Used /* Connectedcallback is used to get data on onload */
     connectedCallback() {
@@ -133,6 +158,7 @@ export default class Questionnaire extends LightningElement {
             console.log('this.recordId in Questionnaire', this.recordId);
         }
         if (this.isTemplate) {
+            this.isSupplier = false;
             if (this.objectApiName == 'Rhythm__AccountAssessmentRelation__c') {
                this.isAccountAssessment = true;
                console.log('this.objectApiName',this.objectApiName);
@@ -142,6 +168,7 @@ export default class Questionnaire extends LightningElement {
                     if (typeof result[0].Rhythm__Assessment__r != 'undefined' && typeof result[0].Rhythm__Assessment__r.Rhythm__Template__c);
                     {
                         var assessmentJunctionId = result[0].Rhythm__Assessment__r.Id;
+                        this.assessment = result[0].Rhythm__Assessment__r.Id;
                         var assessmentTemplateId = result[0].Rhythm__Assessment__r.Rhythm__Template__c;
                         getQuestionsList({ templateId: assessmentTemplateId }).then(result => {
                             var resultMap = result;
@@ -286,7 +313,8 @@ export default class Questionnaire extends LightningElement {
             }
         }
         else {
-            getSurveyValues({}).then(result => {
+            this.isSupplier = true;
+            
                 /*This method is used to get all the assessments records*/
                 console.log('this.assessment', this.assessment);
                 getSupplierAssessmentList({ assessmentId: this.assessment }).then(result => {
@@ -380,9 +408,7 @@ export default class Questionnaire extends LightningElement {
                     console.log('Error' + error);
                 });
                 this.showspinner = false;
-            }).catch(error => {
-                console.log('Error' + error);
-            })
+            
         }
     }
     /**
@@ -393,20 +419,18 @@ export default class Questionnaire extends LightningElement {
     constructQuestionsAndAnswers(questionsList) {
         var duplicatequestionList = questionsList;
         this.questionsAndAnswerss = [];
-
+       
         for (var i = 0; i < questionsList.length; i++) {
-            questionsList[i].numberOfQuestions = questionsList[i].questions.length;
+            
             if ((questionsList.length > this.sectionLimits) || questionsList.length <= this.sectionLimits) {
                 for (var j = 0; j < questionsList[i].questions.length; j++) {
-                    questionsList[i].numberOfQuestions = questionsList[i].numberOfQuestions + questionsList[i].questions[j].Children.length;
-                    console.log('this.childQuestionList', this.childQuestionList);
-                    console.log('questionsList[i].questions[j].Id)', questionsList[i].questions[j].Id);
-                    console.log(this.childQuestionList.includes(questionsList[i].questions[j].Id));
+                    //questionsList[i].numberOfQuestions = questionsList[i].numberOfQuestions + questionsList[i].questions[j].Children.length;
                     if ((this.childQuestionList.includes(questionsList[i].questions[j].Id))) {
                         const deletedQues = questionsList[i].questions.splice(j, 1);
                         console.log('deletedQues', deletedQues);
                     }
                 }
+                questionsList[i].numberOfQuestions = questionsList[i].questions.length;
                 this.questionsAndAnswerss.push(questionsList[i]);
             }
         }
@@ -429,11 +453,11 @@ export default class Questionnaire extends LightningElement {
                         }
                         if (typeof questionsList[i].questions[j].Children != 'undefined') {
                             //
-                            for (var k = 0; k < questionsList[i].questions[j].Children.length; k++) {
-                                if (typeof questionsList[i].questions[j].Children.value != 'undefined') {
-                                    numberOfResponses++;
-                                }
-                            }
+                            // for (var k = 0; k < questionsList[i].questions[j].Children.length; k++) {
+                            //     if (typeof questionsList[i].questions[j].Children.value != 'undefined') {
+                            //         numberOfResponses++;
+                            //     }
+                            // }
                         }
                         if (duplicatequestionList[i].questions[j].Rhythm__Flag__c == true) {
                             displayFlag++;
@@ -515,8 +539,14 @@ export default class Questionnaire extends LightningElement {
 
         }
         console.log('responseId' + responseId);
+        var filemap={};
+        filemap.responseId = responseId;
+        filemap.fileBlob = this.fileResponseData.filedata;
+        filemap.name = this.fileResponseData.name;
+        filemap.quesId = this.fileResponseData.questionId;
+        filemap.assessmentId = this.assessment;
         /*Apex method is used to store the uploaded attachments into response records */
-        uploadFile({ resId: responseId, fileBlob: this.fileResponseData.filedata, name: this.fileResponseData.name, quesId: this.fileResponseData.questionId, assessmentId: this.assessment }).then(result => {
+        uploadFile({ fileResp: JSON.stringify(filemap)}).then(result => {
             this.template.querySelectorAll('c-rtmvpc-render-question-template')[0].getShowUploadStatus();
 
             console.log('this.questionsAndAnswerss', this.questionsAndAnswerss);
@@ -646,9 +676,8 @@ export default class Questionnaire extends LightningElement {
                     }
                     if (typeof this.questionsAndAnswerss[i].questions[j].Files__c != 'undefined') {
                         filesmap[this.questionsAndAnswerss[i].questions[j].Id] = this.questionsAndAnswerss[i].questions[j].Files__c;
-
                     }
-                }
+                
                 if (this.questionsAndAnswerss[i].questions[j].isEmail == true && !(this.questionsAndAnswerss[i].questions[j].value.match(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/))) {
                     isAssessmentValidated = true;
                     this.showspinner = false;
@@ -676,7 +705,10 @@ export default class Questionnaire extends LightningElement {
                     }
                 }
             }
+            }
         }
+
+        console.log('hello');
         console.log('conversationhistory>>', conversationhistory);
         for (const seckey of this.responseMap.keys()) {
             var reponse = { 'sobjectType': 'Rhythm__Response__c' };
@@ -735,8 +767,18 @@ export default class Questionnaire extends LightningElement {
             this.success = true;
 
             console.log('responseList', responseList);
+            var responseQueryMap={};
+            responseQueryMap.assesmentId = this.assessment;
+            if(isSubmit)
+            {
+                responseQueryMap.assesmentId = 'Submitted';
+            }
+            else
+            {
+                responseQueryMap.status = 'Draft';
+            }
             /* This method is used to create the response for the questions*/
-            createSupplierResponse({ suppResponseList: responseList, vendorId: this.vendor, assesmentId: this.assessment, isSubmit: isSubmit }).then(result => {
+            createSupplierResponse({ suppResponseList: responseList, paramMap: JSON.stringify(responseQueryMap) }).then(result => {
 
                 console.log('sucessfully created Response result==>', result);
                 this.totastmessage = 'Responses saved successfully';
@@ -761,8 +803,11 @@ export default class Questionnaire extends LightningElement {
             }).catch(error => {
                 console.log('Error' + error);
                 this.totastmessage = 'Error : ' + JSON.stringify(error);
-            })
-
+            });
+            const selectedEvent = new CustomEvent('timelinehandle', {
+            detail: 'true'});
+        // Dispatches the event.
+        this.dispatchEvent(selectedEvent);
         }
         // else {
         //     this.showspinner = false;
@@ -812,6 +857,7 @@ export default class Questionnaire extends LightningElement {
         quTemp.labelId = qu.Id + '_labelId';
         quTemp.spanId = qu.Id + '_spanId';
         quTemp.customerFlag = false;
+        quTemp.Rhythm__Flag__c = false;
         quTemp.parentQuestionId = qu.Rhythm__Parent_Question__c;
         if (this.objectApiName == 'Rhythm__AccountAssessmentRelation__c' || !this.isTemplate) {
             if (typeof savedResp.get(qu.Id) != 'undefined' && typeof savedResp.get(qu.Id).value != 'undefined') {
@@ -914,10 +960,7 @@ export default class Questionnaire extends LightningElement {
                 this.questionMap.set(qu.Rhythm__Section__r.Name, quesList);
             }
             console.log('this.questionMap', this.questionMap);
-            if(this.objectApiName=='Rhythm__AccountAssessmentRelation__c')
-            {
-                quTemp.Rhythm__Flag__c = false;
-            }
+            
             return quTemp;
         }
 
@@ -1021,8 +1064,21 @@ export default class Questionnaire extends LightningElement {
     //Used /* handlechatHistory is used to dispatch the event to the parent component (rtmvpcAssessmentDetail) */
     handlechatHistory(event) {
         this.showChat = event.detail;
+        console.log('this.showChat',this.showChat);
+        console.log('this.assessment',this.assessment);
         this.showChat.assesmentId = this.assessment;
-
+        console.log('this.showChat',this.showChat);
+        for(var i=0;i<this.questionsAndAnswerss.length;i++)
+        {
+            for(var j=0;j<this.questionsAndAnswerss[i].questions.length;j++)
+            {
+                if(this.questionsAndAnswerss[i].questions[j].Id==this.showChat.questionId)
+                {
+                    console.log('Into if');
+                    this.questionsAndAnswerss[i].questions[j].Rhythm__Flag__c=this.showChat.responseflag;
+                }
+            }
+        }
         console.log('chat', this.showChat);
         const selectedChat = new CustomEvent('selectconversation', {
             detail: this.showChat
