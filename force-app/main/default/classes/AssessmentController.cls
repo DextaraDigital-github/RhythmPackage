@@ -116,7 +116,7 @@ public with sharing class AssessmentController {
     {
         List<Assessment__c> AssessmentRecords= [SELECT Name,Target_Completion_Date__c,Status__c,
                                                 Additional_Requests__c,Customer_Review__c,Number_of_Questions__c,
-                                                Start_Date__c,End_Date__c,CreatedDate,CreatedUser__c
+                                                Number_of_Suppliers_responded_back__c,Start_Date__c,End_Date__c,CreatedDate
                                                 FROM Assessment__c LIMIT 100];
         return AssessmentRecords;
     }
@@ -167,8 +167,7 @@ public with sharing class AssessmentController {
     {
         System.debug('accountId'+accountId);
         List<SObject> assessmentData = [SELECT Id, IsDeleted, Name,Account__c,Assessment__c, Assessment__r.name ,Assessment__r.Status__c,Assessment__r.Customer_Review__c,Assessment__r.Number_of_Questions__c,
-                                        Assessment__r.Additional_Requests__c,Number_of_Questions__c, Number_of_Responses__c,
-                                        Assessment__r.CreatedBy.Name
+                                        Assessment__r.Number_of_Suppliers_responded_back__c,Assessment__r.Additional_Requests__c,Number_of_Questions__c, Number_of_Responses__c 
                                         FROM AccountAssessmentRelation__c 
                                         WHERE Account__c=:accountId];
         System.debug('assessmentData'+assessmentData);
@@ -654,8 +653,6 @@ public with sharing class AssessmentController {
             for(Section__c sec:SectionList){
               SectionWrapper sectionwrap=new SectionWrapper();
               sectionwrap.name=sec.name;
-              sectionwrap.noofqustns=(Integer)sec.No_of_Questions__c;
-              sectionwrap.colfield2=(Integer)sec.No_of_Questions__c;
               sectionwrap.sequencenumber=sec.Section_Sequence_Number__c;
               sectionwrap.assessmenttemplateId=sec.Assessment_Template__c;
               sectionwrap.recId=sec.Id;
@@ -684,8 +681,7 @@ public with sharing class AssessmentController {
                                           Assessment_Template__c,(select Flag__c from Responses__r) from Question__c where Assessment_Template__c =:templateId];
       for(Question__c question:questionList){
            QuestionWrapper questionwrapper = new QuestionWrapper();
-           questionwrapper.recId=question.Id;
-           questionwrapper.colfield2=question.name;
+           questionwrapper.questionId=question.Id;
            questionwrapper.assessmentTemplateId=question.Assessment_Template__c;
            questionwrapper.sectionId=question.Section__c;
            questionwrapper.name=question.Question__c;
@@ -773,13 +769,11 @@ public with sharing class AssessmentController {
  
     public class QuestionWrapper{
         @AuraEnabled
-        public Id recId{get;set;}
-        @AuraEnabled
-        public String name{get;set;}
-        @AuraEnabled
-        public String colfield2{get;set;}
+        public Id questionId{get;set;}
         @AuraEnabled
         public String question{get;set;}
+        @AuraEnabled
+        public String Name{get;set;}
           @AuraEnabled
         public String sectionId{get;set;}
          @AuraEnabled
@@ -817,11 +811,7 @@ public with sharing class AssessmentController {
     } 
       public class SectionWrapper{
          @AuraEnabled
-        public Id recId{get;set;}
-         @AuraEnabled
-        public Integer colfield2{get;set;}
-           @AuraEnabled
-        public Integer noofqustns{get;set;}
+        public Id sectionId{get;set;}
          @AuraEnabled
         public Id assessmenttemplateId{get;set;}
         @AuraEnabled

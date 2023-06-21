@@ -12,6 +12,7 @@
 				<template if:true={showgrid}>
 					<c-custom-table   obj-name='Rhythm__Assessment__c' rel-name='Rhythm__Assessments__r' object-record-data={recList} 
 						def-page-size={pageSize} col-list={tablefieldList} show-progress-bar="true" show-survey="true" onrowclick={openSurveyHandler}></c-custom-table>
+						
 				</template>
 				<template if:true={showsurvey}>
 					<c-rtmvpc-Assessment-Detail></c-rtmvpc-Assessment-Detail>

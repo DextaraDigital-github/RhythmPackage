@@ -159,12 +159,12 @@
     <enableSharing>true</enableSharing>
     <enableStreamingApi>true</enableStreamingApi>
     <externalSharingModel>ControlledByParent</externalSharingModel>
-    <label>AccountAssessmentRelation</label>
+    <label>Response</label>
     <nameField>
         <label>Name</label>
         <type>Text</type>
     </nameField>
-    <pluralLabel>AccountAssessmentRelation</pluralLabel>
+    <pluralLabel>Response</pluralLabel>
     <searchLayouts></searchLayouts>
     <sharingModel>ControlledByParent</sharingModel>
     <visibility>Public</visibility>
