@@ -85,11 +85,13 @@ public with sharing class AssessmentController {
         	UPSERT suppResponseList;
         } 
         
-        List<AccountAssessmentRelation__c> assessment=[SELECT Id,Name,Status__c,Assessment__c,Account__c
+        List<AccountAssessmentRelation__c> assessment=[SELECT Id,Status__c
                                         FROM AccountAssessmentRelation__c 
                                         WHERE Assessment__c=:(Id)queryMap.get('assesmentId') AND Account__c=:(Id)queryMap.get('accountId')];
-        if(assessment.isEmpty()){
+        System.debug(assessment.isEmpty());
+        if(!assessment.isEmpty()){
             assessment[0].Status__c =(string)queryMap.get('status');
+            System.debug('mmm'+assessment[0].Status__c );
             UPDATE assessment;
         }
         
@@ -104,7 +106,7 @@ public with sharing class AssessmentController {
     public static List<Sobject> getAssessmentStatus(String assessmentId)
     {
         List<Sobject> assessmentstatus =[SELECT Id, IsDeleted, ParentId, CreatedById, CreatedDate, Field, DataType, OldValue, NewValue  
-                                         FROM Assessment__History 
+                                         FROM AccountAssessmentRelation__History  
                                          WHERE ParentId=:assessmentId AND Field ='Rhythm__Status__c' order by createdDate desc ];
         return assessmentstatus;
     }
@@ -125,10 +127,10 @@ public with sharing class AssessmentController {
     public static List<Object> getAccountAssesmentRecords(String accountId, String assessmentId)
     {
         List<Sobject> accountassessment = [SELECT Id, IsDeleted, Name,Account__c,Assessment__c, Assessment__r.name ,
-                                            Assessment__r.Status__c,Assessment__r.Customer_Review__c,
-                                            Assessment__r.Number_of_Questions__c,
+                                            Assessment__r.Status__c,Assessment__r.Customer_Review__c,CreatedDate,
+                                            Assessment__r.Number_of_Questions__c,Status__c,Start_Date__c,End_Date__c,
                                             Assessment__r.Additional_Requests__c,Number_of_Questions__c,Assessment__r.CreatedDate,
-                                            Assessment__r.Template__c, Number_of_Responses__c,Assessment__r.CreatedBy.Name
+                                            Assessment__r.Template__c, Number_of_Responses__c,Assessment__r.CreatedBy.Name,Assessment__r.CreatedUser__c
                                             FROM AccountAssessmentRelation__c Where Account__c=:accountId AND Assessment__c=:assessmentId];
         return accountassessment;
     }
@@ -194,8 +196,8 @@ public with sharing class AssessmentController {
     public static List<Sobject> getAccountAssessmentRecordData(String assrecordId)
     {
         List<Sobject> accountassessment = [SELECT Id, IsDeleted, Name,Account__c,Assessment__c, Assessment__r.name ,
-                                            Assessment__r.Status__c,Assessment__r.Customer_Review__c,
-                                            Assessment__r.Number_of_Questions__c,
+                                            Assessment__r.Status__c,Assessment__r.Customer_Review__c,CreatedDate,
+                                            Assessment__r.Number_of_Questions__c,Start_Date__c,End_Date__c,Status__c,
                                             Assessment__r.Additional_Requests__c,Number_of_Questions__c,Assessment__r.CreatedDate,
                                             Assessment__r.Template__c, Number_of_Responses__c,Assessment__r.CreatedBy.Name
                                             FROM AccountAssessmentRelation__c 
@@ -401,22 +403,31 @@ public with sharing class AssessmentController {
      * @param searchKey userinput for the search.
     */
     @AuraEnabled(cacheable=true)
-    public static List<Account> getAllSuppliers(string searchKey){
+    public static List<Account> getAllSuppliers(string existingData,string searchKey){
+        system.debug('existingData-------->'+existingData);
         List<Account> supplierList = new List<Account>();
         string query = '';
         try{
+            set<Id> existingSups = new set<Id>();
+            if(string.isNotBlank(existingData)){
+                existingSups = (set<Id>) JSON.deserialize(existingData, set<Id>.class);
+            }
             query = 'SELECT Id,Name FROM Account';
             if(string.isBlank(searchKey)){
                 query = query+' Order By CreatedDate DESC limit 10';
             }else{
                 string sKey = '\'%'+searchKey+'%\'';
-                query = query+' WHERE Name LIKE '+sKey +' Order By CreatedDate DESC LIMIT 50000';
+                query = query+' WHERE Name LIKE '+sKey;
+                if(existingSups.isEmpty() == false){
+                    query = query+ ' OR Id IN :existingSups';
+                }
             }
+            system.debug('query---->'+query);
         }catch(exception e){
             String errorMsg = e.getMessage();
             throw new AuraHandledException(ErrorMsg);
         }
-        return safe.doQuery(query);
+        return Database.query(query);
     }
 
 
@@ -428,7 +439,7 @@ public with sharing class AssessmentController {
     */
 
     @AuraEnabled
-    public static ResultWrapper sendAssessment(sObject assessmentRecord,string operationType, string suppliers,string deleteList){
+    public static ResultWrapper sendAssessment(sObject assessmentRecord,string operationType, string suppliers,string existingSups, string deleteList){
         ResultWrapper resWrap = new ResultWrapper();
         try{
             string assessmentId = '';
@@ -439,10 +450,24 @@ public with sharing class AssessmentController {
             system.debug('assessmentRecord------>'+assessmentRecord);
             assessmentId = assessmentRecord.Id;
             system.debug('assessmentId------>'+assessmentId);
+            set<string> suppliersList = new set<string>();
+            set<string> deleteSupList = new set<string>();
+            set<string> existingSupList = new set<string>();
+            set<string> suppliersIds = new set<string>();
+            if(string.isNotBlank(suppliers)){
+                suppliersList = (set<string>) JSON.deserialize(suppliers, set<string>.class);
+            }
+            if(string.isNotBlank(existingSups)){
+                existingSupList = (set<string>) JSON.deserialize(existingSups, set<string>.class);
+            }
+            for(string newSupId:suppliersList){
+                if(!existingSupList.contains(newSupId)){
+                    suppliersIds.add(newSupId);
+                }
+            }
             if(string.isNotBlank(deleteList)){
-                List<string> deleteSupList = (List<string>) JSON.deserialize(deleteList, List<string>.class);
+                deleteSupList = (set<string>) JSON.deserialize(deleteList, set<string>.class);
                 system.debug('deleteSupList------>'+deleteSupList);
-                
                 List<AccountAssessmentRelation__c> deleteAccAssRelns = new List<AccountAssessmentRelation__c>();
                 for(AccountAssessmentRelation__c assReln:[SELECT Id FROM AccountAssessmentRelation__c WHERE Rhythm__Account__c IN:deleteSupList]){
                     deleteAccAssRelns.add(assReln);
@@ -456,11 +481,7 @@ public with sharing class AssessmentController {
             }
             List<AccountAssessmentRelation__c> accountAssessRelnsList = new List<AccountAssessmentRelation__c>();
             List<Assessment_Supplier__c> assessSupList = new List<Assessment_Supplier__c>();
-            List<string> suppliersList = (List<string>) JSON.deserialize(suppliers, List<string>.class);
-            set<string> suppliersIds = new set<string>();
-            for(string sId:suppliersList){
-                suppliersIds.add(sId);
-            }
+            
             for(Account acc:[SELECT Id,Name FROM Account WHERE ID IN:suppliersIds]){
                 Assessment_Supplier__c assessSup = new Assessment_Supplier__c();
                 assessSup.Account__c = acc.Id;
@@ -633,6 +654,53 @@ public with sharing class AssessmentController {
         return safe.doQuery(query);
     }
 
+    /**
+     * It is used to search the existing suppliers for assessment.
+     * @param assesmentId assessment record id
+     * @param searchKey user input to search supplier
+    */
+    @AuraEnabled(cacheable=true)
+    public static List<AccountAssessmentRelation__c> getExistingSuppliersWithSearch(string assessmentId, string searchKey){
+        string query = 'SELECT Id,Account__c,Account__r.Name FROM AccountAssessmentRelation__c WHERE Assessment__c = \'' + assessmentId + '\'';
+        if(string.isNotBlank(searchKey)){
+            string sKey = '\'%'+searchKey+'%\'';
+            query = query+' AND Account__r.Name LIKE '+sKey;
+        }else{
+            query = query+' LIMIT 10';
+        }
+        return safe.doQuery(query);
+    }
+
+    @AuraEnabled
+    public static ResultWrapper deleteAssessment(string assessmentId){
+        ResultWrapper resWrap = new ResultWrapper();
+        try{
+            List<Assessment__c> deleteAssmtsList = new List<Assessment__c>();
+            for(Assessment__c assmt:[SELECT Id FROM Assessment__c WHERE Id =:assessmentId]){
+                deleteAssmtsList.add(assmt);
+            }
+            List<Database.DeleteResult> deleteResult = safe.doDelete(deleteAssmtsList);
+            List<String> errorList = SecurityCheckController.safeClassExceptionHandlerDelete(deleteResult);
+            resWrap.isSuccess = true;
+            resWrap.message = '';
+            resWrap.errorCode = '';
+            if(errorList.size()>0){
+                resWrap.isSuccess = false;
+                resWrap.message = '';
+                resWrap.errorCode = '';
+                Database.rollback(sp);
+                throw new SecurityControllerException(String.join( errorList, ', ' ));
+            }
+        }catch(exception e){
+            String errorMsg = e.getMessage();
+            resWrap.isSuccess = false;
+            resWrap.message = e.getMessage();
+            resWrap.errorCode = '';
+            throw new AuraHandledException(ErrorMsg);
+        }
+        return resWrap;
+    }
+
     @AuraEnabled(cacheable=true)
     public static List<Assessment__c> getAssessmentRecordData(string accountId){
         return [SELECT Id,Start_Date__c,Name FROM Assessment__c WHERE Account__c=:accountId ];
@@ -791,22 +859,6 @@ public with sharing class AssessmentController {
                 System.debug('Exception '+e);
             }
         } 
-    }
-     /**
-     * It is used to search the existing suppliers for assessment.
-     * @param assesmentId assessment record id
-     * @param searchKey user input to search supplier
-    */
-    @AuraEnabled(cacheable=true)
-    public static List<AccountAssessmentRelation__c> getExistingSuppliersWithSearch(string assessmentId, string searchKey){
-        string query = 'SELECT Id,Account__c,Account__r.Name FROM AccountAssessmentRelation__c WHERE Assessment__c = \'' + assessmentId + '\'';
-        if(string.isNotBlank(searchKey)){
-            string sKey = '\'%'+searchKey+'%\'';
-            query = query+' AND Account__r.Name LIKE:sKey';
-        }else{
-            query = query+' LIMIT 10';
-        }
-        return safe.doQuery(query);
     }
     
     /**

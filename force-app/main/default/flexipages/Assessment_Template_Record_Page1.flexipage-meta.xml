@@ -81,7 +81,7 @@
         <name>detailTabContent</name>
         <type>Facet</type>
     </flexiPageRegions>
-    <flexiPageRegions>
+    <!--<flexiPageRegions>
         <itemInstances>
             <componentInstance>
                 <componentInstanceProperties>
@@ -95,7 +95,8 @@
         <name>Facet-6f5467bd-4022-4240-9a80-6c859f5e30d7</name>
         <type>Facet</type>
     </flexiPageRegions>
-    <flexiPageRegions>
+    -->
+    <!--<flexiPageRegions>
         <itemInstances>
             <componentInstance>
                 <componentName>questionTablePlatform</componentName>
@@ -105,6 +106,7 @@
         <name>Facet-35jg5omirkj</name>
         <type>Facet</type>
     </flexiPageRegions>
+    -->
     <flexiPageRegions>
         <itemInstances>
             <componentInstance>
@@ -143,7 +145,7 @@
                 <identifier>detailTab</identifier>
             </componentInstance>
         </itemInstances>
-        <itemInstances>
+        <!--<itemInstances>
             <componentInstance>
                 <componentInstanceProperties>
                     <name>active</name>
@@ -161,7 +163,8 @@
                 <identifier>flexipage_tab2</identifier>
             </componentInstance>
         </itemInstances>
-        <itemInstances>
+        -->
+        <!--<itemInstances>
             <componentInstance>
                 <componentInstanceProperties>
                     <name>body</name>
@@ -175,6 +178,7 @@
                 <identifier>flexipage_tab3</identifier>
             </componentInstance>
         </itemInstances>
+        -->
         <itemInstances>
             <componentInstance>
                 <componentInstanceProperties>

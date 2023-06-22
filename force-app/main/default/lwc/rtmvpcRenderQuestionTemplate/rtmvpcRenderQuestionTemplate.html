@@ -327,7 +327,8 @@
 							</div>
 							<div class="slds-col slds-size_12-of-12">
 								<div class="slds-grid slds-wrap">
-									<div class="slds-col slds-size_12-of-12">
+									<div class="slds-col slds-size_12-of-12"  data-id={questionary.Id}
+										key={questionary.Id} onclick={openChatHandler}>
 										<span class="slds-form-element__labelttnor">
 										<!-- Question & Mandatory Starts here -->
 											<template if:true={questionary.required}>
@@ -993,13 +994,13 @@
 												<template for:each={questionary.Files__c} for:item="file">
 													<div class="slds-m-right_small slds-m-vertical_small cad-tnailcard2"
 														key={file}>
-
-														<div class="slds-m-horizontal_small slds-m-top_small cad-tnailcard2inner"
+														<div class="slds-grid slds-wrap">
+														<div class="slds-col slds-m-left_x-small slds-m-vertical_xx-small" style="width:0px"
 															key={file} title="Click to Download">
 
 															<template if:true={file.isPng}>
 																<a href={file.url}>
-																	<lightning-icon icon-name="doctype:image">
+																	<lightning-icon icon-name="doctype:image" size="small">
 																	</lightning-icon>
 																</a>
 																<template if:true={issupplier}>
@@ -1013,7 +1014,7 @@
 															</template>
 															<template if:true={file.isPdf}>
 																<a href={file.url}>
-																	<lightning-icon icon-name="doctype:pdf">
+																	<lightning-icon icon-name="doctype:pdf" size="small">
 																	</lightning-icon>
 																</a>
 																<template if:true={issupplier}>
@@ -1027,7 +1028,7 @@
 															</template>
 															<template if:true={file.isDocx}>
 																<a href={file.url}>
-																	<lightning-icon icon-name="doctype:word">
+																	<lightning-icon icon-name="doctype:word" size="small">
 																	</lightning-icon>
 																</a>
 																<template if:true={issupplier}>
@@ -1041,7 +1042,7 @@
 															</template>
 															<template if:true={file.isCsv}>
 																<a href={file.url}>
-																	<lightning-icon icon-name="doctype:csv">
+																	<lightning-icon icon-name="doctype:csv" size="small">
 																	</lightning-icon>
 																</a>
 																<template if:true={issupplier}>
@@ -1055,8 +1056,7 @@
 															</template>
 
 														</div>
-														<div style=" overflow:hidden;">
-															<center>
+														<div class="slds-col" style="overflow:hidden; width:100px;">
 																<a href={file.url}>
 																	<div class="slds-m-around_x-small"
 																		style="font-size:12px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;"
@@ -1064,7 +1064,7 @@
 																		{file.name}
 																	</div>
 																</a>
-															</center>
+														</div>
 														</div>
 													</div>
 												</template>

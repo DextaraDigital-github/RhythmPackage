@@ -69,6 +69,7 @@ export default class Questionnaire extends LightningElement {
     @api accid;
     @track isAccountAssessment;
     @track isSupplier;
+    @api accountAssessmentStatus;
 
     //Used /* handleAccordionSection is used to handle opening and closing of a disclosure */
     handleAccordionSection() {
@@ -371,7 +372,7 @@ export default class Questionnaire extends LightningElement {
                             this.showButtons.Summary = false;
                             this.showButtons.Section_Navigation.show = false;
                             this.showButtons.Save_Submit = false;
-                            if (supplierAssessment.Rhythm__Status__c === 'Submitted') {
+                            if (this.accountAssessmentStatus === 'Submitted') {
                                 this.showButtons.Summary = true;
                             }
                             else {
@@ -752,7 +753,7 @@ export default class Questionnaire extends LightningElement {
             responseList.push(reponse);
         }
         console.log('this.requiredQuestionList', this.requiredQuestionList);
-        if (this.requiredQuestionList.length > 0) {
+        if (this.requiredQuestionList.length > 0 && isSubmit) {
             isAssessmentValidated = true;
             this.showspinner = false;
             this.showToast = true;
@@ -772,13 +773,20 @@ export default class Questionnaire extends LightningElement {
             responseQueryMap.assesmentId = this.assessment;
             if(isSubmit)
             {
-                responseQueryMap.assesmentId = 'Submitted';
+                responseQueryMap.status = 'Submitted';
             }
             else
             {
-                responseQueryMap.status = 'Draft';
+                responseQueryMap.status = 'In progress';
             }
-
+            if(isSubmit)
+            {
+                responseQueryMap.submit = true;
+            }
+            else
+            {
+                responseQueryMap.submit = false;
+            }
             console.log('this.accid',this.accid);
             /* This method is used to create the response for the questions*/
             createSupplierResponse({ suppResponseList: responseList, paramMap: JSON.stringify(responseQueryMap) }).then(result => {
@@ -807,10 +815,10 @@ export default class Questionnaire extends LightningElement {
                 console.log('Error' + error);
                 this.totastmessage = 'Error : ' + JSON.stringify(error);
             });
-            const selectedEvent = new CustomEvent('timelinehandle', {
-            detail: 'true'});
-        // Dispatches the event.
-        this.dispatchEvent(selectedEvent);
+        //     const selectedEvent = new CustomEvent('timelinehandle', {
+        //     detail: 'true'});
+        // // Dispatches the event.
+        // this.dispatchEvent(selectedEvent);
         }
         // else {
         //     this.showspinner = false;
@@ -843,7 +851,7 @@ export default class Questionnaire extends LightningElement {
         //quTemp.sectionId = this.section;
         quTemp.isText = ('Text' == qtype);
         quTemp.isPercent = ('Percent' == qtype);
-        quTemp.isRadio = ('Radio Select' == qtype);
+        quTemp.isRadio = ('Radio' == qtype);
         quTemp.isPicklist = ('Picklist' == qtype);
         quTemp.isMultiPicklist = ('Picklist (Multi-Select)' == qtype);
         quTemp.isDate = ('Date' == qtype);
@@ -867,7 +875,7 @@ export default class Questionnaire extends LightningElement {
                 quTemp.Rhythm__Flag__c = savedResp.get(qu.Id).Flag__c;
 
             }
-            if(this.objectApiName=='Rhythm__AccountAssessmentRelation__c')
+            if(this.objectApiName=='Rhythm__AccountAssessmentRelation__c' && this.assessmentStatus=='Submitted')
             {
                 quTemp.customerFlag = true;
             }   

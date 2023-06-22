@@ -19,7 +19,7 @@ export default class RtmvpcAssessments extends LightningElement {
 @track objName='Rhythm__Assessment__c';
 @api tablefieldList =  [
         { label: 'Assessment Name', fieldName: 'Name' },
-        { label: 'Target Completion Date', fieldName: 'Rhythm__Target_Completion_Date__c',type:'date' },
+        { label: 'Target Completion Date', fieldName: 'Rhythm__End_Date__c',type:'date' },
         { label: 'Assessment Status', fieldName: 'Rhythm__Status__c'},
         { label: '#Additional Requests',fieldName:'Rhythm__Additional_Requests__c'},
         { label: 'Customer Review Status', fieldName: 'Rhythm__Customer_Review__c'},
