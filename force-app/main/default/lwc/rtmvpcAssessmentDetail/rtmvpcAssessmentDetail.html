@@ -129,10 +129,10 @@
 						<!-- <div class="cad-serch">
 							<input type="text" placeholder="Search" class="cad-serch-input" onkeyup={searchInputChangeHandler}/>
 							</div>
-						 -->
+							-->
 						<!--
-							 ++ If Searc enabled use below Class "class="cad-sec_bodyfull2"" insted of  "class="cad-sec_bodyfull1"" ++ 
-						 -->
+								++ If Searc enabled use below Class "class="cad-sec_bodyfull2"" insted of  "class="cad-sec_bodyfull1"" ++ 
+							-->
 						<div class="cad-sec_bodyfull1">
 							<div class="cad-sec_vcontainer2_2" style="height:calc(100% - 0px)">
 								<!--  style="height:calc(100% - 42px)" -->
@@ -141,20 +141,20 @@
 										<!-- <strong>Assessment Component Placeholder</strong>
 											<h1>calling tabular report questionnaire</h1> -->
 										<template if:true={showSections}>
+											<template if:true={accountAssessmentStatus}>
 											<c-Questionnaire vendor={accountid} assessment={assessmentid}
-												object-api-name={objectApiName} record-id={recordId}
+												object-api-name={objectApiName} record-id={recordId} accid={assaccId}
 												onselectconversation={chatHistory} onshowsummary={showsummaryHandler}
+												account-assessment-status={accountAssessmentStatus}
 												onexpandcollapse={handleExpandCollapse}
 												ontimelinehandle={handleTimeLine}>
 											</c-Questionnaire>
+											</template>
 										</template>
-										<template if:false={showSections}>
-											<!-- <h1>Section Id {sectionId}</h1> -->
-
-										</template>
+										
 										<!-- <template if:false={showFlag}>
 												
-											    <c-rtmvpc-render-question-template onselectchange={chatHistory}></c-rtmvpc-render-question-template>
+												<c-rtmvpc-render-question-template onselectchange={chatHistory}></c-rtmvpc-render-question-template>
 											</template> -->
 									</div>
 								</div>
@@ -244,5 +244,5 @@
 				</div>
 			</div>
 		</div>
-	 -->
+		-->
 </template>

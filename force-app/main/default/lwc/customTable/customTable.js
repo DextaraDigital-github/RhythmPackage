@@ -55,6 +55,7 @@ export default class CustomTable extends LightningElement {
     @api recId;
     @api recordType;
     @api objName;
+    @api accountid;
     @api relName;
     @api colList;
     @api isCustomDetailPage;
@@ -374,9 +375,9 @@ export default class CustomTable extends LightningElement {
                             recJson.fieldName = colList[j].fieldName;
                             recJson.label = colList[j].label;
                             if (colList[j].type === 'date' ) {
-                                if(typeof relatedListRecords[i].Rhythm__Assessment__r.Rhythm__Target_Completion_Date__c!='undefined')
+                                if(typeof relatedListRecords[i].Rhythm__End_Date__c!='undefined')
                                 {
-                                    var x = relatedListRecords[i].Rhythm__Assessment__r.Rhythm__Target_Completion_Date__c.split('T')[0];
+                                    var x = relatedListRecords[i].Rhythm__End_Date__c.split('T')[0];
                                     // recJson.value = x.split('-')[2] + '-' + x.split('-')[1] + '-' + x.split('-')[0];
                                     var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
                                     recJson.value = months[Number(x.split('-')[1]) - 1] + '-' + x.split('-')[2] + '-' + x.split('-')[0];
@@ -384,10 +385,19 @@ export default class CustomTable extends LightningElement {
                                 
                             }
                             else {
-                                if(typeof relatedListRecords[i].Rhythm__Assessment__r[colList[j].fieldName]!='undefined')
+                                
+                                if(typeof relatedListRecords[i][colList[j].fieldName]!='undefined' && colList[j].fieldName!='Name')
                                 {
-                                    recJson.value = relatedListRecords[i].Rhythm__Assessment__r[colList[j].fieldName];
+                                    recJson.value = relatedListRecords[i][colList[j].fieldName];
                                 }
+                                else if(colList[j].fieldName=='Name')
+                                {
+                                if(typeof relatedListRecords[i].Rhythm__Assessment__r['Name']!='undefined')
+                                {
+                                    recJson.value = relatedListRecords[i].Rhythm__Assessment__r['Name'];
+                                }
+                                }
+                                
                                 
                             }
                             //Project 'Completed' 'In progress' 'On Hold' 'Open' 'Overdue' null
@@ -417,8 +427,8 @@ export default class CustomTable extends LightningElement {
                             }
 
                             if (colList[j].fieldName === 'Rhythm__Status__c') {
-                                if(typeof relatedListRecords[i].Rhythm__Assessment__r.Rhythm__Status__c!='undefined')
-                                if (relatedListRecords[i].Rhythm__Assessment__r.Rhythm__Status__c === 'Submitted') {
+                                if(typeof relatedListRecords[i].Rhythm__Status__c!='undefined')
+                                if (relatedListRecords[i].Rhythm__Status__c === 'Submitted') {
                                     recJson.surveySymbol = 'utility:lock';
                                 }
                                 else {
@@ -799,7 +809,7 @@ export default class CustomTable extends LightningElement {
                 this.viewColList = this.colList;
                 //this.recList = this.assignData(this.relatedListRecords, this.colList);
                 this.recList = this.assignData(currentPageRecords, this.viewColList);
-
+                this.accountsId = this.accountid;
                 this.allRecordsList = this.recList;
                 console.log('this.recList',this.recList);
                 console.log('this.allRecordsList',this.allRecordsList);

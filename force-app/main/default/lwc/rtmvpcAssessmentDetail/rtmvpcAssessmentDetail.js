@@ -7,7 +7,7 @@
 import { LightningElement, track, api } from 'lwc';
 import getAssessmentStatus from '@salesforce/apex/AssessmentController.getAssessmentStatus';
 import getAccountAssessmentRecordData from '@salesforce/apex/AssessmentController.getAccountAssessmentRecordData';
-import getAssesmentRecords from '@salesforce/apex/AssessmentController.getAssesmentRecords';
+import getAccountAssesmentRecords from '@salesforce/apex/AssessmentController.getAccountAssesmentRecords';
 import getUserName from '@salesforce/apex/AssessmentController.getUserName';
 import errorLogRecord from '@salesforce/apex/AssessmentController.errorLogRecord';
 import getQuestionsList from '@salesforce/apex/AssessmentController.getQuestionsList'; //To fetch all the Questions from the Assessment_Template__c Id from the Supplier_Assessment__c record
@@ -38,11 +38,17 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
     @track isRecordPage;
     @track showExpand=true;
      @track finalSection;
+     @track assaccId;
+     @track accountassessmentrelId;
+     @track accountAssessmentStatus;
 
     @track savedResponseMap = new Map();
     connectedCallback() {
         this.customerId = this.recordId;
         this.showconverstion = true;
+       
+        console.log('accountid',this.accountid);
+        this.assaccId = this.accountid;
         /* To get the username */
         
         this.showSections = true;
@@ -69,15 +75,22 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
             if(this.recordId==null || typeof this.recordId=='undefined')
             {
                 console.log('getUserName result',result);
-                getAssesmentRecords({}).then(result => {
+                getAccountAssesmentRecords({accountId:this.assaccId, assessmentId:this.assessmentid}).then(result => {
                     console.log('handleTimeLine',result);
                 for (var j = 0; j < result.length; j++) {
-                    if (result[j].Id == this.assessmentid) {
+                    if (result[j].Rhythm__Assessment__c == this.assessmentid) {
+                        
+                        console.log('result[j]',result[j]);
+                        this.accountassessmentrelId = result[j].Id;
+                        if(typeof result[j].Rhythm__Status__c!='undefined')
+                        {
+                        this.accountAssessmentStatus = result[j].Rhythm__Status__c;
                         this.statusassessment = result[j].Rhythm__Status__c;
-                        if (this.statusassessment == 'Submitted' || this.statusassessment == 'Open' || this.statusassessment == 'Completed' || this.statusassessment == 'Closed') {
+                        if (this.accountAssessmentStatus == 'Submitted' || this.accountAssessmentStatus == 'Open' || this.accountAssessmentStatus == 'Completed' || this.accountAssessmentStatus == 'Closed') {
                             this.showstatus = true;
                         }
-                        this.assessmentName = result[j].Name;
+                        }
+                        this.assessmentName = result[j].Rhythm__Assessment__r.Name;
                         if (typeof result[j].Rhythm__Start_Date__c != 'undefined') {
                             var statustrack = {};
                             var dateformat = result[j].Rhythm__Start_Date__c;
@@ -85,11 +98,13 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
                             statustrack['date'] = dateformats + ' ' + '00:00:00';
                             statustrack['status'] = 'Start Date';
                             statustrack['classlist'] = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_default';
-                            statustrack['name'] = result[j].Rhythm__CreatedUser__c;
+                            statustrack['name'] = result[j].Rhythm__Assessment__r.Rhythm__CreatedUser__c;
                             this.assessmentTimeline.push(statustrack);
                         }
                         else {
                             var statustrack = {};
+                            if(typeof result[j].CreatedDate!='undefined')
+                            {
                             var date = result[j].CreatedDate.split('T');
                             var time = date[1].split('.');
                             var dateformat = date[0];
@@ -97,8 +112,9 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
                             statustrack['date'] = dateformats + ' ' + time[0];
                             statustrack['status'] = 'Start Date';
                             statustrack['classlist'] = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_default';
-                            statustrack['name'] =result[j].Rhythm__CreatedUser__c;
+                            statustrack['name'] =result[j].Rhythm__Assessment__r.Rhythm__CreatedUser__c;
                             this.assessmentTimeline.push(statustrack);
+                            }
                         }
                         if (typeof result[j].Rhythm__End_Date__c != 'undefined') {
                             var statustrack = {};
@@ -108,7 +124,7 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
                             this.endDate = statustrack['date'];
                             statustrack['status'] = 'End Date';
                             statustrack['classlist'] = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_default';
-                            statustrack['name'] = result[j].Rhythm__CreatedUser__c;
+                            statustrack['name'] = result[j].Rhythm__Assessment__r.Rhythm__CreatedUser__c;
                             this.assessmentTimeline.push(statustrack);
                         }
                         // if(typeof result[j].Rhythm__Status__c != 'undefined')
@@ -125,8 +141,10 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
                         // }
                     }
                 }
+                console.log('this.accountassessmentrelId',this.accountassessmentrelId);
                 /* To get the assessment tracking history to update on timeline*/
-                getAssessmentStatus({ assessmentId: this.assessmentid }).then(result => {
+                getAssessmentStatus({ assessmentId: this.accountassessmentrelId }).then(result => {
+                    console.log('accountassessmentrelId',result);
                     var assessmentStatus = result;
                     if (typeof result != 'undefined') {
                         var oldvaluelst = [];

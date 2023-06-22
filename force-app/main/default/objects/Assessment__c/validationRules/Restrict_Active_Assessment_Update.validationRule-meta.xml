@@ -4,4 +4,4 @@
     <active>true</active>
     <errorConditionFormula>IF(Number_of_Invited_Suppliers__c &gt; 0, true, false)</errorConditionFormula>
     <errorMessage>Assessment program in use, cannot be edited</errorMessage>
-</ValidationRule>
+</ValidationRule> 
