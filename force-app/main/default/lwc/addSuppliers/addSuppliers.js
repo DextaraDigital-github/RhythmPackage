@@ -7,8 +7,8 @@ export default class AddSuppliers extends LightningElement {
     @track supplierData;
     @api selectedSupplierData = [];
     @track values;
-    @track availableSuppliersCount = 'Available Suppliers(0)';
-    @track selectedSuppliersCount = 'Selected Suppliers(0)';
+    availableSuppliersCount = 'Available Suppliers(0)';
+    selectedSuppliersCount = 'Selected Suppliers(0)';
     searchKey = '';
     exSearchKey = '';
     @track latestSuppliers;
@@ -16,39 +16,20 @@ export default class AddSuppliers extends LightningElement {
     @api existingSuppList=[];
     hasRendered = true;
     @api recordId;
-    testVal;
 
-    get idValue(){
-        if(this.recordId != undefined && this.recordId.length>0){
-            this.testVal = this.recordId
-          }
-          return this.testVal;
-    }
-    @wire(getAllSuppliers,{searchKey:'$searchKey'})
-    suppliersList(result){
-        console.log('SLISt------>',this.idValue);
-        this.latestSuppliers = result;
-        if (result.data) {
-            let tempList = [];
-            console.log('SupplierData-------->',JSON.stringify(this.supplierData));
-            this.supplierData = JSON.parse(JSON.stringify(result.data));
-            for (let supRec of this.supplierData){
-                tempList.push({
-                    "label": supRec.Name,
-                    "value": supRec.Id
-                });
-            }
-            this.supplierData = tempList;
-            this.availableSuppliersCount = this.availableSuppliersCount.split('(')[0] + '(' + this.supplierData.length + ')';
-        }
-        else if (result.error) {
-            this.showNotification('Error',result.error.body.message,'error');
-            console.log('getAllSuppliers:Error------->',result.error);
+    get existingData(){
+        if(this.existingSuppList != undefined && this.existingSuppList.length>0){
+            console.log('inside---');
+            return JSON.stringify(this.existingSuppList);
+        }else{
+            return '';
         }
     }
+    
 
-    @wire(getExistingSuppliers, { assessmentId: '$idValue',searchKey:'$exSearchKey'})
+    @wire(getExistingSuppliers, { assessmentId: '$recordId',searchKey:'$exSearchKey'})
     existingSuppliers(result) {
+        console.log('callingexsuppliers-------->');
         this.latestExSuppliers = result;
         if (result.data) {
             let tempList=[];
@@ -59,15 +40,51 @@ export default class AddSuppliers extends LightningElement {
             if(tempList.length > 0){
                 this.existingSuppList = tempList;
                 this.values = [...this.existingSuppList];
+                this.selectedSuppliersCount = this.selectedSuppliersCount.split('(')[0] + '(' + this.existingSuppList.length + ')';
             }
         } else if (result.error) {
             console.log('eror---->',result.error);
         }
     }
 
+    @wire(getAllSuppliers,{existingData:'$existingData',searchKey:'$searchKey'})
+    suppliersList(result){
+        this.latestSuppliers = result;
+        if (result.data) {
+            let tempList = [];
+            console.log('SupplierData-------->',JSON.stringify(this.supplierData));
+            let retData = JSON.parse(JSON.stringify(result.data));
+            for (let supRec of retData){
+                tempList.push({
+                    "label": supRec.Name,
+                    "value": supRec.Id
+                });
+            }
+            this.supplierData = tempList;
+            if(this.supplierData.length > 0){
+                this.availableSuppliersCount = this.availableSuppliersCount.split('(')[0] + '(' + (this.supplierData.length - this.existingSuppList.length) + ')';
+            }
+            
+        }
+        else if (result.error) {
+            this.showNotification('Error',result.error.body.message,'error');
+            console.log('getAllSuppliers:Error------->',result.error);
+        }
+    }
+
     handleChange(event) {
         try{
             console.log('existingSupData-------->',JSON.stringify(this.existingSuppList));
+            console.log('EVENTDET-------->',JSON.stringify(event.detail));
+            console.log('values-------->',JSON.stringify(event.detail.value));
+            let delList = [];
+            let eventValues = event.detail.value;
+            for(let rec of this.existingSuppList){
+                if(eventValues.indexOf(rec) === -1){
+                    delList.push(rec);
+                }
+            }
+            console.log('delList-------->',JSON.stringify(delList));
             this.values = event.target.value;
             this.selectedSupplierData = [];
             for (var i = 0; i < this.supplierData.length; i++) {
@@ -79,7 +96,7 @@ export default class AddSuppliers extends LightningElement {
             this.availableSuppliersCount = this.availableSuppliersCount.split('(')[0] + '(' + (this.supplierData.length - selectedSupp) + ')';
             this.selectedSuppliersCount = this.selectedSuppliersCount.split('(')[0] + '(' + selectedSupp + ')';
             const custEvent = new CustomEvent('updatedsupliers', {
-                detail : {newSuppliers:[...this.values],existingSupps:[...this.existingSuppList]}
+                detail : {newSuppliers:[...this.values],existingSupps:[...this.existingSuppList],delList:[...delList]}
               })
             this.dispatchEvent(custEvent);
         }catch(error){
@@ -89,18 +106,21 @@ export default class AddSuppliers extends LightningElement {
 
     handleSearch(event){
         try{
-            let searchKey = event.target.value;
-            this.searchKey = searchKey;
-            refreshApex(this.latestSuppliers);
+            console.log('InTheNewSearch----->');
+            console.log('searchname----->',event.target.dataset.id);
+            this.searchKey = event.target.value;
+            //refreshApex(this.latestSuppliers);
         }catch(error){
             console.log('addSuppliers:handleSearch:error----->',error);
         }
     }
     handleExSearch(event){
         try{
+             console.log('searchname----->',event.target.dataset.id);
+            console.log('InTheExSearch----->');
             let searchKey = event.target.value;
             this.exSearchKey = searchKey;
-            refreshApex(this.latestExSuppliers);
+            //refreshApex(this.latestExSuppliers);
         }catch(error){
             console.log('addSuppliers:handleSearch:error----->',error);
         }

@@ -4,13 +4,13 @@
             <lightning-layout multiple-rows>
                 <lightning-layout-item size="6" padding="">
                     <div style="margin-right: 40px;">
-                        <lightning-input type="search" label="Search New Supplier" onchange={handleSearch}>
+                        <lightning-input type="search" data-id="newsearch" label="Search New Supplier" onchange={handleSearch}>
                         </lightning-input>
                     </div>
                 </lightning-layout-item>
                 <lightning-layout-item size="6" padding="">
                     <div style="margin-right: 40px;">
-                        <lightning-input type="search" label="Search Existing Supplier" onchange={handleExSearch}>
+                        <lightning-input type="search" data-id="exsearch" label="Search Existing Supplier" onchange={handleExSearch}>
                         </lightning-input>
                     </div>
                 </lightning-layout-item>

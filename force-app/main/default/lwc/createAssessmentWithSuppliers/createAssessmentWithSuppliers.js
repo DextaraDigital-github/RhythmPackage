@@ -1,4 +1,4 @@
-import { LightningElement,track,wire } from 'lwc';
+import { LightningElement,track,wire,api } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import addSuppliers from '@salesforce/apex/AssessmentController.sendAssessment';
@@ -12,7 +12,7 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
     @track suppliersList=[];
     modalHeading = 'New Assessment';
     assessmentId ='';
-    templateId = '';
+    @api templateId = '';
     dateValue;
     frequencyValue = 'One Time';
     isTempRO = false;
@@ -77,10 +77,14 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
             console.log('AddSuppliersMethod------->',JSON.stringify(this.suppliersList));
             console.log('assessmentRecord--------->',JSON.stringify(this.assessmentRecord));
             if(this.suppliersList.length > 0){
-                addSuppliers({assessmentRecord:this.assessmentRecord,operationType:'new',suppliers:JSON.stringify(this.suppliersList),deleteList:''})
+                addSuppliers({assessmentRecord:this.assessmentRecord,operationType:'new',suppliers:JSON.stringify(this.suppliersList),existingSups:'',deleteList:''})
                 .then(result => {
                     console.log('addSuppliers Result------->'+JSON.stringify(result));
                     if(result.isSuccess == true){
+                        let successEvent = new CustomEvent("success", {
+                        detail: {value:'refreshit'}
+                        });
+                        this.dispatchEvent(successEvent);
                         this.showModal = false;
                         this.assessmentId = result.recordId;
                         this.showNotification('Success','Assessment created and suppliers added successfully.','success');
