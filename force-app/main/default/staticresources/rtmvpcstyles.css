@@ -182,9 +182,9 @@
 	.slds-button--icon-more:active .slds-button__icon, .slds-button_icon-more:active .slds-button__icon,
 	.slds-button--icon-more:focus .slds-button__icon, .slds-button_icon-more:focus .slds-button__icon, 
 	.slds-button--icon-more:hover .slds-button__icon, .slds-button_icon-more:hover .slds-button__icon, 
-	.slds-button--icon-more:visited .slds-button__icon, .slds-button_icon-more:visited .slds-button__icon { color:var(--dbtn-icoh); background:var(--dbtn-bgh); }
+	.slds-button--icon-more:visited .slds-button__icon, .slds-button_icon-more:visited .slds-button__icon { color:var(--dbtn-icoh); }
 	.slds-button--icon-more:focus .slds-button__icon, .slds-button--icon-more:hover .slds-button__icon, .slds-button_icon-more:focus .slds-button__icon, .slds-button_icon-more:hover .slds-button__icon { fill:var(--dbtn-icoh); }
-	
+	 
 	.slds-icon-standard-budget { background:var(--sbtn-bg); }
 	.rtmvpc-layout { }
 	.rtmvpc-header { height:56px; position:fixed; box-shadow:0 2px 3px rgba(52,58,64,.06); z-index:99; border-bottom:1px solid rgba(0,0,0,0.19);
@@ -417,7 +417,9 @@
 	
 	.cib-sec_vcontainer3 textarea { height:60px; }
 	.cad-sec_vcontainer3 textarea { height:60px; }
-	
+
+	.cad-titlebutton_more .slds-button--icon-more, .cad-titlebutton_more .slds-button_icon-more { background-color:transparent!important; border-color:transparent!important; }
+
 	.cib-dis-no {display:none;}
 	.cib-dis-ib {display:inline-block;}
 	.cib-tasklist .cib-statusicons .cib-archive:hover .slds-button__icon {fill:#2d67c5;}
