@@ -68,6 +68,10 @@ jobs:
       - name: 'List All ORGS'
         run: sfdx force:org:list
         
+     # Authorizing Scratch Org
+      - name: 'Authorizing required scratch org'
+        run: sfdx force:auth:web:login --setalias TrialScratch --instanceurl https://efficiency-computing-6773-dev-ed.scratch.my.salesforce.com
+        
       # Check whether the scratch org is connected or not
       - name: 'Scratch Org Connection status'
         run: sfdx force:org:display -u ${{github.event.inputs.scratch-org_username}} --verbose --all
