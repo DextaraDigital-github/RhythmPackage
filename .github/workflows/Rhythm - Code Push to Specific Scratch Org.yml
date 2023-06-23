@@ -70,7 +70,7 @@ jobs:
         
       # Check whether the scratch org is connected or not
       - name: 'Scratch Org Connection status'
-        run: sfdx force:org:display -u ${{github.event.inputs.scratch-org_username}} --verbose
+        run: sfdx force:org:display -u ${{github.event.inputs.scratch-org_username}} --verbose --all
         
       # Code Push to Scratch org
       - name: 'code push'
