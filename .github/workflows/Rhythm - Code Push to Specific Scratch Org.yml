@@ -70,7 +70,7 @@ jobs:
         
      # Authorizing Scratch Org
       - name: 'Authorizing required scratch org'
-        run: sfdx force:auth:web:login --setalias TrialScratch --instanceurl https://efficiency-computing-6773-dev-ed.scratch.my.salesforce.com
+        run: sfdx force:auth:web:login --setalias TrialScratch --instanceurl https://drive-ruby-6425-dev-ed.scratch.my.salesforce.com
         
       # Check whether the scratch org is connected or not
       - name: 'Scratch Org Connection status'
