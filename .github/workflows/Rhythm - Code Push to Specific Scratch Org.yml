@@ -8,7 +8,7 @@ on:
     inputs:
      scratch-org_username: 
       #username to the scratch-org which needs to be created
-      default: 'scratchorgusername@gmail.com'
+      default: 'scratch-org'
       required: true
 
 # Jobs to be executed
@@ -64,10 +64,14 @@ jobs:
         working-directory: .github/jwt/
         run: sfdx auth:jwt:grant --clientid ${{ secrets.CONNECTED_APP_CONSUMER_KEY_DEVHUB }} --jwtkeyfile server.key --username ${{ secrets.HUB_ORG_USERNAME }} -d --instanceurl ${{ secrets.SFDC_HOST_LOGIN }}
         
-     # Run Salesforce CLI Scanner For Security checks _
+     # Run Salesforce CLI Scanner For Security checks
       - name: 'List All ORGS'
         run: sfdx force:org:list
         
+      # Check whether the scratch org is connected or not
+      - name: 'Scratch Org Connection status'
+        run: sfdx force:org:display -u ${{github.event.inputs.scratch-org_username}} --verbose
+        
       # Code Push to Scratch org
       - name: 'code push'
-        run: sfdx force:source:push --targetusername=${{github.event.inputs.scratch-org_username}} --wait 20
+        run: sfdx force:source:push --targetusername=${{github.event.inputs.scratch-org_username}} --wait 20 --loglevel debug
