@@ -445,14 +445,18 @@ export default class CustomTable extends LightningElement {
                                 //     recDetails.progressBarValue = (Number(relatedListRecords[i].fields['Number_of_Responses__c'].value) * 100 / Number(relatedListRecords[i].fields['Number_of_Questions__c'].value)) ? (Number(relatedListRecords[i].fields['Number_of_Responses__c'].value) * 100 / Number(relatedListRecords[i].fields['Number_of_Questions__c'].value)).toString().split('.')[0] : 0;
                                 // } else
                                 //     recDetails.progressBarValue = '0';
-                                if(typeof relatedListRecords[i].Rhythm__Assessment__r.Rhythm__Number_of_Questions__c!='undefined' &&
-                                typeof relatedListRecords[i].Rhythm__Assessment__r.Rhythm__Number_of_Suppliers_responded_back__c )
+                                // if(typeof relatedListRecords[i].Rhythm__Assessment__r.Rhythm__Number_of_Questions__c!='undefined' &&
+                                // typeof relatedListRecords[i].Rhythm__Assessment__r.Rhythm__Number_of_Suppliers_responded_back__c )
+                                // {
+                                //     recDetails.progressBarValue = ((Number(relatedListRecords[i].fields['Number_of_Responses__c'].value) * 100 / Number(relatedListRecords[i].fields['Number_of_Questions__c'].value)) ? (Number(relatedListRecords[i].fields['Number_of_Responses__c'].value) * 100 / Number(relatedListRecords[i].fields['Number_of_Questions__c'].value)).toString().split('.')[0] : 0);
+                                // }
+                                // else
+                                // {
+                                //     recDetails.progressBarValue = '0';
+                                // }
+                                if(typeof relatedListRecords[i].Rhythm__Completed__c!='undefined')
                                 {
-                                    recDetails.progressBarValue = ((Number(relatedListRecords[i].fields['Number_of_Responses__c'].value) * 100 / Number(relatedListRecords[i].fields['Number_of_Questions__c'].value)) ? (Number(relatedListRecords[i].fields['Number_of_Responses__c'].value) * 100 / Number(relatedListRecords[i].fields['Number_of_Questions__c'].value)).toString().split('.')[0] : 0);
-                                }
-                                else
-                                {
-                                    recDetails.progressBarValue = '0';
+                                    recDetails.progressBarValue=relatedListRecords[i].Rhythm__Completed__c;
                                 }
                                 console.log('Executed upto line 436 without error');
                             }

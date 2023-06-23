@@ -110,6 +110,9 @@ export default class RtmvpcAssessmentChatter extends LightningElement {
 
    /* handleRightButtonClick is used to save the newly typed message to the response record */
    handleRightButtonClick(event) {
+      console.log('this.newChat',this.newChat);
+      if(typeof this.newChat !='undefined' && this.newChat !='')
+      {
       this.responseWrapper.assessmentId = this.assessmentId;
       this.responseWrapper.questionId = this.questionId;
       /*This method is used to get conversation history between vendor and customer after firing the event */
@@ -208,6 +211,7 @@ export default class RtmvpcAssessmentChatter extends LightningElement {
          });
       });
 
+   }
    }
 
 }

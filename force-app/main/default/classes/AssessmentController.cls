@@ -65,8 +65,10 @@ public with sharing class AssessmentController {
     public static void createSupplierResponse(List<SObject> suppResponseList,String paramMap){
         Map<String,object> queryMap = (Map<String,Object>)JSON.deserializeUntyped(paramMap);
         List<Id> questionIds = new List<Id>();
+        Map<Id,SObject> suppResponseMap = new Map<Id,SObject>();
         for(SObject response:suppResponseList){
             questionIds.add((Id)response.get('Rhythm__Question__c'));
+            suppResponseMap.put((Id)response.get('Rhythm__Question__c'),response);
         }
         
         List<Response__c> existingResponses = new List<Response__c>();
@@ -74,27 +76,48 @@ public with sharing class AssessmentController {
         {
             existingResponses = [SELECT Id,Name,Question__c,Response__c,Files__c,Assessment__c,Flag__c,Is_Latest_Response__c 
                                     FROM Response__c 
-                                    WHERE Question__c IN:questionIds];  
+                                    WHERE Question__c IN:questionIds AND Is_Latest_Response__c = true];  
         }
         for(Response__c resp :existingResponses)
         {
+            ((Response__c)suppResponseMap.get(resp.Question__c)).Files__c = resp.Files__c;
             resp.Is_Latest_Response__c = false;
         }
-        suppResponseList.addAll(existingResponses);
-        if(!suppResponseList.isEmpty()){
-        	UPSERT suppResponseList;
+        System.debug('suppResponseList'+suppResponseList);
+        System.debug('existingResponses'+existingResponses);
+        //suppResponseList.addAll(existingResponses);
+        if(!suppResponseMap.values().isEmpty()){
+        	INSERT suppResponseMap.values();
         } 
-        
-        List<AccountAssessmentRelation__c> assessment=[SELECT Id,Status__c
-                                        FROM AccountAssessmentRelation__c 
-                                        WHERE Assessment__c=:(Id)queryMap.get('assesmentId') AND Account__c=:(Id)queryMap.get('accountId')];
-        System.debug(assessment.isEmpty());
-        if(!assessment.isEmpty()){
-            assessment[0].Status__c =(string)queryMap.get('status');
-            System.debug('mmm'+assessment[0].Status__c );
-            UPDATE assessment;
+        if(!existingResponses.isEmpty())
+        {
+            UPDATE existingResponses;
         }
         
+        
+        List<AccountAssessmentRelation__c> assessment=[SELECT Id,Name,Status__c,Assessment__c,Account__c
+                                        FROM AccountAssessmentRelation__c 
+                                        WHERE Assessment__c=:(Id)queryMap.get('assesmentId') AND Account__c=:(Id)queryMap.get('accountId')];
+        if(!assessment.isEmpty()){
+            assessment[0].Status__c =(string)queryMap.get('status');
+             UPDATE assessment;
+        }
+        
+    }
+
+    @AuraEnabled
+    public static List<Sobject> updateAccountAssessmentStatus(String paramMap)
+    {
+        Map<String,object> queryMap = (Map<String,Object>)JSON.deserializeUntyped(paramMap);
+        List<AccountAssessmentRelation__c> accountAssessment = [SELECT Id,Name,Status__c,Assessment__c,Account__c
+                                                               FROM AccountAssessmentRelation__c
+                                                               WHERE Id=:(String)queryMap.get('recId')];
+        for(AccountAssessmentRelation__c assessment : accountAssessment)
+        {
+            assessment.Status__c = (String)queryMap.get('assessmentStatus');
+        }
+        UPDATE accountAssessment;
+        return accountAssessment;
     }
  
     
@@ -150,7 +173,7 @@ public with sharing class AssessmentController {
         List<Response__c> responseRecords=[SELECT Conversation_History__c,createdDate 
                                             FROM Response__c 
                                             WHERE Assessment__c =:(String)responseMap.get('assessmentId') AND Question__c=:(String)responseMap.get('questionId') 
-                                            ];
+                                           AND Is_Latest_Response__c=true ];
         System.debug('responseRecords'+responseRecords);
         return responseRecords;
     }
@@ -182,7 +205,7 @@ public with sharing class AssessmentController {
         System.debug('accountId'+accountId);
         List<SObject> assessmentData = [SELECT Id, IsDeleted, Name,Account__c,Assessment__c, Assessment__r.name ,Assessment__r.Status__c,Assessment__r.Customer_Review__c,Assessment__r.Number_of_Questions__c,
                                         Assessment__r.Additional_Requests__c,Number_of_Questions__c, Number_of_Responses__c,
-                                        Assessment__r.CreatedBy.Name
+                                        Assessment__r.CreatedBy.Name,Status__c,End_Date__c,Completed__c
                                         FROM AccountAssessmentRelation__c 
                                         WHERE Account__c=:accountId];
         System.debug('assessmentData'+assessmentData);
@@ -352,6 +375,7 @@ public with sharing class AssessmentController {
         System.debug('uploadFile '+fileResp);
         Map<String,Object> filemap = (Map<String,Object>) JSON.deserializeUntyped(fileResp);
         System.debug('filemap '+filemap);
+        System.debug(filemap.get('quesId'));
         try
         {
             String baseUrl = URL.getSalesforceBaseUrl().toExternalForm();
@@ -374,22 +398,26 @@ public with sharing class AssessmentController {
                           FROM Response__c 
                           WHERE Question__c =:(String)filemap.get('quesId') AND Is_Latest_Response__c = true];
                 System.debug('Into if'+srList);
-                String fileUrl = baseUrl+'/sfc/servlet.shepherd/document/download/'+cvList[0].ContentDocumentId+'?operationContext=S1';
-                String fileJson = '{"name":"'+(String)filemap.get('name')+'","url":"'+fileUrl+'","type":"'+ftype+'"}';
-                srList[0].Files__c = (srList[0].Files__c == null || srList[0].Files__c.trim().length() == 0 || srList[0].Files__c=='[]') ? '['+fileJson+']' : '['+fileJson+','+srList[0].Files__c.substring(1,srList[0].Files__c.length());
-                UPDATE srList;
+                if(!srList.isEmpty() ){
+                    String fileUrl = baseUrl+'/sfc/servlet.shepherd/document/download/'+cvList[0].ContentDocumentId+'?operationContext=S1';
+                    String fileJson = '{"name":"'+(String)filemap.get('name')+'","url":"'+fileUrl+'","type":"'+ftype+'"}';
+                    srList[0].Files__c = (srList[0].Files__c == null || srList[0].Files__c.trim().length() == 0 || srList[0].Files__c=='[]') ? '['+fileJson+']' : '['+fileJson+','+srList[0].Files__c.substring(1,srList[0].Files__c.length());
+                    UPDATE srList;
+                }
+                else{
+                    Response__c res=new Response__c();
+                    res.Question__c=(String)filemap.get('quesId');
+                    res.Assessment__c=(String)filemap.get('assessmentId');
+                    System.debug('Into else');
+                    String fileUrl = baseUrl+'/sfc/servlet.shepherd/document/download/'+cvList[0].ContentDocumentId+'?operationContext=S1';
+                    string fileJson = '[{"name":"'+(String)filemap.get('name')+'","url":"'+fileUrl+'","type":"'+ftype+'"}]';
+                    res.Files__c=fileJson;
+                    res.Is_Latest_Response__c= true;
+                    srList.add(res);
+                    INSERT srList;
+            	}
             }
-            else{
-                Response__c res=new Response__c();
-                res.Question__c=(String)filemap.get('quesId');
-                res.Assessment__c=(String)filemap.get('assessmentId');
-                System.debug('Into else');
-                String fileUrl = baseUrl+'/sfc/servlet.shepherd/document/download/'+cvList[0].ContentDocumentId+'?operationContext=S1';
-                string fileJson = '[{"name":"'+(String)filemap.get('name')+'","url":"'+fileUrl+'","type":"'+ftype+'"}]';
-                res.Files__c=fileJson;
-                srList.add(res);
-                INSERT srList;
-            }
+            
             return srList;
         }
         catch(Exception e)
@@ -403,31 +431,25 @@ public with sharing class AssessmentController {
      * @param searchKey userinput for the search.
     */
     @AuraEnabled(cacheable=true)
-    public static List<Account> getAllSuppliers(string existingData,string searchKey){
-        system.debug('existingData-------->'+existingData);
+    public static List<Account> getAllSuppliers(string searchKey,string selId){
         List<Account> supplierList = new List<Account>();
+        set<string> selSet = new set<string>();
+        selSet.add(selId);
         string query = '';
         try{
-            set<Id> existingSups = new set<Id>();
-            if(string.isNotBlank(existingData)){
-                existingSups = (set<Id>) JSON.deserialize(existingData, set<Id>.class);
-            }
             query = 'SELECT Id,Name FROM Account';
             if(string.isBlank(searchKey)){
                 query = query+' Order By CreatedDate DESC limit 10';
             }else{
                 string sKey = '\'%'+searchKey+'%\'';
-                query = query+' WHERE Name LIKE '+sKey;
-                if(existingSups.isEmpty() == false){
-                    query = query+ ' OR Id IN :existingSups';
-                }
+                query = query+' WHERE Name LIKE '+sKey+' OR ID IN:'+selSet;
             }
             system.debug('query---->'+query);
         }catch(exception e){
             String errorMsg = e.getMessage();
             throw new AuraHandledException(ErrorMsg);
         }
-        return Database.query(query);
+        return safe.doQuery(query);
     }
 
 
@@ -449,6 +471,8 @@ public with sharing class AssessmentController {
             }
             system.debug('assessmentRecord------>'+assessmentRecord);
             assessmentId = assessmentRecord.Id;
+            Date asmtStartDate = (Date)assessmentRecord.get('Start_Date__c');
+            system.debug('asmtStartDate------>'+asmtStartDate);
             system.debug('assessmentId------>'+assessmentId);
             set<string> suppliersList = new set<string>();
             set<string> deleteSupList = new set<string>();
@@ -468,8 +492,8 @@ public with sharing class AssessmentController {
             if(string.isNotBlank(deleteList)){
                 deleteSupList = (set<string>) JSON.deserialize(deleteList, set<string>.class);
                 system.debug('deleteSupList------>'+deleteSupList);
-                List<AccountAssessmentRelation__c> deleteAccAssRelns = new List<AccountAssessmentRelation__c>();
-                for(AccountAssessmentRelation__c assReln:[SELECT Id FROM AccountAssessmentRelation__c WHERE Rhythm__Account__c IN:deleteSupList]){
+                List<Assessment_Supplier__c> deleteAccAssRelns = new List<Assessment_Supplier__c>();
+                for(Assessment_Supplier__c assReln:[SELECT Id FROM Assessment_Supplier__c WHERE Account__c IN:deleteSupList]){
                     deleteAccAssRelns.add(assReln);
                 }
                 List<Database.DeleteResult> deleteResult = safe.doDelete(deleteAccAssRelns);
@@ -488,12 +512,13 @@ public with sharing class AssessmentController {
                 assessSup.Assessment__c = assessmentId;
                 assessSup.Status__c = 'Inactive';
                 assessSupList.add(assessSup);
-
-                AccountAssessmentRelation__c accAssessReln = new AccountAssessmentRelation__c();
-                accAssessReln.Name = acc.Name;
-                accAssessReln.Account__c = acc.Id;
-                accAssessReln.Assessment__c = assessmentId;
-                accountAssessRelnsList.add(accAssessReln);
+                if(asmtStartDate == Date.Today()){
+                    AccountAssessmentRelation__c accAssessReln = new AccountAssessmentRelation__c();
+                    accAssessReln.Name = acc.Name;
+                    accAssessReln.Account__c = acc.Id;
+                    accAssessReln.Assessment__c = assessmentId;
+                    accountAssessRelnsList.add(accAssessReln);
+                }
             }
             set<Id> successRecordsIdSet = new set<Id>();
             if(accountAssessRelnsList.isEmpty() == false){
@@ -650,7 +675,7 @@ public with sharing class AssessmentController {
 
     @AuraEnabled(cacheable=true)
     public static List<Assessment__c> getAssessmentRecord(string assessmentId){
-        string query = 'SELECT Id,Start_Date__c FROM Assessment__c WHERE Id=\'' + assessmentId + '\' LIMIT 1';
+        string query = 'SELECT Id,Start_Date__c,End_Date__c FROM Assessment__c WHERE Id=\'' + assessmentId + '\' LIMIT 1';
         return safe.doQuery(query);
     }
 
@@ -661,12 +686,12 @@ public with sharing class AssessmentController {
     */
     @AuraEnabled(cacheable=true)
     public static List<AccountAssessmentRelation__c> getExistingSuppliersWithSearch(string assessmentId, string searchKey){
-        string query = 'SELECT Id,Account__c,Account__r.Name FROM AccountAssessmentRelation__c WHERE Assessment__c = \'' + assessmentId + '\'';
+        string query = 'SELECT Id,Account__c,Account__r.Name FROM Assessment_Supplier__c WHERE Assessment__c = \'' + assessmentId + '\'';
         if(string.isNotBlank(searchKey)){
             string sKey = '\'%'+searchKey+'%\'';
             query = query+' AND Account__r.Name LIKE '+sKey;
         }else{
-            query = query+' LIMIT 10';
+            query = query+' LIMIT 500';
         }
         return safe.doQuery(query);
     }
@@ -699,6 +724,11 @@ public with sharing class AssessmentController {
             throw new AuraHandledException(ErrorMsg);
         }
         return resWrap;
+    }
+
+    @AuraEnabled(cacheable=true)
+    public static List<Assessment_Template__c> getTemplateData(string templateId){
+        return [SELECT Id,Status__c,Name FROM Assessment_Template__c WHERE Id=:templateId ];
     }
 
     @AuraEnabled(cacheable=true)

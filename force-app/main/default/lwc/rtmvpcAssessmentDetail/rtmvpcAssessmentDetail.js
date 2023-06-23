@@ -50,9 +50,8 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
         console.log('accountid',this.accountid);
         this.assaccId = this.accountid;
         /* To get the username */
-        
-        this.showSections = true;
         this.handleTimeLine();
+         
         
     }
     handleAccordian(event)
@@ -146,7 +145,8 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
                 getAssessmentStatus({ assessmentId: this.accountassessmentrelId }).then(result => {
                     console.log('accountassessmentrelId',result);
                     var assessmentStatus = result;
-                    if (typeof result != 'undefined') {
+                    if(result.length>0){
+                    if (typeof result != 'undefined' && typeof result !='[]') {
                         var oldvaluelst = [];
                         for (var i = 0; i < assessmentStatus.length; i++) {
                             if (typeof assessmentStatus[i].OldValue != 'undefined') {
@@ -164,19 +164,21 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
                                 statustrack['status'] = assessmentStatus[i].NewValue;
                                 switch (assessmentStatus[i].NewValue) {
                                     case "New": statustrack['classlist'] = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_submited'; break;
-                                    case "Submitted": statustrack['classlist'] = 'cad-timeline_slidebase cad-timeline_vendor cad-timeline_submited'; break;
-                                    case "Draft": statustrack['classlist'] = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_pending'; break;
-                                    case "Open": statustrack['classlist'] = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_default'; break;
-                                    case "Completed": statustrack['classlist'] = 'cad-timeline_slidebase cad-timeline_vendor cad-timeline_needmoreinfo'; break;
-                                    case "Closed": statustrack['classlist'] = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_approved'; break;
+                                    case "In progress": statustrack['classlist'] = 'cad-timeline_slidebase cad-timeline_vendor cad-timeline_pending'; break;
+                                    case "Submitted": statustrack['classlist'] = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_submited'; break;
+                                    case "In review": statustrack['classlist'] = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_pending'; break;
+                                    case "Accepted": statustrack['classlist'] = 'cad-timeline_slidebase cad-timeline_vendor cad-timeline_approved'; break;
+                                    case "Need more information": statustrack['classlist'] = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_needmoreinfo'; break;
+                                    case "Review Completed": statustrack['classlist'] = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_submited'; break;
                                 }
                                 statustrack['name'] = this.userName;
                                 this.assessmentTimeline.push(statustrack);
                             }
                         }
-                        var relocate = this.assessmentTimeline.splice(0, 1);
-                        this.assessmentTimeline.push(relocate[0]);
+                         var relocate = this.assessmentTimeline.splice(0, 1);
+                         this.assessmentTimeline.push(relocate[0]);
                     }
+                }
                     this.showSections = true;
                 }).catch(error => {
                     errorLogRecord({ componentName: 'RtmvpcAssessmentChatter', methodName: 'getChatterResponse', className: 'AssessmentController', errorData: error.message }).then((result) => {
@@ -198,26 +200,27 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
                     console.log('Executing for 1',this.assessmentid);
                     if (typeof result[j].Rhythm__Assessment__r != 'undefined' && typeof result[j].Rhythm__Assessment__r.Id != 'undefined') {
                         if (result[j].Rhythm__Assessment__r.Id == this.assessmentid) {
-                            if (typeof result[j].Rhythm__Assessment__r.Rhythm__Status__c != 'undefined') {
+                            if (typeof result[j].Rhythm__Status__c != 'undefined') {
 
-                                this.statusassessment = result[j].Rhythm__Assessment__r.Rhythm__Status__c;
+                                this.statusassessment = result[j].Rhythm__Status__c;
+                                this.accountAssessmentStatus=this.statusassessment;
                                 if (this.statusassessment == 'Submitted' || this.statusassessment == 'Open' || this.statusassessment == 'Completed' || this.statusassessment == 'Closed') {
                                     this.showstatus = true;
                                 }
-                                this.assessmentName = result[j].Rhythm__Assessment__r.Name;
-                                if (typeof result[j].Rhythm__Assessment__r.Rhythm__Start_Date__c != 'undefined') {
+                                this.assessmentName =  result[j].Rhythm__Assessment__r.Name;
+                                if (typeof result[j].Rhythm__Start_Date__c != 'undefined') {
                                     var statustrack = {};
-                                    var dateformat = result[j].Rhythm__Assessment__r.Rhythm__Start_Date__c;
+                                    var dateformat = result[j].Rhythm__Start_Date__c;
                                     var dateformats = months[Number(dateformat.split('-')[1]) - 1] + '-' + dateformat.split('-')[2] + '-' + dateformat.split('-')[0];
                                     statustrack['date'] = dateformats + ' ' + '00:00:00';
                                     statustrack['status'] = 'Start Date';
                                     statustrack['classlist'] = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_default';
-                                    statustrack['name'] = result[j].Rhythm__Assessment__r.CreatedBy.Name;
+                                    statustrack['name'] = result[j].Rhythm__Assessment__r.Rhythm__CreatedUser__c;
                                     this.assessmentTimeline.push(statustrack);
                                 }
                                 else {
                                     var statustrack = {};
-                                    if(typeof result[j].Rhythm__Assessment__r.CreatedDate!='undefined')
+                                    if(typeof result[j].CreatedDate!='undefined')
                                     {
                                         var date = result[j].Rhythm__Assessment__r.CreatedDate.split('T');
                                         var time = date[1].split('.');
@@ -226,20 +229,20 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
                                         statustrack['date'] = dateformats + ' ' + time[0];
                                         statustrack['status'] = 'Start Date';
                                         statustrack['classlist'] = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_default';
-                                        statustrack['name'] = result[j].Rhythm__Assessment__r.CreatedBy.Name;
+                                        statustrack['name'] = result[j].Rhythm__Assessment__r.Rhythm__CreatedUser__c;
                                         this.assessmentTimeline.push(statustrack);
                                     }
                                     
                                 }
-                                if (typeof result[j].Rhythm__Assessment__r.Rhythm__End_Date__c != 'undefined') {
+                                if (typeof result[j].Rhythm__End_Date__c != 'undefined') {
                                     var statustrack = {};
-                                    var dateformat = result[j].Rhythm__Assessment__r.Rhythm__End_Date__c;
+                                    var dateformat = result[j].Rhythm__End_Date__c;
                                     var dateformats = months[Number(dateformat.split('-')[1]) - 1] + '-' + dateformat.split('-')[2] + '-' + dateformat.split('-')[0];
                                     statustrack['date'] = '(Due date ' + dateformats + ')';
                                     this.endDate = statustrack['date'];
                                     statustrack['status'] = 'End Date';
                                     statustrack['classlist'] = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_default';
-                                    statustrack['name'] = result[j].Rhythm__Assessment__r.CreatedBy.Name;
+                                    statustrack['name'] = result[j].Rhythm__CreatedUser__c;
                                     this.assessmentTimeline.push(statustrack);
                                 }
                             }
@@ -248,8 +251,9 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
                     console.log('Executing for');
                 }
                 /* To get the assessment tracking history to update on timeline*/
-                getAssessmentStatus({ assessmentId: this.assessmentid }).then(result => {
+                getAssessmentStatus({ assessmentId: this.recordId }).then(result => {
                     var assessmentStatus = result;
+
                     if (typeof result != 'undefined') {
                         var oldvaluelst = [];
                         for (var i = 0; i < assessmentStatus.length; i++) {
@@ -268,11 +272,13 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
                                 statustrack['status'] = assessmentStatus[i].NewValue;
                                 switch (assessmentStatus[i].NewValue) {
                                     case "New": statustrack['classlist'] = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_submited'; break;
-                                    case "Submitted": statustrack['classlist'] = 'cad-timeline_slidebase cad-timeline_vendor cad-timeline_submited'; break;
-                                    case "Draft": statustrack['classlist'] = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_pending'; break;
-                                    case "Open": statustrack['classlist'] = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_default'; break;
-                                    case "Completed": statustrack['classlist'] = 'cad-timeline_slidebase cad-timeline_vendor cad-timeline_needmoreinfo'; break;
-                                    case "Closed": statustrack['classlist'] = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_approved'; break;
+                                    case "In progress": statustrack['classlist'] = 'cad-timeline_slidebase cad-timeline_vendor cad-timeline_pending'; break;
+                                    case "Submitted": statustrack['classlist'] = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_submited'; break;
+                                    case "In review": statustrack['classlist'] = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_pending'; break;
+                                    case "Accepted": statustrack['classlist'] = 'cad-timeline_slidebase cad-timeline_vendor cad-timeline_approved'; break;
+                                    case "Need more information": statustrack['classlist'] = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_needmoreinfo'; break;
+                                    case "Review Completed": statustrack['classlist'] = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_submited'; break;
+                                    
                                 }
                                 statustrack['name'] = this.userName;
                                 this.assessmentTimeline.push(statustrack);
@@ -281,7 +287,7 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
                         var relocate = this.assessmentTimeline.splice(0, 1);
                         this.assessmentTimeline.push(relocate[0]);
                     }
-                    
+                    this.showSections = true;
                 
                 }).catch(error => {
                     errorLogRecord({ componentName: 'RtmvpcAssessmentChatter', methodName: 'getChatterResponse', className: 'AssessmentController', errorData: error.message }).then((result) => {

@@ -101,7 +101,7 @@
 									onchange={handleChange}>
 								</lightning-combobox>
 								-->
-								<template if:true={isRecordPage}>
+								<!-- <template if:true={isRecordPage}> -->
 									<template if:true={showExpand}>
 								<lightning-button-icon icon-name="utility:expand_all" variant="bare" onclick={handleAccordian} data-id="[ + ]"
 									alternative-text="Close window">
@@ -110,7 +110,7 @@
 								<lightning-button-icon icon-name="utility:collapse_all" variant="bare" data-id="[ - ]" onclick={handleAccordian}
 									alternative-text="Close window">
 								</lightning-button-icon></template>
-								</template>
+								<!-- </template> -->
 								
 								
 								<lightning-button-menu icon-name="utility:download" data-id={assessmentid}
@@ -141,7 +141,7 @@
 										<!-- <strong>Assessment Component Placeholder</strong>
 											<h1>calling tabular report questionnaire</h1> -->
 										<template if:true={showSections}>
-											<template if:true={accountAssessmentStatus}>
+											<!--<template if:true={accountAssessmentStatus}>-->
 											<c-Questionnaire vendor={accountid} assessment={assessmentid}
 												object-api-name={objectApiName} record-id={recordId} accid={assaccId}
 												onselectconversation={chatHistory} onshowsummary={showsummaryHandler}
@@ -149,7 +149,7 @@
 												onexpandcollapse={handleExpandCollapse}
 												ontimelinehandle={handleTimeLine}>
 											</c-Questionnaire>
-											</template>
+											<!--</template>-->
 										</template>
 										
 										<!-- <template if:false={showFlag}>

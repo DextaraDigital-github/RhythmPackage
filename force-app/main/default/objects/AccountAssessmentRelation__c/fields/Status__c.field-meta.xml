@@ -13,11 +13,6 @@
         <valueSetDefinition>
             <sorted>false</sorted>
             <value>
-                <fullName>Not Started</fullName>
-                <default>false</default>
-                <label>Not Started</label>
-            </value>
-            <value>
                 <fullName>In progress</fullName>
                 <default>false</default>
                 <label>In progress</label>
@@ -38,8 +33,30 @@
                 <label>Accepted</label>
             </value>
             <value>
+                <fullName>Need more information</fullName>
+                <default>false</default>
+                <label>Need more information</label>
+            </value>
+            <value>
+                <fullName>New</fullName>
+                <default>false</default>
+                <label>New</label>
+            </value>
+            <value>
+                <fullName>Review Completed</fullName>
+                <default>false</default>
+                <label>Review Completed</label>
+            </value>
+            <value>
+                <fullName>Not Started</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Not Started</label>
+            </value>
+            <value>
                 <fullName>Rejected</fullName>
                 <default>false</default>
+                <isActive>false</isActive>
                 <label>Rejected</label>
             </value>
         </valueSetDefinition>

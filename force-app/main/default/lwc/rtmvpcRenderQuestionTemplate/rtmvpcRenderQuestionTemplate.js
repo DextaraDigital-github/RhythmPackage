@@ -6,6 +6,7 @@
 */
 import { LightningElement, api, track } from 'lwc';
 import getResponseFlag from '@salesforce/apex/AssessmentController.getResponseFlag';
+import updateAccountAssessmentStatus from '@salesforce/apex/AssessmentController.updateAccountAssessmentStatus';
 
 export default class RtmvpcRenderQuestionTemplate extends LightningElement {
     @api responses; /*questions related to particular section will be stored in this JSON wrapper */
@@ -17,8 +18,11 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
     @api assessmentid;
     @track checkedLabel;
     @api sectionid;
+    @api accountid;
+    @track customeFlagsList=[];
     @api issupplier;
     @track deletefiledata = {};
+    @api recid;
     connectedCallback() {
         console.log('responses', this.responses);
         this.chatterMap.openChat = false;
@@ -48,7 +52,7 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
                 flagresponse = !(this.responses[i].Rhythm__Flag__c);
             }
         }
-
+        
         console.log('openReview', quesId);
         console.log('this.responses', this.responses);
         getResponseFlag({ questionId: quesId, assessmentId:this.assessmentid }).then((result) => {
@@ -116,6 +120,7 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
     openChatHandler(event) {
         var quesId = event.currentTarget.dataset.id;
         console.log('event.cuurentTarget.dataset.id', event.currentTarget.dataset.id);
+        console.log('this.chatterMap',this.chatterMap +'');
         if(this.issupplier)
         {
             this.chatterMap.accountType = 'supplier';
@@ -132,7 +137,7 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
         }
         else {
             if(this.chatterMap.questionId!=quesId)
-            {
+            {                
                 this.chatterMap.openChat = true;
                 this.chatterMap.disableSendButton = false;
             }
@@ -167,6 +172,40 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
         });
         this.dispatchEvent(selectedEvent);
     }
+    @api
+    checkCustomerFlags()
+    {
+        var boolflag;
+        var param={};
+        var status;
+        console.log('In Child');
+        if(this.responses[0].customerFlag==true)
+        {
+            for(var i=0;i<this.responses.length;i++)
+            {
+                if(this.responses[i].Rhythm__Flag__c)
+                {
+                    boolflag = true;
+                }
+            }
+        }
+        if(boolflag)
+        {
+            status ='Need more information';
+        }
+        else
+        {
+            status ='Review Completed';
+        }
+         param.assessmentStatus = status;
+        console.log('this.recid',this.recid);
+        param.recId = this.recid;
+        updateAccountAssessmentStatus({paramMap : JSON.stringify(param) }).then(result=>{
+            console.log('result',result);
+        }).catch(error=>{
+            console.log('error',error);
+        });
+    }
 
     /* uploadFilesHandler is used to dispatch the file blob value to parent component(Questionnaire) with the loading on uploading the attachment*/
     uploadFilesHandler(event) {
@@ -175,6 +214,19 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
         this.fileresponsemap['questionId'] = questionId[0];
         this.fileresponsemap['sectionId'] = this.sectionid;
         this.fileresponsemap['name'] = event.target.files[0].name;
+        if(typeof questionId[0]!='undefined')
+        {
+            for(var i=0;i<this.responses.length;i++)
+            {
+                if(this.responses[i].Id==questionId[0])
+                {
+                    this.fileresponsemap['type'] = this.responses[i].type;
+                    this.fileresponsemap['flag'] = this.responses[i].Rhythm__Flag__c;
+                    this.fileresponsemap['conversationHistory'] = this.responses[i].Rhythm__Conversation_History__c;
+                }
+               
+            }
+        }
         this.fileresponsemap['url'] = URL.createObjectURL(event.target.files[0]);
         let type = (event.target.files[0].name).split('.');
         this.fileresponsemap['type'] = type[1];

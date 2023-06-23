@@ -131,7 +131,7 @@
                                                 assessmentid ={assessment}
                                                 onvaluechange={onResponseChange} onfileupload={handleFileUpload}
                                                 onselectchange={handlechatHistory} ondeleteattachment={handledeletefile}
-                                                onselectquestion={selectquestionHandler}>
+                                                onselectquestion={selectquestionHandler} recid={recordId}>
                                             </c-rtmvpc-render-question-template>
                                         </div>
 
@@ -189,7 +189,26 @@
                     flexibility="auto" class="slds-float--right" style="margin-right:5px;"></lightning-button>
                 &nbsp;&nbsp;
             </template>
+            
             <!-- Displays Save, Save & Submit buttons if the Assessment is not Submitted --END-->
         </div>
+    </template>
+    <template if:true={isTemplate}>
+        <template if:true={showcustomerbuttons}>
+                <template if:true={showInReview}>
+                    <lightning-button variant="Brand" label="Start Review" title="Save Response" onclick={handleStartReview}
+                    flexibility="auto" class="slds-float--right slds-button_neutral">
+                </lightning-button>
+                </template>
+            <template if:true={showSaveAndSubmit}>
+                <lightning-button variant="Brand" label="Save & Submit" title="Save Response" onclick={handleSubmitCustomer}
+                    flexibility="auto" class="slds-float--right slds-button_neutral">
+                </lightning-button>
+                &nbsp;&nbsp;
+                <lightning-button variant="Brand" label="Save" title="Save Response" onclick={handleSaveCustomer}
+                    flexibility="auto" class="slds-float--right" style="margin-right:5px;"></lightning-button>
+                &nbsp;&nbsp;
+            </template>
+            </template>
     </template>
 </template>
