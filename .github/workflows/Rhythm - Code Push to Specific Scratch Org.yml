@@ -8,7 +8,7 @@ on:
     inputs:
      scratch-org_username: 
       #username to the scratch-org which needs to be created
-      default: 'scratch-org'
+      default: 'scratchorg@gmail.com'
       required: true
 
 # Jobs to be executed
