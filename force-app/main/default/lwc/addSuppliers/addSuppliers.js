@@ -4,8 +4,10 @@ import getAllSuppliers from '@salesforce/apex/AssessmentController.getAllSupplie
 import getExistingSuppliers from '@salesforce/apex/AssessmentController.getExistingSuppliersWithSearch';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 export default class AddSuppliers extends LightningElement {
+    renderedExistingSuppliers = false;
     @track supplierData;
     @api selectedSupplierData = [];
+    @track currentValues;
     @track values;
     availableSuppliersCount = 'Available Suppliers(0)';
     selectedSuppliersCount = 'Selected Suppliers(0)';
@@ -13,125 +15,139 @@ export default class AddSuppliers extends LightningElement {
     exSearchKey = '';
     @track latestSuppliers;
     @track latestExSuppliers;
-    @api existingSuppList=[];
+    existingSuppList = [];
+    @api est = [];
     hasRendered = true;
     @api recordId;
 
-
-    get existingData(){
-        if(this.existingSuppList != undefined && this.existingSuppList.length>0){
-            console.log('inside---');
+    get existingData() {
+        if (this.existingSuppList != undefined && this.existingSuppList.length > 0) {
+            console.log('inside existingData : ', JSON.stringify(this.existingSuppList));
             return JSON.stringify(this.existingSuppList);
-        }else{
+        } else {
             return '';
         }
     }
-    
 
-    @wire(getExistingSuppliers, { assessmentId: '$recordId',searchKey:'$exSearchKey'})
+    @wire(getExistingSuppliers, { assessmentId: '$recordId', searchKey: '' })
     existingSuppliers(result) {
-        console.log('callingexsuppliers-------->');
         this.latestExSuppliers = result;
         if (result.data) {
-            let tempList=[];
-            console.log('existingSuppliers---->',JSON.stringify(result.data));
-            for(let rec of result.data){
+            let tempList = [];
+            console.log('existingSuppliers data---->', JSON.stringify(result.data));
+            for (let rec of result.data) {
                 tempList.push(rec.Rhythm__Account__c);
             }
-            if(tempList.length > 0){
+            if (tempList.length > 0) {
                 this.existingSuppList = tempList;
-                this.values = [...this.existingSuppList];
+                if (!this.renderedExistingSuppliers) {
+                    this.est = JSON.parse(JSON.stringify(this.existingSuppList));
+                    this.renderedExistingSuppliers = true;
+                }
+                this.values = this.existingSuppList;
                 this.selectedSuppliersCount = this.selectedSuppliersCount.split('(')[0] + '(' + this.existingSuppList.length + ')';
             }
         } else if (result.error) {
-            console.log('eror---->',result.error);
+            console.log('eror---->', result.error);
         }
     }
-
-    @wire(getAllSuppliers,{existingData:'$existingData',searchKey:'$searchKey'})
-    suppliersList(result){
-        try{
-            this.latestSuppliers = result;
-            if (result.data) {
-                let tempList = [];
-                console.log('SupplierData-------->',JSON.stringify(this.supplierData));
-                let retData = JSON.parse(JSON.stringify(result.data));
-                for (let supRec of retData){
-                    tempList.push({
-                        "label": supRec.Name,
-                        "value": supRec.Id
-                    });
-                }
-                this.supplierData = tempList;
-                if(this.supplierData.length > 0 && this.existingSuppList.length > 0){
-                    this.availableSuppliersCount = this.availableSuppliersCount.split('(')[0] + '(' + (this.supplierData.length - this.existingSuppList.length) + ')';
-                }
-                
+    @wire(getAllSuppliers, { existingData: '$existingData', searchKey: '$searchKey', exSearchKey: '$exSearchKey' })
+    suppliersList(result) {
+        this.latestSuppliers = result;
+        if (result.data) {
+            let tempList = [];
+            console.log('this.supplierData-------->', JSON.stringify(this.supplierData));
+            console.log('this.existingData-------->', JSON.stringify(this.existingData));
+            console.log('this.existingSuppList-------->', JSON.stringify(this.existingSuppList));
+            console.log('this.values-------->', JSON.stringify(this.values));
+            let retData = JSON.parse(JSON.stringify(result.data));
+            for (let supRec of retData) {
+                tempList.push({
+                    "label": supRec.Name,
+                    "value": supRec.Id
+                });
             }
-            else if (result.error) {
-                this.showNotification('Error',result.error.body.message,'error');
-                console.log('getAllSuppliers:Error------->',result.error);
+            this.supplierData = tempList;
+            if (this.supplierData.length > 0) {
+                this.availableSuppliersCount = this.availableSuppliersCount.split('(')[0] + '(' + (this.supplierData.length - this.existingSuppList.length) + ')';
             }
-        }catch(e){
-            console.log('getAllSuppliers:error------>',e);
+            if (typeof this.values != 'undefined')
+                this.values = JSON.parse(JSON.stringify(this.values));
+            if (typeof this.supplierData != 'undefined')
+                this.supplierData = JSON.parse(JSON.stringify(this.supplierData));
+            for (let rec of this.est) {
+                if (this.values.indexOf(rec) === -1) {
+                    this.delList.push(rec);
+                }
+            }
+            const custEvent = new CustomEvent('updatedsupliers', {
+                detail: { newSuppliers: this.values, existingSupps: this.est, delList: this.delList }
+            })
+            this.dispatchEvent(custEvent);
+        }
+        else if (result.error) {
+            this.showNotification('Error', result.error.body.message, 'error');
+            console.log('getAllSuppliers:Error------->', result.error);
         }
     }
 
     handleChange(event) {
-        try{
-            console.log('existingSupData-------->',JSON.stringify(this.existingSuppList));
-            console.log('EVENTDET-------->',JSON.stringify(event.detail));
-            console.log('values-------->',JSON.stringify(event.detail.value));
-            let delList = [];
-            let eventValues = event.detail.value;
-            for(let rec of this.existingSuppList){
-                if(eventValues.indexOf(rec) === -1){
-                    delList.push(rec);
+        try {
+            this.delList = [];
+            this.currentValues = event.detail.value;
+            if (typeof this.est != 'undefined' && this.est.length > 0) {
+                for (let rec of this.est) {
+                    if (this.values.indexOf(rec) === -1) {
+                        this.delList.push(rec);
+                    }
                 }
             }
-            console.log('delList-------->',JSON.stringify(delList));
+            console.log('this.delList-------->', JSON.stringify(this.delList));
             this.values = event.target.value;
-            this.selectedSupplierData = [];
-            for (var i = 0; i < this.supplierData.length; i++) {
-                if (this.values.includes(this.supplierData[i].value.toString())) {
-                    this.selectedSupplierData.push({ Id: this.supplierData[i].value, Name: this.supplierData[i].label });
-                }
-            }
             let selectedSupp = this.values.length > 0 ? this.values.length : 0;
             this.availableSuppliersCount = this.availableSuppliersCount.split('(')[0] + '(' + (this.supplierData.length - selectedSupp) + ')';
             this.selectedSuppliersCount = this.selectedSuppliersCount.split('(')[0] + '(' + selectedSupp + ')';
+            for (let rec of this.values) {
+                if (this.existingSuppList.indexOf(rec) === -1) {
+                    this.existingSuppList.push(rec);
+                }
+            }
+            this.values = this.existingSuppList;
+            console.log('this.estemp-------->', JSON.stringify(this.est));
+            console.log('this.supplierData-------->', JSON.stringify(this.supplierData));
+            console.log('this.values-------->', JSON.stringify(this.values));
             const custEvent = new CustomEvent('updatedsupliers', {
-                detail : {newSuppliers:[...this.values],existingSupps:[...this.existingSuppList],delList:[...delList]}
-              })
+                detail: { newSuppliers: this.values, existingSupps: this.est, delList: this.delList }
+            })
             this.dispatchEvent(custEvent);
-        }catch(error){
-            console.log('addSuppliers:handleChange:error----->',error);
+        } catch (error) {
+            console.log('addSuppliers:handleChange:error----->', error);
         }
     }
 
-    handleSearch(event){
-        try{
+    handleSearch(event) {
+        try {
             console.log('InTheNewSearch----->');
-            console.log('searchname----->',event.target.dataset.id);
+            console.log('searchname----->', event.target.dataset.id);
             this.searchKey = event.target.value;
             //refreshApex(this.latestSuppliers);
-        }catch(error){
-            console.log('addSuppliers:handleSearch:error----->',error);
+        } catch (error) {
+            console.log('addSuppliers:handleSearch:error----->', error);
         }
     }
-    handleExSearch(event){
-        try{
-             console.log('searchname----->',event.target.dataset.id);
-            console.log('InTheExSearch----->');
+    handleExSearch(event) {
+        try {
             let searchKey = event.target.value;
+            console.log('existingSupData2-------->', JSON.stringify(this.existingSuppList));
+            console.log('values-------->', JSON.stringify(this.values));
             this.exSearchKey = searchKey;
             //refreshApex(this.latestExSuppliers);
-        }catch(error){
-            console.log('addSuppliers:handleSearch:error----->',error);
+        } catch (error) {
+            console.log('addSuppliers:handleSearch:error----->', error);
         }
     }
 
-    showNotification(title,message,variant) {
+    showNotification(title, message, variant) {
         const evt = new ShowToastEvent({
             title: title,
             message: message,
