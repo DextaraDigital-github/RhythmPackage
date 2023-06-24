@@ -7,9 +7,8 @@ import { getRecordNotifyChange } from "lightning/uiRecordApi";
 export default class AddSuppliersforAssessment extends LightningElement {
     @api recordId;
     @track suppliersList=[];
-    @track existingSuppList;
+    @track existingSuppList=[];
     @track delList;
-
 
     @wire(getAssessmentRecord, { assessmentId: '$recordId'})
     assessmentRecord(result) {
@@ -39,13 +38,13 @@ export default class AddSuppliersforAssessment extends LightningElement {
             console.log('startDate----->',this.startDate);
             if(new Date(this.startDate) >= new Date(dateValue)){
                 console.log('AddSuppliersMethod------->',JSON.stringify(this.suppliersList));
-                //if(this.suppliersList.length > 0){
+                if(this.suppliersList.length > 0){
                     addSuppliers({assessmentRecord:this.assessmentRecord,operationType:'update',suppliers:JSON.stringify(this.suppliersList),existingSups:exSupListStr,deleteList:deleteListStr})
                     .then(result => {
                         console.log('addSuppliers Result------->'+JSON.stringify(result));
                         if(result.isSuccess == true){
                             this.showModal = false;
-                            this.showNotification('Success','Suppliers Modified Successfully.','success');
+                            this.showNotification('Success','Suppliers Added to Assessments Successfully.','success');
                             this.closeModal();
                             getRecordNotifyChange([{ recordId: this.assessmentRecord.Id }]);
                         }else{
@@ -54,12 +53,11 @@ export default class AddSuppliersforAssessment extends LightningElement {
                     })
                     .catch(error => {
                         this.error = error;
-                        //this.showNotification('Error',error,'error');
+                        this.showNotification('Error',error,'error');
                     });
-                //}
-                // else{
-                //     //this.showNotification('Error','Please select atleast one supplier to proceed.','error');
-                // }
+                }else{
+                    this.showNotification('Error','Please select atleast one supplier to proceed.','error');
+                }
             }else{
                 this.showNotification('Error','Suppliers cannot be modified for the past assessments','error');
             }
