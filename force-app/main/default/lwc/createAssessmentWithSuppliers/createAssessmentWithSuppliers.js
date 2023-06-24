@@ -3,6 +3,9 @@ import { NavigationMixin } from 'lightning/navigation';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import addSuppliers from '@salesforce/apex/AssessmentController.sendAssessment';
 import getTemplateData from '@salesforce/apex/AssessmentController.getTemplateData';
+import TIME_ZONE from '@salesforce/i18n/timeZone';
+import LOCALE_DATA from '@salesforce/i18n/locale';
+
 
 export default class CreateAssessmentWithSuppliers extends NavigationMixin(LightningElement) {
     showModal = true;
@@ -16,6 +19,8 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
     dateValue;
     frequencyValue = 'One Time';
     @track assessmentRecord;
+    timeZone = TIME_ZONE;
+    locale = LOCALE_DATA
     
 
 
@@ -45,7 +50,8 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
 
     get startDate(){
         if(this.dateValue == undefined){
-          this.dateValue = new Date().toISOString().substring(0, 10);
+            let dateTime= new Date().toLocaleString(this.locale, {timeZone: this.timeZone})
+            console.log('dateTime-------->',dateTime);
         }
         return this.dateValue;
     }
@@ -76,7 +82,8 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
         validatedDetails.isSave = true;
         validatedDetails.message = '';
         let startDate = this.template.querySelector(`[data-id="startdate"]`).value;
-        let todayDate = new Date().toISOString().substring(0, 10);
+        let todayDate = new Date().toLocaleString(this.locale, {timeZone: this.timeZone})
+        todayDate = new Date(todayDate).toISOString().substring(0, 10);
         console.log('startDate----->',startDate);
         console.log('todayDate----->',todayDate);
         if(new Date(startDate) < new Date(todayDate)){
