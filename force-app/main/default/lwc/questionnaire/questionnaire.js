@@ -745,7 +745,7 @@ export default class Questionnaire extends LightningElement {
             }
             if (typeof filesmap[seckey] != 'undefined') {
                 console.log('into filesmap');
-               // reponse.Rhythm__Files__c = filesmap[seckey];
+               //reponse.Rhythm__Files__c = filesmap[seckey];
             }
             if (typeof conversationhistory[seckey] != 'undefined' && conversationhistory[seckey].length > 0) {
                 console.log('into conversation');
@@ -755,7 +755,8 @@ export default class Questionnaire extends LightningElement {
             console.log('reponse in constructResponse', reponse);
             if (this.requiredQuestionList.includes(reponse.Rhythm__Question__c)) {
                 if (typeof reponse.Rhythm__Response__c == 'undefined' ||
-                    (typeof reponse.Rhythm__Response__c != 'undefined' && reponse.Rhythm__Response__c == '')) {
+                    (typeof reponse.Rhythm__Response__c != 'undefined' && reponse.Rhythm__Response__c == '') ||
+                    (typeof reponse.Rhythm__Response__c != 'undefined' && reponse.Rhythm__Response__c == '[]')) {
                     isAssessmentValidated = true;
                     break;
                 }
@@ -915,7 +916,7 @@ export default class Questionnaire extends LightningElement {
                 // }
                 if(this.accountAssessmentStatus=='Submitted' || this.accountAssessmentStatus=='In review' || this.accountAssessmentStatus=='Need more information')
                 {
-                    quTemp.customerFlag = true;
+                    
                     this.showcustomerbuttons = true;
                     if(this.accountAssessmentStatus=='Submitted')
                     {
@@ -923,7 +924,9 @@ export default class Questionnaire extends LightningElement {
                     }
                     if(this.accountAssessmentStatus=='Need more information' || this.accountAssessmentStatus=='In review')
                     {
+                        this.showInReview = false;
                         this.showSaveAndSubmit = true;
+                        quTemp.customerFlag = true;
                     }
                     
                 }
@@ -1199,18 +1202,41 @@ export default class Questionnaire extends LightningElement {
         var status ='In review';
         param.assessmentStatus = status;
         param.recId = this.recordId;
+        for(var i=0;i<this.questionsAndAnswerss.length;i++)
+        {
+            for(var j=0;j<this.questionsAndAnswerss[i].questions.length;j++)
+            {
+                this.questionsAndAnswerss[i].questions[j].customerFlag = true;
+            }
+        }
+
         updateAccountAssessmentStatus({paramMap : JSON.stringify(param) }).then(result=>{
-            console.log('result',result);
+            console.log(' handleStartReview result',result);
             this.showSaveAndSubmit = true;
             this.showInReview = false;
         }).catch(error=>{
             console.log('error',error);
         });
         
+        this.showcustomerbuttons = true;
+        this.showInReview = false;
+        this.showSaveAndSubmit = true;
     }
     handleSubmitCustomer()
     {
         console.log('Hello',this.template.querySelectorAll('c-rtmvpc-render-question-template'));
         this.template.querySelectorAll('c-rtmvpc-render-question-template')[0].checkCustomerFlags();
+    }
+    enableCustomFlag(event)
+    {
+        console.log('enableCustomFlag',event.detail);
+        var param = JSON.parse(event.detail);
+        updateAccountAssessmentStatus({paramMap : JSON.stringify(param) }).then(result=>{
+            console.log('result',result);
+
+        }).catch(error=>{
+            console.log('error',error);
+        });
+        
     }
 }

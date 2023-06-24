@@ -131,7 +131,7 @@
                                                 assessmentid ={assessment}
                                                 onvaluechange={onResponseChange} onfileupload={handleFileUpload}
                                                 onselectchange={handlechatHistory} ondeleteattachment={handledeletefile}
-                                                onselectquestion={selectquestionHandler} recid={recordId}>
+                                                onselectquestion={selectquestionHandler} recid={recordId} onflagenable={enableCustomFlag}>
                                             </c-rtmvpc-render-question-template>
                                         </div>
 
@@ -204,10 +204,10 @@
                 <lightning-button variant="Brand" label="Save & Submit" title="Save Response" onclick={handleSubmitCustomer}
                     flexibility="auto" class="slds-float--right slds-button_neutral">
                 </lightning-button>
-                &nbsp;&nbsp;
+                <!-- &nbsp;&nbsp;
                 <lightning-button variant="Brand" label="Save" title="Save Response" onclick={handleSaveCustomer}
                     flexibility="auto" class="slds-float--right" style="margin-right:5px;"></lightning-button>
-                &nbsp;&nbsp;
+                &nbsp;&nbsp; -->
             </template>
             </template>
     </template>

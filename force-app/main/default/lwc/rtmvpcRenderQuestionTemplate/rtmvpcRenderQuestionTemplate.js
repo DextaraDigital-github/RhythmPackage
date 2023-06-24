@@ -197,15 +197,18 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
         {
             status ='Review Completed';
         }
-         param.assessmentStatus = status;
+        param.assessmentStatus = status;
         console.log('this.recid',this.recid);
         param.recId = this.recid;
-        updateAccountAssessmentStatus({paramMap : JSON.stringify(param) }).then(result=>{
-            console.log('result',result);
-        }).catch(error=>{
-            console.log('error',error);
-        });
+        const selectedEvent = new CustomEvent('flagenable', {
+                bubbles: true,
+                detail: param
+            });
+            /* dispatches event */
+            this.dispatchEvent(selectedEvent);
+            //console.log('dispatch error',selectedEvent);
     }
+  
 
     /* uploadFilesHandler is used to dispatch the file blob value to parent component(Questionnaire) with the loading on uploading the attachment*/
     uploadFilesHandler(event) {
