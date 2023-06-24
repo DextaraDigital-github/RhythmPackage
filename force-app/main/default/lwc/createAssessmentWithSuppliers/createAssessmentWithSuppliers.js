@@ -2,38 +2,52 @@ import { LightningElement,track,wire,api } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import addSuppliers from '@salesforce/apex/AssessmentController.sendAssessment';
-import { CurrentPageReference } from 'lightning/navigation';
-import { RefreshEvent } from 'lightning/refresh';
+import getTemplateData from '@salesforce/apex/AssessmentController.getTemplateData';
 
 export default class CreateAssessmentWithSuppliers extends NavigationMixin(LightningElement) {
-    showNewAssessment=true;
     showModal = true;
+    showNewAssessment=false;
+    isTemplateInactive = false;
     showSuppliers = false;
     @track suppliersList=[];
     modalHeading = 'New Assessment';
     assessmentId ='';
-    @api templateId = '';
+    @api templateId;
     dateValue;
     frequencyValue = 'One Time';
-    isTempRO = false;
     @track assessmentRecord;
+    
+
+
+
+    @wire(getTemplateData,{templateId:'$templateId'})
+    templateRecord(result){
+        console.log('TemplateRecordResult-------->',JSON.stringify(result));
+        if (result.data) {
+            if(result.data.length>0){
+                console.log('TemplateRecord-------->',JSON.stringify(result.data));
+                if(result.data[0].Rhythm__Status__c == 'Inactive'){
+                    this.isTemplateInactive = true;
+                    this.showNewAssessment = false;
+                }else{
+                    this.showNewAssessment = true;
+                }
+            }else{
+                this.showNewAssessment = true;
+            }
+        }else if (result.error) {
+            console.log('TemplateRecord:Error------->',result.error);
+            this.showNotification('Error',result.error.body.message,'error');
+        }else{
+            this.showNewAssessment = true;
+        }
+    }
 
     get startDate(){
         if(this.dateValue == undefined){
           this.dateValue = new Date().toISOString().substring(0, 10);
         }
         return this.dateValue;
-    }
-
-    @wire(CurrentPageReference)
-    getPageReferenceParameters(currentPageReference) {
-       if (currentPageReference) {
-            if(currentPageReference.state.c__templateId != undefined){
-                this.templateId = currentPageReference.state.c__templateId;
-                this.isTempRO = true;
-            }
-          console.log('pageParms----->',currentPageReference.state.c__templateId);
-        }
     }
     
     handleNext(event){

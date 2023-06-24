@@ -17,6 +17,7 @@ export default class AddSuppliers extends LightningElement {
     hasRendered = true;
     @api recordId;
 
+
     get existingData(){
         if(this.existingSuppList != undefined && this.existingSuppList.length>0){
             console.log('inside---');
@@ -49,26 +50,30 @@ export default class AddSuppliers extends LightningElement {
 
     @wire(getAllSuppliers,{existingData:'$existingData',searchKey:'$searchKey'})
     suppliersList(result){
-        this.latestSuppliers = result;
-        if (result.data) {
-            let tempList = [];
-            console.log('SupplierData-------->',JSON.stringify(this.supplierData));
-            let retData = JSON.parse(JSON.stringify(result.data));
-            for (let supRec of retData){
-                tempList.push({
-                    "label": supRec.Name,
-                    "value": supRec.Id
-                });
+        try{
+            this.latestSuppliers = result;
+            if (result.data) {
+                let tempList = [];
+                console.log('SupplierData-------->',JSON.stringify(this.supplierData));
+                let retData = JSON.parse(JSON.stringify(result.data));
+                for (let supRec of retData){
+                    tempList.push({
+                        "label": supRec.Name,
+                        "value": supRec.Id
+                    });
+                }
+                this.supplierData = tempList;
+                if(this.supplierData.length > 0 && this.existingSuppList.length > 0){
+                    this.availableSuppliersCount = this.availableSuppliersCount.split('(')[0] + '(' + (this.supplierData.length - this.existingSuppList.length) + ')';
+                }
+                
             }
-            this.supplierData = tempList;
-            if(this.supplierData.length > 0){
-                this.availableSuppliersCount = this.availableSuppliersCount.split('(')[0] + '(' + (this.supplierData.length - this.existingSuppList.length) + ')';
+            else if (result.error) {
+                this.showNotification('Error',result.error.body.message,'error');
+                console.log('getAllSuppliers:Error------->',result.error);
             }
-            
-        }
-        else if (result.error) {
-            this.showNotification('Error',result.error.body.message,'error');
-            console.log('getAllSuppliers:Error------->',result.error);
+        }catch(e){
+            console.log('getAllSuppliers:error------>',e);
         }
     }
 

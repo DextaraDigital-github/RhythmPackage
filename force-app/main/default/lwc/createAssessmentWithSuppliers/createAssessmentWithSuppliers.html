@@ -57,6 +57,14 @@
                     <template if:true={showSuppliers}>
                         <c-add-suppliers onupdatedsupliers={updateSupplierData}></c-add-suppliers>
                     </template>
+                    <template if:true={isTemplateInactive}>
+                        <div class="slds-align_absolute-center">
+                            <p class="slds-text-title_bold slds-text-color_destructive">New Assessment cannot be added for the Inactive Template.</p>
+                        </div>
+                        <div class="slds-clearfix slds-float_right">
+                            <lightning-button label="OK" title="Cancel" variant="brand" onclick={closeModal}></lightning-button>
+                        </div>
+                    </template>
                 </div>
 
                 <!-- modal footer start-->

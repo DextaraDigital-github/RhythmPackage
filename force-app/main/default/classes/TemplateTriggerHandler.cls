@@ -1,5 +1,4 @@
-public class AssessmentTriggerHandler implements ITriggerHandler{
-     
+public class TemplateTriggerHandler implements ITriggerHandler{
     public void beforeInsert(List<sObject> newList) {
         system.debug('beforeInsert----->');
     }
@@ -9,13 +8,11 @@ public class AssessmentTriggerHandler implements ITriggerHandler{
     }
      
     public void beforeUpdate(List<sObject> newList, Map<Id, sObject> newMap, List<sObject> oldList, Map<Id, sObject> oldMap) {
-        system.debug('inThebeforeUpdate-----');
-        List<Assessment__c> assmtsList = [SELECT Id,(SELECT Id FROM AccountAssessmentRelation__r) FROM Assessment__c WHERE ID IN:newMap.keySet()];
-        for(Assessment__c assmt:assmtsList){
-            if(assmt.AccountAssessmentRelation__r.size() > 0){
-                assmt.addError('Assessment program in use, cannot be edited.');
-            }
-        }
+        // for(Assessment_Template__c template:(List<Assessment_Template__c>)newMap.values()){
+        //     if(template.Number_of_Assessments__c != null && template.Number_of_Assessments__c >0){
+        //         template.addError('Template with Assessment Programs cannot be Modified.');
+        //     }
+        // }
     }
      
     public void afterUpdate(List<sObject> newList, Map<Id, sObject> newMap,  List<sObject> oldList, Map<Id, sObject> oldMap) {
@@ -23,7 +20,13 @@ public class AssessmentTriggerHandler implements ITriggerHandler{
     }
      
     public void beforeDelete(List<sObject> oldList , Map<Id, sObject> oldMap) {
-        system.debug('beforeDelete----->');
+        for(Assessment_Template__c template:(List<Assessment_Template__c>)oldMap.values()){
+            if(string.isNotBlank(template.Status__c) && template.Status__c.equalsIgnoreCase('Active')){
+                template.addError('Active Template cannot be deleted.');
+            }else if(template.Number_of_Assessments__c != null && template.Number_of_Assessments__c >0){
+                template.addError('Template with Assessment Programs cannot be deleted.');
+            }
+        }
     }
      
     public void afterDelete(List<sObject> oldList , Map<Id, sObject> oldMap) {
