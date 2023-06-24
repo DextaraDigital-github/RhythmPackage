@@ -66,6 +66,7 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
     }
     handleTimeLine()
     {
+        this.assessmentTimeline=[];
         getUserName({}).then(result => {
             this.isRecordPage = false;
             this.userName = result;
@@ -171,7 +172,7 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
                                     case "Need more information": statustrack['classlist'] = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_needmoreinfo'; break;
                                     case "Review Completed": statustrack['classlist'] = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_submited'; break;
                                 }
-                                statustrack['name'] = this.userName;
+                                statustrack['name'] = result[i].CreatedBy.Name;
                                 this.assessmentTimeline.push(statustrack);
                             }
                         }
@@ -253,7 +254,7 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
                 /* To get the assessment tracking history to update on timeline*/
                 getAssessmentStatus({ assessmentId: this.recordId }).then(result => {
                     var assessmentStatus = result;
-
+                    console.log('assessmentStatus',assessmentStatus);
                     if (typeof result != 'undefined') {
                         var oldvaluelst = [];
                         for (var i = 0; i < assessmentStatus.length; i++) {
@@ -280,7 +281,11 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
                                     case "Review Completed": statustrack['classlist'] = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_submited'; break;
                                     
                                 }
-                                statustrack['name'] = this.userName;
+                                if(typeof result[i].CreatedBy.Name!='undefined')
+                                {
+                                    statustrack['name'] =result[i].CreatedBy.Name;
+                                }
+                                
                                 this.assessmentTimeline.push(statustrack);
                             }
                         }
@@ -536,5 +541,10 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
                 errorLogRecord({ componentName: 'CustomTable', methodName: 'getSupplierAssessmentList', className: 'AssessmentController', errorData: error.message }).then((result) => {
                     });        
                 })
+    }
+    handleupdatetimeline(event)
+    {
+        console.log('handleUpload Timeline',event.detail);
+        this.handleTimeLine();
     }
 }

@@ -163,6 +163,14 @@ export default class Questionnaire extends LightningElement {
             console.log('this.isTemplate', this.isTemplate);
             console.log('this.recordId in Questionnaire', this.recordId);
         }
+        this.handleOnload();
+        
+    }
+    handleOnload()
+    {
+        //this.questionMap={};
+        this.questionsList=[];
+        this.sectionidslist=[];
         if (this.isTemplate) {
             this.isSupplier = false;
             if (this.objectApiName == 'Rhythm__AccountAssessmentRelation__c') {
@@ -197,6 +205,7 @@ export default class Questionnaire extends LightningElement {
                                     // }
                                 }
                                 console.log('getSupplierResponseList result', result);
+                                if(!this.assessmentStatus=='New' || !this.assessmentStatus=='In progress'){
                                 result.forEach(qres => {
                                     if(typeof qres.Rhythm__Question__r !='undefined')
                                     {
@@ -204,7 +213,7 @@ export default class Questionnaire extends LightningElement {
                                     }
                                    
                                 });
-
+                                }
                                 console.log('this.savedResponseMap', this.savedResponseMap);
                                 console.log('resultMap', resultMap);
                                 //
@@ -382,7 +391,8 @@ export default class Questionnaire extends LightningElement {
                             this.showButtons.Summary = false;
                             this.showButtons.Section_Navigation.show = false;
                             
-                            if (this.accountAssessmentStatus === 'Submitted' || this.accountAssessmentStatus=='Review Completed') {
+                            if (this.accountAssessmentStatus === 'Submitted' || this.accountAssessmentStatus=='Review Completed' || 
+                            this.accountAssessmentStatus=='In review') {
                                 this.showButtons.Save_Submit = false;
                                 this.showcustomerbuttons = false;
                                 this.showButtons.Summary = true;
@@ -883,7 +893,7 @@ export default class Questionnaire extends LightningElement {
         quTemp.isPhone = ('Phone' == qtype);
         quTemp.isCurrency = ('Currency' == qtype);
         quTemp.isEmail = ('Email' == qtype);
-        quTemp.isTextArea = ('Text Area Text Area (Rich)' == qtype);
+        quTemp.isTextArea = ('Text Area (Rich)' == qtype);
         quTemp.type = qtype;
 
         quTemp.required = qu.Rhythm__Required__c;
@@ -1214,10 +1224,15 @@ export default class Questionnaire extends LightningElement {
             console.log(' handleStartReview result',result);
             this.showSaveAndSubmit = true;
             this.showInReview = false;
+            const selectedEvent = new CustomEvent('updatetimeline', {
+                detail: param
+            });
+            this.dispatchEvent(selectedEvent);
+            this.handleOnload();
         }).catch(error=>{
             console.log('error',error);
         });
-        
+         
         this.showcustomerbuttons = true;
         this.showInReview = false;
         this.showSaveAndSubmit = true;
@@ -1230,13 +1245,20 @@ export default class Questionnaire extends LightningElement {
     enableCustomFlag(event)
     {
         console.log('enableCustomFlag',event.detail);
-        var param = JSON.parse(event.detail);
+        var param = event.detail;
         updateAccountAssessmentStatus({paramMap : JSON.stringify(param) }).then(result=>{
             console.log('result',result);
+
+            const selectedEvent = new CustomEvent('updatetimeline', {
+                detail: param
+            });
+            // Dispatches the event.
+            this.dispatchEvent(selectedEvent);
+            this.handleOnload();
 
         }).catch(error=>{
             console.log('error',error);
         });
-        
+         
     }
 }

@@ -12,6 +12,7 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
     @api responses; /*questions related to particular section will be stored in this JSON wrapper */
     @track chatterMap = {};
     @api upload;
+    @api accountassessmentid;
     @track responsemap = {};
     @track fileresponsemap = {};
     @track showUploadProgress;
@@ -25,6 +26,7 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
     @api recid;
     connectedCallback() {
         console.log('responses', this.responses);
+        console.log('kkk',this.recid);
         this.chatterMap.openChat = false;
         this.chatterMap.disableSendButton = true;
         for (let i = 0; i < this.responses.length; i++) {
@@ -55,7 +57,7 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
         
         console.log('openReview', quesId);
         console.log('this.responses', this.responses);
-        getResponseFlag({ questionId: quesId, assessmentId:this.assessmentid }).then((result) => {
+        getResponseFlag({ questionId: quesId, assessmentId:this.assessmentid, accountAssessmentId:this.accountassessmentid }).then((result) => {
             console.log('result', result);
             if(result.length>0)
             {  
@@ -206,7 +208,7 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
             });
             /* dispatches event */
             this.dispatchEvent(selectedEvent);
-            //console.log('dispatch error',selectedEvent);
+            console.log('dispatch error',selectedEvent);
     }
   
 
