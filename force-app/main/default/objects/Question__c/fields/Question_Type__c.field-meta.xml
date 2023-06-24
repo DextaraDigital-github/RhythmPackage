@@ -11,11 +11,6 @@
         <valueSetDefinition>
             <sorted>false</sorted>
             <value>
-                <fullName>Formula</fullName>
-                <default>false</default>
-                <label>Formula</label>
-            </value>
-            <value>
                 <fullName>Checkbox</fullName>
                 <default>false</default>
                 <label>Checkbox</label>
@@ -71,14 +66,14 @@
                 <label>Text</label>
             </value>
             <value>
-                <fullName>Text Area Text Area (Rich)</fullName>
+                <fullName>Text Area (Rich)</fullName>
                 <default>false</default>
-                <label>Text Area Text Area (Rich)</label>
+                <label>Text Area (Rich)</label>
             </value>
             <value>
-                <fullName>Radio Select</fullName>
+                <fullName>Radio</fullName>
                 <default>false</default>
-                <label>Radio Select</label>
+                <label>Radio</label>
             </value>
         </valueSetDefinition>
     </valueSet>

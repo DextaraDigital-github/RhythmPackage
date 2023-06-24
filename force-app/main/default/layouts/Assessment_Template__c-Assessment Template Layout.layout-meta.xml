@@ -119,7 +119,7 @@
         <fields>End_Date__c</fields>
         <fields>Frequency__c</fields>
         <fields>Status__c</fields>
-        <fields>Number_of_invited_Suppliers__c</fields>
+        <fields>Number_of_Invited_Suppliers__c</fields>
         <fields>Number_of_Responded_Suppliers__c</fields>
         <fields>Number_of_Incomplete_Responses__c</fields>
         <relatedList>Assessment__c.Template__c</relatedList>
