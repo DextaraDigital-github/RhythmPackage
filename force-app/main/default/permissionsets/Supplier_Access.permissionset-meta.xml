@@ -402,8 +402,4 @@
         <tab>Section__c</tab>
         <visibility>Available</visibility>
     </tabSettings>
-    <userPermissions>
-        <enabled>true</enabled>
-        <name>ForceTwoFactor</name>
-    </userPermissions>
 </PermissionSet>

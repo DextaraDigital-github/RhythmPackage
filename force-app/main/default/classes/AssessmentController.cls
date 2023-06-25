@@ -16,10 +16,11 @@ public with sharing class AssessmentController {
 */
     @AuraEnabled(cacheable=true)
     public static List<SObject> getSupplierAssessmentList(String assessmentId){
-        return [SELECT Id,Name,Template__c,Disclosure__c,Status__c 
-                FROM Assessment__c 
+        return [SELECT Id,Assessment__r.Template__c,Assessment__r.Disclosure__c,Status__c
+                FROM AccountAssessmentRelation__c 
                 WHERE Id =:assessmentId
                 LIMIT 1];
+        
         
     }
     
@@ -30,20 +31,20 @@ public with sharing class AssessmentController {
 */
     @AuraEnabled(cacheable=true)
     public static List<SObject> getQuestionsList(String templateId){
-        return [SELECT Id,Name,Section__c,Question_Type__c,Required__c,
+        return [SELECT Id,Name,Section__c,Question_Type__c,Required__c,Default_Value__c,
                 Conditional_Response__c,OptionValueSet__c,Question__c,Requires_File_Upload__c,
                 Parent_Question__c,HelpText__c,Section__r.Name,Section__r.Id,
                 Assessment_Template__c 
                 FROM Question__c 
-                WHERE Assessment_Template__c =:templateId order by Question_Sequence_Number__c, Section__r.Section_Sequence_Number__c
+                WHERE Assessment_Template__c =:templateId order by  Section__r.Section_Sequence_Number__c,Question_Sequence_Number__c
                ];
     }
     
     
     
     /**
-* Gets the Response__c information of an Assessment__c.
-* @param assessmentId This is a record id of an Assessment__c.  
+* Gets the Response__c information of an AccountAssessmentRelation__c.
+* @param assessmentId This is a record id of an AccountAssessmentRelation__c.  
 */
     @AuraEnabled(cacheable=true)
     public static List<SObject> getSupplierResponseList(String assessmentId){
@@ -51,7 +52,7 @@ public with sharing class AssessmentController {
                  Assessment__r.Name,Files__c, Response__c,CreatedBy.Name,CreatedDate, Flag__c, 
                  Conversation_History__c,LastModifiedDate,LastModifiedById 
                  FROM Response__c 
-                 WHERE Assessment__c=:assessmentId AND Is_Latest_Response__c= true];
+                 WHERE AccountAssessmentRelation__c=:assessmentId AND Is_Latest_Response__c= true];
     }
     
     /**
@@ -74,13 +75,14 @@ public with sharing class AssessmentController {
         List<Response__c> existingResponses = new List<Response__c>();
         if(!questionIds.isEmpty())
         {
-            existingResponses = [SELECT Id,Name,Question__c,Response__c,Files__c,Assessment__c,Flag__c,Is_Latest_Response__c 
+            existingResponses = [SELECT Id,Name,Question__c,Response__c,Files__c,Assessment__c,Flag__c,Is_Latest_Response__c,AccountAssessmentRelation__c
                                  FROM Response__c 
-                                 WHERE Question__c IN:questionIds AND Is_Latest_Response__c = true];  
+                                 WHERE Question__c IN:questionIds AND AccountAssessmentRelation__c=:(String)queryMap.get('accountassessmentid')
+                                 AND Is_Latest_Response__c = true];  
         }
         for(Response__c resp :existingResponses)
         {
-            ((Response__c)suppResponseMap.get(resp.Question__c)).Files__c = resp.Files__c;
+            ((Response__c)suppResponseMap.get(resp.Question__c)).put('Files__c', resp.Files__c);
             resp.Is_Latest_Response__c = false;
         }
         System.debug('suppResponseList'+suppResponseList);
@@ -97,7 +99,7 @@ public with sharing class AssessmentController {
         
         List<AccountAssessmentRelation__c> assessment=[SELECT Id,Name,Status__c,Assessment__c,Account__c
                                                        FROM AccountAssessmentRelation__c 
-                                                       WHERE Assessment__c=:(Id)queryMap.get('assesmentId') AND Account__c=:(Id)queryMap.get('accountId')];
+                                                       WHERE Id=:(String)queryMap.get('accountassessmentid')];
         if(!assessment.isEmpty()){
             assessment[0].Status__c =(string)queryMap.get('status');
             UPDATE assessment;
@@ -128,7 +130,8 @@ public with sharing class AssessmentController {
     @AuraEnabled
     public static List<Sobject> getAssessmentStatus(String assessmentId)
     {
-        List<Sobject> assessmentstatus =[SELECT Id, IsDeleted, ParentId, CreatedById, CreatedDate, Field, DataType, OldValue, NewValue  
+        List<Sobject> assessmentstatus =[SELECT Id, IsDeleted, ParentId, CreatedById, CreatedDate, Field, DataType, OldValue, NewValue,
+                                                CreatedBy.Name  
                                          FROM AccountAssessmentRelation__History  
                                          WHERE ParentId=:assessmentId AND Field ='Rhythm__Status__c' order by createdDate desc ];
         return assessmentstatus;
@@ -172,7 +175,7 @@ public with sharing class AssessmentController {
         System.debug((String)responseMap.get('questionId'));
         List<Response__c> responseRecords=[SELECT Conversation_History__c,createdDate 
                                            FROM Response__c 
-                                           WHERE Assessment__c =:(String)responseMap.get('assessmentId') AND Question__c=:(String)responseMap.get('questionId') 
+                                           WHERE AccountAssessmentRelation__c =:(String)responseMap.get('accountassessmentId') AND Question__c=:(String)responseMap.get('questionId') 
                                            AND Is_Latest_Response__c=true ];
         System.debug('responseRecords'+responseRecords);
         return responseRecords;
@@ -193,7 +196,8 @@ public with sharing class AssessmentController {
     {
         List<User> strAccId = [SELECT Contact.AccountId FROM User WHERE id=:userinfo.getuserid()];
         return strAccId[0].Contact.AccountId;
-        //return null;
+        
+       // return null;
     }
     /**
 * Gets the AccountAssessmentRelation__c information of all fields in AccountAssessmentRelation__c for a particular Account__c.
@@ -218,11 +222,12 @@ public with sharing class AssessmentController {
     @AuraEnabled
     public static List<Sobject> getAccountAssessmentRecordData(String assrecordId)
     {
-        List<Sobject> accountassessment = [SELECT Id, IsDeleted, Name,Account__c,Assessment__c, Assessment__r.name ,
+        List<Sobject> accountassessment = [SELECT Id, IsDeleted, Name,Account__c,Assessment__c, Assessment__r.Name,
                                            Assessment__r.Status__c,Assessment__r.Customer_Review__c,CreatedDate,
                                            Assessment__r.Number_of_Questions__c,Start_Date__c,End_Date__c,Status__c,
                                            Assessment__r.Additional_Requests__c,Number_of_Questions__c,Assessment__r.CreatedDate,
-                                           Assessment__r.Template__c, Number_of_Responses__c,Assessment__r.CreatedBy.Name
+                                           Assessment__r.Template__c, Number_of_Responses__c,Assessment__r.CreatedBy.Name,Assessment__r.CreatedUser__c,
+                                           CreatedBy.Name
                                            FROM AccountAssessmentRelation__c 
                                            WHERE Id=:assrecordId ];
         return accountassessment;
@@ -232,15 +237,15 @@ public with sharing class AssessmentController {
 * @param questionId record id of a Question__c.
 */
     @AuraEnabled
-    public static List<SObject> getResponseFlag(String questionId, String assessmentId)
+    public static List<SObject> getResponseFlag(String questionId, String accountAssessmentId)
     {
         System.debug('questionId'+questionId);
-        System.debug('assessmentId'+assessmentId);
+        System.debug('assessmentId'+accountAssessmentId);
         List<Response__c> SupplierResponseList=  [SELECT Id, Question__c,Assessment__c,Question__r.Question_Type__c, 
                                                   Assessment__r.Name,Files__c, Response__c,CreatedBy.Name,CreatedDate, Flag__c, 
                                                   Conversation_History__c,LastModifiedDate,LastModifiedById 
                                                   FROM Response__c 
-                                                  WHERE Question__c=:questionId AND Assessment__c=:assessmentId AND Is_Latest_Response__c= true];
+                                                  WHERE Question__c=:questionId AND AccountAssessmentRelation__c=:accountAssessmentId AND Is_Latest_Response__c= true];
         System.debug('SupplierResponseList'+SupplierResponseList);
         if(!SupplierResponseList.isEmpty())
         {
@@ -257,7 +262,7 @@ public with sharing class AssessmentController {
             System.debug('Into else');
             Response__c response = new Response__c();
             response.Question__c = questionId;
-            response.Assessment__c = assessmentId;
+            response.AccountAssessmentRelation__c = accountAssessmentId;
             response.Flag__c = True;
             response.Is_Latest_Response__c = true;
             INSERT response;
@@ -312,7 +317,7 @@ public with sharing class AssessmentController {
         System.debug('chatMap'+chatMap);
         List<Response__c> responseRecords=[SELECT Conversation_History__c,createdDate	
                                            FROM Response__c 
-                                           WHERE Assessment__c =:(String)chatMap.get('assessmentId')
+                                           WHERE AccountAssessmentRelation__c =:(String)chatMap.get('accountassessmentId')
                                            AND Question__c=:(String)chatMap.get('questionId')
                                            AND Is_Latest_Response__c=true 
                                           ];
@@ -326,8 +331,9 @@ public with sharing class AssessmentController {
             System.debug('into else');
             Response__c response = new Response__c();
             response.Question__c = (String)chatMap.get('questionId');
-            response.Assessment__c = (String)chatMap.get('assessmentId');
+           // response.Assessment__c = (String)chatMap.get('assessmentId');
             response.Conversation_History__c = JSON.serialize(chatMap.get('responseList'));
+            response.AccountAssessmentRelation__c=(String)chatMap.get('accountassessmentId');
             response.Is_Latest_Response__c = true;
             INSERT response;
         }
@@ -396,7 +402,7 @@ public with sharing class AssessmentController {
                 
                 srList = [SELECT Id,Files__c,Question__c 
                           FROM Response__c 
-                          WHERE Question__c =:(String)filemap.get('quesId') AND Is_Latest_Response__c = true];
+                          WHERE Question__c =:(String)filemap.get('quesId') AND AccountAssessmentRelation__c=:(String)filemap.get('assessmentId') AND Is_Latest_Response__c = true];
                 System.debug('Into if'+srList);
                 if(!srList.isEmpty() ){
                     String fileUrl = baseUrl+'/sfc/servlet.shepherd/document/download/'+cvList[0].ContentDocumentId+'?operationContext=S1';
@@ -407,7 +413,7 @@ public with sharing class AssessmentController {
                 else{
                     Response__c res=new Response__c();
                     res.Question__c=(String)filemap.get('quesId');
-                    res.Assessment__c=(String)filemap.get('assessmentId');
+                    res.AccountAssessmentRelation__c=(String)filemap.get('assessmentId');
                     System.debug('Into else');
                     String fileUrl = baseUrl+'/sfc/servlet.shepherd/document/download/'+cvList[0].ContentDocumentId+'?operationContext=S1';
                     string fileJson = '[{"name":"'+(String)filemap.get('name')+'","url":"'+fileUrl+'","type":"'+ftype+'"}]';
@@ -534,7 +540,7 @@ public with sharing class AssessmentController {
                 Assessment_Supplier__c assessSup = new Assessment_Supplier__c();
                 assessSup.Account__c = acc.Id;
                 assessSup.Assessment__c = assessmentId;
-                assessSup.Status__c = 'Active';
+                assessSup.Status__c = 'Inactive';
                 assessSupList.add(assessSup);
                 if(asmtStartDate == Date.Today()){
                     AccountAssessmentRelation__c accAssessReln = new AccountAssessmentRelation__c();

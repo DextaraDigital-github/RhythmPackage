@@ -50,11 +50,6 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>Assessment_Template__c.Status__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
         <field>Assessment_Template__c.Type__c</field>
         <readable>true</readable>
     </fieldPermissions>
@@ -100,11 +95,6 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>Assessment__c.Incomplete_Responses__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
         <field>Assessment__c.Name__c</field>
         <readable>true</readable>
     </fieldPermissions>
@@ -115,22 +105,7 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>Assessment__c.Number_of_Suppliers_responded_back__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
-        <field>Assessment__c.Number_of_invited_Suppliers__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
         <field>Assessment__c.Project_Assignment__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
-        <field>Assessment__c.Responses_Incomplete__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -151,11 +126,6 @@
     <fieldPermissions>
         <editable>true</editable>
         <field>Assessment__c.Target_Completion_Date__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
-        <field>Assessment__c.Template__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -191,11 +161,6 @@
     <fieldPermissions>
         <editable>true</editable>
         <field>Question__c.Question_Sequence_Number__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
-        <field>Question__c.Question_Type__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
