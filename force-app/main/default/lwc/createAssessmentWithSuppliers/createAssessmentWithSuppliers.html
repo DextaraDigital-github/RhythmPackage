@@ -28,7 +28,7 @@
                                         <lightning-input-field field-name="Rhythm__Template__c" value={templateId} data-id="template" name="template" required></lightning-input-field>
                                     </lightning-layout-item>
                                     <lightning-layout-item size="6" padding="around-small">
-                                        <lightning-input-field field-name="Rhythm__Start_Date__c" value={startDate} data-id="startdate" name="startdate" required></lightning-input-field>
+                                        <lightning-input-field field-name="Rhythm__Start_Date__c" data-id="startdate" name="startdate" required></lightning-input-field>
                                     </lightning-layout-item>
                                     <lightning-layout-item size="6" padding="around-small">
                                         <lightning-input-field field-name="Rhythm__End_Date__c" value="" name="enddate"></lightning-input-field>
@@ -56,6 +56,14 @@
                     </template>
                     <template if:true={showSuppliers}>
                         <c-add-suppliers onupdatedsupliers={updateSupplierData}></c-add-suppliers>
+                    </template>
+                    <template if:true={isTemplateInactive}>
+                        <div class="slds-align_absolute-center">
+                            <p class="slds-text-title_bold slds-text-color_destructive">New Assessment cannot be added for the Inactive Template.</p>
+                        </div>
+                        <div class="slds-clearfix slds-float_right">
+                            <lightning-button label="OK" title="Cancel" variant="brand" onclick={closeModal}></lightning-button>
+                        </div>
                     </template>
                 </div>
 

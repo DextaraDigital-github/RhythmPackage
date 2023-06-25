@@ -5,7 +5,6 @@
     <externalId>false</externalId>
     <label>Question</label>
     <referenceTo>Question__c</referenceTo>
-    <relationshipLabel>Responses</relationshipLabel>
     <relationshipName>Responses</relationshipName>
     <required>false</required>
     <trackHistory>false</trackHistory>

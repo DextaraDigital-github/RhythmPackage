@@ -4,18 +4,29 @@
 			<div class="rtmvpc-pgstitle">Welcome to the Supplier Portal </div>
 			<h1 class="rtmvpc-pgmtitle capitalize">Assessments</h1>
 		</div>
-	</header> 
-		
+	</header>
+
 	<div class="">
 		<div class="">
-			<div  class="cdgWrapper">
-				<template if:true={showgrid}>
-					<c-custom-table   obj-name='Rhythm__Assessment__c' rel-name='Rhythm__Assessments__r' object-record-data={recList} 
-						def-page-size={pageSize} col-list={tablefieldList} show-progress-bar="true" show-survey="true" onrowclick={openSurveyHandler}></c-custom-table>
+			<div class="cdgWrapper">
+				<template if:true={show.grid}>
+					<c-custom-table obj-name='Rhythm__Assessment__c' rel-name='Rhythm__Assessments__r'
+						object-record-data={recList} accountid={accId} def-page-size={pageSize}
+						col-list={tablefieldList} show-progress-bar="true" show-survey="true"
+						onrowclick={openSurveyHandler}></c-custom-table>
 				</template>
-				<template if:true={showsurvey}>
-					<c-rtmvpc-Assessment-Detail></c-rtmvpc-Assessment-Detail>
-			</template>
+				<template if:true={show.survey}>
+					<button class="slds-m-bottom_small cdg_actions" onclick={backClickHandler}>
+						<span class="textstyle01">
+							<i class="las la-chevron-circle-left"></i> Back
+						</span>
+					</button>
+					<c-rtmvpc-assessment-detail accountid={accId} accountassessmentid={accountassessmentId}>
+					</c-rtmvpc-assessment-detail>
+					<!-- <template if:true={accId}>
+						<c-rtmvpc-Assessment-Detail accountid={accId}></c-rtmvpc-Assessment-Detail>
+					</template> -->
+				</template>
 			</div>
 		</div>
 	</div>

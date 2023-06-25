@@ -3,18 +3,13 @@
     <fullName>Question_Type__c</fullName>
     <externalId>false</externalId>
     <label>Question Type</label>
-    <required>false</required>
+    <required>true</required>
     <trackHistory>false</trackHistory>
     <trackTrending>false</trackTrending>
     <type>Picklist</type>
     <valueSet>
         <valueSetDefinition>
             <sorted>false</sorted>
-            <value>
-                <fullName>Formula</fullName>
-                <default>false</default>
-                <label>Formula</label>
-            </value>
             <value>
                 <fullName>Checkbox</fullName>
                 <default>false</default>
@@ -71,14 +66,14 @@
                 <label>Text</label>
             </value>
             <value>
-                <fullName>Text Area Text Area (Rich)</fullName>
+                <fullName>Text Area (Rich)</fullName>
                 <default>false</default>
-                <label>Text Area Text Area (Rich)</label>
+                <label>Text Area (Rich)</label>
             </value>
             <value>
-                <fullName>Radio Select</fullName>
+                <fullName>Radio</fullName>
                 <default>false</default>
-                <label>Radio Select</label>
+                <label>Radio</label>
             </value>
         </valueSetDefinition>
     </valueSet>

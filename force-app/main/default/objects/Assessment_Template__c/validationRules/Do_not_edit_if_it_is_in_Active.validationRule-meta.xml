@@ -3,5 +3,5 @@
     <fullName>Do_not_edit_if_it_is_in_Active</fullName>
     <active>true</active>
     <errorConditionFormula>IF( AND(ISPICKVAL(Status__c,&apos;Active&apos;),OR( ISCHANGED( Name ),ISCHANGED( Historical_Id__c ),ISCHANGED( Type__c ),ISCHANGED( Version__c ),ISCHANGED( Disclosure__c)) ),true,false)</errorConditionFormula>
-    <errorMessage>Assessments in the ‘Active Status’ can&apos;t be Editable.</errorMessage>
+    <errorMessage>Assessments in the ‘Active Status’ can&apos;t be Edited</errorMessage>
 </ValidationRule>

@@ -6,21 +6,28 @@
 */
 import { LightningElement, api, track } from 'lwc';
 import getResponseFlag from '@salesforce/apex/AssessmentController.getResponseFlag';
+import updateAccountAssessmentStatus from '@salesforce/apex/AssessmentController.updateAccountAssessmentStatus';
 
 export default class RtmvpcRenderQuestionTemplate extends LightningElement {
     @api responses; /*questions related to particular section will be stored in this JSON wrapper */
     @track chatterMap = {};
     @api upload;
+    @api accountassessmentid;
     @track responsemap = {};
     @track fileresponsemap = {};
     @track showUploadProgress;
-    @api assessmentId;
+    @api assessmentid;
     @track checkedLabel;
+    @api accountassessment;
     @api sectionid;
+    @api accountid;
+    @track customeFlagsList=[];
     @api issupplier;
     @track deletefiledata = {};
+    @api recid;
     connectedCallback() {
         console.log('responses', this.responses);
+        console.log('kkk',this.recid);
         this.chatterMap.openChat = false;
         this.chatterMap.disableSendButton = true;
         for (let i = 0; i < this.responses.length; i++) {
@@ -34,36 +41,64 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
             }
         }
     }
-    openReview(event)
-    {
-        console.log('openReview',event.currentTarget.dataset.id);
-        getResponseFlag({questionId : event.currentTarget.dataset.id}).then((result)=>{
+    openReview(event) {
 
-        }).catch(error=>{
+        var quesId = event.currentTarget.dataset.id;
+        var flagresponse;
+        if(!this.issupplier)
+        {
 
-        });
-        this.chatterMap.questionId = event.currentTarget.dataset.id;
-        this.chatterMap.accountType = 'vendor';
-        console.log('this.chatterMap',this.chatterMap);
-        if (this.chatterMap.openChat == false) {
-            this.chatterMap.openChat = true;
-            this.chatterMap.disableSendButton = false;
+        for(var i=0;i<this.responses.length;i++)
+        {
+            if(this.responses[i].Id==quesId)
+            {
+                flagresponse = !(this.responses[i].Rhythm__Flag__c);
+            }
         }
-        else {
-            this.chatterMap.openChat = false;
-            this.chatterMap.disableSendButton = true;
+        console.log('openReview', quesId);
+        console.log('this.responses', this.responses);
+            this.chatterMap.questionId = quesId;
+            this.chatterMap.accountType = 'vendor';
+            this.chatterMap.responseflag = flagresponse;
+            console.log('this.chatterMap', this.chatterMap);
+            if (this.chatterMap.openChat == false) {
+                this.chatterMap.openChat = true;
+                this.chatterMap.disableSendButton = false;
+            }
+            else {
+                this.chatterMap.openChat = false;
+                this.chatterMap.disableSendButton = true;
+            }
+            const selectedEvent = new CustomEvent('flagchange', {
+                detail: this.chatterMap
+            });
+            // Dispatches the event.
+            this.dispatchEvent(selectedEvent);
+
+        
         }
-        const selectedEvent = new CustomEvent('selectchange', {
-            detail: this.chatterMap
-        });
-        // Dispatches the event.
-        this.dispatchEvent(selectedEvent);
+
     }
 
     /*handleChange is used to dispatch an event to its parent component(Questionnaire) and change the response and send back to the parent component*/
     handleChange(event) {
         var changedvalue = event.target.value;
         var questionId = event.currentTarget.dataset.key;
+        for(var i=0;i<this.responses.length;i++)
+        {
+            console.log('into the for loop',changedvalue);
+               if(typeof changedvalue == 'undefined' || changedvalue == '' || changedvalue=='[]' )
+                 {
+                      console.log('into the for loop',changedvalue);
+                       if(this.responses[i].Id == questionId )
+                       {
+                            console.log('into the for loop',this.responses[i].defaultValue);
+                           changedvalue=this.responses[i].defaultValue;
+                           console.log('into the for loop',changedvalue);
+                       }
+                   }
+        }
+        
         for (var i = 0; i < this.responses.length; i++) {
             if (this.responses[i].Id == questionId && this.responses[i].isCheckbox == true) {
                 if (event.target.checked) {
@@ -91,17 +126,37 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
     /* openChatHandler is used to dispatch an event to its parent component(Questionnaire) by sending
        the questionId to parent component to open chat conversation */
     openChatHandler(event) {
-        this.chatterMap.questionId = event.currentTarget.dataset.id;
-        console.log('event.cuurentTarget.dataset.id',event.currentTarget.dataset.id);
-        this.chatterMap.accountType = 'supplier';
+        var quesId = event.currentTarget.dataset.id;
+        console.log('event.cuurentTarget.dataset.id', event.currentTarget.dataset.id);
+        console.log('this.chatterMap',this.chatterMap +'');
+        if(this.issupplier)
+        {
+            this.chatterMap.accountType = 'supplier';
+        }
+        else
+        {
+            this.chatterMap.accountType = 'vendor';
+
+        }
+        
         if (this.chatterMap.openChat == false) {
             this.chatterMap.openChat = true;
             this.chatterMap.disableSendButton = false;
         }
         else {
-            this.chatterMap.openChat = false;
-            this.chatterMap.disableSendButton = true;
+            if(this.chatterMap.questionId!=quesId)
+            {                
+                this.chatterMap.openChat = true;
+                this.chatterMap.disableSendButton = false;
+            }
+            else
+            {
+                this.chatterMap.openChat = false;
+                this.chatterMap.disableSendButton = true;
+            }
+            
         }
+        this.chatterMap.questionId = quesId;
         const selectedEvent = new CustomEvent('selectchange', {
             detail: this.chatterMap
         });
@@ -112,7 +167,9 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
     /* getShowUploadStatus  is used to show progressbar while uploading the file.This method will be invoked from Questionnaire component.*/
     @api
     getShowUploadStatus() {
+        console.log('this.showUploadProgress',this.showUploadProgress);
         this.showUploadProgress = false;
+        console.log('this.showUploadProgress',this.showUploadProgress);
     }
 
     /* handlechildchange is used to dispatch the value to parent component(Questionnaire) on value change*/
@@ -123,6 +180,7 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
         });
         this.dispatchEvent(selectedEvent);
     }
+  
 
     /* uploadFilesHandler is used to dispatch the file blob value to parent component(Questionnaire) with the loading on uploading the attachment*/
     uploadFilesHandler(event) {
@@ -131,6 +189,19 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
         this.fileresponsemap['questionId'] = questionId[0];
         this.fileresponsemap['sectionId'] = this.sectionid;
         this.fileresponsemap['name'] = event.target.files[0].name;
+        if(typeof questionId[0]!='undefined')
+        {
+            for(var i=0;i<this.responses.length;i++)
+            {
+                if(this.responses[i].Id==questionId[0])
+                {
+                    this.fileresponsemap['type'] = this.responses[i].type;
+                    this.fileresponsemap['flag'] = this.responses[i].Rhythm__Flag__c;
+                    this.fileresponsemap['conversationHistory'] = this.responses[i].Rhythm__Conversation_History__c;
+                }
+               
+            }
+        }
         this.fileresponsemap['url'] = URL.createObjectURL(event.target.files[0]);
         let type = (event.target.files[0].name).split('.');
         this.fileresponsemap['type'] = type[1];

@@ -3,11 +3,9 @@
     <fullName>Number_of_invited_Suppliers__c</fullName>
     <externalId>false</externalId>
     <label># Invited Suppliers</label>
-    <precision>18</precision>
-    <required>false</required>
-    <scale>0</scale>
+    <summaryForeignKey>AccountAssessmentRelation__c.Assessment__c</summaryForeignKey>
+    <summaryOperation>count</summaryOperation>
     <trackHistory>false</trackHistory>
     <trackTrending>false</trackTrending>
-    <type>Number</type>
-    <unique>false</unique>
-</CustomField>
+    <type>Summary</type>
+</CustomField>  

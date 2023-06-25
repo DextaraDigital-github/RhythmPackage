@@ -9,22 +9,22 @@ export default class RtmvpcAssessments extends LightningElement {
 @api parentId='0017i00001QBzehAAD';
 //@track parentId;
 @track recList= [];
-@track accId='0017i00001QBzehAAD';
-//@track accId;
+//@track accId='0017i00001QCVtwAAH';
+@track accId;
+@track assessmentId;
 @track pageSize = 15;
-@track showgrid= false;
-@track showsurvey = false;
+@track show = {grid: false, survey: false};
 @track relName='Rhythm__Assessments__r';
 @track fieldsList=[];
 @track objName='Rhythm__Assessment__c';
 @api tablefieldList =  [
         { label: 'Assessment Name', fieldName: 'Name' },
-        { label: 'Target Completion Date', fieldName: 'Rhythm__Target_Completion_Date__c',type:'date' },
+        { label: 'Target Completion Date', fieldName: 'Rhythm__End_Date__c',type:'date' },
         { label: 'Assessment Status', fieldName: 'Rhythm__Status__c'},
         { label: '#Additional Requests',fieldName:'Rhythm__Additional_Requests__c'},
         { label: 'Customer Review Status', fieldName: 'Rhythm__Customer_Review__c'},
-        { label: '# Number of Questions', fieldName:'Rhythm__Number_of_Questions__c'},
-        { label: '# Number of Responses', fieldName:'Rhythm__Number_of_Suppliers_responded_back__c'}
+        // { label: '# Number of Questions', fieldName:'Rhythm__Number_of_Questions__c'},
+        // { label: '# Number of Responses', fieldName:'Rhythm__Number_of_Suppliers_responded_back__c'}
         ];
 
     connectedCallback(){
@@ -32,16 +32,16 @@ export default class RtmvpcAssessments extends LightningElement {
         for (let i = 0; i < this.tablefieldList.length; i++) {
             this.fieldsList.push(this.objName + '.' + this.tablefieldList[i].fieldName);
         }
-        getAssessmentJunctionRecords({ accountId: this.accId}).then(result=>{
-              this.recList = result;
-              console.log('result',result);
-            this.showgrid=true;
-         });
-    //      getAccountId({}).then((result) => {
+        // getAssessmentJunctionRecords({ accountId: this.accId}).then(result=>{
+        //       this.recList = result;
+        //       console.log('result',result);
+        //     this.show.grid=true;
+        //  });
+         getAccountId({}).then((result) => {
 
-    //      this.accId = result;
-    //      this.fetchingRecords();
-    //   });    
+         this.accId = result;
+         this.fetchingRecords();
+      });    
         
     }
     fetchingRecords()
@@ -50,7 +50,7 @@ export default class RtmvpcAssessments extends LightningElement {
          getAssessmentJunctionRecords({ accountId: this.accId}).then(result=>{
               this.recList = result;
               console.log('result',result);
-            this.showgrid=true;
+            this.show.grid=true;
          });
     }
 //    @wire(getRelatedListRecords, {
@@ -62,11 +62,11 @@ export default class RtmvpcAssessments extends LightningElement {
 //         if (data) {
 //             console.log('getRelatedListRecordsList',data);
 //             this.recList = JSON.parse(JSON.stringify(data.records));
-//             this.showgrid=true;
+//             this.show.grid=true;
 //         }
 //         else if (error) {
 //             console.log('Wire Related List data', JSON.stringify(error));
-//             this.showgrid=true;
+//             this.show.grid=true;
 //         }
  //   }
 
@@ -112,6 +112,14 @@ export default class RtmvpcAssessments extends LightningElement {
 
     openSurveyHandler(event)
     {
-        this.showsurvey = true;
+        this.show.grid = false;
+        this.accountassessmentId = event.detail.accountassessmentId;
+        this.show.survey = true;
+    }
+    backClickHandler(event)
+    {
+        this.show.survey = false;
+        this.assessmentId = undefined;
+        this.show.grid = true;
     }
 }

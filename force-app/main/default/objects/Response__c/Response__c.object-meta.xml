@@ -152,15 +152,15 @@
     <enableSearch>true</enableSearch>
     <enableSharing>true</enableSharing>
     <enableStreamingApi>true</enableStreamingApi>
-    <externalSharingModel>Private</externalSharingModel>
-    <label>Response</label>
+    <externalSharingModel>ReadWrite</externalSharingModel>
+    <label>Supplier Response</label>
     <nameField>
         <displayFormat>R-{000000}</displayFormat>
         <label>Response Name</label>
         <trackHistory>false</trackHistory>
         <type>AutoNumber</type>
     </nameField>
-    <pluralLabel>Responses</pluralLabel>
+    <pluralLabel>Supplier Response</pluralLabel>
     <searchLayouts></searchLayouts>
     <sharingModel>ReadWrite</sharingModel>
     <visibility>Public</visibility>

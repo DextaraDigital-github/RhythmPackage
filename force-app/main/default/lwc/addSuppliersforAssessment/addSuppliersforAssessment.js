@@ -3,10 +3,12 @@ import { CloseActionScreenEvent } from 'lightning/actions';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import addSuppliers from '@salesforce/apex/AssessmentController.sendAssessment';
 import getAssessmentRecord from '@salesforce/apex/AssessmentController.getAssessmentRecord';
+import { getRecordNotifyChange } from "lightning/uiRecordApi";
 export default class AddSuppliersforAssessment extends LightningElement {
     @api recordId;
     @track suppliersList=[];
-    @track existingSuppList;
+    @track existingSuppList=[];
+    @track delList;
 
     @wire(getAssessmentRecord, { assessmentId: '$recordId'})
     assessmentRecord(result) {
@@ -20,53 +22,55 @@ export default class AddSuppliersforAssessment extends LightningElement {
     }
 
     handleAdd(){
-        let deleteList = [];
-        if(this.existingSuppList.length>0){
-            for(let supId of this.existingSuppList){
-                if(this.suppliersList.indexOf(supId) === -1){
-                    deleteList.push(supId);
+        try{
+            console.log('existingSuppList------>',JSON.stringify(this.existingSuppList));
+            console.log('suppliersList------>',JSON.stringify(this.suppliersList));
+            let deleteListStr = '';
+            let exSupListStr = '';
+            if(this.existingSuppList.length>0){
+                exSupListStr = JSON.stringify(this.existingSuppList);
+            }
+             if(this.delList.length>0){
+                deleteListStr = JSON.stringify(this.delList);
+            }
+            let dateValue = new Date().toISOString().substring(0, 10);
+            console.log('todayDate----->',dateValue);
+            console.log('startDate----->',this.startDate);
+            if(new Date(this.startDate) >= new Date(dateValue)){
+                console.log('AddSuppliersMethod------->',JSON.stringify(this.suppliersList));
+                if(this.suppliersList.length > 0){
+                    addSuppliers({assessmentRecord:this.assessmentRecord,operationType:'update',suppliers:JSON.stringify(this.suppliersList),existingSups:exSupListStr,deleteList:deleteListStr})
+                    .then(result => {
+                        console.log('addSuppliers Result------->'+JSON.stringify(result));
+                        if(result.isSuccess == true){
+                            this.showModal = false;
+                            this.showNotification('Success','Suppliers Added to Assessments Successfully.','success');
+                            this.closeModal();
+                            getRecordNotifyChange([{ recordId: this.assessmentRecord.Id }]);
+                        }else{
+                            //this.showNotification('Error',result.message,'error');
+                        }
+                    })
+                    .catch(error => {
+                        this.error = error;
+                        this.showNotification('Error',error,'error');
+                    });
+                }else{
+                    this.showNotification('Error','Please select atleast one supplier to proceed.','error');
                 }
-            }
-        }
-        let deleteListStr = '';
-        if(deleteList.length>0){
-            deleteListStr = JSON.stringify(deleteList);
-        }
-        let dateValue = new Date().toISOString().substring(0, 10);
-        console.log('todayDate----->',dateValue);
-        console.log('startDate----->',this.startDate);
-        if(new Date(this.startDate) >= new Date(dateValue)){
-            console.log('AddSuppliersMethod------->',JSON.stringify(this.suppliersList));
-            if(this.suppliersList.length > 0){
-                addSuppliers({assessmentRecord:this.assessmentRecord,operationType:'update',suppliers:JSON.stringify(this.suppliersList),deleteList:deleteListStr})
-                .then(result => {
-                    console.log('addSuppliers Result------->'+JSON.stringify(result));
-                    if(result.isSuccess == true){
-                        this.showModal = false;
-                        this.showNotification('Success','Suppliers Added to Assessments Successfully.','success');
-                        this.closeModal();
-                    }else{
-                        //this.showNotification('Error',result.message,'error');
-                    }
-                })
-                .catch(error => {
-                    this.error = error;
-                    //this.showNotification('Error',error,'error');
-                });
             }else{
-                this.showNotification('Error','Please select atleast one supplier to proceed.','error');
+                this.showNotification('Error','Suppliers cannot be modified for the past assessments','error');
             }
-        }else{
-            this.showNotification('Error','Suppliers cannot be modified for the past assessments','error');
+        }catch(e){
+            console.log(JSON.stringify(e));
         }
-       
-        
     }
 
     updateSupplierData(event){
         console.log('addSuppliersAssessment------>'+JSON.stringify(event.detail));
         this.suppliersList = event.detail.newSuppliers;
         this.existingSuppList = event.detail.existingSupps;
+        this.delList = event.detail.delList;
     }
 
     showNotification(title,message,variant) {
