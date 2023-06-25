@@ -21,7 +21,7 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
     @api assessmentid;
     @api recordId;
     @api objectApiName;
-    @track showflagquestions = true;
+    @track showflagquestions = false;
     @track userName;
     @track showSections;
     @track showFlag = false;
@@ -37,11 +37,11 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
     @track customerId;
     @track isRecordPage;
     @track showExpand=true;
-     @track finalSection;
-     @track assaccId;
-     @track accountassessmentrelId;
-     @track accountAssessmentStatus;
-
+    @track finalSection;
+    @track assaccId;
+    @track accountassessmentrelId;
+    @track accountAssessmentStatus;
+    @api accountassessmentid;
     @track savedResponseMap = new Map();
     connectedCallback() {
         this.customerId = this.recordId;
@@ -75,10 +75,11 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
             if(this.recordId==null || typeof this.recordId=='undefined')
             {
                 console.log('getUserName result',result);
-                getAccountAssesmentRecords({accountId:this.assaccId, assessmentId:this.assessmentid}).then(result => {
+                getAccountAssessmentRecordData({assrecordId:this.accountassessmentid}).then(result => {
+
                     console.log('handleTimeLine',result);
                 for (var j = 0; j < result.length; j++) {
-                    if (result[j].Rhythm__Assessment__c == this.assessmentid) {
+                    if (result[j].Id == this.accountassessmentid) {
                         
                         console.log('result[j]',result[j]);
                         this.accountassessmentrelId = result[j].Id;
@@ -86,7 +87,7 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
                         {
                         this.accountAssessmentStatus = result[j].Rhythm__Status__c;
                         this.statusassessment = result[j].Rhythm__Status__c;
-                        if (this.accountAssessmentStatus == 'Submitted' || this.accountAssessmentStatus == 'Open' || this.accountAssessmentStatus == 'Completed' || this.accountAssessmentStatus == 'Closed') {
+                        if (this.accountAssessmentStatus == 'Submitted' || this.accountAssessmentStatus == 'In review' || this.accountAssessmentStatus == 'Need more information') {
                             this.showstatus = true;
                         }
                         }
@@ -141,9 +142,9 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
                         // }
                     }
                 }
-                console.log('this.accountassessmentrelId',this.accountassessmentrelId);
+                console.log('this.accountassessmentrelId',this.accountassessmentid);
                 /* To get the assessment tracking history to update on timeline*/
-                getAssessmentStatus({ assessmentId: this.accountassessmentrelId }).then(result => {
+                getAssessmentStatus({ assessmentId: this.accountassessmentid }).then(result => {
                     console.log('accountassessmentrelId',result);
                     var assessmentStatus = result;
                     if(result.length>0){
@@ -172,19 +173,28 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
                                     case "Need more information": statustrack['classlist'] = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_needmoreinfo'; break;
                                     case "Review Completed": statustrack['classlist'] = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_submited'; break;
                                 }
-                                statustrack['name'] = result[i].CreatedBy.Name;
+                                //statustrack['name'] = result[i].CreatedBy.Name;//todo create a formula field in accountassesmentrelation by koushik
                                 this.assessmentTimeline.push(statustrack);
                             }
                         }
-                         var relocate = this.assessmentTimeline.splice(0, 1);
-                         this.assessmentTimeline.push(relocate[0]);
+                        if(this.assessmentTimeline.length>2)
+                        {
+                            var relocate = this.assessmentTimeline.splice(0, 1);
+                            this.assessmentTimeline.push(relocate[0]);
+                        }
+                         
                     }
+                }
+                if(this.assessmentStatus=='Need more information')
+                {
+                    this.handleFilterFlag(true);
                 }
                     this.showSections = true;
                 }).catch(error => {
                     errorLogRecord({ componentName: 'RtmvpcAssessmentChatter', methodName: 'getChatterResponse', className: 'AssessmentController', errorData: error.message }).then((result) => {
                     });
                 });
+            
             }).catch(error => {
                 errorLogRecord({ componentName: 'RtmvpcAssessmentChatter', methodName: 'getChatterResponse', className: 'AssessmentController', errorData: error.message }).then((result) => {
                 });
@@ -289,8 +299,12 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
                                 this.assessmentTimeline.push(statustrack);
                             }
                         }
-                        var relocate = this.assessmentTimeline.splice(0, 1);
+                        if(this.assessmentTimeline.length>2)
+                        {
+                             var relocate = this.assessmentTimeline.splice(0, 1);
                         this.assessmentTimeline.push(relocate[0]);
+                        }
+                       
                     }
                     this.showSections = true;
                 
@@ -344,6 +358,7 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
     /* chatHistory is used to get the question id, assessment id and flag boolean from the child component (Questionnaire) and pass it to the child component(AssessmentChatter)*/
     chatHistory(event) {
         this.showChat = event.detail;
+        this.showChat.accountassessmentId=this.accountassessmentid;
         this.showData = this.showChat.openChat;
         this.showconverstion = this.showChat.disableSendButton;
     }
@@ -359,14 +374,14 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
     }
     handleExportCSV(event)
     {
-         var assessmentId = event.currentTarget.dataset.id;
+         //var assessmentId = event.currentTarget.dataset.id;
       
-        getSupplierAssessmentList({ assessmentId: assessmentId }).then(resultData => {
-            var assessmentTemplateId = resultData[0].Rhythm__Template__c
+        getSupplierAssessmentList({ assessmentId: this.accountassessmentid }).then(resultData => {
+            var assessmentTemplateId = resultData[0].Rhythm__Assessment__r.Rhythm__Template__c;
          
             getQuestionsList({ templateId: assessmentTemplateId }).then(result => {
                 var resultMap = result;
-                getSupplierResponseList({ assessmentId: assessmentId }).then(result => {
+                getSupplierResponseList({ assessmentId: this.accountassessmentid }).then(result => {
                     result.forEach(qres => { 
                         console.log('jjjj',qres);
                          var savedResponseList= new Map();
@@ -412,7 +427,7 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
                     var url = window.URL.createObjectURL(blob);
                     var atag = document.createElement('a');
                     atag.setAttribute('href', url);                    
-                    atag.setAttribute('download', resultData[0].Name + '.csv');
+                    atag.setAttribute('download', resultData[0].Rhythm__Assessment__r.Name + '.csv');
                     atag.click();
                 }).catch(error => {
                    errorLogRecord({ componentName: 'CustomTable', methodName: 'getSupplierResponseList', className: 'AssessmentController', errorData: error.message }).then((result) => {
@@ -429,16 +444,16 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
         })
     }
      constructWrapper(questionResp, savedResp) {
-        var questionMap = new Map();
-        console.log('responsemap',savedResp);
+       
+               var questionMap = new Map();
+        console.log('responsemap', savedResp);
         questionResp.forEach(qu => {
-            var quTemp = {};          
-            quTemp.questionId = qu.Id;          
+            var quTemp = {};
+            quTemp.questionId = qu.Id;
             quTemp.question = qu.Rhythm__Question__c;
-             if(qu.Rhythm__Required__c == true)
-            {
-                var str='';
-                str=str+ qu.Rhythm__Question__c+'*';
+            if (qu.Rhythm__Required__c == true) {
+                var str = '';
+                str = str + qu.Rhythm__Question__c + '*';
                 quTemp.question = str;
             }
             if (questionMap.has(qu.Rhythm__Section__r.Name)) {
@@ -447,28 +462,29 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
                 var quesList = [];
                 quesList.push(quTemp);
                 questionMap.set(qu.Rhythm__Section__r.Name, quesList);
-            }            
-            if(typeof (savedResp.get(quTemp.questionId)) != 'undefined' && savedResp.get(quTemp.questionId).conversationHistory == 'undefined')
-            {
-               quTemp.value = savedResp.get(quTemp.questionId).get('value');
             }
-            else if( typeof (savedResp.get(quTemp.questionId)) != 'undefined'){               
-                  quTemp.value = savedResp.get(quTemp.questionId).get('value');
-                     quTemp.conversationHistory = savedResp.get(quTemp.questionId).get('history');
-                     quTemp.files = savedResp.get(quTemp.questionId).get('files');
-                
+            if (typeof (savedResp.get(quTemp.questionId)) != 'undefined' && savedResp.get(quTemp.questionId).conversationHistory == 'undefined') {
+                quTemp.value = savedResp.get(quTemp.questionId).get('value');
             }
-            
+            else if (typeof (savedResp.get(quTemp.questionId)) != 'undefined') {
+                quTemp.value = savedResp.get(quTemp.questionId).get('value');
+                quTemp.conversationHistory = savedResp.get(quTemp.questionId).get('history');
+                quTemp.files = savedResp.get(quTemp.questionId).get('files');
+
+            }
+
         });
+        console.log('kkk',questionMap);
         return questionMap;
     }
     handleExportPDF(event) {
-         var assessmentId = event.currentTarget.dataset.id;
-        getSupplierAssessmentList({ assessmentId: assessmentId }).then(resultData => {
-            var assessmentTemplateId = resultData[0].Rhythm__Template__c;
+         //var assessmentId = event.currentTarget.dataset.id;
+         console.log('lll',this.accountassessmentid);
+        getSupplierAssessmentList({ assessmentId: this.accountassessmentid }).then(resultData => {
+            var assessmentTemplateId = resultData[0].Rhythm__Assessment__r.Rhythm__Template__c;;
             getQuestionsList({ templateId: assessmentTemplateId }).then(result => {
                 var resultMap = result;
-                getSupplierResponseList({ assessmentId: assessmentId }).then(result => {
+                getSupplierResponseList({ assessmentId: this.accountassessmentid}).then(result => {
                     result.forEach(qres => {
                          var savedResponseList= new Map();
 

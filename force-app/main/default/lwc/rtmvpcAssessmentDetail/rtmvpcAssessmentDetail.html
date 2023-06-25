@@ -86,8 +86,8 @@
 									<template if:false={showflagquestions}>
 										<span class="cib-archive:hover">
 											<lightning-icon data-id="showpriorityflag" icon-name="utility:priority"
-												alternative-text="Additional Requests" size="x-small"
-												title="Additional Requests" onclick={handleChange}></lightning-icon>
+												 size="x-small"
+											     onclick={handleChange}></lightning-icon>
 										</span>
 									</template>
 
@@ -146,7 +146,7 @@
 												object-api-name={objectApiName} record-id={recordId} accid={assaccId}
 												onselectconversation={chatHistory} onshowsummary={showsummaryHandler}
 												account-assessment-status={accountAssessmentStatus} onupdatetimeline={handleupdatetimeline}
-												onexpandcollapse={handleExpandCollapse}
+												onexpandcollapse={handleExpandCollapse} accountassessmentid={accountassessmentid}
 												ontimelinehandle={handleTimeLine}>
 											</c-Questionnaire>
 											<!--</template>-->

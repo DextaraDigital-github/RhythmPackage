@@ -18,6 +18,7 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
     @track showUploadProgress;
     @api assessmentid;
     @track checkedLabel;
+    @api accountassessment;
     @api sectionid;
     @api accountid;
     @track customeFlagsList=[];
@@ -54,16 +55,8 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
                 flagresponse = !(this.responses[i].Rhythm__Flag__c);
             }
         }
-        
         console.log('openReview', quesId);
         console.log('this.responses', this.responses);
-        getResponseFlag({ questionId: quesId, assessmentId:this.assessmentid, accountAssessmentId:this.accountassessmentid }).then((result) => {
-            console.log('result', result);
-            if(result.length>0)
-            {  
-                flagresponse = JSON.parse(JSON.stringify(result[0].Rhythm__Flag__c));
-            }
-            
             this.chatterMap.questionId = quesId;
             this.chatterMap.accountType = 'vendor';
             this.chatterMap.responseflag = flagresponse;
@@ -76,15 +69,13 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
                 this.chatterMap.openChat = false;
                 this.chatterMap.disableSendButton = true;
             }
-            const selectedEvent = new CustomEvent('selectchange', {
+            const selectedEvent = new CustomEvent('flagchange', {
                 detail: this.chatterMap
             });
             // Dispatches the event.
             this.dispatchEvent(selectedEvent);
 
-        }).catch(error => {
-            console.log('error', error);
-        });
+        
         }
 
     }
@@ -93,6 +84,21 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
     handleChange(event) {
         var changedvalue = event.target.value;
         var questionId = event.currentTarget.dataset.key;
+        for(var i=0;i<this.responses.length;i++)
+        {
+            console.log('into the for loop',changedvalue);
+               if(typeof changedvalue == 'undefined' || changedvalue == '' || changedvalue=='[]' )
+                 {
+                      console.log('into the for loop',changedvalue);
+                       if(this.responses[i].Id == questionId )
+                       {
+                            console.log('into the for loop',this.responses[i].defaultValue);
+                           changedvalue=this.responses[i].defaultValue;
+                           console.log('into the for loop',changedvalue);
+                       }
+                   }
+        }
+        
         for (var i = 0; i < this.responses.length; i++) {
             if (this.responses[i].Id == questionId && this.responses[i].isCheckbox == true) {
                 if (event.target.checked) {
@@ -173,42 +179,6 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
             detail: event.detail
         });
         this.dispatchEvent(selectedEvent);
-    }
-    @api
-    checkCustomerFlags()
-    {
-        var boolflag;
-        var param={};
-        var status;
-        console.log('In Child');
-        if(this.responses[0].customerFlag==true)
-        {
-            for(var i=0;i<this.responses.length;i++)
-            {
-                if(this.responses[i].Rhythm__Flag__c)
-                {
-                    boolflag = true;
-                }
-            }
-        }
-        if(boolflag)
-        {
-            status ='Need more information';
-        }
-        else
-        {
-            status ='Review Completed';
-        }
-        param.assessmentStatus = status;
-        console.log('this.recid',this.recid);
-        param.recId = this.recid;
-        const selectedEvent = new CustomEvent('flagenable', {
-                bubbles: true,
-                detail: param
-            });
-            /* dispatches event */
-            this.dispatchEvent(selectedEvent);
-            console.log('dispatch error',selectedEvent);
     }
   
 

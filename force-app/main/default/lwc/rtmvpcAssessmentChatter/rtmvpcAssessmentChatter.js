@@ -15,6 +15,7 @@ export default class RtmvpcAssessmentChatter extends LightningElement {
    @track assessmentId;
    @track chatDataMap = {};
    @track newChat;
+   @track accountassessmentId;
    userName;
    @track responseList = [];
    @track showResponse = false;
@@ -22,11 +23,13 @@ export default class RtmvpcAssessmentChatter extends LightningElement {
    @track newResponse = [];
    @api recordid;
    @track responseWrapper = {};
+   
 
    connectedCallback() {
       this.questionId = this.chattermap.questionId;
       this.assessmentId = this.chattermap.assesmentId;
       this.accountType = this.chattermap.accountType;
+      this.accountassessmentId=this.chattermap.accountassessmentId;
       console.log('kkkk',this.chattermap);
       /*getUserName is used to get the username */
       getUserName({}).then((result) => {
@@ -35,7 +38,17 @@ export default class RtmvpcAssessmentChatter extends LightningElement {
       console.log('kkkk');
       this.responseWrapper.assessmentId = this.assessmentId;
       this.responseWrapper.questionId = this.questionId;
+      
       console.log('kkkk', this.responseWrapper);
+      if(typeof this.recordid!='undefined')
+      {
+         this.responseWrapper.accountassessmentId = this.recordid;
+      }
+      else
+      {
+         this.responseWrapper.accountassessmentId = this.accountassessmentId;
+      }
+      console.log('this.accountassessmentId',this.accountassessmentId);
 
       /*getChatterResponse is used to get conversation history between vendor and customer on onload */
       getChatterResponse({ responseWrapper: JSON.stringify(this.responseWrapper) }).then((result) => {
@@ -115,6 +128,16 @@ export default class RtmvpcAssessmentChatter extends LightningElement {
       {
       this.responseWrapper.assessmentId = this.assessmentId;
       this.responseWrapper.questionId = this.questionId;
+       
+      if(typeof this.recordid != 'undefined')
+      {
+         this.responseWrapper.accountassessmentId = this.recordid;
+      }
+      else
+      {
+         this.responseWrapper.accountassessmentId = this.accountassessmentId;
+      }
+      console.log('this.accountassessmentId',this.accountassessmentId);
       /*This method is used to get conversation history between vendor and customer after firing the event */
       getChatterResponse({ responseWrapper: JSON.stringify(this.responseWrapper) }).then((result1) => {
          console.log('ssss',result1);
@@ -194,6 +217,7 @@ export default class RtmvpcAssessmentChatter extends LightningElement {
          console.log('newResponse', this.newResponse);
          this.chatDataMap.conversationHistory = JSON.stringify(this.responseList);
          this.chatDataMap.questionId = this.questionId;
+          this.chatDataMap.accountassessmentId = this.accountassessmentId;
 
          /* This dispatch event is used to assign the conversation data to the main wrapper (questionnaire) to update the data in the latest records. */
          const selectedEvent = new CustomEvent('chatconversation', {

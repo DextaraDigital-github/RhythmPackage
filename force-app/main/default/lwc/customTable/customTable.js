@@ -1,6 +1,6 @@
-import { LightningElement, wire, track, api } from 'lwc';
-import getAssesmentRecords from '@salesforce/apex/AssessmentController.getAssesmentRecords';
-import { getRelatedListRecords } from 'lightning/uiRelatedListApi'; //To fetch all the related records of a RecordId
+import { LightningElement, track, api } from 'lwc';
+// import getAssesmentRecords from '@salesforce/apex/AssessmentController.getAssesmentRecords';
+// import { getRelatedListRecords } from 'lightning/uiRelatedListApi'; //To fetch all the related records of a RecordId
 import getRelatedTasks from '@salesforce/apex/rtmvpcRelatedListsController.getRelatedTasks'; //To fetch all the related Task records of a RecordId as the uiRelatedListApi doesn't support Activity
 import getQuestionsList from '@salesforce/apex/AssessmentController.getQuestionsList'; //To fetch all the Questions from the Assessment_Template__c Id from the Supplier_Assessment__c record
 import getSupplierResponseList from '@salesforce/apex/AssessmentController.getSupplierResponseList'; //To fetch all the Supplier_Response__c records related to the Supplier_Assessment__c record
@@ -13,7 +13,7 @@ import errorLogRecord from '@salesforce/apex/AssessmentController.errorLogRecord
 
 export default class CustomTable extends LightningElement {
     @api navListHandler = [];
-    @api navListHandler_copy = [];
+    // @api navListHandler_copy = [];
     statusOptions = [
         {
             value: 'all',
@@ -34,10 +34,10 @@ export default class CustomTable extends LightningElement {
     ];
     value = 'All';
 
-    @track spinner = false;
+    // @track spinner = false;
     @api record;
-    @track sample='';
-    @track count=0;
+    // @track sample = '';
+    // @track count = 0;
     @track iconName = 'utility:pin';
 
     handleClick(event) {
@@ -51,7 +51,7 @@ export default class CustomTable extends LightningElement {
     //Boolean tracked variable to indicate if modal is open or not default value is false as modal is closed when page is loaded 
     @track isShowHideColumnsModalOpen = false;
     @track isShuffleColumnsModalOpen = false;
-    assessmentrecorddata=[];
+    assessmentrecorddata = [];
     @api recId;
     @api recordType;
     @api objName;
@@ -62,8 +62,8 @@ export default class CustomTable extends LightningElement {
     @api showProgressBar;
     @api showSurvey;
     @api progressBarValue = 0;
-    @api defPageSize=15;
-    @track recList=[];
+    @api defPageSize = 15;
+    @track recList = [];
     @track showTable;
     @track accountsId;
     @track recordDetailId;
@@ -85,14 +85,15 @@ export default class CustomTable extends LightningElement {
     //handlePageSizeChange
     @track savedResponseMap = new Map();
     @track finalSection;
-    @track opt_showCalendar;
     @track assessmentsId;
-    @track opt_list;
-    @track opt_new;
-    @track opt_delete;
-    @track opt_newEmp;
-    @track opt_rec_csv;
-    @track opt_rec_pdf;
+    @api gridoptions = { deleteRecords: false, calendarViews: false, bulkCreation: false, newRecord: false, newEmployee: false, exportRowAsCsv: false, exportRowAsPdf: false };
+    // @track opt_showCalendar;
+    // @track opt_list;
+    // @track opt_new;
+    // @track opt_delete;
+    // @track opt_newEmp;
+    // @track opt_rec_csv;
+    // @track opt_rec_pdf;
     @track selectedItemId;
     @api isChildTable;
     progressBarData = {};
@@ -151,7 +152,7 @@ export default class CustomTable extends LightningElement {
     //     }
     // }
 
-    
+
 
     handlePageNumberChange(event) {
         if (!!event) {
@@ -301,19 +302,20 @@ export default class CustomTable extends LightningElement {
             }
 
         }
-       csvHeader=csvHeader+csvRows;
+        csvHeader = csvHeader + csvRows;
         csvHeader = csvHeader.replaceAll('undefined', '').replaceAll('null', '');
         var blob = new Blob([csvHeader], { type: 'text/plain' });
-       var url = window.URL.createObjectURL(blob);
-                    var atag = document.createElement('a');
-                    atag.setAttribute('href', url);                    
-                   atag.setAttribute('download', 'assessments' + '.csv');
-                   atag.click();
-                   
+        var url = window.URL.createObjectURL(blob);
+        var atag = document.createElement('a');
+        atag.setAttribute('href', url);
+        atag.setAttribute('download', 'assessments' + '.csv');
+        atag.click();
+
     }
 
-   
+
     assignData(relatedListRecords, colList) {
+        console.log('llll',relatedListRecords);
 
         var recDataList = [];
         if (typeof this.objName != undefined && this.objName === 'Task') {
@@ -363,42 +365,38 @@ export default class CustomTable extends LightningElement {
             //console.log('recDataList-->', recDataList);
         }
         else {
-            console.log('relatedListRecords',relatedListRecords);
-            console.log('colList',colList);
+            console.log('relatedListRecords', relatedListRecords);
+            console.log('colList', colList);
             for (var i = 0; i < relatedListRecords.length; i++) {
                 var recDetails = {};
                 var recArray = [];
                 if (relatedListRecords[i] != null) {
                     for (var j = 0; j < colList.length; j++) {
-                        if (typeof relatedListRecords[i].Rhythm__Assessment__r!='undefined') {
+                        if (typeof relatedListRecords[i].Rhythm__Assessment__r != 'undefined') {
                             let recJson = {};
                             recJson.fieldName = colList[j].fieldName;
                             recJson.label = colList[j].label;
-                            if (colList[j].type === 'date' ) {
-                                if(typeof relatedListRecords[i].Rhythm__End_Date__c!='undefined')
-                                {
+                            if (colList[j].type === 'date') {
+                                if (typeof relatedListRecords[i].Rhythm__End_Date__c != 'undefined') {
                                     var x = relatedListRecords[i].Rhythm__End_Date__c.split('T')[0];
                                     // recJson.value = x.split('-')[2] + '-' + x.split('-')[1] + '-' + x.split('-')[0];
                                     var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
                                     recJson.value = months[Number(x.split('-')[1]) - 1] + '-' + x.split('-')[2] + '-' + x.split('-')[0];
                                 }
-                                
+
                             }
                             else {
-                                
-                                if(typeof relatedListRecords[i][colList[j].fieldName]!='undefined' && colList[j].fieldName!='Name')
-                                {
+
+                                if (typeof relatedListRecords[i][colList[j].fieldName] != 'undefined' && colList[j].fieldName != 'Name') {
                                     recJson.value = relatedListRecords[i][colList[j].fieldName];
                                 }
-                                else if(colList[j].fieldName=='Name')
-                                {
-                                if(typeof relatedListRecords[i].Rhythm__Assessment__r['Name']!='undefined')
-                                {
-                                    recJson.value = relatedListRecords[i].Rhythm__Assessment__r['Name'];
+                                else if (colList[j].fieldName == 'Name') {
+                                    if (typeof relatedListRecords[i].Rhythm__Assessment__r['Name'] != 'undefined') {
+                                        recJson.value = relatedListRecords[i].Rhythm__Assessment__r['Name'];
+                                    }
                                 }
-                                }
-                                
-                                
+
+
                             }
                             //Project 'Completed' 'In progress' 'On Hold' 'Open' 'Overdue' null
                             //Employee 'Active' 'Inactive' null
@@ -418,22 +416,21 @@ export default class CustomTable extends LightningElement {
                                 recJson.isHyperlink = true;
                                 if (this.objName === 'Rhythm__Assessment__c') {
                                     //console.log(relatedListRecords[i].fields['Additional__c'].value);
-                                    if(typeof relatedListRecords[i].Rhythm__Assessment__r.Rhythm__Additional_Requests__c!='undefined'
-                                    && Number(relatedListRecords[i].Rhythm__Assessment__r.Rhythm__Additional_Requests__c)>0)
-                                    {
+                                    if (typeof relatedListRecords[i].Rhythm__Assessment__r.Rhythm__Additional_Requests__c != 'undefined'
+                                        && Number(relatedListRecords[i].Rhythm__Assessment__r.Rhythm__Additional_Requests__c) > 0) {
                                         recJson.flagSymbol = 'action:priority';
                                     }
                                 }
                             }
 
                             if (colList[j].fieldName === 'Rhythm__Status__c') {
-                                if(typeof relatedListRecords[i].Rhythm__Status__c!='undefined')
-                                if (relatedListRecords[i].Rhythm__Status__c === 'Submitted') {
-                                    recJson.surveySymbol = 'utility:lock';
-                                }
-                                else {
-                                    recJson.surveySymbol = 'utility:unlock';
-                                }
+                                if (typeof relatedListRecords[i].Rhythm__Status__c != 'undefined')
+                                    if (relatedListRecords[i].Rhythm__Status__c === 'Submitted') {
+                                        recJson.surveySymbol = 'utility:lock';
+                                    }
+                                    else {
+                                        recJson.surveySymbol = 'utility:unlock';
+                                    }
                             }
                             recArray.push(recJson);
                             if (this.showProgressBar === "true") {
@@ -454,20 +451,20 @@ export default class CustomTable extends LightningElement {
                                 // {
                                 //     recDetails.progressBarValue = '0';
                                 // }
-                                if(typeof relatedListRecords[i].Rhythm__Completed__c!='undefined')
-                                {
-                                    recDetails.progressBarValue=relatedListRecords[i].Rhythm__Completed__c;
+                                if (typeof relatedListRecords[i].Rhythm__Completed__c != 'undefined') {
+                                    recDetails.progressBarValue = relatedListRecords[i].Rhythm__Completed__c;
                                 }
                                 console.log('Executed upto line 436 without error');
                             }
-                            recDetails.id = relatedListRecords[i].Rhythm__Assessment__r.Id;
+                            //recDetails.id = relatedListRecords[i].Rhythm__Assessment__r.Id;
+                            recDetails.id = relatedListRecords[i].Id
 
                         }
                     }
-                    
-                    
+
+
                 }
-                
+
                 recDetails.viewButton = true;
                 recDetails.takeSurvey = false;
                 recDetails.rowClick = 'viewClickHandler';
@@ -490,7 +487,7 @@ export default class CustomTable extends LightningElement {
                 recDataList.push(recDetails);
             }
         }
-        console.log('recDataList',JSON.stringify(recDataList));
+        console.log('recDataList', JSON.stringify(recDataList));
         return recDataList;
     }
 
@@ -636,27 +633,34 @@ export default class CustomTable extends LightningElement {
         //     });
         //     this.dispatchEvent(showchilddetailpage);
         // }
-        // this.spinner = false;
-    */
-    //this.takeSurvey = true;
-    console.log('In view click Handler');
-    const rowclick = new CustomEvent('rowclick',{
-        detail:{}
-    });
-    this.dispatchEvent(rowclick);
+        this.spinner = false;*/
+        //this.takeSurvey = true;
+        console.log('In view click Handler');
+        const rowclick = new CustomEvent('rowclick', {
+            detail: {}
+        });
+        this.dispatchEvent(rowclick);
     }
 
     takeSurveyHandler(event) {
-        this.showTable = false;
-        this.takeSurvey = true;
-        
-        this.recordDetailId = event.currentTarget.dataset.id;
-        this.assessmentsId = this.recordDetailId;
-        console.log('record',this.recordDetailId);
+        // this.showTable = false;
+        // this.takeSurvey = true;
+
+        // this.recordDetailId = event.currentTarget.dataset.id;
+        // this.assessmentsId = this.recordDetailId;
+        // console.log('record', this.recordDetailId);
+
+        console.log('In Take Survey Handler',event.currentTarget.dataset.id);
+        const rowclick = new CustomEvent('rowclick', {
+            detail: { accountassessmentId: event.currentTarget.dataset.id }
+        });
+        this.dispatchEvent(rowclick);
     }
 
+    //TBR
     backClickHandler(event) {
-        this.spinner = true;
+        // this.spinner = true;
+        /*
         console.log('CustomTable navList', this.navListHandler);
         if (this.navListHandler.length > 1) {
             console.log('in child');
@@ -695,7 +699,8 @@ export default class CustomTable extends LightningElement {
             // this.tableLabel = '';
             //this.activeTab = backToChildProperties.activeTab;
         }
-        this.spinner = false;
+        */ //Commented Today
+        // this.spinner = false;
 
 
         // this.spinner = true;
@@ -806,18 +811,18 @@ export default class CustomTable extends LightningElement {
 
     connectedCallback() {
 
-                console.log('this.objectRecordData',this.objectRecordData);
-                this.preparePaginationControlsData();
-                let pageSizeDefaultValue = this.pageSizeOptions[0].value;
-                let currentPageRecords = this.getPageRecords(this.objectRecordData, 1, pageSizeDefaultValue);
-                this.viewColList = this.colList;
-                //this.recList = this.assignData(this.relatedListRecords, this.colList);
-                this.recList = this.assignData(currentPageRecords, this.viewColList);
-                this.accountsId = this.accountid;
-                this.allRecordsList = this.recList;
-                console.log('this.recList',this.recList);
-                console.log('this.allRecordsList',this.allRecordsList);
-//KOUSHIK CHANGES
+        console.log('this.objectRecordData', this.objectRecordData);
+        this.preparePaginationControlsData();
+        let pageSizeDefaultValue = this.pageSizeOptions[0].value;
+        let currentPageRecords = this.getPageRecords(this.objectRecordData, 1, pageSizeDefaultValue);
+        this.viewColList = this.colList;
+        //this.recList = this.assignData(this.relatedListRecords, this.colList);
+        this.recList = this.assignData(currentPageRecords, this.viewColList);
+        this.accountsId = this.accountid;
+        this.allRecordsList = this.recList;
+        console.log('this.recList', this.recList);
+        console.log('this.allRecordsList', this.allRecordsList);
+        //KOUSHIK CHANGES
 
 
         // this.relatedListRecords = JSON.parse(JSON.stringify(this.objectRecordData));
@@ -831,53 +836,52 @@ export default class CustomTable extends LightningElement {
 
 
 
-        console.log('Object Name',this.objName);
-        this.opt_showCalendar = (this.objName === 'Task' ? true : false);
-        this.opt_list = true;
-        this.opt_new = (this.objName === 'Employee__c' ? false : true);
-        this.opt_newEmp = (this.objName === 'Employee__c' ? true : false);
-        this.opt_rec_csv = (this.objName === 'Rhythm__Assessment__c' ? true : false);
-        this.opt_rec_pdf = (this.objName === 'Rhythm__Assessment__c' ? true : false);
-        this.opt_rec_csv = (this.objName === 'Rhythm__Assessment__c' ? true : false);
-        this.opt_rec_pdf = (this.objName === 'Rhythm__Assessment__c' ? true : false);
-        console.log('this.objName',this.objName);
-        if(this.objName!=undefined && this.objName=='Rhythm__Assessment__c')
-        {
-            
-        //     getAssesmentRecords().then(result=>{
-        //         console.log('Result>>>>>',result);
-        //     for(let i=0;i<result.length;i++)
-        //     {
-        //        var record = result[i];
-        //        var recorddata={}
-        //        //console.log('record>>>>>',record);
-        //        this.assessmentrecorddata =[];
-        //        for(let field in record)
-        //        {
-        //             var obj ={};
-        //             obj.label = field;
-        //             obj.value = record[field];
+        console.log('Object Name', this.objName);
+        // this.gridoptions.calendarViews = false;
+        // this.gridoptions.bulkCreation = false;
+        // this.gridoptions.newRecord = false;
+        // this.gridoptions.newEmployee = false;
+        // this.gridoptions.deleteRecords = false;
+        this.gridoptions.exportRowAsCsv = (this.objName === 'Rhythm__Assessment__c' ? true : false);
+        this.gridoptions.exportRowAsPdf = (this.objName === 'Rhythm__Assessment__c' ? true : false);
+        // this.gridoptions.rec_csv = (this.objName === 'Rhythm__Assessment__c' ? true : false);
+        // this.gridoptions.rec_pdf = (this.objName === 'Rhythm__Assessment__c' ? true : false);
+        console.log('this.objName', this.objName);
+        if (this.objName != undefined && this.objName == 'Rhythm__Assessment__c') {
 
-        //             console.log('obj>>>>>>',obj);
-        //             this.assessmentrecorddata.push(obj);   
-        //        }
-        //        recorddata['data'] = this.assessmentrecorddata;
-        //        console.log('recorddata',recorddata);
-        //        this.recList.push(recorddata);
-        //    }
-        //         //this.assessmentrecorddata = result;
-        //         console.log(' this.recList', this.recList);
-        //     }).catch(error=>{
-        //         console.log('error',error);
-        //     });
-        //   console.log('assessmentRecrds',this.assessmentrecorddata);
-          
+            //     getAssesmentRecords().then(result=>{
+            //         console.log('Result>>>>>',result);
+            //     for(let i=0;i<result.length;i++)
+            //     {
+            //        var record = result[i];
+            //        var recorddata={}
+            //        //console.log('record>>>>>',record);
+            //        this.assessmentrecorddata =[];
+            //        for(let field in record)
+            //        {
+            //             var obj ={};
+            //             obj.label = field;
+            //             obj.value = record[field];
+
+            //             console.log('obj>>>>>>',obj);
+            //             this.assessmentrecorddata.push(obj);   
+            //        }
+            //        recorddata['data'] = this.assessmentrecorddata;
+            //        console.log('recorddata',recorddata);
+            //        this.recList.push(recorddata);
+            //    }
+            //         //this.assessmentrecorddata = result;
+            //         console.log(' this.recList', this.recList);
+            //     }).catch(error=>{
+            //         console.log('error',error);
+            //     });
+            //   console.log('assessmentRecrds',this.assessmentrecorddata);
+
 
 
         }
         this.viewColList = this.colList;
         this.showTable = true;
-        this.opt_delete = false;
         this.search = {};
         if (!this.recordType) {
             this.recordType = '012000000000000AAA';
@@ -1029,22 +1033,20 @@ export default class CustomTable extends LightningElement {
     }
     /* To generate Excel file which contains assessment questions, responses and conversation history. */
     csvClickHandler(event) {
-        var assessmentId = event.currentTarget.dataset.id;
-        getSupplierAssessmentList({ assessmentId: assessmentId }).then(resultData => {
-            var assessmentTemplateId = resultData[0].Rhythm__Template__c;           
+        var accountassessmentId = event.currentTarget.dataset.id;
+        getSupplierAssessmentList({ assessmentId: accountassessmentId }).then(resultData => {
+            var assessmentTemplateId = resultData[0].Rhythm__Assessment__r.Rhythm__Template__c;
             getQuestionsList({ templateId: assessmentTemplateId }).then(result => {
                 var resultMap = result;
-                getSupplierResponseList({ assessmentId: assessmentId }).then(result => {
-                    result.forEach(qres => { 
-                         var savedResponseList= new Map();
-                        savedResponseList.set('value',qres.Rhythm__Response__c);
-                        if(('Rhythm__Conversation_History__c' in qres))
-                        {
-                         savedResponseList.set('history',(qres.Rhythm__Conversation_History__c));
+                getSupplierResponseList({ assessmentId: accountassessmentId }).then(result => {
+                    result.forEach(qres => {
+                        var savedResponseList = new Map();
+                        savedResponseList.set('value', qres.Rhythm__Response__c);
+                        if (('Rhythm__Conversation_History__c' in qres)) {
+                            savedResponseList.set('history', (qres.Rhythm__Conversation_History__c));
                         }
-                        if(('Rhythm__Files__c' in qres))
-                        {
-                         savedResponseList.set('files',(qres.Rhythm__Files__c));
+                        if (('Rhythm__Files__c' in qres)) {
+                            savedResponseList.set('files', (qres.Rhythm__Files__c));
                         }
                         this.savedResponseMap.set(qres.Rhythm__Question__c, savedResponseList);
                     });
@@ -1052,60 +1054,56 @@ export default class CustomTable extends LightningElement {
                     var str = 'Section,Question,Answer,ConversationHistory,NumberOfAttachments\n';
                     for (const key of this.finalSection.keys()) {
                         for (var i = 0; i < this.finalSection.get(key).length; i++) {
-                             if(typeof this.finalSection.get(key)[i].conversationHistory != "undefined")
-                            {
-                                 var tempstr='';
-                                for( var j=0;j<JSON.parse(this.finalSection.get(key)[i].conversationHistory).length;j++)
-                                {
-                                    
-                                      tempstr=tempstr + JSON.parse(this.finalSection.get(key)[i].conversationHistory)[j].Name +':' + JSON.parse(this.finalSection.get(key)[i].conversationHistory)[j].Text+ '\n';
+                            if (typeof this.finalSection.get(key)[i].conversationHistory != "undefined") {
+                                var tempstr = '';
+                                for (var j = 0; j < JSON.parse(this.finalSection.get(key)[i].conversationHistory).length; j++) {
+
+                                    tempstr = tempstr + JSON.parse(this.finalSection.get(key)[i].conversationHistory)[j].Name + ':' + JSON.parse(this.finalSection.get(key)[i].conversationHistory)[j].Text + '\n';
                                 }
-                               
-                            this.finalSection.get(key)[i].conversationHistory=tempstr;
+
+                                this.finalSection.get(key)[i].conversationHistory = tempstr;
                             }
-                              if(typeof this.finalSection.get(key)[i].files != "undefined")
-                            {
-                                this.finalSection.get(key)[i].files=JSON.parse(this.finalSection.get(key)[i].files).length;
+                            if (typeof this.finalSection.get(key)[i].files != "undefined") {
+                                this.finalSection.get(key)[i].files = JSON.parse(this.finalSection.get(key)[i].files).length;
                             }
-                            
-                            str += '"'+key+ '","'+(i+1)+'.'+' '+ this.finalSection.get(key)[i].question + '","'  + this.finalSection.get(key)[i].value + '","' + this.finalSection.get(key)[i].conversationHistory + '","'+this.finalSection.get(key)[i].files+ '"\n';
+
+                            str += '"' + key + '","' + (i + 1) + '.' + ' ' + this.finalSection.get(key)[i].question + '","' + this.finalSection.get(key)[i].value + '","' + this.finalSection.get(key)[i].conversationHistory + '","' + this.finalSection.get(key)[i].files + '"\n';
                         }
-                        str+='\n';
+                        str += '\n';
                     }
                     str = str.replaceAll('undefined', '').replaceAll('null', '');
                     var blob = new Blob([str], { type: 'text/plain' });
                     var url = window.URL.createObjectURL(blob);
                     var atag = document.createElement('a');
-                    atag.setAttribute('href', url);                    
-                    atag.setAttribute('download', resultData[0].Name + '.csv');
+                    atag.setAttribute('href', url);
+                    atag.setAttribute('download', resultData[0].Rhythm__Assessment__r.Name + '.csv');
                     atag.click();
                 }).catch(error => {
-                   errorLogRecord({ componentName: 'CustomTable', methodName: 'getSupplierResponseList', className: 'AssessmentController', errorData: error.message }).then((result) => {
-                    });                
-                    })
+                    errorLogRecord({ componentName: 'CustomTable', methodName: 'getSupplierResponseList', className: 'AssessmentController', errorData: error.message }).then((result) => {
+                    });
+                })
 
             }).catch(error => {
                 errorLogRecord({ componentName: 'CustomTable', methodName: 'getQuestionsList', className: 'AssessmentController', errorData: error.message }).then((result) => {
-                    });
+                });
             })
         }).catch(error => {
-             errorLogRecord({ componentName: 'CustomTable', methodName: 'getSupplierAssessmentList', className: 'AssessmentController', errorData: error.message }).then((result) => {
-                    });    
+            errorLogRecord({ componentName: 'CustomTable', methodName: 'getSupplierAssessmentList', className: 'AssessmentController', errorData: error.message }).then((result) => {
+            });
         })
     }
 
     /* constructWrapperis used to build the wrapper which contains question name,reponse and conversation data to generate the pdf*/
     constructWrapper(questionResp, savedResp) {
         var questionMap = new Map();
-        console.log('responsemap',savedResp);
+        console.log('responsemap', savedResp);
         questionResp.forEach(qu => {
-            var quTemp = {};          
-            quTemp.questionId = qu.Id;          
+            var quTemp = {};
+            quTemp.questionId = qu.Id;
             quTemp.question = qu.Rhythm__Question__c;
-             if(qu.Rhythm__Required__c == true)
-            {
-                var str='';
-                str=str+ qu.Rhythm__Question__c+'*';
+            if (qu.Rhythm__Required__c == true) {
+                var str = '';
+                str = str + qu.Rhythm__Question__c + '*';
                 quTemp.question = str;
             }
             if (questionMap.has(qu.Rhythm__Section__r.Name)) {
@@ -1114,18 +1112,17 @@ export default class CustomTable extends LightningElement {
                 var quesList = [];
                 quesList.push(quTemp);
                 questionMap.set(qu.Rhythm__Section__r.Name, quesList);
-            }            
-            if(typeof (savedResp.get(quTemp.questionId)) != 'undefined' && savedResp.get(quTemp.questionId).conversationHistory == 'undefined')
-            {
-               quTemp.value = savedResp.get(quTemp.questionId).get('value');
             }
-            else if( typeof (savedResp.get(quTemp.questionId)) != 'undefined'){               
-                  quTemp.value = savedResp.get(quTemp.questionId).get('value');
-                     quTemp.conversationHistory = savedResp.get(quTemp.questionId).get('history');
-                     quTemp.files = savedResp.get(quTemp.questionId).get('files');
-                
+            if (typeof (savedResp.get(quTemp.questionId)) != 'undefined' && savedResp.get(quTemp.questionId).conversationHistory == 'undefined') {
+                quTemp.value = savedResp.get(quTemp.questionId).get('value');
             }
-            
+            else if (typeof (savedResp.get(quTemp.questionId)) != 'undefined') {
+                quTemp.value = savedResp.get(quTemp.questionId).get('value');
+                quTemp.conversationHistory = savedResp.get(quTemp.questionId).get('history');
+                quTemp.files = savedResp.get(quTemp.questionId).get('files');
+
+            }
+
         });
         return questionMap;
     }
@@ -1169,32 +1166,30 @@ export default class CustomTable extends LightningElement {
     pdfClickHandler(event) {
         var x = event.currentTarget.dataset.id;
         getSupplierAssessmentList({ assessmentId: x }).then(resultData => {
-            var assessmentTemplateId = resultData[0].Rhythm__Template__c;
+            var assessmentTemplateId = resultData[0].Rhythm__Assessment__r.Rhythm__Template__c;
             getQuestionsList({ templateId: assessmentTemplateId }).then(result => {
                 var resultMap = result;
                 getSupplierResponseList({ assessmentId: x }).then(result => {
                     result.forEach(qres => {
-                         var savedResponseList= new Map();
+                        var savedResponseList = new Map();
 
-                        savedResponseList.set('value',qres.Rhythm__Response__c);
-                        if(('Rhythm__Conversation_History__c' in qres))
-                        {
-                         savedResponseList.set('history',(qres.Rhythm__Conversation_History__c));
+                        savedResponseList.set('value', qres.Rhythm__Response__c);
+                        if (('Rhythm__Conversation_History__c' in qres)) {
+                            savedResponseList.set('history', (qres.Rhythm__Conversation_History__c));
                         }
-                        if(('Rhythm__Files__c' in qres))
-                        {
-                         savedResponseList.set('files',(qres.Rhythm__Files__c));
+                        if (('Rhythm__Files__c' in qres)) {
+                            savedResponseList.set('files', (qres.Rhythm__Files__c));
                         }
                         this.savedResponseMap.set(qres.Rhythm__Question__c, savedResponseList);
                     });
-                    console.log('savedmap',this.savedResponseMap);
+                    console.log('savedmap', this.savedResponseMap);
                     this.finalSection = this.constructWrapper(resultMap, this.savedResponseMap);
                     var tableHtml = '<table><thead><tr>';
                     tableHtml += '<th>Section</th><th colspan="2">Question</th><th>Response</th><th>ConversationHistory</th><th>NumberOfAttachments</th>';
                     tableHtml += '</tr></thead><tbody>';
-                    console.log('this.finalSection',this.finalSection);
+                    console.log('this.finalSection', this.finalSection);
                     var count = 0;
-                    for (const key of this.finalSection.keys()) {                        
+                    for (const key of this.finalSection.keys()) {
                         count += 1;
                         if (count % 2 === 0) {
                             tableHtml += '<tr><td class="evenLeftTd" rowspan=' + this.finalSection.get(key).length + '>' + key + '</td>';
@@ -1202,29 +1197,26 @@ export default class CustomTable extends LightningElement {
                         else {
                             tableHtml += '<tr><td class="oddLeftTd" rowspan=' + this.finalSection.get(key).length + '>' + key + '</td>';
                         }
-                        for (var i = 0; i < this.finalSection.get(key).length; i++) {                                                 
-                            if(typeof this.finalSection.get(key)[i].conversationHistory != "undefined")
-                            {
-                                 var str='';
-                                for( var j=0;j<JSON.parse(this.finalSection.get(key)[i].conversationHistory).length;j++)
-                                {                                    
-                                      str=str + JSON.parse(this.finalSection.get(key)[i].conversationHistory)[j].Name +':' + JSON.parse(this.finalSection.get(key)[i].conversationHistory)[j].Text+ '\n';
+                        for (var i = 0; i < this.finalSection.get(key).length; i++) {
+                            if (typeof this.finalSection.get(key)[i].conversationHistory != "undefined") {
+                                var str = '';
+                                for (var j = 0; j < JSON.parse(this.finalSection.get(key)[i].conversationHistory).length; j++) {
+                                    str = str + JSON.parse(this.finalSection.get(key)[i].conversationHistory)[j].Name + ':' + JSON.parse(this.finalSection.get(key)[i].conversationHistory)[j].Text + '\n';
                                 }
-                               
-                            this.finalSection.get(key)[i].conversationHistory=str;
+
+                                this.finalSection.get(key)[i].conversationHistory = str;
                             }
-                             if(typeof this.finalSection.get(key)[i].files != "undefined")
-                            {
-                                this.finalSection.get(key)[i].files=JSON.parse(this.finalSection.get(key)[i].files).length;
+                            if (typeof this.finalSection.get(key)[i].files != "undefined") {
+                                this.finalSection.get(key)[i].files = JSON.parse(this.finalSection.get(key)[i].files).length;
                             }
-                            tableHtml += '<td class="align-to-top">'+ (i+1)+'.'+'</td><td>'+ this.finalSection.get(key)[i].question + '</td><td>' + this.finalSection.get(key)[i].value + '</td><td> ' + this.finalSection.get(key)[i].conversationHistory +'</td><td> ' + this.finalSection.get(key)[i].files + '</td></tr>';
-                        
+                            tableHtml += '<td class="align-to-top">' + (i + 1) + '.' + '</td><td>' + this.finalSection.get(key)[i].question + '</td><td>' + this.finalSection.get(key)[i].value + '</td><td> ' + this.finalSection.get(key)[i].conversationHistory + '</td><td> ' + this.finalSection.get(key)[i].files + '</td></tr>';
+
                         }
-                        tableHtml +='<tr><td></td><td></td><td></td><td></td></tr>';
+                        tableHtml += '<tr><td></td><td></td><td></td><td></td></tr>';
                     }
                     tableHtml += '</tbody></table>';
-                   
-                   var win = window.open('', '', 'width=' + (window.innerWidth * 0.9) + ',height=' + (window.innerHeight * 0.9) + ',location=no, top=' + (window.innerHeight * 0.1) + ', left=' + (window.innerWidth * 0.1));
+
+                    var win = window.open('', '', 'width=' + (window.innerWidth * 0.9) + ',height=' + (window.innerHeight * 0.9) + ',location=no, top=' + (window.innerHeight * 0.1) + ', left=' + (window.innerWidth * 0.1));
                     var style = '<style>@media print { * {-webkit-print-color-adjust:exact;}}} @page{ margin: 0px;} *{margin: 0px; padding: 0px; height: 0px; font-family: Source Sans Pro, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif !important;} .headerDiv{width: 100%; height: 56px; padding: 20px; background-color: #03314d;} .headerText{font-size: 40px; color: white; font-weight: bold} .tableDiv{padding: 20px;} table {border-collapse:collapse; font-size: 14px;} table td, th{ padding: 4px;} table tr:nth-child(odd) td {background-color: #F9F9F9;} .oddLeftTd{background-color: #E9E9E9 !important;} .evenLeftTd{background-color: #F1F1F1 !important;} table th{ border: 1px solid #E9E9E9; background-color:#B5BEC58F} table { page-break-inside:auto; } tr { page-break-inside:avoid; page-break-after:auto; } .align-to-top{ vertical-align: top; }</style>';
                     win.document.getElementsByTagName('head')[0].innerHTML += style;
                     win.document.getElementsByTagName('body')[0].innerHTML += '<div class="headerDiv slds-p-around_small"><span class="headerText">Rhythm</span></div><br/>';
@@ -1238,13 +1230,13 @@ export default class CustomTable extends LightningElement {
                 })
 
             }).catch(error => {
-                 errorLogRecord({ componentName: 'CustomTable', methodName: 'getQuestionsList', className: 'AssessmentController', errorData: error.message }).then((result) => {
-                    });
+                errorLogRecord({ componentName: 'CustomTable', methodName: 'getQuestionsList', className: 'AssessmentController', errorData: error.message }).then((result) => {
+                });
             })
         }).catch(error => {
-                errorLogRecord({ componentName: 'CustomTable', methodName: 'getSupplierAssessmentList', className: 'AssessmentController', errorData: error.message }).then((result) => {
-                    });        
-                })
+            errorLogRecord({ componentName: 'CustomTable', methodName: 'getSupplierAssessmentList', className: 'AssessmentController', errorData: error.message }).then((result) => {
+            });
+        })
     }
 
 
@@ -1284,10 +1276,11 @@ export default class CustomTable extends LightningElement {
             }
             //console.log(JSON.stringify(this.rowDataIdList));
         }
-        if (this.rowDataIdList.length > 0)
-            this.opt_delete = true;
-        else
-            this.opt_delete = false;
+        this.gridoptions.deleteRecords = (this.rowDataIdList.length > 0 && this.gridoptions.deleteRecords);
+        // if (this.rowDataIdList.length > 0)
+        //     this.gridoptions.deleteRecords = true;
+        // else
+        //     this.gridoptions.deleteRecords = false;
     }
 
     deleteHandler(event) {
@@ -1391,30 +1384,28 @@ export default class CustomTable extends LightningElement {
     //Column Resize: Start
 
     columnResizeDetails = {
-        "initialPosition":0,
-        "lastPosition":0,
-        "fieldName":'',
-        "columnHeader":null,
-        "resizeHandleInitPosition":0,
-        "columnResizeHandle":null
+        "initialPosition": 0,
+        "lastPosition": 0,
+        "fieldName": '',
+        "columnHeader": null,
+        "resizeHandleInitPosition": 0,
+        "columnResizeHandle": null
     };
 
-    handleResizeMouseDown(event)
-    {
+    handleResizeMouseDown(event) {
         this.clearColumnResizeDetails();
         //console.log('handleResizeMouseDown -- ',event.currentTarget.dataset.resizefield);
-        
+
         this.columnResizeDetails.initialPosition = event.clientX;
         this.columnResizeDetails.resizeHandleInitPosition = event.clientX;
         this.columnResizeDetails.fieldName = event.currentTarget.dataset.resizefield;
         //console.log('this.columnResizeDetails -- ',this.columnResizeDetails);
 
-        let columnHeader = this.template.querySelectorAll('[data-columnheader="'+this.columnResizeDetails.fieldName+'"]');
-        let columnresizeHandle = this.template.querySelectorAll('[data-resizefield="'+this.columnResizeDetails.fieldName+'"]');
+        let columnHeader = this.template.querySelectorAll('[data-columnheader="' + this.columnResizeDetails.fieldName + '"]');
+        let columnresizeHandle = this.template.querySelectorAll('[data-resizefield="' + this.columnResizeDetails.fieldName + '"]');
         //let columnresizeHandle =event.currentTarget;
 
-        if(!!columnHeader && columnHeader.length > 0 && !!columnresizeHandle && columnresizeHandle.length > 0)
-        {
+        if (!!columnHeader && columnHeader.length > 0 && !!columnresizeHandle && columnresizeHandle.length > 0) {
             let cResizeDetails = this.columnResizeDetails;
             //window.isResizingProgress = true;
             cResizeDetails.columnHeader = columnHeader[0];
@@ -1422,15 +1413,14 @@ export default class CustomTable extends LightningElement {
             //cResizeDetails.columnResizeHandle = columnresizeHandle;
 
             let handleResizeMouseMoveHandler1 = this.handleResizeMouseMove;
-            let resizeMouseMoveHandler = function(event1)
-            {
+            let resizeMouseMoveHandler = function (event1) {
                 //console.log('resizeMouseMoveHandler event1-- ',event1);
                 handleResizeMouseMoveHandler1(event1, cResizeDetails);
             };
 
             window.addEventListener('mouseup', (muEvent) => {
-                                                        this.handleColumnResizeMouseUp(muEvent, cResizeDetails, resizeMouseMoveHandler);
-                                                        },{ once: true });
+                this.handleColumnResizeMouseUp(muEvent, cResizeDetails, resizeMouseMoveHandler);
+            }, { once: true });
 
             //window.addEventListener('mousemove', resizeMouseMoveHandler,{ once: false });
         }
@@ -1440,28 +1430,28 @@ export default class CustomTable extends LightningElement {
     handleResizeMouseMove(mmEvent, mmResizeDetails) {
         //console.log('handleResizeMouseMove');
         // console.log('handleResizeMouseMove mmResizeDetails -- ',mmResizeDetails);
-       // console.log('window.isResizingProgress -- ',window.isResizingProgress);
+        // console.log('window.isResizingProgress -- ',window.isResizingProgress);
         //if(!!window.isResizingProgress && window.isResizingProgress)
         //{
-            //event = event || window.event;
-            //event.preventDefault();
-            // calculate the new cursor position:
+        //event = event || window.event;
+        //event.preventDefault();
+        // calculate the new cursor position:
 
-            //console.log('mmResizeDetails.resizeHandleInitPosition -- ',mmResizeDetails.resizeHandleInitPosition);
-            //console.log('mmEvent.clientX -- ',mmEvent.clientX);
-            //console.log('mmResizeDetails.columnResizeHandle -- ', mmResizeDetails.columnResizeHandle);
-            let pos1 = mmResizeDetails.resizeHandleInitPosition  - mmEvent.clientX;
-            console.log('pos1 -- ', pos1);
-            mmResizeDetails.resizeHandleInitPosition = mmEvent.clientX;
-            let mmResizeHandle = mmResizeDetails.columnResizeHandle;
-            // set the element's new position:
-            mmResizeHandle.style.left = (mmResizeHandle.offsetLeft - pos1) + "px";
+        //console.log('mmResizeDetails.resizeHandleInitPosition -- ',mmResizeDetails.resizeHandleInitPosition);
+        //console.log('mmEvent.clientX -- ',mmEvent.clientX);
+        //console.log('mmResizeDetails.columnResizeHandle -- ', mmResizeDetails.columnResizeHandle);
+        let pos1 = mmResizeDetails.resizeHandleInitPosition - mmEvent.clientX;
+        console.log('pos1 -- ', pos1);
+        mmResizeDetails.resizeHandleInitPosition = mmEvent.clientX;
+        let mmResizeHandle = mmResizeDetails.columnResizeHandle;
+        // set the element's new position:
+        mmResizeHandle.style.left = (mmResizeHandle.offsetLeft - pos1) + "px";
 
-             console.log('mmResizeHandle.offsetLeft -- ', mmResizeHandle.offsetLeft);
+        console.log('mmResizeHandle.offsetLeft -- ', mmResizeHandle.offsetLeft);
 
-            // console.log('-------------------------*********************----------------------------------');
+        // console.log('-------------------------*********************----------------------------------');
         //}
-  }
+    }
 
     handleColumnResizeMouseUp(muEvent, muResizeDetails, handleResizeMouseMoveHandler) {
         // calculate the new cursor position:
@@ -1470,14 +1460,14 @@ export default class CustomTable extends LightningElement {
         //  pos4 = e.clientY;
         window.isResizingProgress = false;
         muResizeDetails.lastPosition = muEvent.clientX;
-        console.log('muResizeDetails -- ',muResizeDetails);
+        console.log('muResizeDetails -- ', muResizeDetails);
         let differencePosition = muResizeDetails.lastPosition - muResizeDetails.initialPosition;
 
-        console.log('differencePosition -- ',differencePosition);
-        console.log('muResizeDetails.columnHeader.offsetWidth -- ',muResizeDetails.columnHeader.offsetWidth);
-        
+        console.log('differencePosition -- ', differencePosition);
+        console.log('muResizeDetails.columnHeader.offsetWidth -- ', muResizeDetails.columnHeader.offsetWidth);
+
         let colWidth = muResizeDetails.columnHeader.offsetWidth + differencePosition;
-        muResizeDetails.columnHeader.setAttribute("style","width:"+colWidth+"px");
+        muResizeDetails.columnHeader.setAttribute("style", "width:" + colWidth + "px");
 
         //window.removeEventListener('mousemove',handleResizeMouseMoveHandler);
         //muResizeDetails.columnHeader.style.width= parseInt(muResizeDetails.columnHeader.style.width)+ differencePosition + 'px';
@@ -1485,28 +1475,24 @@ export default class CustomTable extends LightningElement {
         //window.removeEventListener('mouseup', this.handleColumnResizeMouseUp);
     }
 
-    clearColumnResizeDetails()
-    {
+    clearColumnResizeDetails() {
         this.columnResizeDetails.initialPosition = 0;
         this.columnResizeDetails.lastPosition = 0;
         this.columnResizeDetails.fieldName = '';
         this.columnResizeDetails.columnHeader = null;
         this.columnResizeDetails.resizeHandleInitPosition = 0;
-        this.columnResizeDetails.columnResizeHandle= null;
+        this.columnResizeDetails.columnResizeHandle = null;
     }
 
-    setAllColumnHeadersWidth()
-    {
+    setAllColumnHeadersWidth() {
         console.log('setAllColumnHeadersWidth');
         let columnHeaders = this.template.querySelectorAll('[data-columnheader]');
 
-        if(!!columnHeaders && columnHeaders.length > 0)
-        {
-            for(var i=0;i<columnHeaders.length;i++)
-            {
+        if (!!columnHeaders && columnHeaders.length > 0) {
+            for (var i = 0; i < columnHeaders.length; i++) {
                 let cWidth = columnHeaders[i].offsetWidth;
-                 console.log('columnHeaders[i].offsetWidth -- ', columnHeaders[i].offsetWidth);
-                columnHeaders[i].setAttribute("style","width:"+cWidth+"px");
+                console.log('columnHeaders[i].offsetWidth -- ', columnHeaders[i].offsetWidth);
+                columnHeaders[i].setAttribute("style", "width:" + cWidth + "px");
             }
         }
     }

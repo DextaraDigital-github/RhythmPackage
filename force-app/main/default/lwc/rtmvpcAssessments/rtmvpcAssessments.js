@@ -9,11 +9,11 @@ export default class RtmvpcAssessments extends LightningElement {
 @api parentId='0017i00001QBzehAAD';
 //@track parentId;
 @track recList= [];
-//@track accId='0017i00001QBzehAAD';
+//@track accId='0017i00001QCVtwAAH';
 @track accId;
+@track assessmentId;
 @track pageSize = 15;
-@track showgrid= false;
-@track showsurvey = false;
+@track show = {grid: false, survey: false};
 @track relName='Rhythm__Assessments__r';
 @track fieldsList=[];
 @track objName='Rhythm__Assessment__c';
@@ -35,7 +35,7 @@ export default class RtmvpcAssessments extends LightningElement {
         // getAssessmentJunctionRecords({ accountId: this.accId}).then(result=>{
         //       this.recList = result;
         //       console.log('result',result);
-        //     this.showgrid=true;
+        //     this.show.grid=true;
         //  });
          getAccountId({}).then((result) => {
 
@@ -50,7 +50,7 @@ export default class RtmvpcAssessments extends LightningElement {
          getAssessmentJunctionRecords({ accountId: this.accId}).then(result=>{
               this.recList = result;
               console.log('result',result);
-            this.showgrid=true;
+            this.show.grid=true;
          });
     }
 //    @wire(getRelatedListRecords, {
@@ -62,11 +62,11 @@ export default class RtmvpcAssessments extends LightningElement {
 //         if (data) {
 //             console.log('getRelatedListRecordsList',data);
 //             this.recList = JSON.parse(JSON.stringify(data.records));
-//             this.showgrid=true;
+//             this.show.grid=true;
 //         }
 //         else if (error) {
 //             console.log('Wire Related List data', JSON.stringify(error));
-//             this.showgrid=true;
+//             this.show.grid=true;
 //         }
  //   }
 
@@ -112,6 +112,14 @@ export default class RtmvpcAssessments extends LightningElement {
 
     openSurveyHandler(event)
     {
-        this.showsurvey = true;
+        this.show.grid = false;
+        this.accountassessmentId = event.detail.accountassessmentId;
+        this.show.survey = true;
+    }
+    backClickHandler(event)
+    {
+        this.show.survey = false;
+        this.assessmentId = undefined;
+        this.show.grid = true;
     }
 }
