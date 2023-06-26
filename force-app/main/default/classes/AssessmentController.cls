@@ -195,11 +195,24 @@ public with sharing class AssessmentController {
     @AuraEnabled
     public static string getAccountId()
     {
-        List<User> strAccId = [SELECT Contact.AccountId FROM User WHERE id=:userinfo.getuserid()];
-        return strAccId[0].Contact.AccountId;
+        // List<User> strAccId = [SELECT Contact.AccountId FROM User WHERE id=:userinfo.getuserid()];
+        // return strAccId[0].Contact.AccountId;
+        
+        return null;
+    }
+    
+    
+     @AuraEnabled
+    public static string getCommunityURL()
+    {
+           Id currentNetworkId = Network.getNetworkId();
+           String relativeUrlBase = URL.getSalesforceBaseUrl().toExternalForm()+'/login';
+           return relativeUrlBase;
         
        // return null;
     }
+    
+    
     /**
 * Gets the AccountAssessmentRelation__c information of all fields in AccountAssessmentRelation__c for a particular Account__c.
 * @param accountId This is a record id of an Account__c.
@@ -517,9 +530,9 @@ public with sharing class AssessmentController {
                 existingSupList = (set<string>) JSON.deserialize(existingSups, set<string>.class);
             }
             for(string newSupId:suppliersList){
-                if(!existingSupList.contains(newSupId)){
+                // if(!existingSupList.contains(newSupId)){
                     suppliersIds.add(newSupId);
-                }
+                // }
             }
             if(string.isNotBlank(deleteList)){
                 deleteSupList = (set<string>) JSON.deserialize(deleteList, set<string>.class);
@@ -530,6 +543,7 @@ public with sharing class AssessmentController {
                 }
                 List<Database.DeleteResult> deleteResult = safe.doDelete(deleteAccAssRelns);
                 List<String> errorList = SecurityCheckController.safeClassExceptionHandlerDelete(deleteResult);
+                SYstem.debug(errorList);
                 if(errorList.size()>0){
                     Database.rollback(sp);
                     throw new SecurityControllerException(String.join( errorList, ', ' ));
@@ -563,6 +577,7 @@ public with sharing class AssessmentController {
             if(accountAssessRelnsList.isEmpty() == false){
                 Database.SaveResult[] results = safe.doInsert(accountAssessRelnsList);
                 List<String> errorsList = SecurityCheckController.safeClassExceptionHandlerInsert(results);
+                SYstem.debug(errorsList);
                 if(errorsList.size()>0){
                     Database.rollback(sp);
                     throw new SecurityControllerException(String.join(errorsList, ', ' ));
