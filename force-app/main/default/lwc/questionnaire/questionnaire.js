@@ -969,21 +969,29 @@ export default class Questionnaire extends LightningElement {
                 }
 
             }
-            if (this.accountAssessmentStatus == 'Submitted' || this.accountAssessmentStatus == 'Need more information' || this.assessmentStatus == 'In review') {
-                if (this.assessmentStatus == 'Need more information') {
-                    if (quTemp.Rhythm__Flag__c) {
-                        quTemp.isEditable = false;
+            else {
+                if (this.accountAssessmentStatus == 'Submitted' || this.accountAssessmentStatus == 'Need more information' || this.assessmentStatus == 'In review') {
+                    if (this.assessmentStatus == 'Need more information') {
+                        if (quTemp.Rhythm__Flag__c) {
+                            quTemp.isEditable = false;
+                        }
+                        else {
+                            quTemp.isEditable = true;
+                        }
                     }
                     else {
                         quTemp.isEditable = true;
+                        this.showButtons.Save_Submit = false;
                     }
                 }
                 else {
-                    quTemp.isEditable = true;
+                    if (this.accountAssessmentStatus == 'Review Completed') {
+                        quTemp.isEditable = true;
+                    }
+                    else {
+                        quTemp.isEditable = false;
+                    }
                 }
-            }
-            else {
-                quTemp.isEditable = false;
             }
             if (this.objectApiName == 'Rhythm__AccountAssessmentRelation__c') {
 
