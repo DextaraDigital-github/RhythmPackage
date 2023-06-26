@@ -1,7 +1,7 @@
 public class SendAssessmentNotificationsBatch implements Database.Batchable<sObject> {
     public Database.QueryLocator start(Database.BatchableContext bc){
         Date todayDate = Date.Today();
-        string query = 'SELECT Id,Name,Account__r.Name,Account__c,Assessment__c FROM Assessment_Supplier__c WHERE Status__c= \'Active\' AND Assessment__r.Start_Date__c=:todayDate';
+        string query = 'SELECT Id,Name,Assessment__r.Start_Date__c,Assessment__r.End_Date__c,Account__r.Name,Account__c,Assessment__c FROM Assessment_Supplier__c WHERE Status__c= \'Active\' AND Assessment__r.Start_Date__c=:todayDate';
         return Database.getQueryLocator(query);
     }
     public void execute(Database.BatchableContext bc, List<Assessment_Supplier__c> scope){
@@ -11,9 +11,16 @@ public class SendAssessmentNotificationsBatch implements Database.Batchable<sObj
             List<AccountAssessmentRelation__c> accountAssessRelnsList = new List<AccountAssessmentRelation__c>();
             for(Assessment_Supplier__c assSuppl:scope){
                 AccountAssessmentRelation__c accAssessReln = new AccountAssessmentRelation__c();
-                accAssessReln.Name = assSuppl.Account__r.Name+' - Assessment';
+                accAssessReln.Name = assSuppl.Account__r.Name;
                 accAssessReln.Account__c = assSuppl.Account__c;
                 accAssessReln.Assessment__c = assSuppl.Assessment__c;
+                if(assSuppl.Assessment__r.Start_Date__c != null){
+                    accAssessReln.Start_Date__c = assSuppl.Assessment__r.Start_Date__c;
+                }
+                if(assSuppl.Assessment__r.End_Date__c != null){
+                    accAssessReln.End_Date__c = assSuppl.Assessment__r.End_Date__c;
+                }
+                accAssessReln.Status__c = 'New';
                 accountAssessRelnsList.add(accAssessReln);
             }
             set<Id> successRecordsIdSet = new set<Id>();
