@@ -21,8 +21,8 @@ export default class RtmvpcAssessments extends LightningElement {
         { label: 'Assessment Name', fieldName: 'Name' },
         { label: 'Target Completion Date', fieldName: 'Rhythm__End_Date__c',type:'date' },
         { label: 'Assessment Status', fieldName: 'Rhythm__Status__c'},
-        { label: '#Additional Requests',fieldName:'Rhythm__Additional_Requests__c'},
-        { label: 'Customer Review Status', fieldName: 'Rhythm__Customer_Review__c'},
+        { label: '#Additional Requests',fieldName:'Rhythm__Follow_Up_Requests__c'},
+       // { label: 'Customer Review Status', fieldName: 'Rhythm__Customer_Review__c'},
         // { label: '# Number of Questions', fieldName:'Rhythm__Number_of_Questions__c'},
         // { label: '# Number of Responses', fieldName:'Rhythm__Number_of_Suppliers_responded_back__c'}
         ];

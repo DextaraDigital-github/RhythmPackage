@@ -24,11 +24,20 @@
 		</template>
 	</div>
 	</div>
-
+    <template if:true={showData}>
 	<div class="cad-sec_vcontainer3 slds-border_top slds-p-around_small">
 		<lightning-textarea placeholder="Type your response here..." value={newChat} variant="label-hidden"
 			onchange={chatChangeHandler}>
 		</lightning-textarea>
 		<lightning-button label="Send" onclick={handleRightButtonClick}></lightning-button>
 	</div>
+    </template>
+	 <template if:false={showData}>
+	<div class="cad-sec_vcontainer3 slds-border_top slds-p-around_small">
+		<lightning-textarea placeholder="Type your response here..." value={newChat} variant="label-hidden"
+			disabled="true" onchange={chatChangeHandler}>
+		</lightning-textarea>
+		<lightning-button label="Send" onclick={handleRightButtonClick}></lightning-button>
+	</div>
+    </template>
 </template>

@@ -157,7 +157,8 @@ public with sharing class AssessmentController {
                                            Assessment__r.Number_of_Questions__c,Status__c,Start_Date__c,End_Date__c,
                                            Assessment__r.Additional_Requests__c,Number_of_Questions__c,Assessment__r.CreatedDate,
                                            Assessment__r.Template__c, Number_of_Responses__c,Assessment__r.CreatedBy.Name,Assessment__r.CreatedUser__c
-                                           FROM AccountAssessmentRelation__c Where Account__c=:accountId AND Assessment__c=:assessmentId];
+                                           FROM AccountAssessmentRelation__c Where Account__c=:accountId AND Assessment__c=:assessmentId
+                                          ORDER BY CreatedDate DESC];
         return accountassessment;
     }
     /**
@@ -209,9 +210,9 @@ public with sharing class AssessmentController {
         System.debug('accountId'+accountId);
         List<SObject> assessmentData = [SELECT Id, IsDeleted, Name,Account__c,Assessment__c, Assessment__r.name ,Assessment__r.Status__c,Assessment__r.Customer_Review__c,Assessment__r.Number_of_Questions__c,
                                         Assessment__r.Additional_Requests__c,Number_of_Questions__c, Number_of_Responses__c,
-                                        Assessment__r.CreatedBy.Name,Status__c,End_Date__c,Completed__c
+                                        Assessment__r.CreatedBy.Name,Status__c,End_Date__c,Completed__c,Follow_Up_Requests__c
                                         FROM AccountAssessmentRelation__c 
-                                        WHERE Account__c=:accountId];
+                                        WHERE Account__c=:accountId order by CreatedDate DESC];
         System.debug('assessmentData'+assessmentData);
         return assessmentData;
     }
@@ -502,6 +503,7 @@ public with sharing class AssessmentController {
             system.debug('assessmentRecord------>'+assessmentRecord);
             assessmentId = assessmentRecord.Id;
             Date asmtStartDate = (Date)assessmentRecord.get('Start_Date__c');
+            Date asmtEndDate = (Date)assessmentRecord.get('End_Date__c') != null?(Date)assessmentRecord.get('End_Date__c'):null;
             system.debug('asmtStartDate------>'+asmtStartDate);
             system.debug('assessmentId------>'+assessmentId);
             set<string> suppliersList = new set<string>();
@@ -547,6 +549,13 @@ public with sharing class AssessmentController {
                     accAssessReln.Name = acc.Name;
                     accAssessReln.Account__c = acc.Id;
                     accAssessReln.Assessment__c = assessmentId;
+                    if(asmtStartDate != null){
+                        accAssessReln.Start_Date__c = asmtStartDate;
+                    }
+                    if(asmtEndDate != null){
+                        accAssessReln.End_Date__c = asmtEndDate;
+                    }
+                    accAssessReln.Status__c = 'New';
                     accountAssessRelnsList.add(accAssessReln);
                 }
             }
