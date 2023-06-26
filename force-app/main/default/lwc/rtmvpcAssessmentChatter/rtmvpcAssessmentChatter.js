@@ -23,9 +23,15 @@ export default class RtmvpcAssessmentChatter extends LightningElement {
    @track newResponse = [];
    @api recordid;
    @track responseWrapper = {};
-   
-
-   connectedCallback() {
+   @track showData =false;
+   @api
+   displayConversation(chatmap){
+      this.responseWrapper={};
+       this.showData = chatmap.openChat;
+      if(typeof chatmap!== 'undefined' && chatmap){
+         this.chattermap = chatmap;
+      }
+      console.log('connectedsupplier',this.recordid);
       this.questionId = this.chattermap.questionId;
       this.assessmentId = this.chattermap.assesmentId;
       this.accountType = this.chattermap.accountType;
@@ -40,7 +46,7 @@ export default class RtmvpcAssessmentChatter extends LightningElement {
       this.responseWrapper.questionId = this.questionId;
       
       console.log('kkkk', this.responseWrapper);
-      if(typeof this.recordid!='undefined')
+      if(typeof this.recordid!=='undefined')
       {
          this.responseWrapper.accountassessmentId = this.recordid;
       }
@@ -53,12 +59,13 @@ export default class RtmvpcAssessmentChatter extends LightningElement {
       /*getChatterResponse is used to get conversation history between vendor and customer on onload */
       getChatterResponse({ responseWrapper: JSON.stringify(this.responseWrapper) }).then((result) => {
          console.log('Chatter result', result);
-         if (typeof result != 'undefined') {
+         this.showResponse = false;
+         if (typeof result !== 'undefined') {
             if (('Rhythm__Conversation_History__c' in result[0])) {
                this.newResponse = JSON.parse(result[0].Rhythm__Conversation_History__c);
-               if (typeof this.recordid != 'undefined') {
+               if (typeof this.recordid !== 'undefined') {
                   for (let i = 0; i < this.newResponse.length; i++) {
-                     if (this.newResponse[i].accountType == 'customer') {
+                     if (this.newResponse[i].accountType === 'customer') {
                         console.log('hhhh');
                         this.newResponse[i].recipientType = 'cad-cd-customer';
                      }
@@ -68,10 +75,11 @@ export default class RtmvpcAssessmentChatter extends LightningElement {
                         console.log('hhhhfff',this.newResponse[i].recipientType);
                      }
                   }
+                  
                }
                else {
                   for (let i = 0; i < this.newResponse.length; i++) {
-                     if (this.newResponse[i].accountType == 'customer') {
+                     if (this.newResponse[i].accountType === 'customer') {
                         this.newResponse[i].recipientType = 'cad-ad-customer';
                      }
                      else {
@@ -81,12 +89,15 @@ export default class RtmvpcAssessmentChatter extends LightningElement {
                }
                this.responseList = this.newResponse;
                this.showResponse = true;
+               if(this.responseList.length === 0){
+                     this.showResponse = false;
+               }
             }
          }
          else {
             this.showResponse = false;
          }
-
+  console.log('connectedsupplierlistin apex',this.recordid);
       }).catch((err) => {
          var errormap = {};
          errormap.componentName = 'RtmvpcAssessmentChatter';
@@ -97,6 +108,18 @@ export default class RtmvpcAssessmentChatter extends LightningElement {
          });
       });
       console.log('response', this.responseList);
+       console.log('connectedsupplierlist',this.recordid);
+   }
+
+   renderedCallback(){
+      // if(typeof this.chattermap !== 'undefined' && this.chattermap && this.questionId !== this.chattermap.questionId){
+      //    this.displayConversation();
+      // }
+   }
+   connectedCallback() {
+      //  if(typeof this.chattermap !== 'undefined' && this.chattermap && this.questionId !== this.chattermap.questionId){
+      //    this.displayConversation();
+      //  }
    }
    /*callChatterResponse is used to save the conversation history between vendor and customer in the response record */
    callChatterResponse(response) {
@@ -124,12 +147,12 @@ export default class RtmvpcAssessmentChatter extends LightningElement {
    /* handleRightButtonClick is used to save the newly typed message to the response record */
    handleRightButtonClick(event) {
       console.log('this.newChat',this.newChat);
-      if(typeof this.newChat !='undefined' && this.newChat !='')
+      if(typeof this.newChat !=='undefined' && this.newChat !=='')
       {
       this.responseWrapper.assessmentId = this.assessmentId;
       this.responseWrapper.questionId = this.questionId;
        
-      if(typeof this.recordid != 'undefined')
+      if(typeof this.recordid !== 'undefined')
       {
          this.responseWrapper.accountassessmentId = this.recordid;
       }
@@ -138,15 +161,16 @@ export default class RtmvpcAssessmentChatter extends LightningElement {
          this.responseWrapper.accountassessmentId = this.accountassessmentId;
       }
       console.log('this.accountassessmentId',this.accountassessmentId);
+      this.newResponse=[];
       /*This method is used to get conversation history between vendor and customer after firing the event */
       getChatterResponse({ responseWrapper: JSON.stringify(this.responseWrapper) }).then((result1) => {
          console.log('ssss',result1);
-         if(result1.length !=0  )
+         if(result1.length !==0  )
          {
-         if (typeof result1[0].Rhythm__Conversation_History__c != 'undefined') {
+         if (typeof result1[0].Rhythm__Conversation_History__c !== 'undefined') {
             this.newResponse = JSON.parse(result1[0].Rhythm__Conversation_History__c);
          }
-         if(typeof result1[0].CreatedDate!='undefined')
+         if(typeof result1[0].CreatedDate!=='undefined')
          {
             this.responseMap.createdTime = result1[0].CreatedDate;
          }
@@ -157,9 +181,9 @@ export default class RtmvpcAssessmentChatter extends LightningElement {
          this.responseMap.Name = this.userName;
          console.log('this.recordid', this.recordid);
 
-         if (typeof this.recordid != 'undefined') {
+         if (typeof this.recordid !== 'undefined') {
                   for (let i = 0; i < this.newResponse.length; i++) {
-                     if (this.newResponse[i].accountType == 'customer') {
+                     if (this.newResponse[i].accountType === 'customer') {
                         console.log('hhhh');
                         this.newResponse[i].recipientType = 'cad-cd-customer';
                      }
@@ -172,7 +196,7 @@ export default class RtmvpcAssessmentChatter extends LightningElement {
                }
                else {
                   for (let i = 0; i < this.newResponse.length; i++) {
-                     if (this.newResponse[i].accountType == 'customer') {
+                     if (this.newResponse[i].accountType === 'customer') {
                         this.newResponse[i].recipientType = 'cad-ad-customer';
                      }
                      else {
@@ -182,25 +206,25 @@ export default class RtmvpcAssessmentChatter extends LightningElement {
                }
 
 
-
-         if (this.recordid != null || typeof this.recordid != 'undefined') {
+          console.log('supplier',this.recordid);
+         if (this.recordid !== null && typeof this.recordid !== 'undefined') {
             
             console.log('this.accountType',this.accountType);
             this.responseMap.accountType = 'customer';
-            if (this.accountType == 'vendor') {
+            if (this.accountType === 'vendor') {
                this.responseMap.recipientType = 'cad-cd-customer';
             }
-            else if (this.accountType == 'supplier') {
+            else if (this.accountType === 'supplier') {
                this.responseMap.recipientType = 'cad-cd-supplier';
             }
          
          }
          else {
             this.responseMap.accountType = 'supplier';
-            if (this.accountType == 'vendor') {
+            if (this.accountType === 'vendor') {
                this.responseMap.recipientType = 'cad-ad-customer';
             }
-            else if (this.accountType == 'supplier') {
+            else if (this.accountType === 'supplier') {
                this.responseMap.recipientType = 'cad-ad-supplier';
             }
 
@@ -210,6 +234,7 @@ export default class RtmvpcAssessmentChatter extends LightningElement {
          console.log('Hello i am at 145');
 
          this.newResponse.push(this.responseMap);
+         console.log('sample',this.newResponse);
          this.callChatterResponse(this.newResponse);
          this.responseList = this.newResponse;
          this.showResponse = true;

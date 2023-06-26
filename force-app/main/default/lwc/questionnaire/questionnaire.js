@@ -189,8 +189,10 @@ export default class Questionnaire extends LightningElement {
                         getQuestionsList({ templateId: assessmentTemplateId }).then(result => {
                             var resultMap = result;
                             for (var i = 0; i < resultMap.length; i++) {
-                                if (!this.sectionidslist.includes(resultMap[i].Rhythm__Section__r.Id)) {
-                                    this.sectionidslist.push(resultMap[i].Rhythm__Section__r.Id);
+                                if (typeof resultMap[i].Rhythm__Section__r.Id != 'undefined') {
+                                    if (!this.sectionidslist.includes(resultMap[i].Rhythm__Section__r.Id)) {
+                                        this.sectionidslist.push(resultMap[i].Rhythm__Section__r.Id);
+                                    }
                                 }
                             }
                             console.log('getQuestionsList', resultMap);
@@ -280,8 +282,10 @@ export default class Questionnaire extends LightningElement {
                 getQuestionsList({ templateId: this.recordId }).then(result => {
                     var resultMap = result;
                     for (var i = 0; i < resultMap.length; i++) {
-                        if (!this.sectionidslist.includes(resultMap[i].Rhythm__Section__r.Id)) {
-                            this.sectionidslist.push(resultMap[i].Rhythm__Section__r.Id);
+                        if (typeof resultMap[i].Rhythm__Section__r.Id != 'undefined') {
+                            if (!this.sectionidslist.includes(resultMap[i].Rhythm__Section__r.Id)) {
+                                this.sectionidslist.push(resultMap[i].Rhythm__Section__r.Id);
+                            }
                         }
                     }
                     console.log('resultMap', resultMap);
@@ -341,7 +345,7 @@ export default class Questionnaire extends LightningElement {
             this.isSupplier = true;
 
             /*This method is used to get all the assessments records*/
-            console.log('this.assessment', this.assessment);
+            console.log('this.assessment', this.accountassessmentid);
             getSupplierAssessmentList({ assessmentId: this.accountassessmentid }).then(result => {
                 console.log('getSupplierAssessmentList 293', result);
                 var assessmentTemplateId = result[0].Rhythm__Assessment__r.Rhythm__Template__c;
@@ -354,9 +358,12 @@ export default class Questionnaire extends LightningElement {
                     var resultMap = result;
                     console.log('resultMap 303', resultMap)
                     for (var i = 0; i < resultMap.length; i++) {
-                        if (!this.sectionidslist.includes(resultMap[i].Rhythm__Section__r.Id)) {
-                            this.sectionidslist.push(resultMap[i].Rhythm__Section__r.Id);
+                        if (typeof resultMap[i].Rhythm__Section__r.Id != 'undefined') {
+                            if (!this.sectionidslist.includes(resultMap[i].Rhythm__Section__r.Id)) {
+                                this.sectionidslist.push(resultMap[i].Rhythm__Section__r.Id);
+                            }
                         }
+
                     }
                     console.log('getQuestionsList', resultMap);
                     /* This method is used to get all the responses of the questions in particular section*/
@@ -814,7 +821,15 @@ export default class Questionnaire extends LightningElement {
                 }
             }
             else {
-                responseQueryMap.status = 'Submitted';
+                if (isSubmit) {
+                    responseQueryMap.status = 'Submitted';
+                    this.showButtons.Save_Submit = false;
+                }
+                else {
+                    responseQueryMap.status = 'Need more information';
+
+                }
+
             }
             if (isSubmit) {
                 responseQueryMap.submit = true;
@@ -844,15 +859,11 @@ export default class Questionnaire extends LightningElement {
                         }
                     }
                 }
-                if (responseQueryMap.status == 'Submitted') {
-                    this.showButtons.Save_Submit = false;
-                }
-
                 //     this.showspinner = false;
-                   setTimeout(() => {this.handleOnload()}, 400);
-                   const selectedEvent = new CustomEvent('updatetimeline', {
+                //setTimeout(() => {this.handleOnload()}, 400);
+                const selectedEvent = new CustomEvent('updatetimeline', {
                     detail: true
-                    });
+                });
                 this.dispatchEvent(selectedEvent);
             }).catch(error => {
                 console.log('Error' + error);
@@ -949,23 +960,27 @@ export default class Questionnaire extends LightningElement {
 
                 }
                 else {
-                    quTemp.customerFlag = false;
+                    if (this.accountAssessmentStatus == 'Review completed') {
+                        quTemp.isEditable = true;
+                    }
+                    else {
+                        quTemp.isEditable = false;
+                    }
                 }
 
             }
-            if (this.accountAssessmentStatus == 'Submitted' || this.accountAssessmentStatus == 'Need more information' || this.assessmentStatus=='In review') {
-               if(this.assessmentStatus=='Need more information')
-               {
+            if (this.accountAssessmentStatus == 'Submitted' || this.accountAssessmentStatus == 'Need more information' || this.assessmentStatus == 'In review') {
+                if (this.assessmentStatus == 'Need more information') {
                     if (quTemp.Rhythm__Flag__c) {
-                    quTemp.isEditable = false;
+                        quTemp.isEditable = false;
                     }
                     else {
-                    quTemp.isEditable = true;
+                        quTemp.isEditable = true;
                     }
-               }
-               else{
-                   quTemp.isEditable= true;
-               }
+                }
+                else {
+                    quTemp.isEditable = true;
+                }
             }
             else {
                 quTemp.isEditable = false;

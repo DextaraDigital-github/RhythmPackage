@@ -1,4 +1,5 @@
 public class TemplateTriggerHandler implements ITriggerHandler{
+    public static TriggerFrameworkServiceController serviceController = new TriggerFrameworkServiceController();
     public void beforeInsert(List<sObject> newList) {
         system.debug('beforeInsert----->');
     }
@@ -8,14 +9,16 @@ public class TemplateTriggerHandler implements ITriggerHandler{
     }
      
     public void beforeUpdate(List<sObject> newList, Map<Id, sObject> newMap, List<sObject> oldList, Map<Id, sObject> oldMap) {
-        Map<Id,Assessment_Template__c> templatesMap = new Map<Id,Assessment_Template__c>([SELECT Id,(SELECT Id FROM Assessments__r) FROM Assessment_Template__c WHERE ID IN:newMap.keySet()]);
-        for(Assessment_Template__c template:(List<Assessment_Template__c>)newMap.values()){
-            if(templatesMap.GET(template.Id).Assessments__r.size()>0){
-                template.addError('Template with Assessment Programs cannot be Modified.');
+        system.debug('inThebeforeUpdate-----');
+        for(sObject templt:newMap.values()){
+            Decimal assessmentCount = (Decimal)templt.get('Number_of_Assessments__c');
+            boolean isCriteriaMet = serviceController.checkEntryCriteria(templt,oldMap.get(templt.Id),'Assessment_Template_c');
+            if(isCriteriaMet && assessmentCount > 0){
+                templt.addError('Template with Assessment Programs cannot be Modified.');
             }
         }
     }
-     
+
     public void afterUpdate(List<sObject> newList, Map<Id, sObject> newMap,  List<sObject> oldList, Map<Id, sObject> oldMap) {
         system.debug('afterUpdate----->');
     }

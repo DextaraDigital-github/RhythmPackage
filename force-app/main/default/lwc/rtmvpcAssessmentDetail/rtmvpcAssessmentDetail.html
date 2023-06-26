@@ -210,20 +210,20 @@
 								</div>
 							</div>
 
-							<div class="cad-sec_vcontainer3 slds-border_top slds-p-around_small">
+							<!-- <div class="cad-sec_vcontainer3 slds-border_top slds-p-around_small">
 								<lightning-textarea placeholder="Type your response here..." variant="label-hidden"
 									disabled="true" onchange={chatChangeHandler}>
 								</lightning-textarea>
 								<lightning-button label="Send" onclick={sendButtonHandler} disabled="true">
 								</lightning-button>
-							</div>
+							</div> -->
 						</template>
 
-						<template if:true={showData}>
+						<!--<template if:true={showData}>-->
 							<c-rtmvpc-assessment-chatter chattermap={showChat} onchatconversation={handleChat}
 								recordid={customerId}>
 							</c-rtmvpc-assessment-chatter>
-						</template>
+						<!--</template>-->
 
 					</div>
 				</div>

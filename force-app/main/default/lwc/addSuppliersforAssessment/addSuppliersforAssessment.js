@@ -11,20 +11,19 @@ export default class AddSuppliersforAssessment extends LightningElement {
     @track delList;
 
     @wire(getAssessmentRecord, { assessmentId: '$recordId'})
-    assessmentRecord(result) {
+    getAssessmentRecord_wiredData(result) {
         if (result.data) {
+            console.log('getAssessmentRecord : ',JSON.stringify(result.data));
             this.assessmentRecord = result.data[0];
-            console.log('assessmentRecord---->',JSON.stringify(result.data));
             this.startDate = result.data[0].Rhythm__Start_Date__c;
         } else if (result.error) {
-            console.log('eror---->',result.error);
+            console.log('getAssessmentRecord error : ',result.error);
         }
     }
 
     handleAdd(){
         try{
-            console.log('existingSuppList------>',JSON.stringify(this.existingSuppList));
-            console.log('suppliersList------>',JSON.stringify(this.suppliersList));
+            console.log('handleAdd - START : ');
             let deleteListStr = '';
             let exSupListStr = '';
             if(this.existingSuppList.length>0){
@@ -38,7 +37,7 @@ export default class AddSuppliersforAssessment extends LightningElement {
             console.log('startDate----->',this.startDate);
             if(new Date(this.startDate) >= new Date(dateValue)){
                 console.log('AddSuppliersMethod------->',JSON.stringify(this.suppliersList));
-                if(this.suppliersList.length > 0){
+                if(this.suppliersList.length > 0 || this.delList.length>0){
                     addSuppliers({assessmentRecord:this.assessmentRecord,operationType:'update',suppliers:JSON.stringify(this.suppliersList),existingSups:exSupListStr,deleteList:deleteListStr})
                     .then(result => {
                         console.log('addSuppliers Result------->'+JSON.stringify(result));

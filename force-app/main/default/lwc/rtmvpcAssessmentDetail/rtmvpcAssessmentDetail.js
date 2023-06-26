@@ -45,7 +45,7 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
     @track savedResponseMap = new Map();
     connectedCallback() {
         this.customerId = this.recordId;
-        this.showconverstion = true;
+        this.showconverstion = false;
        
         console.log('accountid',this.accountid);
         this.assaccId = this.accountid;
@@ -357,10 +357,13 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
     }
     /* chatHistory is used to get the question id, assessment id and flag boolean from the child component (Questionnaire) and pass it to the child component(AssessmentChatter)*/
     chatHistory(event) {
-        this.showChat = event.detail;
+        
+        this.showChat = JSON.parse(JSON.stringify(event.detail));
         this.showChat.accountassessmentId=this.accountassessmentid;
+        console.log('assessment', this.showChat.accountassessmentId);
         this.showData = this.showChat.openChat;
         this.showconverstion = this.showChat.disableSendButton;
+        this.template.querySelector('c-rtmvpc-assessment-chatter').displayConversation(this.showChat);
     }
 
     showsummaryHandler(event) {
