@@ -7,6 +7,7 @@ import RtmvpcLogosymbolPic1 from '@salesforce/resourceUrl/rtmlogosymbol';
 //import RtmvpcLogotypePic1 from '@salesforce/resourceUrl/rtmlogofull1';
 import RtmvpcLogofullPic1 from '@salesforce/resourceUrl/rtmlogofull';
 import getUserName from '@salesforce/apex/AssessmentController.getUserName';
+import getCommunityURL from '@salesforce/apex/AssessmentController.getCommunityURL';
 
 
 
@@ -36,15 +37,24 @@ export default class RtmvpcMaster extends NavigationMixin(LightningElement) {
     isDashboard = false; 
     isSettings = false;
     @track userName;
+    @track logoutURL;
     @api activeRecId;
     @api activemenuitem;
 
     connectedCallback()
     {
+  
+    }
+    handleUserName()
+    {
         /*getUserName is used to get the username */
       getUserName({}).then((result) => {
          this.userName = result;
       });
+      getCommunityURL({}).then((resultURL) => {
+         this.logoutURL = resultURL;
+      });
+      console.log('username',this.logoutURL);      
     }
 
     renderedCallback() {        
