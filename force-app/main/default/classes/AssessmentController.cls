@@ -46,7 +46,7 @@ public with sharing class AssessmentController {
 * Gets the Response__c information of an AccountAssessmentRelation__c.
 * @param assessmentId This is a record id of an AccountAssessmentRelation__c.  
 */
-    @AuraEnabled(cacheable=true)
+    @AuraEnabled
     public static List<SObject> getSupplierResponseList(String assessmentId){
         return  [SELECT Id, Question__c,Assessment__c,Question__r.Question_Type__c, 
                  Assessment__r.Name,Files__c, Response__c,CreatedBy.Name,CreatedDate, Flag__c, 
@@ -195,10 +195,10 @@ public with sharing class AssessmentController {
     @AuraEnabled
     public static string getAccountId()
     {
-        // List<User> strAccId = [SELECT Contact.AccountId FROM User WHERE id=:userinfo.getuserid()];
-        // return strAccId[0].Contact.AccountId;
+        List<User> strAccId = [SELECT Contact.AccountId FROM User WHERE id=:userinfo.getuserid()];
+        return strAccId[0].Contact.AccountId;
         
-        return null;
+        // return null;
     }
     
     

@@ -282,7 +282,7 @@ export default class Questionnaire extends LightningElement {
                 getQuestionsList({ templateId: this.recordId }).then(result => {
                     var resultMap = result;
                     for (var i = 0; i < resultMap.length; i++) {
-                        if (typeof resultMap[i].Rhythm__Section__r.Id != 'undefined') {
+                        if (typeof resultMap[i].Rhythm__Section__r!='undefined'&&typeof resultMap[i].Rhythm__Section__r.Id != 'undefined') {
                             if (!this.sectionidslist.includes(resultMap[i].Rhythm__Section__r.Id)) {
                                 this.sectionidslist.push(resultMap[i].Rhythm__Section__r.Id);
                             }
@@ -358,7 +358,7 @@ export default class Questionnaire extends LightningElement {
                     var resultMap = result;
                     console.log('resultMap 303', resultMap)
                     for (var i = 0; i < resultMap.length; i++) {
-                        if (typeof resultMap[i].Rhythm__Section__r.Id != 'undefined') {
+                        if (typeof resultMap[i].Rhythm__Section__r != 'undefined' && typeof resultMap[i].Rhythm__Section__r.Id!='undefined') {
                             if (!this.sectionidslist.includes(resultMap[i].Rhythm__Section__r.Id)) {
                                 this.sectionidslist.push(resultMap[i].Rhythm__Section__r.Id);
                             }
@@ -865,6 +865,7 @@ export default class Questionnaire extends LightningElement {
                     detail: true
                 });
                 this.dispatchEvent(selectedEvent);
+                this.handleOnload();
             }).catch(error => {
                 console.log('Error' + error);
                 this.totastmessage = 'Error : ' + JSON.stringify(error);
@@ -1072,13 +1073,17 @@ export default class Questionnaire extends LightningElement {
             if (typeof savedResp.get(qu.Id) != 'undefined' && typeof savedResp.get(qu.Id).value != 'undefined')
                 this.responseMap.set(qu.Id, savedResp.get(qu.Id).value);
             quTemp.Children = [];
-            if (this.questionMap.has(qu.Rhythm__Section__r.Name)) {
+            if(typeof qu.Rhythm__Section__r!='undefined' && typeof qu.Rhythm__Section__r.Name!='undefined')
+            {
+                if (this.questionMap.has(qu.Rhythm__Section__r.Name)) {
                 this.questionMap.get(qu.Rhythm__Section__r.Name).push(quTemp);
             } else {
                 var quesList = [];
                 quesList.push(quTemp);
                 this.questionMap.set(qu.Rhythm__Section__r.Name, quesList);
             }
+            }
+            
             console.log('this.questionMap', this.questionMap);
 
             return quTemp;
