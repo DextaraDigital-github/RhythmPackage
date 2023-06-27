@@ -39,7 +39,7 @@
                 <field>Assessment_Template__c</field>
             </layoutItems>
             <layoutItems>
-                <behavior>Edit</behavior>
+                <behavior>Required</behavior>
                 <field>Section__c</field>
             </layoutItems>
             <layoutItems>
