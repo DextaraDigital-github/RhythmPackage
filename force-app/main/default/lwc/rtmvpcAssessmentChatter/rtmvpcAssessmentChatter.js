@@ -146,6 +146,7 @@ export default class RtmvpcAssessmentChatter extends LightningElement {
 
    /* handleRightButtonClick is used to save the newly typed message to the response record */
    handleRightButtonClick(event) {
+       this.showData=false;
       console.log('this.newChat',this.newChat);
       if(typeof this.newChat !=='undefined' && this.newChat !=='')
       {
@@ -232,11 +233,15 @@ export default class RtmvpcAssessmentChatter extends LightningElement {
 
          
          console.log('Hello i am at 145');
-
+         
+         if(typeof this.responseMap.Text !='undefined' && this.responseMap.Text !='' ) 
+         {
          this.newResponse.push(this.responseMap);
+         }
          console.log('sample',this.newResponse);
          this.callChatterResponse(this.newResponse);
          this.responseList = this.newResponse;
+         this.showData=true;
          this.showResponse = true;
          this.newChat = '';
          console.log('newResponse', this.newResponse);
