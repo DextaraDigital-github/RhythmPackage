@@ -31,6 +31,7 @@ export default class RtmvpcAssessmentChatter extends LightningElement {
       if (typeof chatmap !== 'undefined' && chatmap) {
          this.chattermap = chatmap;
       }
+       this.showData=false;
       console.log('connectedsupplier', this.recordid);
       this.questionId = this.chattermap.questionId;
       this.assessmentId = this.chattermap.assesmentId;
@@ -57,6 +58,7 @@ export default class RtmvpcAssessmentChatter extends LightningElement {
       /*getChatterResponse is used to get conversation history between vendor and customer on onload */
       getChatterResponse({ responseWrapper: JSON.stringify(this.responseWrapper) }).then((result) => {
          console.log('Chatter result', result);
+         this.showData=true;
          this.showResponse = false;
          if (typeof result !== 'undefined') {
             if (('Rhythm__Conversation_History__c' in result[0])) {
@@ -96,6 +98,7 @@ export default class RtmvpcAssessmentChatter extends LightningElement {
             this.showResponse = false;
          }
          console.log('connectedsupplierlistin apex', this.recordid);
+        
       }).catch((err) => {
          var errormap = {};
          errormap.componentName = 'RtmvpcAssessmentChatter';
@@ -146,9 +149,12 @@ export default class RtmvpcAssessmentChatter extends LightningElement {
 
    /* handleRightButtonClick is used to save the newly typed message to the response record */
    handleRightButtonClick(event) {
-      this.showData = false;
+      
+      //console.log('this.newChat', this.newChat.length);
       console.log('this.newChat', this.newChat);
-      if (typeof this.newChat !== 'undefined' && this.newChat !== '') {
+      var chat=this.newChat.trim(' ');
+      if (typeof this.newChat !== 'undefined' && this.newChat !== '' && chat.length >0) {
+         this.showData = false;
          this.responseWrapper.assessmentId = this.assessmentId;
          this.responseWrapper.questionId = this.questionId;
 
@@ -259,6 +265,9 @@ export default class RtmvpcAssessmentChatter extends LightningElement {
             });
          });
 
+      }
+      else{
+         this.newChat = '';
       }
    }
 

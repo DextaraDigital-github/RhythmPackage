@@ -126,42 +126,42 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
     /* openChatHandler is used to dispatch an event to its parent component(Questionnaire) by sending
        the questionId to parent component to open chat conversation */
     openChatHandler(event) {
-        var quesId = event.currentTarget.dataset.id;
-        console.log('event.cuurentTarget.dataset.id', event.currentTarget.dataset.id);
-        console.log('this.chatterMap',this.chatterMap +'');
-        if(this.issupplier)
-        {
-            this.chatterMap.accountType = 'supplier';
-        }
-        else
-        {
-            this.chatterMap.accountType = 'vendor';
+        // var quesId = event.currentTarget.dataset.id;
+        // console.log('event.cuurentTarget.dataset.id', event.currentTarget.dataset.id);
+        // console.log('this.chatterMap',this.chatterMap +'');
+        // if(this.issupplier)
+        // {
+        //     this.chatterMap.accountType = 'supplier';
+        // }
+        // else
+        // {
+        //     this.chatterMap.accountType = 'vendor';
 
-        }
+        // }
         
-        if (this.chatterMap.openChat == false) {
-            this.chatterMap.openChat = true;
-            this.chatterMap.disableSendButton = false;
-        }
-        else {
-            if(this.chatterMap.questionId!=quesId)
-            {                
-                this.chatterMap.openChat = true;
-                this.chatterMap.disableSendButton = false;
-            }
-            else
-            {
-                this.chatterMap.openChat = false;
-                this.chatterMap.disableSendButton = true;
-            }
+        // if (this.chatterMap.openChat == false) {
+        //     this.chatterMap.openChat = true;
+        //     this.chatterMap.disableSendButton = false;
+        // }
+        // else {
+        //     if(this.chatterMap.questionId!=quesId)
+        //     {                
+        //         this.chatterMap.openChat = true;
+        //         this.chatterMap.disableSendButton = false;
+        //     }
+        //     else
+        //     {
+        //         this.chatterMap.openChat = false;
+        //         this.chatterMap.disableSendButton = true;
+        //     }
             
-        }
-        this.chatterMap.questionId = quesId;
-        const selectedEvent = new CustomEvent('selectchange', {
-            detail: this.chatterMap
-        });
-        // Dispatches the event.
-        this.dispatchEvent(selectedEvent);
+        // }
+        // this.chatterMap.questionId = quesId;
+        // const selectedEvent = new CustomEvent('selectchange', {
+        //     detail: this.chatterMap
+        // });
+        // // Dispatches the event.
+        // this.dispatchEvent(selectedEvent);
     }
 
     /* getShowUploadStatus  is used to show progressbar while uploading the file.This method will be invoked from Questionnaire component.*/
@@ -290,6 +290,46 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
             }
         });
         this.dispatchEvent(selectquestion);
+
+
+
+
+        var quesId = event.currentTarget.dataset.id;
+        console.log('event.cuurentTarget.dataset.id', event.currentTarget.dataset.id);
+        console.log('this.chatterMap',this.chatterMap +'');
+        if(this.issupplier)
+        {
+            this.chatterMap.accountType = 'supplier';
+        }
+        else
+        {
+            this.chatterMap.accountType = 'vendor';
+
+        }
+        
+        if (this.chatterMap.openChat == false) {
+            this.chatterMap.openChat = true;
+            this.chatterMap.disableSendButton = false;
+        }
+        else {
+            if(this.chatterMap.questionId!=quesId)
+            {                
+                this.chatterMap.openChat = true;
+                this.chatterMap.disableSendButton = false;
+            }
+            else
+            {
+                this.chatterMap.openChat = false;
+                this.chatterMap.disableSendButton = true;
+            }
+            
+        }
+        this.chatterMap.questionId = quesId;
+        const selectedEvent = new CustomEvent('selectchange', {
+            detail: this.chatterMap
+        });
+        // Dispatches the event.
+        this.dispatchEvent(selectedEvent);
     }
 
     /* selectquestionHandler method is used to dispatch an event to its parent component till it reaches the questionnaire component, in case of any nested questions */
