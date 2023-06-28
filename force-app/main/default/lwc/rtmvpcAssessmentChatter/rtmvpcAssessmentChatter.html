@@ -6,12 +6,12 @@
 			<template for:each={responseList} for:item="chatItem">
 				<div class="cad-ad-default" key={chatItem}>
 					<!-- classes: cad-ad-approved, cad-ad-rejected, cad-ad-submited, cad-ad-default -->
-					<div class={chatItem.recipientType} key={chatItem}>
+					<div class={chatItem.recipientType} >
 						<!-- classes: cad-ad-customer,cad-ad-supplier -->
-						<div class="cad-ad-base" key={chatItem}>
-							<div key={chatItem} class="cad-ad-datentime">{chatItem.createdTime}</div>
-							<div key={chatItem} class="cad-ad-message">{chatItem.Text}</div>
-							<div key={chatItem} class="cad-ad-sender">- {chatItem.Name}</div>
+						<div class="cad-ad-base" >
+							<div class="cad-ad-datentime">{chatItem.createdTime}</div>
+							<div class="cad-ad-message">{chatItem.Text}</div>
+							<div class="cad-ad-sender">- {chatItem.Name}</div>
 						</div>
 					</div>
 				</div>
