@@ -93,39 +93,39 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
                                         }
                                         this.assessmentName = accAssessment.Rhythm__Assessment__r.Name;
                                         if (typeof accAssessment.Rhythm__Start_Date__c !== 'undefined') {
-                                            var statustrack = {};
-                                            var dateformat = accAssessment.Rhythm__Start_Date__c;
-                                            var dateformats = months[Number(dateformat.split('-')[1]) - 1] + '-' + dateformat.split('-')[2] + '-' + dateformat.split('-')[0];
-                                            statustrack['date'] = dateformats + ' ' + '00:00:00';
-                                            statustrack['status'] = 'Start Date';
-                                            statustrack['classlist'] = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_default';
-                                            statustrack['name'] = accAssessment.Rhythm__Assessment__r.Rhythm__CreatedUser__c;
+                                            let statustrack = {};
+                                            let dateformat = accAssessment.Rhythm__Start_Date__c;
+                                            let dateformats = months[Number(dateformat.split('-')[1]) - 1] + '-' + dateformat.split('-')[2] + '-' + dateformat.split('-')[0];
+                                            statustrack.date = dateformats + ' 00:00:00';
+                                            statustrack.status = 'Start Date';
+                                            statustrack.classlist = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_default';
+                                            statustrack.name = accAssessment.Rhythm__Assessment__r.Rhythm__CreatedUser__c;
                                             this.assessmentTimeline.push(statustrack);
                                         }
                                         else {
-                                            var statustrack = {};
+                                            let statustrack = {};
                                             if (typeof accAssessment.CreatedDate !== 'undefined') {
-                                                var date = accAssessment.Rhythm__Assessment__r.CreatedDate.split('T');
-                                                var time = date[1].split('.');
-                                                var dateformat = date[0];
-                                                var dateformats = months[Number(dateformat.split('-')[1]) - 1] + '-' + dateformat.split('-')[2] + '-' + dateformat.split('-')[0];
-                                                statustrack['date'] = dateformats + ' ' + time[0];
-                                                statustrack['status'] = 'Start Date';
-                                                statustrack['classlist'] = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_default';
-                                                statustrack['name'] = accAssessment.Rhythm__Assessment__r.Rhythm__CreatedUser__c;
+                                                let date = accAssessment.Rhythm__Assessment__r.CreatedDate.split('T');
+                                                let time = date[1].split('.');
+                                                let dateformat = date[0];
+                                                let dateformats = months[Number(dateformat.split('-')[1]) - 1] + '-' + dateformat.split('-')[2] + '-' + dateformat.split('-')[0];
+                                                statustrack.date = dateformats + ' ' + time[0];
+                                                statustrack.status = 'Start Date';
+                                                statustrack.classlist = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_default';
+                                                statustrack.name = accAssessment.Rhythm__Assessment__r.Rhythm__CreatedUser__c;
                                                 this.assessmentTimeline.push(statustrack);
                                             }
 
                                         }
                                         if (typeof accAssessment.Rhythm__End_Date__c !== 'undefined') {
-                                            var statustrack = {};
-                                            var dateformat = accAssessment.Rhythm__End_Date__c;
-                                            var dateformats = months[Number(dateformat.split('-')[1]) - 1] + '-' + dateformat.split('-')[2] + '-' + dateformat.split('-')[0];
-                                            statustrack['date'] = '(Due date ' + dateformats + ')';
-                                            this.endDate = statustrack['date'];
-                                            statustrack['status'] = 'End Date';
-                                            statustrack['classlist'] = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_default';
-                                            statustrack['name'] = accAssessment.Rhythm__Assessment__r.Rhythm__CreatedUser__c;
+                                            let statustrack = {};
+                                            let dateformat = accAssessment.Rhythm__End_Date__c;
+                                            let dateformats = months[Number(dateformat.split('-')[1]) - 1] + '-' + dateformat.split('-')[2] + '-' + dateformat.split('-')[0];
+                                            statustrack.date = '(Due date ' + dateformats + ')';
+                                            this.endDate = statustrack.date;
+                                            statustrack.status = 'End Date';
+                                            statustrack.classlist = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_default';
+                                            statustrack.name = accAssessment.Rhythm__Assessment__r.Rhythm__CreatedUser__c;
                                             this.assessmentTimeline.push(statustrack);
                                         }
                                     }
@@ -275,7 +275,7 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
                             if (typeof this.finalSection.get(key)[i].files !== "undefined") {
                                 this.finalSection.get(key)[i].files = JSON.parse(this.finalSection.get(key)[i].files).length;
                             }
-                            str += '"' + key + '","' + (i + 1) + '.' + ' ' + this.finalSection.get(key)[i].question + '","' + this.finalSection.get(key)[i].value + '","' + this.finalSection.get(key)[i].conversationHistory + '","' + this.finalSection.get(key)[i].files + '"\n';
+                            str += '"' + key + '","' + (i + 1) + '. ' + this.finalSection.get(key)[i].question + '","' + this.finalSection.get(key)[i].value + '","' + this.finalSection.get(key)[i].conversationHistory + '","' + this.finalSection.get(key)[i].files + '"\n';
                         }
                         str += '\n';
                     }
@@ -331,67 +331,14 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
     }
 
     handleExportPDF() {
-        getSupplierAssessmentList({ assessmentId: this.recordId }).then(resultData => {
-            var assessmentTemplateId = resultData[0].Rhythm__Assessment__r.Rhythm__Template__c;;
-            getQuestionsList({ templateId: assessmentTemplateId }).then(result => {
-                var resultMap = result;
-                getSupplierResponseList({ assessmentId: this.accountassessmentid }).then(result => {
-                    result.forEach(qres => {
-                        var savedResponseList = new Map();
-                        savedResponseList.set('value', qres.Rhythm__Response__c);
-                        if (('Rhythm__Conversation_History__c' in qres)) {
-                            savedResponseList.set('history', (qres.Rhythm__Conversation_History__c));
-                        }
-                        if (('Rhythm__Files__c' in qres)) {
-                            savedResponseList.set('files', (qres.Rhythm__Files__c));
-                        }
-                        this.savedResponseMap.set(qres.Rhythm__Question__c, savedResponseList);
-                    });
-                    this.finalSection = this.constructWrapper(resultMap, this.savedResponseMap);
-                    let tableHtml = '<table><thead><tr>';
-                    tableHtml += '<th>Section</th><th colspan="2">Question</th><th>Response</th><th>ConversationHistory</th><th>NumberOfAttachments</th>';
-                    tableHtml += '</tr></thead><tbody>';
-                    console.log('this.finalSection', this.finalSection);
-                    let count = 0;
-                    for (const key of this.finalSection.keys()) {
-                        count += 1;
-                        if (count % 2 === 0) {
-                            tableHtml += '<tr><td class="evenLeftTd" rowspan=' + this.finalSection.get(key).length + '>' + key + '</td>';
-                        }
-                        else {
-                            tableHtml += '<tr><td class="oddLeftTd" rowspan=' + this.finalSection.get(key).length + '>' + key + '</td>';
-                        }
-                        for (let i = 0; i < this.finalSection.get(key).length; i++) {
-                            if (typeof this.finalSection.get(key)[i].conversationHistory !== "undefined") {
-                                let str = '';
-                                for (let j = 0; j < JSON.parse(this.finalSection.get(key)[i].conversationHistory).length; j++) {
-                                    str = str + JSON.parse(this.finalSection.get(key)[i].conversationHistory)[j].Name + ':' + JSON.parse(this.finalSection.get(key)[i].conversationHistory)[j].Text + '\n';
-                                }
-
-                                this.finalSection.get(key)[i].conversationHistory = str;
-                            }
-                            if (typeof this.finalSection.get(key)[i].files !== "undefined") {
-                                this.finalSection.get(key)[i].files = JSON.parse(this.finalSection.get(key)[i].files).length;
-                            }
-                            tableHtml += '<td class="align-to-top">' + (i + 1) + '.' + '</td><td>' + this.finalSection.get(key)[i].question + '</td><td>' + this.finalSection.get(key)[i].value + '</td><td> ' + this.finalSection.get(key)[i].conversationHistory + '</td><td> ' + this.finalSection.get(key)[i].files + '</td></tr>';
-
-                        }
-                        tableHtml += '<tr><td></td><td></td><td></td><td></td></tr>';
-                    }
-                    tableHtml += '</tbody></table>';
-                }).catch(error => {
-                    errorLogRecord({ componentName: 'CustomTable', methodName: 'getSupplierResponseList', className: 'AssessmentController', errorData: error.message }).then(() => {
-                    });
-                })
-
-            }).catch(error => {
-                errorLogRecord({ componentName: 'CustomTable', methodName: 'getQuestionsList', className: 'AssessmentController', errorData: error.message }).then(() => {
-                });
-            })
-        }).catch(error => {
-            errorLogRecord({ componentName: 'CustomTable', methodName: 'getSupplierAssessmentList', className: 'AssessmentController', errorData: error.message }).then(() => {
-            });
-        })
+        let pageurl = window.location.href;
+        if(typeof this.recordId!='undefined'){
+            let baseurl = pageurl.split('.com')[0] +'.com/apex/RenderAsPdf?id='+this.recordId;
+            window.open(baseurl);
+        }else{
+            let baseurl = pageurl.split('.com')[0] +'.com/apex/RenderAsPdf?id='+this.accountassessmentid;
+            window.open(baseurl);
+        }
     }
 
     handleupdatetimeline() {
