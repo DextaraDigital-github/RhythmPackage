@@ -13,9 +13,9 @@
         <valueSetDefinition>
             <sorted>false</sorted>
             <value>
-                <fullName>In progress</fullName>
+                <fullName>In Progress</fullName>
                 <default>false</default>
-                <label>In progress</label>
+                <label>In Progress</label>
             </value>
             <value>
                 <fullName>Submitted</fullName>
@@ -23,9 +23,9 @@
                 <label>Submitted</label>
             </value>
             <value>
-                <fullName>In review</fullName>
+                <fullName>In Review</fullName>
                 <default>false</default>
-                <label>In review</label>
+                <label>In Review</label>
             </value>
             <value>
                 <fullName>Accepted</fullName>
@@ -33,9 +33,9 @@
                 <label>Accepted</label>
             </value>
             <value>
-                <fullName>Need more information</fullName>
+                <fullName>Need More Information</fullName>
                 <default>false</default>
-                <label>Need more information</label>
+                <label>Need More Information</label>
             </value>
             <value>
                 <fullName>New</fullName>

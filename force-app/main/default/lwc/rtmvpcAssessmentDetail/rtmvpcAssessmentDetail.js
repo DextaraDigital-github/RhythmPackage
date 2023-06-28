@@ -154,11 +154,11 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
                                     statustrack.status = assessStatus.NewValue;
                                     switch (assessStatus.NewValue) {
                                         case "New": statustrack.classlist = 'cad-timeline_slidebase cad-timeline_vendor cad-timeline_submited'; break;
-                                        case "In progress": statustrack.classlist = 'cad-timeline_slidebase cad-timeline_vendor cad-timeline_pending'; break;
+                                        case "In Progress": statustrack.classlist = 'cad-timeline_slidebase cad-timeline_vendor cad-timeline_pending'; break;
                                         case "Submitted": statustrack.classlist = 'cad-timeline_slidebase cad-timeline_vendor cad-timeline_submited'; break;
-                                        case "In review": statustrack.classlist = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_pending'; break;
+                                        case "In Review": statustrack.classlist = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_pending'; break;
                                         case "Accepted": statustrack.classlist = 'cad-timeline_slidebase cad-timeline_vendor cad-timeline_submited'; break;
-                                        case "Need more information": statustrack.classlist = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_rejected'; break;
+                                        case "Need More Information": statustrack.classlist = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_rejected'; break;
                                         case "Review Completed": statustrack.classlist = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_reviewcompleted'; break;
                                         default : console.log('default');
                                     }

@@ -218,7 +218,7 @@ export default class Questionnaire extends LightningElement {
                                     // }
                                 }
                                 console.log('getSupplierResponseList result', this.assessmentStatus);
-                                if (this.assessmentStatus != 'New' && this.assessmentStatus != 'In progress') {
+                                if (this.assessmentStatus != 'New' && this.assessmentStatus != 'In Progress') {
                                     console.log('qres==>', result);
                                     result.forEach(qres => {
 
@@ -415,7 +415,7 @@ export default class Questionnaire extends LightningElement {
                         this.showButtons.Section_Navigation.show = false;
 
                         if (this.accountAssessmentStatus === 'Submitted' || this.accountAssessmentStatus == 'Review Completed' ||
-                            this.accountAssessmentStatus == 'In review') {
+                            this.accountAssessmentStatus == 'In Review') {
                             this.showButtons.Save_Submit = false;
                             this.showcustomerbuttons = false;
                             this.showButtons.Summary = true;
@@ -444,7 +444,7 @@ export default class Questionnaire extends LightningElement {
                             }
                             this.questionsList[i]['responsesPercentage'] = Math.floor((Number(this.questionsList[i].numberOfResponses) / Number(this.questionsList[i].numberOfQuestions)) * 100);
                         }
-                        //this.handleFilterFlag(true);
+                       // this.handleFilterFlag(true);
                         console.log('this.questionsAndAnswerss', this.questionsAndAnswerss);
                         console.log('this.questionsvaluemap', this.questionsvaluemap);
                     }).catch(error => {
@@ -926,12 +926,12 @@ export default class Questionnaire extends LightningElement {
             responseQueryMap.accountId = this.accid;
             responseQueryMap.assesmentId = this.assessment;
             responseQueryMap.accountassessmentid = this.accountassessmentid;
-            if (this.assessmentStatus != 'Need more information') {
+            if (this.assessmentStatus != 'Need More Information') {
                 if (isSubmit) {
                     responseQueryMap.status = 'Submitted';
                 }
                 else {
-                    responseQueryMap.status = 'In progress';
+                    responseQueryMap.status = 'In Progress';
                 }
             }
             else {
@@ -940,7 +940,7 @@ export default class Questionnaire extends LightningElement {
                     this.showButtons.Save_Submit = false;
                 }
                 else {
-                    responseQueryMap.status = 'Need more information';
+                    responseQueryMap.status = 'Need More Information';
 
                 }
 
@@ -1067,13 +1067,13 @@ export default class Questionnaire extends LightningElement {
                 // {
                 //     quTemp.customerFlag = false;
                 // }
-                if (this.accountAssessmentStatus == 'Submitted' || this.accountAssessmentStatus == 'In review' || this.accountAssessmentStatus == 'Need more information') {
+                if (this.accountAssessmentStatus == 'Submitted' || this.accountAssessmentStatus == 'In Review' || this.accountAssessmentStatus == 'Need More Information') {
 
                     this.showcustomerbuttons = true;
                     if (this.accountAssessmentStatus == 'Submitted') {
                         this.showInReview = true;
                     }
-                    if (this.accountAssessmentStatus == 'Need more information' || this.accountAssessmentStatus == 'In review') {
+                    if (this.accountAssessmentStatus == 'Need More Information' || this.accountAssessmentStatus == 'In Review') {
                         this.showInReview = false;
                         this.showSaveAndSubmit = true;
                         quTemp.customerFlag = true;
@@ -1091,8 +1091,8 @@ export default class Questionnaire extends LightningElement {
 
             }
             else {
-                if (this.accountAssessmentStatus == 'Submitted' || this.accountAssessmentStatus == 'Need more information' || this.assessmentStatus == 'In review') {
-                    if (this.assessmentStatus == 'Need more information') {
+                if (this.accountAssessmentStatus == 'Submitted' || this.accountAssessmentStatus == 'Need More Information' || this.assessmentStatus == 'In Review') {
+                    if (this.assessmentStatus == 'Need More Information') {
                         if (quTemp.Rhythm__Flag__c) {
                             quTemp.isEditable = false;
                         }
@@ -1213,14 +1213,14 @@ export default class Questionnaire extends LightningElement {
             if (typeof savedResp.get(qu.Id) != 'undefined' && typeof savedResp.get(qu.Id).value != 'undefined')
                 this.responseMap.set(qu.Id, savedResp.get(qu.Id).value);
             quTemp.Children = [];
-            if(typeof qu.Rhythm__Section__r!='undefined' && typeof qu.Rhythm__Section__r.Id!='undefined')
+            if(typeof qu.Rhythm__Section__r!='undefined' && typeof qu.Rhythm__Section__r.Name!='undefined')
             {
-                if (this.questionMap.has(qu.Rhythm__Section__r.Id)) {
+                if (this.questionMap.has(qu.Rhythm__Section__r.Name)) {
                 this.questionMap.get(qu.Rhythm__Section__r.Name).push(quTemp);
             } else {
                 var quesList = [];
                 quesList.push(quTemp);
-                this.questionMap.set(qu.Rhythm__Section__r.Id, quesList);
+                this.questionMap.set(qu.Rhythm__Section__r.Name, quesList);
             }
             }
             
@@ -1404,7 +1404,7 @@ export default class Questionnaire extends LightningElement {
     }
     handleStartReview() {
         var param = {};
-        var status = 'In review';
+        var status = 'In Review';
         param.assessmentStatus = status;
         param.recId = this.recordId;
         // for(var i=0;i<this.questionsAndAnswerss.length;i++)
@@ -1443,7 +1443,7 @@ export default class Questionnaire extends LightningElement {
             for (var j = 0; j < this.questionsAndAnswerss[i].questions.length; j++) {
                 if (this.questionsAndAnswerss[i].questions[j].customerFlag == true &&
                     this.questionsAndAnswerss[i].questions[j].Rhythm__Flag__c == true) {
-                    param.assessmentStatus = 'Need more information';
+                    param.assessmentStatus = 'Need More Information';
                     bool = true;
                     break;
                 }
