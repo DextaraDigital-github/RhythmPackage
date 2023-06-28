@@ -29,13 +29,23 @@ export default class RtmvpcAssessments extends LightningElement {
          this.accId = result;
          this.fetchingRecords();
       });    
-        
-    }
+    
+    }  
+    
     fetchingRecords(){
         getAssessmentJunctionRecords({ accountId: this.accId}).then(result=>{
         this.recList = result;
         this.show.grid=true;
+        let win=window.location.search;
+        let x=win.split('=');
+         if(x[0] ==='?Rhythm__AccountAssessmentRelation__c')
+        {
+           this.accountassessmentId=x[1];        
+           this.show.survey = true;
+           this.show.grid=false;
+         }
         });
+         
     }
 
 
