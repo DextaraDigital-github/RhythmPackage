@@ -1,12 +1,6 @@
 <!-- This HTML is used to load both section(tabluar report questionnaire) and Questions(Quesstionnaire) in same component based on the selection of sectionId and AssessmentId
 	-->
 <template>
-	<!-- <header class="rtmvpc-pgheader">
-		<div class="rtmvpc-pghtitle">
-			<div class="rtmvpc-pgstitle">Welcome to the Supplier Portal </div>
-			<h1 class="rtmvpc-pgmtitle capitalize">Inbox</h1>
-		</div>
-	</header> -->
 	<div class="cad-cardbase slds-p-around_small">
 		<div class="cad-tbl">
 			<div class="cad-row">
@@ -23,19 +17,16 @@
 								<div class="slds-scrollable_y">
 									<template for:each={assessmentTimeline} for:item="assessment">
 										<div key={assessment.status} class={assessment.classlist}>
-											<div key={assessment.status} class="cad-timeline_dot"></div>
-											<div key={assessment.status} class="cad-timeline_datetime">{assessment.date}
+											<div class="cad-timeline_dot"></div>
+											<div class="cad-timeline_datetime">{assessment.date}
 											</div>
-											<div key={assessment.status} class="cad-timeline_content">
-												<h2 key={assessment.status} class="cad-timeline_title">
+											<div class="cad-timeline_content">
+												<h2 class="cad-timeline_title">
 													{assessment.status}</h2>
 												<span>- {assessment.name}</span>
 											</div>
 										</div>
 									</template>
-
-
-
 								</div>
 							</div>
 						</div>
@@ -44,23 +35,6 @@
 
 				<div class="cad-cel cad-auto cad-list">
 					<div class="cad-sec_container">
-						<!-- <div class="cad-top_menu_container">
-							<div class="slds-float_left">
-								<button class="cad_actions" onclick={handleLeftButtonClick}><i class="las la-bars"></i></button>
-							</div>
-							<div class="slds-float_right">
-								<button class="cad_actions " data-id="Task" onclick={showDataHandler}>
-										<i class="las la-tasks"></i>
-								</button>
-								<button class="cad_actions " data-id="Supplier_Inbox_Categ__c" onclick={showDataHandler}>
-									<i class="las la-bell"></i>
-								</button>
-								<button class="cad_actions " data-id="Supplier_Task__c" onclick={showDataHandler}>
-									<i class="las la-exclamation-triangle"></i>
-								</button>
-							</div>
-						</div> -->
-
 						<div class="cad-sec_header">
 							<div class="slds-float_left slds-is-absolute" style="width:100%; padding:4px 80px 0px 31px;"
 								title="Details : ESG Assessment (Due date 05/14/2023)">
@@ -71,14 +45,12 @@
 								<button class="cad_actions" onclick={handleLeftButtonClick} title="Show / Hide Timeline Panel"><i class="las la-bars"></i></button>
 							</div>
 
-
-
 							<div class="slds-float_right slds-is-relative">
 								<template if:true={showstatus}>
 									<template if:true={showflagquestions}>
 
 										<span class="cib-flag">
-											<lightning-icon key={assessmentid} data-id="showlowerflag"
+											<lightning-icon data-id="showlowerflag"
 												icon-name="utility:lower_flag" size="x-small" onclick={handleChange}>
 											</lightning-icon>
 										</span>
@@ -90,29 +62,19 @@
 											     onclick={handleChange}></lightning-icon>
 										</span>
 									</template>
-
-									<!-- <lightning-input type="Checkbox" key={assessmentid}
-										onchange={handleChange} unchecked="false"></lightning-input> -->
 								</template>
 								&nbsp; &nbsp;
-								<!-- 
-								<lightning-combobox name="progress" label="Status" variant="label-hidden"
-									value={value} placeholder="Select Progress" options={options}
-									onchange={handleChange}>
-								</lightning-combobox>
-								-->
-								<!-- <template if:true={isRecordPage}> -->
-									<template if:true={showExpand}>
-								<lightning-button-icon icon-name="utility:expand_all" variant="bare" onclick={handleAccordian} data-id="[ + ]"
-									alternative-text="Close window">
-								</lightning-button-icon></template>
+								
+								<template if:true={showExpand}>
+									<lightning-button-icon icon-name="utility:expand_all" variant="bare" onclick={handleAccordian} data-id="[ + ]"
+										alternative-text="Close window">
+									</lightning-button-icon>
+								</template>
 								<template if:false={showExpand}>
-								<lightning-button-icon icon-name="utility:collapse_all" variant="bare" data-id="[ - ]" onclick={handleAccordian}
-									alternative-text="Close window">
-								</lightning-button-icon></template>
-								<!-- </template> -->
-								
-								
+									<lightning-button-icon icon-name="utility:collapse_all" variant="bare" data-id="[ - ]" onclick={handleAccordian}
+										alternative-text="Close window">
+									</lightning-button-icon>
+								</template>
 								<lightning-button-menu icon-name="utility:download" data-id={assessmentid}
 									menu-alignment="right" menu-size="medium" alternative-text="Export"
 									variant="label-hidden" title="Export" style="top:-3px;">
@@ -126,22 +88,11 @@
 								<button class="cad_actions" onclick={handleRightButtonClick} title="Show / Hide Info Panel"><i class="las la-bars"></i></button>
 							</div>
 						</div>
-						<!-- <div class="cad-serch">
-							<input type="text" placeholder="Search" class="cad-serch-input" onkeyup={searchInputChangeHandler}/>
-							</div>
-							-->
-						<!--
-								++ If Searc enabled use below Class "class="cad-sec_bodyfull2"" insted of  "class="cad-sec_bodyfull1"" ++ 
-							-->
 						<div class="cad-sec_bodyfull1">
 							<div class="cad-sec_vcontainer2_2" style="height:calc(100% - 0px)">
-								<!--  style="height:calc(100% - 42px)" -->
 								<div class="slds-scrollable_y" style="max-height:calc(100% - 40px);">
 									<div class="slds-text-align_center slds-text-heading_large">
-										<!-- <strong>Assessment Component Placeholder</strong>
-											<h1>calling tabular report questionnaire</h1> -->
 										<template if:true={showSections}>
-											<!--<template if:true={accountAssessmentStatus}>-->
 											<c-Questionnaire vendor={accountid} assessment={assessmentid}
 												object-api-name={objectApiName} record-id={recordId} accid={assaccId}
 												onselectconversation={chatHistory} onshowsummary={showsummaryHandler}
@@ -149,50 +100,16 @@
 												onexpandcollapse={handleExpandCollapse} accountassessmentid={accountassessmentid}
 												ontimelinehandle={handleTimeLine}>
 											</c-Questionnaire>
-											<!--</template>-->
 										</template>
-										
-										<!-- <template if:false={showFlag}>
-												
-												<c-rtmvpc-render-question-template onselectchange={chatHistory}></c-rtmvpc-render-question-template>
-											</template> -->
 									</div>
 								</div>
 							</div>
-							<!-- <div class="slds-is-absolute slds-border_top slds-p-vertical_x-small slds-p-horizontal_small slds-text-align_right"
-								style="width:100%; bottom:0px;">
-								<lightning-button label="Save"></lightning-button>
-								<lightning-button label="Submit" variant="brand" class="slds-m-left_medium">
-								</lightning-button>
-							</div> -->
 						</div>
 					</div>
 				</div>
 
 				<div class="cad-cel cad-w300 cad-disc cad-pl8 cadshowright" data-id="caddisc">
 					<div class="cad-sec_container_nobdr cad-sec_vcontainer">
-						<!-- <div class="cad-top_back_container">
-							<button class="cad_actions" data-id="buttoncaddisc" onclick={handleRightButtonClick}>
-								<i class="las la-chevron-circle-left"></i>
-								<span class="textstyle01"></span>
-							</button>
-						</div> -->
-						<!-- <div class="cad-tophead-details cad-sec_vcontainer1">
-							<div class="slds-grid slds-wrap slds-gutters_small">
-								<button class="cad_actions slds-float_right slds-is-absolute" style="right:0px;" data-id="buttoncaddisc" onclick={handleRightButtonClick} >
-									<i class="las la-chevron-circle-right"></i>
-									<span class="textstyle01"></span>
-								</button>
-								<div class="slds-col slds-size_12-of-12 slds-text-align_center">
-									<h4 class="slds-p-top_x-small slds-p-bottom_xx-small">
-										Selected Question Current Status
-									</h4>
-									<div class="">
-										<div class="cad-approved">Approved</div>
-									</div>
-								</div>
-							</div>
-						</div> -->
 						<div class="cad-tophead-details cad-sec_vcontainer1a">
 							<div class="slds-text-align_center slds-p-vertical_x-small">
 								<button class="cad_actions slds-float_right slds-is-absolute" style="right:0px;top:3px;" data-id="buttoncaddisc" onclick={handleRightButtonClick} >
@@ -209,40 +126,13 @@
 
 								</div>
 							</div>
-
-							<!-- <div class="cad-sec_vcontainer3 slds-border_top slds-p-around_small">
-								<lightning-textarea placeholder="Type your response here..." variant="label-hidden"
-									disabled="true" onchange={chatChangeHandler}>
-								</lightning-textarea>
-								<lightning-button label="Send" onclick={sendButtonHandler} disabled="true">
-								</lightning-button>
-							</div> -->
 						</template>
-
-						<!--<template if:true={showData}>-->
-							<c-rtmvpc-assessment-chatter chattermap={showChat} onchatconversation={handleChat}
-								recordid={customerId}>
-							</c-rtmvpc-assessment-chatter>
-						<!--</template>-->
-
+						<c-rtmvpc-assessment-chatter chattermap={showChat} onchatconversation={handleChat}
+							recordid={customerId}>
+						</c-rtmvpc-assessment-chatter>
 					</div>
 				</div>
 			</div>
 		</div>
 	</div>
-	<!-- 
-		<div class="slds-p-around_medium">
-			<div class="slds-grid slds-wrap slds-gutters_x-small">
-				<div class="slds-col slds-size_1-of-1 slds-small-size_12-of-12 slds-medium-size_3-of-12 slds-large-size_2-of-12">
-					<div class="rtmvpc-ib-card slds-scrollable_y">
-						<h4>Task Type</h4>
-					</div>
-				</div>
-				<div class="slds-col slds-size_1-of-1 slds-small-size_12-of-12 slds-medium-size_9-of-12 slds-large-size_10-of-12">
-					<div class="rtmvpc-ib-card slds-scrollable_y">
-					</div>
-				</div>
-			</div>
-		</div>
-		-->
 </template>
