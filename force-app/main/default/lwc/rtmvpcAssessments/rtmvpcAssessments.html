@@ -13,7 +13,8 @@
 					<c-custom-table obj-name='Rhythm__Assessment__c' rel-name='Rhythm__Assessments__r'
 						object-record-data={recList} accountid={accId} def-page-size={pageSize}
 						col-list={tablefieldList} show-progress-bar="true" show-survey="true"
-						onrowclick={openSurveyHandler}></c-custom-table>
+						onrowclick={openSurveyHandler} onexportrowascsv={exportRowAsCsvHandler}
+						onexportrowaspdf={exportRowAsPdfHandler}></c-custom-table>
 				</template>
 				<template if:true={show.survey}>
 					<button class="slds-m-bottom_small cdg_actions" onclick={backClickHandler}>

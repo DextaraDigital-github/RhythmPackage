@@ -3,7 +3,7 @@
 	<template if:true={responses}>
 		<template for:each={responses} for:item="questionary">
 			<div key={questionary.Id} class="temp_question_border-bottom">
-				<template if:false={questionary.showUpload}>
+				
 					<div class="qactivelabelcont"  data-id={questionary.Id}
 						onclick={highlightQuestionHandler}>
 						<div
@@ -58,6 +58,7 @@
 											</lightning-input-rich-text>
 										</template>
 										<template if:true={questionary.isPicklist}>
+											<p>sample</p>
 											<lightning-combobox  data-key={questionary.Id}
 												data-con={questionary.conditional} name={questionary.question}
 												variant="label-hidden" value={questionary.value}
@@ -185,7 +186,6 @@
 						</div>
 
 					</div>
-				</template>
 
 				<!-- File upload -->
 				<template if:true={questionary.showUpload}>
@@ -247,7 +247,7 @@
 												</label>
 											</div> -->
 											<lightning-input type="file"
-												accept=".xlsx, .xls, .csv, .png, .doc, .docx, .pdf" label="Attachment"
+												accept=".xlsx, .xls, .csv, .png, .doc, .docx, .pdf" label="Attachment" data-id={questionary.Id}
 												onchange={uploadFilesHandler}></lightning-input>
 											<p>limit size : 3.5mb</p>
 										</div>

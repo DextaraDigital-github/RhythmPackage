@@ -1,4 +1,4 @@
-import { LightningElement,track,api } from 'lwc';
+import { LightningElement,api } from 'lwc';
 export default class ShowToastMessage extends LightningElement {
     @api isShowModal;
     @api isSucess;
@@ -17,13 +17,5 @@ export default class ShowToastMessage extends LightningElement {
         this.dispatchEvent(selectEvent);
     }
     connectedCallback() {
-        // if(this.messageFromComponent.split(':').length>1)
-        // {
-        //     this.isSucess=false;
-        // }
-        // else
-        // {
-        //     this.isSucess=true;
-        // }
     }
 }

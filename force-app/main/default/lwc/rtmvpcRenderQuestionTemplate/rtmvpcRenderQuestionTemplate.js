@@ -119,15 +119,16 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
 
     /* uploadFilesHandler is used to dispatch the file blob value to parent component(Questionnaire) with the loading on uploading the attachment*/
     uploadFilesHandler(event) {
+        console.log('hello');
         var x = new FileReader();
-        var questionId = (event.target.id).split('_');
-        this.fileresponsemap.questionId = questionId[0];
+        var questionId = (event.currentTarget.dataset.id);
+        this.fileresponsemap.questionId = questionId;
         this.fileresponsemap.sectionId = this.sectionid;
         this.fileresponsemap.name = event.target.files[0].name;
-        if(typeof questionId[0] !== 'undefined'){
+        if(typeof questionId !== 'undefined'){
             if(this.responses && this.responses.length > 0){
                 this.responses.forEach(res => {
-                    if(res.Id === questionId[0]){
+                    if(res.Id === questionId){
                         this.fileresponsemap.type = res.type;
                         this.fileresponsemap.flag = res.Rhythm__Flag__c;
                         this.fileresponsemap.conversationHistory = res.Rhythm__Conversation_History__c;
@@ -154,7 +155,7 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
             case "doc": this.fileresponsemap.isDocx = true; break;
             default : console.log('default');
         }
-        //let s = x.readAsDataURL(event.target.files[0]);
+        let s = x.readAsDataURL(event.target.files[0]);
         x.addEventListener("loadend", (event) => {
             this.fileresponsemap.filedata = x.result;
             this.fileresponsemap.showUploadProgress = this.showUploadProgress;

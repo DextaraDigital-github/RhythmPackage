@@ -1,6 +1,6 @@
 <template>
 	<!-- Shows a grid view of records -->
-	<template lwc:if={showTable}>
+	<!-- <template lwc:if={showTable}> -->
 		<div class="slds-p-around_small">
 			<div class="cdgtitletoolbar slds-grid slds-wrap ">
 				<div class="slds-col slds-small-size_12-of-12 slds-medium-size_6-of-12 slds-large-size_6-of-12">
@@ -79,7 +79,7 @@
 										menu-size="medium" alternative-text="Export" variant="label-hidden"
 										title="Export">
 										<lightning-menu-item label="PDF" title="PDF" value="PDF"
-											onclick={handleExportPDF}>
+											onclick={exportGridAsPdfHandler}>
 										</lightning-menu-item>
 										<lightning-menu-item label="CSV" title="CSV" value="CSV"
 											onclick={exportGridAsCsvHandler}>
@@ -143,7 +143,7 @@
 								<i data-id={col.fieldName} onclick={sortClickHandler} data-sorticon class="las la-angle-down sort-inactive"></i>
 								<!-- Inputs text to search data in that column -->
 								<div>
-									<input type="text" data-filtertextbox data-id={col.fieldName} onchange={inputChangeHandler} class="slds-input"/>
+									<input type="text" data-filtertextbox data-id={col.fieldName} onkeyup={inputChangeHandler} class="slds-input"/>
 								</div>
 									<div class="slds-resizable">
 										<span class="slds-resizable__handle" onmousedown={handleResizeMouseDown} data-resizefield={col.fieldName}>
@@ -152,7 +152,7 @@
 									</div>
 								</div>
 						</template>
-						<!-- Option to display a prgress bar -->
+						<!-- Option to display a progress bar -->
 						<template lwc:if={showProgressBar}>
 							<div class="th">% Completed
 								<div class="slds-resizable">
@@ -176,7 +176,7 @@
 							</div>
 							
 							<!-- Dynamically passing data to each column in a row by iterating through columns -->
-							<template key={rec.id} for:each={rec.record} for:item="col">
+							<template for:each={rec.record} for:item="col">
 								<div key={col.fieldName} class="td" data-id={rec.id} onclick={takeSurveyHandler}>
 									<div class={col.classList}>
 										<label class="slds-form-element__label">{col.label}</label>
@@ -225,13 +225,13 @@
 									icon-name="utility:threedots_vertical" icon-size="small">
 									<template if:true={gridoptions.exportRowAsPdf}>
 										<lightning-menu-item label="PDF" title="PDF" value="PDF" data-id={rec.id}
-											onclick={pdfClickHandler}>
+											onclick={exportRowAsPdfHandler}>
 										</lightning-menu-item>
 									</template>
 									<!-- Option to import data in the row as CSV. Only available for Assessments as of now. -->
 									<template if:true={gridoptions.exportRowAsCsv}>
 										<lightning-menu-item label="CSV" title="CSV" value="CSV" data-id={rec.id}
-											onclick={csvClickHandler}>
+											onclick={exportRowAsCsvHandler}>
 										</lightning-menu-item>
 									</template>
 								</lightning-button-menu>
@@ -284,7 +284,7 @@
 				</tr>
 			</table>
 		</div>
-	</template>
+	<!-- </template> -->
 
 	<!-- Show/Hide Columns Modal Popup -->
 	<template if:true={isShowHideColumnsModalOpen}>
