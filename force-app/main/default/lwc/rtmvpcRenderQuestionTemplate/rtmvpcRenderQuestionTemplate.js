@@ -75,7 +75,7 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
             this.responses.forEach(res => {
                 if( (typeof changedvalue === 'undefined' || changedvalue === '' || changedvalue === '[]') 
                     && res.Id === questionId ) {
-                        changedvalue=this.responses[i].defaultValue;
+                        changedvalue=res.defaultValue;
                         if(res.isCheckbox === true){
                             changedvalue = 'true';
                         }else{
@@ -119,7 +119,6 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
 
     /* uploadFilesHandler is used to dispatch the file blob value to parent component(Questionnaire) with the loading on uploading the attachment*/
     uploadFilesHandler(event) {
-        console.log('hello');
         var x = new FileReader();
         var questionId = (event.currentTarget.dataset.id);
         this.fileresponsemap.questionId = questionId;
@@ -136,10 +135,8 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
                 })
             }
         }
-        this.fileresponsemap.url = URL.createObjectURL(event.target.files[0]);
         let type = (event.target.files[0].name).split('.');
         this.fileresponsemap.type = type[1];
-        //let file = event.target.files[0].name;
         this.showUploadProgress = true;
         this.fileresponsemap.isPng = false;
         this.fileresponsemap.isPdf = false;
@@ -155,8 +152,7 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
             case "doc": this.fileresponsemap.isDocx = true; break;
             default : console.log('default');
         }
-        let s = x.readAsDataURL(event.target.files[0]);
-        x.addEventListener("loadend", (event) => {
+        x.addEventListener("loadend", () => {
             this.fileresponsemap.filedata = x.result;
             this.fileresponsemap.showUploadProgress = this.showUploadProgress;
             /*To upload file and save the file in the record */

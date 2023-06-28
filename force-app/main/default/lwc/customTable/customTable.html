@@ -4,11 +4,14 @@
 		<div class="slds-p-around_small">
 			<div class="cdgtitletoolbar slds-grid slds-wrap ">
 				<div class="slds-col slds-small-size_12-of-12 slds-medium-size_6-of-12 slds-large-size_6-of-12">
-					<div class="slds-grid slds-wrap slds-p-bottom_xx-small">
+					<div class="slds-grid slds-wrap slds-p-bottom_xx-small slds-grid_vertical-align-center">
 						<div class="slds-text-left">
 							<lightning-icon icon-name="standard:budget" size="medium" title=""></lightning-icon>
 						</div>
-						<div class="slds-text-left slds-col_bump-right">
+                        <div class="slds-text-left slds-col_bump-right">
+                            <h1 class="slds-p-left_x-small" style="min-width:fit-content; font-size: 20px; font-weight: 600;">All</h1>
+                        </div>
+						<!-- <div class="slds-text-left slds-col_bump-right">
 							<h4 style="min-width:fit-content;">
 								<lightning-combobox name="status" label="List of Records" variant="label-hidden"
 									placeholder="All" value={value} onchange={handleChange} options={statusOptions}>
@@ -18,7 +21,7 @@
 						<div class="slds-col slds-text-left slds-p-left_small">
 							<lightning-button-icon variant="label-hidden" icon-name={iconName} onclick={handleClick}>
 							</lightning-button-icon>
-						</div>
+						</div> -->
 					</div>
 				</div>
 				<div class="slds-col slds-small-size_12-of-12 slds-medium-size_6-of-12 slds-large-size_6-of-12">
@@ -88,7 +91,7 @@
 								</div>
 
 								<!-- Options related to list view - Creating, Cloning, Renaming, Deleting a list view -->
-								<div class="slds-p-left_small">
+								<!-- <div class="slds-p-left_small">
 									<lightning-button-menu icon-name="utility:settings" menu-alignment="right"
 										menu-size="medium" alternative-text="Settings" variant="label-hidden"
 										title="Settings">
@@ -102,10 +105,10 @@
 										<lightning-menu-item label="Delete" title="Delete" value="Delete">
 										</lightning-menu-item>
 									</lightning-button-menu>
-								</div>
+								</div> -->
 
 								<!-- Options related to grid columns - Showing/Hiding columns, Reordering the columns -->
-								<div class="slds-p-left_small slds-m-right_small ">
+								<!-- <div class="slds-p-left_small slds-m-right_small ">
 									<lightning-button-menu icon-name="utility:table_settings" menu-alignment="right"
 										menu-size="medium" alternative-text="Column Settings" variant="label-hidden"
 										title="Column Settings">
@@ -116,7 +119,7 @@
 											value="ShuffleColumns" onclick={openShuffleColumnsModal}>
 										</lightning-menu-item>
 									</lightning-button-menu>
-								</div>
+								</div> -->
 							</div>
 						</div>
 					</div>
@@ -176,7 +179,7 @@
 							</div>
 							
 							<!-- Dynamically passing data to each column in a row by iterating through columns -->
-							<template for:each={rec.record} for:item="col">
+							<template key={rec.id} for:each={rec.record} for:item="col">
 								<div key={col.fieldName} class="td" data-id={rec.id} onclick={takeSurveyHandler}>
 									<div class={col.classList}>
 										<label class="slds-form-element__label">{col.label}</label>

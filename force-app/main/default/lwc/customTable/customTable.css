@@ -44,6 +44,10 @@ div.cdg .slds-input {color:#333333; }
 div.cdg .slds-dropdown__item>a { padding:0px 0.75rem;}
 div.cdg .slds-resizable__divider:after {height: calc(100% + 220px); background:linear-gradient(0deg, rgba(1,118,211,0) 0%, rgba(1,118,211,1) 27%, rgba(1,118,211,1) 100%);}
 
+
+.cad-timeline_reviewcompleted  {background:#d1f7c4;border-radius:4px;}
+.cad-timeline_pending  {background:#ffebb3; border:1px solid #dbc790;border-radius:4px;}
+ .cad-timeline_rejected {background:#ffbdc7; border:1px solid #e0a2ab;border-radius:4px;}
 @media only screen and (max-width:991px) {
    .cdgWrapper {}
    .cdgWrapperinner {max-width:calc(100vw - 28px); overflow-x:auto;}

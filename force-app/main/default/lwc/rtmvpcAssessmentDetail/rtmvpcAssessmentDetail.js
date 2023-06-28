@@ -137,7 +137,6 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
                     /* To get the assessment tracking history to update on timeline*/
                     getAssessmentStatus({ assessmentId: accountAssessmentRecord }).then(statusResult => {
                         var assessmentStatus = statusResult;
-                        console.log('assessmentStatus', assessmentStatus);
                         if (typeof statusResult !== 'undefined') {   
                             let oldvaluelst = [];
                             if(assessmentStatus  && assessmentStatus!==null){
@@ -163,10 +162,9 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
                                         case "Review Completed": statustrack.classlist = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_reviewcompleted'; break;
                                         default : console.log('default');
                                     }
-                                    if (typeof assessStatus.CreatedBy.Name !== 'undefined') {
-                                        statustrack.name = assessStatus.CreatedBy.Name;
-                                    }
-
+                                    // if (typeof assessStatus.CreatedBy.Name !== 'undefined') {
+                                    //    // statustrack.name = assessStatus.CreatedBy.Name;
+                                    // }
                                     this.assessmentTimeline.push(statustrack);
                                 }
                             })

@@ -58,7 +58,6 @@
 											</lightning-input-rich-text>
 										</template>
 										<template if:true={questionary.isPicklist}>
-											<p>sample</p>
 											<lightning-combobox  data-key={questionary.Id}
 												data-con={questionary.conditional} name={questionary.question}
 												variant="label-hidden" value={questionary.value}
@@ -277,7 +276,7 @@
 																			size="small">
 																		</lightning-icon>
 																	</a>
-																	<template if:true={issupplier}>
+																	<template if:true={questionary.isEditable}>
 																		<lightning-button-icon icon-name="utility:close"
 																			variant="bare" data-id={questionary.Id}
 																			data-key={file.name} onclick={deleteFile}
@@ -292,7 +291,7 @@
 																			size="small">
 																		</lightning-icon>
 																	</a>
-																	<template if:true={issupplier}>
+																	<template if:true={questionary.isEditable}>
 																		<lightning-button-icon icon-name="utility:close"
 																			variant="bare" data-id={questionary.Id}
 																			data-key={file.name} onclick={deleteFile}
@@ -307,7 +306,7 @@
 																			size="small">
 																		</lightning-icon>
 																	</a>
-																	<template if:true={issupplier}>
+																	<template if:true={questionary.isEditable}>
 																		<lightning-button-icon icon-name="utility:close"
 																			variant="bare" data-id={questionary.Id}
 																			data-key={file.name} onclick={deleteFile}
@@ -322,7 +321,7 @@
 																			size="small">
 																		</lightning-icon>
 																	</a>
-																	<template if:true={issupplier}>
+																	<template if:true={questionary.isEditable}>
 																		<lightning-button-icon icon-name="utility:close"
 																			variant="bare" data-id={questionary.Id}
 																			data-key={file.name} onclick={deleteFile}

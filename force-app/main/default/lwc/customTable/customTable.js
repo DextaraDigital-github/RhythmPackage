@@ -6,6 +6,7 @@ export default class CustomTable extends LightningElement {
         {
             value: 'all',
             label: 'All',
+            //description: 'Done working on this item',
         },
         {
             value: 'new',
@@ -107,7 +108,7 @@ export default class CustomTable extends LightningElement {
                             let fieldDetails = currentRecord.record[k];
                             //console.log('fieldDetails==>'+ fieldDetails);
                             if (fieldDetails.fieldName == fieldName) {
-                                if (typeof fieldDetails.value === 'undefined' || !(typeof fieldDetails.value != 'undefined' && fieldDetails.value.toUpperCase().includes(filterValue))) {
+                                if (typeof fieldDetails.value === 'undefined' || !(typeof fieldDetails.value != 'undefined' && fieldDetails.value.toString().toUpperCase().includes(filterValue))) {
                                     isRecordMatched = false;
                                     break;
                                 }
@@ -140,7 +141,7 @@ export default class CustomTable extends LightningElement {
     resetAllColumnSortStatusToDefault() {
         let allSortIcons = this.template.querySelectorAll('[data-sorticon]');
         if (!!allSortIcons && allSortIcons.length > 0) {
-            for (let i = 0; i < allSortIcons.length; i++) {
+            for (var i = 0; i < allSortIcons.length; i++) {
                 allSortIcons[i].className = 'las la-angle-down sort-inactive';
             }
         }
@@ -151,7 +152,7 @@ export default class CustomTable extends LightningElement {
         const offset = perPage * (page - 1);
         const paginatedItems = items.slice(offset, perPage * page);
         return paginatedItems;
-    }
+    };
 
     // Returns the count of total records
     getTotalRelatedRecordsCount() {
@@ -223,7 +224,7 @@ export default class CustomTable extends LightningElement {
         let totalPages = Math.ceil(totalRecordsCount / parseInt(perPage));
         if (totalPages > 0) {
             let tempPageOptions = [];
-            for (let i = 1; i <= totalPages; i++) {
+            for (var i = 1; i <= totalPages; i++) {
                 tempPageOptions.push({ label: i.toString(), value: i.toString() });
             }
             this.pageNumberOptions = tempPageOptions;
@@ -274,7 +275,7 @@ export default class CustomTable extends LightningElement {
             let getFieldDetailsByName = function (recordDetails, fieldName) {
                 let resFieldDetails = null;
                 if (!!recordDetails.record && recordDetails.record.length > 0) {
-                    for (let k = 0; k < recordDetails.record.length; k++) {
+                    for (var k = 0; k < recordDetails.record.length; k++) {
                         let fieldDetails = recordDetails.record[k];
                         if (fieldDetails.fieldName == fieldName) {
                             resFieldDetails = fieldDetails;
@@ -341,6 +342,12 @@ export default class CustomTable extends LightningElement {
                                 recJson.classList = 'status-inprogress';
                             else if (recJson.value.toLowerCase() === 'waiting on someone else' || recJson.value.toLowerCase() === 'on hold' || recJson.value.toLowerCase() === 'new')
                                 recJson.classList = 'status-waitingonsomeoneelse';
+                                else if (recJson.value === 'In review')
+                                recJson.classList = 'cad-timeline_pending';
+                                 else if (recJson.value === 'Review Completed')
+                                recJson.classList = 'cad-timeline_reviewcompleted';
+                                 else if (recJson.value === 'Need more information')
+                                recJson.classList = 'cad-timeline_rejected';
                         }
                         if (colList[j].fieldName === 'Name') {
                             recJson.isHyperlink = true;
@@ -529,7 +536,7 @@ export default class CustomTable extends LightningElement {
         for (let colIndex = 0; colIndex < this.recList[0].record.length; colIndex++) {
             csvHeader = csvHeader + this.recList[0].record[colIndex].label + ',';
         }
-        csvHeader = csvHeader.substring(0, csvHeader.length - 1) + '\n';
+        csvHeader = csvHeader.substring(0, csvHeader.length - 1) + ','+'% completed'+','+'\n';
         let csvRows = '';
         for (let i = 0; i < this.recList.length; i++) {
             let recordDetails = this.recList[i];
@@ -538,6 +545,7 @@ export default class CustomTable extends LightningElement {
                 for (let j = 0; j < recordDetails.record.length; j++) {
                     csvRow += recordDetails.record[j].value + ',';
                 }
+                csvRow=csvRow+this.recList[i].progressBarValue;
                 csvRow = csvRow.substring(0, csvRow.length - 1) + '\n';
                 csvRows += csvRow;
             }
@@ -559,6 +567,7 @@ export default class CustomTable extends LightningElement {
         for (let i = 0; i < this.viewColList.length; i++) {
             tableHtml += '<th>' + this.viewColList[i].label + '</th>';
         }
+        tableHtml += '<th>' + '% Completed' + '</th>';
         tableHtml += '</tr></thead><tbody>';
         for (let i = 0; i < this.recList.length; i++) {
             tableHtml += '<tr>';
@@ -572,7 +581,9 @@ export default class CustomTable extends LightningElement {
                 else {
                     tableHtml += '<td>' + this.recList[i].record[j].value + '</td>';
                 }
+                 
             }
+            tableHtml += '<td>' + this.recList[i].progressBarValue + '</td>'; 
             tableHtml += '</tr>';
         }
         tableHtml += '</tbody></table>';
