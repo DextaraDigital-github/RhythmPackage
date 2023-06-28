@@ -80,7 +80,7 @@ export default class CustomTable extends LightningElement {
         if (!!allTextBoxes && allTextBoxes.length > 0) {
             for (let i = 0; i < allTextBoxes.length; i++) {
                 let txtBox = allTextBoxes[i];
-                if (txtBox.value != '') {
+                if (txtBox.value !== '') {
                     let filterDetail = {};
                     filterDetail.fieldName = txtBox.dataset.id;
                     filterDetail.filterValue = txtBox.value;
@@ -92,7 +92,7 @@ export default class CustomTable extends LightningElement {
     }
 
     // Filters data based on the search
-    inputChangeHandler(event) {
+    inputChangeHandler() {
         let filterDetailsList = this.getAllFilterDetails();
         var newRecList = [];
         if (!!filterDetailsList && filterDetailsList.length > 0
@@ -106,9 +106,9 @@ export default class CustomTable extends LightningElement {
                     if (!!currentRecord.record && currentRecord.record.length > 0) {
                         for (let k = 0; k < currentRecord.record.length; k++) {
                             let fieldDetails = currentRecord.record[k];
-                            //console.log('fieldDetails==>'+ fieldDetails);
-                            if (fieldDetails.fieldName == fieldName) {
-                                if (typeof fieldDetails.value === 'undefined' || !(typeof fieldDetails.value != 'undefined' && fieldDetails.value.toString().toUpperCase().includes(filterValue))) {
+                            //console.log('fieldDetails===>'+ fieldDetails);
+                            if (fieldDetails.fieldName === fieldName) {
+                                if (typeof fieldDetails.value === 'undefined' || !(typeof fieldDetails.value !== 'undefined' && fieldDetails.value.toString().toUpperCase().includes(filterValue))) {
                                     isRecordMatched = false;
                                     break;
                                 }
@@ -141,9 +141,9 @@ export default class CustomTable extends LightningElement {
     resetAllColumnSortStatusToDefault() {
         let allSortIcons = this.template.querySelectorAll('[data-sorticon]');
         if (!!allSortIcons && allSortIcons.length > 0) {
-            for (var i = 0; i < allSortIcons.length; i++) {
-                allSortIcons[i].className = 'las la-angle-down sort-inactive';
-            }
+            allSortIcons.forEach(allsort => {
+                allsort.className = 'las la-angle-down sort-inactive';
+            })
         }
     }
 
@@ -152,12 +152,12 @@ export default class CustomTable extends LightningElement {
         const offset = perPage * (page - 1);
         const paginatedItems = items.slice(offset, perPage * page);
         return paginatedItems;
-    };
+    }
 
     // Returns the count of total records
     getTotalRelatedRecordsCount() {
         let totalRecordsCount = 0;
-        if (!!this.relatedListRecords) {
+        if (this.relatedListRecords) {
             totalRecordsCount = this.relatedListRecords.length;
         }
         return totalRecordsCount;
@@ -165,7 +165,7 @@ export default class CustomTable extends LightningElement {
 
     // Handles the change in page number and prepares the data accordingly
     handlePageNumberChange(event) {
-        if (!!event) {
+        if (event) {
             this.selectedPageNumber = event.detail.value;
         }
         this.clearAllFilterTextboxes();
@@ -188,10 +188,10 @@ export default class CustomTable extends LightningElement {
 
     // Navigates to the previous page in the table pagination
     handlePreviousClick() {
-        if (!!this.selectedPageNumber) {
-            let page = parseInt(this.selectedPageNumber);
+        if (this.selectedPageNumber) {
+            let page = Number(this.selectedPageNumber);
             let previousPage = page - 1 ? page - 1 : null;
-            if (!!previousPage) {
+            if (previousPage) {
                 this.selectedPageNumber = previousPage.toString();
                 this.handlePageNumberChange(null);
             }
@@ -199,14 +199,14 @@ export default class CustomTable extends LightningElement {
     }
 
     // Navigates to the next page in the table pagination
-    handleNextClick(event) {
+    handleNextClick() {
         if (!!this.selectedPageSize && !!this.selectedPageNumber) {
-            let perPage = parseInt(this.selectedPageSize);
-            let page = parseInt(this.selectedPageNumber);
+            let perPage = Number(this.selectedPageSize);
+            let page = Number(this.selectedPageNumber);
             let totalRecordsCount = this.getTotalRelatedRecordsCount();
             let totalPages = Math.ceil(totalRecordsCount / perPage);
             let nextPage = (totalPages > page) ? page + 1 : null;
-            if (!!nextPage) {
+            if (nextPage && nextPage !== null) {
                 this.selectedPageNumber = nextPage.toString();
                 this.handlePageNumberChange(null);
             }
@@ -221,10 +221,10 @@ export default class CustomTable extends LightningElement {
         }
         this.pageNumberOptions = [];
         let totalRecordsCount = this.getTotalRelatedRecordsCount();
-        let totalPages = Math.ceil(totalRecordsCount / parseInt(perPage));
+        let totalPages = Math.ceil(totalRecordsCount / Number(perPage));
         if (totalPages > 0) {
             let tempPageOptions = [];
-            for (var i = 1; i <= totalPages; i++) {
+            for (let i = 1; i <= totalPages; i++) {
                 tempPageOptions.push({ label: i.toString(), value: i.toString() });
             }
             this.pageNumberOptions = tempPageOptions;
@@ -249,13 +249,13 @@ export default class CustomTable extends LightningElement {
     }
 
     // Resets the column sort status to inactive
-    setAllColumnSortStatusToDefault(activeSortFieldName, sortType, isFirstClick) {
+    setAllColumnSortStatusToDefault(activeSortFieldName, sortType) {
         let allSortIcons = this.template.querySelectorAll('[data-sorticon]');
-        if (!!allSortIcons && allSortIcons.length > 0) {
+        if (allSortIcons && allSortIcons.length > 0) {
             for (let i = 0; i < allSortIcons.length; i++) {
                 let sortIcon = allSortIcons[i];
-                if (sortIcon.dataset.id == activeSortFieldName) {
-                    if (sortType == 'ASC') {
+                if (sortIcon.dataset.id === activeSortFieldName) {
+                    if (sortType === 'ASC') {
                         sortIcon.className = 'las la-angle-up';
                     }
                     else {
@@ -274,10 +274,10 @@ export default class CustomTable extends LightningElement {
         this.recList.sort(function (a, b) {
             let getFieldDetailsByName = function (recordDetails, fieldName) {
                 let resFieldDetails = null;
-                if (!!recordDetails.record && recordDetails.record.length > 0) {
-                    for (var k = 0; k < recordDetails.record.length; k++) {
+                if (recordDetails.record && recordDetails.record.length > 0) {
+                    for (let k = 0; k < recordDetails.record.length; k++) {
                         let fieldDetails = recordDetails.record[k];
-                        if (fieldDetails.fieldName == fieldName) {
+                        if (fieldDetails.fieldName === fieldName) {
                             resFieldDetails = fieldDetails;
                             break;
                         }
@@ -287,10 +287,10 @@ export default class CustomTable extends LightningElement {
             };
             let aFieldDetails = getFieldDetailsByName(a, sortFieldName);
             let bFieldDetails = getFieldDetailsByName(b, sortFieldName);
-            let aFieldValue = (!!aFieldDetails.value) ? aFieldDetails.value : '';
-            let bFieldValue = (!!bFieldDetails.value) ? bFieldDetails.value : '';
+            let aFieldValue = (aFieldDetails.value) ? aFieldDetails.value : '';
+            let bFieldValue = (bFieldDetails.value) ? bFieldDetails.value : '';
             let compareVal  = false;
-            if (sortType == "ASC") {
+            if (sortType === "ASC") {
                 compareVal = aFieldValue.localeCompare(bFieldValue);
             }
             else {
@@ -308,26 +308,26 @@ export default class CustomTable extends LightningElement {
         for (let i = 0; i < relatedListRecords.length; i++) {
             let recDetails = {};
             let recArray = [];
-            if (relatedListRecords[i] != null) {
+            if (relatedListRecords[i] !== null) {
                 for (let j = 0; j < colList.length; j++) {
-                    if (typeof relatedListRecords[i].Rhythm__Assessment__r != 'undefined') {
+                    if (typeof relatedListRecords[i].Rhythm__Assessment__r !== 'undefined') {
                         let recJson = {};
                         recJson.fieldName = colList[j].fieldName;
                         recJson.label = colList[j].label;
                         if (colList[j].type === 'date') {
-                            if (typeof relatedListRecords[i].Rhythm__End_Date__c != 'undefined') {
+                            if (typeof relatedListRecords[i].Rhythm__End_Date__c !== 'undefined') {
                                 let x = relatedListRecords[i].Rhythm__End_Date__c.split('T')[0];
                                 let months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
                                 recJson.value = months[Number(x.split('-')[1]) - 1] + '-' + x.split('-')[2] + '-' + x.split('-')[0];
                             }
                         }
                         else {
-                            if (typeof relatedListRecords[i][colList[j].fieldName] != 'undefined' && colList[j].fieldName != 'Name') {
+                            if (typeof relatedListRecords[i][colList[j].fieldName] !== 'undefined' && colList[j].fieldName !== 'Name') {
                                 recJson.value = relatedListRecords[i][colList[j].fieldName];
                             }
-                            else if (colList[j].fieldName == 'Name') {
-                                if (typeof relatedListRecords[i].Rhythm__Assessment__r['Name'] != 'undefined') {
-                                    recJson.value = relatedListRecords[i].Rhythm__Assessment__r['Name'];
+                            else if (colList[j].fieldName === 'Name') {
+                                if (typeof relatedListRecords[i].Rhythm__Assessment__r.Name !== 'undefined') {
+                                    recJson.value = relatedListRecords[i].Rhythm__Assessment__r.Name;
                                 }
                             }
                         }
@@ -352,14 +352,14 @@ export default class CustomTable extends LightningElement {
                         if (colList[j].fieldName === 'Name') {
                             recJson.isHyperlink = true;
                             if (this.objName === 'Rhythm__Assessment__c') {
-                                if (typeof relatedListRecords[i].Rhythm__Assessment__r.Rhythm__Additional_Requests__c != 'undefined'
+                                if (typeof relatedListRecords[i].Rhythm__Assessment__r.Rhythm__Additional_Requests__c !== 'undefined'
                                     && Number(relatedListRecords[i].Rhythm__Assessment__r.Rhythm__Additional_Requests__c) > 0) {
                                     recJson.flagSymbol = 'action:priority';
                                 }
                             }
                         }
                         if (colList[j].fieldName === 'Rhythm__Status__c') {
-                            if (typeof relatedListRecords[i].Rhythm__Status__c != 'undefined')
+                            if (typeof relatedListRecords[i].Rhythm__Status__c !== 'undefined')
                                 if (relatedListRecords[i].Rhythm__Status__c === 'Submitted') {
                                     recJson.surveySymbol = 'utility:lock';
                                 }
@@ -369,7 +369,7 @@ export default class CustomTable extends LightningElement {
                         }
                         recArray.push(recJson);
                         if (this.showProgressBar === "true") {
-                            if (typeof relatedListRecords[i].Rhythm__Completed__c != 'undefined') {
+                            if (typeof relatedListRecords[i].Rhythm__Completed__c !== 'undefined') {
                                 recDetails.progressBarValue = relatedListRecords[i].Rhythm__Completed__c;
                             }
                         }
@@ -404,14 +404,7 @@ export default class CustomTable extends LightningElement {
         this.gridoptions.exportRowAsCsv = (this.objName === 'Rhythm__Assessment__c' ? true : false);
         this.gridoptions.exportRowAsPdf = (this.objName === 'Rhythm__Assessment__c' ? true : false);
         this.viewColList = this.colList;
-        // this.showTable = true;
-        // this.search = {};
-        if (typeof this.colList != undefined && this.colList != null) {
-            // this.fieldsList = [];
-            // for (let i = 0; i < this.colList.length; i++) {
-            //     // this.search[this.colList[i]] = '';
-            //     this.fieldsList.push(this.objName + '.' + this.colList[i].fieldName);
-            // }
+        if (typeof this.colList !== 'undefined' && this.colList !== null) {
             this.prepareColumnsOptions();
         }
         //Do not delete
@@ -439,7 +432,7 @@ export default class CustomTable extends LightningElement {
 
     // Prepares the available columns options and selected columns options for the Show/Hide columns popup
     prepareColumnsOptions() {
-        if (!(!!this.colList && this.colList.length > 0)) {
+        if (!(this.colList && this.colList.length > 0)) {
             return;
         }
         let tempColumnsOptions = []
@@ -473,7 +466,7 @@ export default class CustomTable extends LightningElement {
     applyShowHideColumns() {
         this.clearAllFilterTextboxes();
         this.resetAllColumnSortStatusToDefault();
-        if (!(!!this.selectedColumnsList && this.selectedColumnsList.length > 0)) {
+        if (!(this.selectedColumnsList && this.selectedColumnsList.length > 0)) {
             return;
         }
         let columnDetailsList = [];
@@ -481,7 +474,7 @@ export default class CustomTable extends LightningElement {
             let selectedColumn = this.selectedColumnsList[i];
             for (let j = 0; j < this.colList.length; j++) {
                 let colDetails = this.colList[j];
-                if (colDetails.fieldName == selectedColumn) {
+                if (colDetails.fieldName === selectedColumn) {
                     columnDetailsList.push(colDetails);
                     break;
                 }
@@ -536,7 +529,7 @@ export default class CustomTable extends LightningElement {
         for (let colIndex = 0; colIndex < this.recList[0].record.length; colIndex++) {
             csvHeader = csvHeader + this.recList[0].record[colIndex].label + ',';
         }
-        csvHeader = csvHeader.substring(0, csvHeader.length - 1) + ','+'% completed'+','+'\n';
+        csvHeader = csvHeader.substring(0, csvHeader.length - 1) + ',% completed,\n';
         let csvRows = '';
         for (let i = 0; i < this.recList.length; i++) {
             let recordDetails = this.recList[i];
@@ -567,7 +560,7 @@ export default class CustomTable extends LightningElement {
         for (let i = 0; i < this.viewColList.length; i++) {
             tableHtml += '<th>' + this.viewColList[i].label + '</th>';
         }
-        tableHtml += '<th>' + '% Completed' + '</th>';
+        tableHtml += '<th>% Completed</th>';
         tableHtml += '</tr></thead><tbody>';
         for (let i = 0; i < this.recList.length; i++) {
             tableHtml += '<tr>';
@@ -687,7 +680,7 @@ export default class CustomTable extends LightningElement {
         let mmResizeHandle = mmResizeDetails.columnResizeHandle;
         mmResizeHandle.style.left = (mmResizeHandle.offsetLeft - pos1) + "px";
     }
-    handleColumnResizeMouseUp(muEvent, muResizeDetails, handleResizeMouseMoveHandler) {
+    handleColumnResizeMouseUp(muEvent, muResizeDetails) {
         window.isResizingProgress = false;
         muResizeDetails.lastPosition = muEvent.clientX;
         let differencePosition = muResizeDetails.lastPosition - muResizeDetails.initialPosition;

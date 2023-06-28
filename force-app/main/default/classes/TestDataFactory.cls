@@ -68,14 +68,14 @@ public class TestDataFactory
 		return createRecords(contactsToInsert, doInsert, attributes);
 	}
     /* createAccountContactRelation method is used to create AccountContactRelation records */
-    public static List<AccountContactRelation> createAccountContactRelation(Id accountid,Id contactid,Map<String, Object> attributes)
+    public static List<SObject> createAccountContactRelation(Id accountid,Id contactid,Map<String, Object> attributes)
 	{
-       List<AccountContactRelation> acrlst = new List<AccountContactRelation>();
-           AccountContactRelation acr = new AccountContactRelation();
-            acr.AccountId = accountid;
-            acr.ContactId = contactid;
-        acrlst.add(acr);
-       return createRecords(acrlst, true, attributes);
+    //    List<AccountContactRelation> acrlst = new List<AccountContactRelation>();
+    //        AccountContactRelation acr = new AccountContactRelation();
+    //         acr.AccountId = accountid;
+    //         acr.ContactId = contactid;
+    //     acrlst.add(acr);
+    //    return createRecords(acrlst, true, attributes);
         
 	}
       /* createAsset method is used to create Asset records */

@@ -1,7 +1,7 @@
 {
   "orgName": "my company",
   "edition": "Developer",
-  "features": ["EnableSetPasswordInApi","Communities","ContactsToMultipleAccounts"],
+  "features": ["EnableSetPasswordInApi","Communities"],
   "language": "en_US",
   
   "settings": {
