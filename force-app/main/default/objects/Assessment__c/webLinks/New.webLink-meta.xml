@@ -10,5 +10,5 @@
     <openType>replace</openType>
     <protected>false</protected>
     <requireRowSelection>true</requireRowSelection>
-    <url>/lightning/n/Rhythm__New_Assessment?c__templateId={!Assessment__c.TemplateId__c}</url>
+    <url>lightning/cmp/Rhythm__newAssessmentButton?Rhythm__templateId={!Assessment__c.TemplateId__c}</url>
 </WebLink>

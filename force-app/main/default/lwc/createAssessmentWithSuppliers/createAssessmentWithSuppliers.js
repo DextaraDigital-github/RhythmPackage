@@ -82,13 +82,18 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
         validatedDetails.isSave = true;
         validatedDetails.message = '';
         let startDate = this.template.querySelector(`[data-id="startdate"]`).value;
+        let endDate = this.template.querySelector(`[data-id="enddate"]`).value;
         let todayDate = new Date().toLocaleString(this.locale, {timeZone: this.timeZone})
         todayDate = new Date(todayDate).toISOString().substring(0, 10);
         console.log('startDate----->',startDate);
         console.log('todayDate----->',todayDate);
         if(new Date(startDate) < new Date(todayDate)){
             validatedDetails.isSave = false;
-            validatedDetails.message = 'Start Date Cannot be the past date.'
+            validatedDetails.message = 'Start Date cannot be a past date.'
+        }
+        else if((typeof endDate != 'undefined' && endDate != null) && new Date(endDate) < new Date(startDate)){
+            validatedDetails.isSave = false;
+            validatedDetails.message = 'End Date cannot be earlier than Start Date.'
         }
         return validatedDetails;
     }
@@ -179,5 +184,11 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
                 actionName: 'view'
             },
         });
+    }
+
+    backHandler()
+    {
+        this.showSuppliers = false;
+        this.showNewAssessment = true;
     }
 }
