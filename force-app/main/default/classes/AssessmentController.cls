@@ -941,7 +941,7 @@ return questionListWrapper;
     }
     
     /* getQuestionsList method is used to get all the questions and sections */
-    @AuraEnabled(cacheable=true)
+    @AuraEnabled
     Public static List<QuestionWrapper> getQuestionsLists(String templateId){
         List<QuestionWrapper> questionListWrapper = new List<QuestionWrapper>();
         try{

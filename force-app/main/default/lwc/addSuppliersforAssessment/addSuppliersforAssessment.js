@@ -8,7 +8,7 @@ import { NavigationMixin } from 'lightning/navigation';
 import getTodayDate from '@salesforce/apex/AssessmentController.getTodayDate';
 import { notifyRecordUpdateAvailable } from 'lightning/uiRecordApi';
 export default class AddSuppliersforAssessment extends NavigationMixin(LightningElement) {
-    @api recordId;
+    @api recordId; 
     @track suppliersList=[];
     @track existingSuppList=[];
     @track delList;

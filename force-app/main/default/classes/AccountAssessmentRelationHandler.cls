@@ -5,7 +5,7 @@ public class AccountAssessmentRelationHandler implements ITriggerHandler{
     }
     
     public void afterInsert(List<sObject> newList , Map<Id, sObject> newMap) {
-        system.debug('afterInsert----->');
+        system.debug('afterInsert----->'); 
         //getQuestionsCount( newList ,newMap);
        
     }

@@ -141,7 +141,7 @@ export default class AddSuppliers extends LightningElement {
             console.log('handleChange - END : ', this.existingSuppList);
         } catch (error) {
             console.log('handleChange error : ', error);
-        }
+        } 
     }
 
     // Updates the search value to search for account among the available accounts

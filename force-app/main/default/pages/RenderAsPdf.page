@@ -6,7 +6,7 @@
         <div class="tableDiv">
             <apex:outputText value="{!displayText}" escape="false" />
         </div>
-    </div>
+    </div> 
     <script>
     setTimeout(function(){
         console.log('HI');

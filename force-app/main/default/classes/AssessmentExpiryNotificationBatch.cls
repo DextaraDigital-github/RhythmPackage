@@ -8,7 +8,7 @@ public class AssessmentExpiryNotificationBatch implements Database.Batchable<sOb
     public void execute(Database.BatchableContext bc, List<AccountAssessmentRelation__c> scope){
         List<ErrorTransactionLog__c> errorList = new List<ErrorTransactionLog__c>();
         List<Messaging.SingleEmailMessage> emailMessagesList = new List<Messaging.SingleEmailMessage>();
-        try{
+        try{ 
             for(AccountAssessmentRelation__c assRelRec:scope){
                 if(String.isNotBlank(assRelRec.Account__r.Email__c)){
                     List<String> sendTo = new List<String>();

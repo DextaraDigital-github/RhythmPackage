@@ -6,5 +6,5 @@
     <columns>Object_Field_Value__c</columns>
     <columns>Activity_User__c</columns>
     <filterScope>Everything</filterScope>
-    <label>All</label>
+    <label>All</label> 
 </ListView>

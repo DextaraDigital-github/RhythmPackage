@@ -12,7 +12,7 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
     showModal = true;
     showNewAssessment=false;
     isTemplateInactive = false;
-    showSuppliers = false;
+    showSuppliers = false; 
     @track suppliersList=[];
     modalHeading = 'New Assessment';
     assessmentId ='';

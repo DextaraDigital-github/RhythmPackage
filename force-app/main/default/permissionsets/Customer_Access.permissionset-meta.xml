@@ -13,7 +13,7 @@
         <field>AccountAssessmentRelation__c.Customer_Review_Status__c</field>
         <readable>true</readable>
     </fieldPermissions>
-    <fieldPermissions>
+    <fieldPermissions> 
         <editable>true</editable>
         <field>AccountAssessmentRelation__c.Follow_Up_Requests__c</field>
         <readable>true</readable>
@@ -96,11 +96,6 @@
     <fieldPermissions>
         <editable>false</editable>
         <field>Assessment__c.Expiry_Reminder_Date__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
-        <field>Assessment__c.Frequency__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>

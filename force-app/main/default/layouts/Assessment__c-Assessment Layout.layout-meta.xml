@@ -7,7 +7,7 @@
     <excludeButtons>RecordShareHierarchy</excludeButtons>
     <excludeButtons>Share</excludeButtons>
     <excludeButtons>Submit</excludeButtons>
-    <layoutSections>
+    <layoutSections> 
         <customLabel>false</customLabel>
         <detailHeading>false</detailHeading>
         <editHeading>true</editHeading>
@@ -22,16 +22,20 @@
                 <field>Template__c</field>
             </layoutItems>
             <layoutItems>
-                <behavior>Readonly</behavior>
-                <field>Status__c</field>
-            </layoutItems>
-            <layoutItems>
                 <behavior>Required</behavior>
                 <field>Start_Date__c</field>
             </layoutItems>
             <layoutItems>
                 <behavior>Edit</behavior>
                 <field>Disclosure__c</field>
+            </layoutItems>
+            <layoutItems>
+                <behavior>Edit</behavior>
+                <field>Expiry_Reminder_Before_in_Days__c</field>
+            </layoutItems>
+            <layoutItems>
+                <behavior>Readonly</behavior>
+                <field>Expiry_Reminder_Date__c</field>
             </layoutItems>
         </layoutColumns>
         <layoutColumns>
@@ -40,7 +44,7 @@
                 <field>Category__c</field>
             </layoutItems>
             <layoutItems>
-                <behavior>Edit</behavior>
+                <behavior>Required</behavior>
                 <field>Frequency__c</field>
             </layoutItems>
             <layoutItems>
@@ -89,11 +93,6 @@
     </layoutSections>
     <platformActionList>
         <actionListContext>Record</actionListContext>
-        <platformActionListItems>
-            <actionName>Assessment__c.Manage_Suppliers</actionName>
-            <actionType>QuickAction</actionType>
-            <sortOrder>0</sortOrder>
-        </platformActionListItems>
         <platformActionListItems>
             <actionName>Edit</actionName>
             <actionType>StandardButton</actionType>

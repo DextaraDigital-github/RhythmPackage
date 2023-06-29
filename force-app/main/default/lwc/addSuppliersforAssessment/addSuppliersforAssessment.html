@@ -2,13 +2,13 @@
     <lightning-quick-action-panel header="Manage Suppliers">
         <div>
             <c-add-suppliers onupdatedsupliers={updateSupplierData} record-id={recordId}></c-add-suppliers>
-        </div>
+        </div> 
         <div slot="footer" class="slds-align_absolute-right">
             <lightning-button
                 variant="neutral"
                 label="Cancel" onclick={closeModal}>
             </lightning-button>
-            <lightning-button
+            <lightning-button 
                 variant="brand"
                 label="Save" onclick={handleAdd}
                 class="slds-m-left_x-small">

@@ -4,7 +4,7 @@ public class TriggerFrameworkServiceController {
         boolean isCriteriaMet = false;
         string triggerObjId = Trigger_Configuration__mdt.getInstance(objectName).Id;
         List<string> fieldsList = getUpdatableFields(triggerObjId);
-        if(fieldsList.isEmpty() == false){
+        if(fieldsList.isEmpty() == false){ 
             for(string fName:fieldsList){
                 if(objectName.equalsIgnoreCase('Assessment_Template_c') && fName.equalsIgnoreCase('Status__c')){
                     if(string.valueOf(record.get(fName)).equalsIgnoreCase('New') && string.valueOf(oldRecord.get(fName)).equalsIgnoreCase('Active')){

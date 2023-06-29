@@ -4,5 +4,5 @@
      <isExposed>true</isExposed>
     <targets>
         <target>lightning__Tab</target>
-    </targets>
+    </targets> 
 </LightningComponentBundle>
