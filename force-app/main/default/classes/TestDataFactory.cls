@@ -76,6 +76,7 @@ public class TestDataFactory
     //         acr.ContactId = contactid;
     //     acrlst.add(acr);
     //    return createRecords(acrlst, true, attributes);
+    return null;
         
 	}
       /* createAsset method is used to create Asset records */

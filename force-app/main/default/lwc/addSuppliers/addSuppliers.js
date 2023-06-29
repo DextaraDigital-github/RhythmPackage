@@ -19,6 +19,37 @@ export default class AddSuppliers extends LightningElement {
     @api recordId;
     newAccounts = [];
     delAccounts = [];
+    hasRendered = true;
+
+     renderedCallback(){
+        console.log('InRenderedcallback----->',this.recordId);
+        if(this.recordId != undefined && this.recordId){
+            console.log('existingList----->',JSON.stringify(this.existingSuppList));
+            if (this.hasRendered) {
+                this.fetchExistingSuppliers();
+                this.hasRendered = false;
+            }
+        }
+    }
+
+    fetchExistingSuppliers(){
+        getExistingSuppliers({ assessmentId:this.recordId, searchKey: '' })
+            .then(result => {
+                if(result){
+                    let tempList = [];
+                    for (let rec of result) {
+                        tempList.push(rec.Rhythm__Account__c);
+                    }
+                    if (tempList.length > 0) {
+                        this.values = this.existingSuppList = JSON.parse(JSON.stringify(tempList));
+                        this.countRecords();
+                    }
+                }
+            })
+            .catch(error => {
+                this.showNotification('Error', error.body.message, 'error');
+            });
+    }
 
     // Updates existingData with the already selected Accounts Data
     get existingData() {
@@ -29,24 +60,31 @@ export default class AddSuppliers extends LightningElement {
         return suppList;
     }
 
-    // Fetches all the existing/assigned accounts from Apex
-    @wire(getExistingSuppliers, { assessmentId: '$recordId', searchKey: '' })
-    getExistingSuppliers_wiredData(result) {
-        // this.latestExSuppliers = result;
-        if (result.data) {
-            let tempList = [];
-            for (let rec of result.data) {
-                tempList.push(rec.Rhythm__Account__c);
-            }
-            if (tempList.length > 0) {
-                this.values = this.existingSuppList = JSON.parse(JSON.stringify(tempList));
-                this.countRecords();
-            }
-        } else if (result.error) {
-            this.showNotification('Error', result.error.body.message, 'error');
-        }
+    // // Fetches all the existing/assigned accounts from Apex
+    // @wire(getExistingSuppliers, { assessmentId: '$recordId', searchKey: '' })
+    // getExistingSuppliers_wiredData(result) {
+    //     // this.latestExSuppliers = result;
+    //     console.log('wiredExistingSuppliers----->',JSON.stringify(result));
+    //     if (result.data) {
+    //         let tempList = [];
+    //         for (let rec of result.data) {
+    //             tempList.push(rec.Rhythm__Account__c);
+    //         }
+    //         if (tempList.length > 0) {
+    //             this.values = this.existingSuppList = JSON.parse(JSON.stringify(tempList));
+    //             this.countRecords();
+    //         }
+    //     } else if (result.error) {
+    //         this.showNotification('Error', result.error.body.message, 'error');
+    //     }
+    // }
+
+    connectedCallback() {
+        console.log('in connectedCallback');
+       //this.getAllSuppliersList();
     }
 
+    
     // Fetches all the available accounts from Apex
     @wire(getAllSuppliers, { existingData: '$existingData', searchKey: '$searchKey', exSearchKey: '$exSearchKey' })
     getAllSuppliers_wiredData(result) {

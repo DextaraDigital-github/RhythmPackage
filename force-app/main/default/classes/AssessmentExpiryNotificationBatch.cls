@@ -10,19 +10,21 @@ public class AssessmentExpiryNotificationBatch implements Database.Batchable<sOb
         List<Messaging.SingleEmailMessage> emailMessagesList = new List<Messaging.SingleEmailMessage>();
         try{
             for(AccountAssessmentRelation__c assRelRec:scope){
-                List<String> sendTo = new List<String>();
-                sendTo.add(assRelRec.Account__r.Email__c);
-                Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
-                mail.setToAddresses(sendTo);
-                mail.setSubject('Sample Survey - Reminder');
-                String body = '<html><body>'+
-                '<br><br>'+'Dear '+assRelRec.Account__r.Name+
-                '<br><br>'+'Assessmet is going to end soon, we’d like to complete a short survey.'+
-                '<br><br><a href='+System.Label.Supplier_Portal_URL+assRelRec.Id+'>Take the survey now.</a>'+
-                                '<br><br>'+'Kind regards,'+
-                                '<br>'+'Rhythm';
-                mail.setHtmlBody(body);
-                emailMessagesList.add(mail);
+                if(String.isNotBlank(assRelRec.Account__r.Email__c)){
+                    List<String> sendTo = new List<String>();
+                    sendTo.add(assRelRec.Account__r.Email__c);
+                    Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
+                    mail.setToAddresses(sendTo);
+                    mail.setSubject('Sample Survey - Reminder');
+                    String body = '<html><body>'+
+                    '<br><br>'+'Dear '+assRelRec.Account__r.Name+
+                    '<br><br>'+'Assessmet is going to end soon, we’d like to complete a short survey.'+
+                    '<br><br><a href='+System.Label.Supplier_Portal_URL+assRelRec.Id+'>Take the survey now.</a>'+
+                                    '<br><br>'+'Kind regards,'+
+                                    '<br>'+'Rhythm';
+                    mail.setHtmlBody(body);
+                    emailMessagesList.add(mail);
+                }
             }
             if(emailMessagesList.isEmpty() == false){
                 Messaging.sendEmail(emailMessagesList);

@@ -40,23 +40,36 @@ public class SendAssessmentNotificationsBatch implements Database.Batchable<sObj
             if(successRecordsIdSet.isEmpty() == false){
                
                 for(AccountAssessmentRelation__c assRelRec:[SELECT Id,Account__r.Name,Account__r.Email__c,Assessment__c FROM AccountAssessmentRelation__c WHERE ID IN:successRecordsIdSet]){
-                    List<String> sendTo = new List<String>();
-                    sendTo.add(assRelRec.Account__r.Email__c);
-                    Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
-                    mail.setToAddresses(sendTo);
-                    mail.setSubject('Sample Survey');
-                    String body = '<html><body>'+
-                    '<br><br>'+'Dear '+assRelRec.Account__r.Name+
-                    '<br><br>'+'we’d like to complete a short survey.'+
-                    '<br><br><a href='+System.Label.Supplier_Portal_URL+assRelRec.Id+'>Take the survey now.</a>'+
-                                    '<br><br>'+'Kind regards,'+
-                                    '<br>'+'Rhythm';
-                    mail.setHtmlBody(body);
-                    emailMessagesList.add(mail);
+                    if(String.isNotBlank(assRelRec.Account__r.Email__c)){
+                        List<String> sendTo = new List<String>();
+                        sendTo.add(assRelRec.Account__r.Email__c);
+                        Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
+                        mail.setToAddresses(sendTo);
+                        mail.setSubject('Sample Survey');
+                        String body = '<html><body>'+
+                        '<br><br>'+'Dear '+assRelRec.Account__r.Name+
+                        '<br><br>'+'we’d like to complete a short survey.'+
+                        '<br><br><a href='+System.Label.Supplier_Portal_URL+assRelRec.Id+'>Take the survey now.</a>'+
+                                        '<br><br>'+'Kind regards,'+
+                                        '<br>'+'Rhythm';
+                        mail.setHtmlBody(body);
+                        emailMessagesList.add(mail);
+                    }
+                    
                 }
             }
             if(emailMessagesList.isEmpty() == false){
-                Messaging.sendEmail(emailMessagesList);
+                List<Messaging.SendEmailResult> emailResults = Messaging.sendEmail(emailMessagesList);
+                for(Messaging.SendEmailResult result :emailResults) {                                    
+                    if(!result.IsSuccess()) {                    
+                        List<Messaging.SendEmailError> errors = result.getErrors();
+                        if (errors.size() > 0){
+                            Messaging.SendEmailError err = errors[0];
+                            system.debug('emailErrorMessage---->'+err.getMessage());
+                            system.debug('emailErrorMessage---->'+err.getFields());
+                        }                	
+                    }
+                }
             }
         }catch(exception e){
             ErrorTransactionLog__c errorRec = new ErrorTransactionLog__c();

@@ -22,28 +22,28 @@
                                 <lightning-messages></lightning-messages>
                                 <lightning-layout multiple-rows>
                                     <lightning-layout-item size="6" padding="around-small">
-                                        <lightning-input-field field-name="Name" data-id="name" name="name" required></lightning-input-field>
+                                        <lightning-input-field field-name="Name" data-id="name" onchange={updateValuesHandler} name="name" value={values.name} required></lightning-input-field>
                                     </lightning-layout-item>
                                     <lightning-layout-item size="6" padding="around-small">
-                                        <lightning-input-field field-name="Rhythm__Template__c" value={templateId} data-id="template" name="template" required></lightning-input-field>
+                                        <lightning-input-field field-name="Rhythm__Template__c" data-id="template" onchange={handleChange} name="template" value={templateId} required></lightning-input-field>
                                     </lightning-layout-item>
                                     <lightning-layout-item size="6" padding="around-small">
-                                        <lightning-input-field field-name="Rhythm__Start_Date__c" data-id="startdate" name="startdate" required></lightning-input-field>
+                                        <lightning-input-field field-name="Rhythm__Start_Date__c" data-id="startdate" onchange={updateValuesHandler} name="startdate" required></lightning-input-field>
                                     </lightning-layout-item>
                                     <lightning-layout-item size="6" padding="around-small">
-                                        <lightning-input-field field-name="Rhythm__End_Date__c" value="" data-id="enddate" name="enddate"></lightning-input-field>
+                                        <lightning-input-field field-name="Rhythm__End_Date__c" data-id="enddate" onchange={updateValuesHandler} name="enddate" value={values.enddate}></lightning-input-field>
                                     </lightning-layout-item>
                                     <lightning-layout-item size="6" padding="around-small">
-                                        <lightning-input-field field-name="Rhythm__Category__c" value="" data-id="category" name="category" required></lightning-input-field>
+                                        <lightning-input-field field-name="Rhythm__Category__c" data-id="category" onchange={updateValuesHandler} name="category" value={values.category} required></lightning-input-field>
                                     </lightning-layout-item>
                                     <lightning-layout-item size="6" padding="around-small">
-                                        <lightning-input-field field-name="Rhythm__Frequency__c" value={frequencyValue} name="frequency"></lightning-input-field>
+                                        <lightning-input-field field-name="Rhythm__Frequency__c" onchange={updateValuesHandler} name="frequencyValue" value={values.frequencyValue}></lightning-input-field>
                                     </lightning-layout-item>
                                     <lightning-layout-item size="6" padding="around-small">
-                                        <lightning-input-field field-name="Rhythm__Disclosure__c" value="" name="disclosure"></lightning-input-field>
+                                        <lightning-input-field field-name="Rhythm__Disclosure__c" onchange={updateValuesHandler} name="disclosure" value={values.disclosure}></lightning-input-field>
                                     </lightning-layout-item>
                                     <lightning-layout-item size="6" padding="around-small">
-                                        <lightning-input-field field-name="Rhythm__Description__c" value="" name="desciption"></lightning-input-field>
+                                        <lightning-input-field field-name="Rhythm__Description__c" onchange={updateValuesHandler} name="description" value={values.description}></lightning-input-field>
                                     </lightning-layout-item>
                                 </lightning-layout>
                                 
@@ -68,6 +68,8 @@
                 </div>
 
                 <!-- modal footer start-->
+                
+
                 <template if:true={showSuppliers}>
                     <footer class="slds-modal__footer">
                         <lightning-button label="Back" title="Back" onclick={backHandler}></lightning-button>

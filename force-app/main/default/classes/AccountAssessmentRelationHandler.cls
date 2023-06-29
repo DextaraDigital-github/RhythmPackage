@@ -6,7 +6,7 @@ public class AccountAssessmentRelationHandler implements ITriggerHandler{
     
     public void afterInsert(List<sObject> newList , Map<Id, sObject> newMap) {
         system.debug('afterInsert----->');
-        getQuestionsCount( newList ,newMap);
+        //getQuestionsCount( newList ,newMap);
        
     }
     
@@ -19,14 +19,14 @@ public class AccountAssessmentRelationHandler implements ITriggerHandler{
         set<Id> acctAssmtSet = new set<Id>();
         Map<Id,AccountAssessmentRelation__c> oldRecordsMap = (Map<Id,AccountAssessmentRelation__c>)oldMap;
         for(AccountAssessmentRelation__c acctAsmt:(List<AccountAssessmentRelation__c>)newList){
-            if(acctAsmt.Status__c.equalsIgnoreCase('Need more information')  && oldRecordsMap.get(acctAsmt.Id).Status__c.equalsIgnoreCase('In review')){
+            if(acctAsmt.Status__c.equalsIgnoreCase('Need more information')  && oldRecordsMap.get(acctAsmt.Id).Status__c.equalsIgnoreCase('In review') && (!oldRecordsMap.get(acctAsmt.Id).Status__c.equalsIgnoreCase('Need more information'))){
                 acctAssmtSet.add(string.valueOf(acctAsmt.get('Id')));
             }
         }
         if(acctAssmtSet.isEmpty() == false){
             AssessmentController.sendEmails(acctAssmtSet,'FUR');
         }
-        
+       updateStatusData(newList,newMap,oldMap); 
     }
     
     public void beforeDelete(List<sObject> oldList , Map<Id, sObject> oldMap) {
@@ -44,36 +44,27 @@ public class AccountAssessmentRelationHandler implements ITriggerHandler{
     }
     
     
-    public void getQuestionsCount(List<sObject> newList , Map<Id, sObject> newMap)
+    public void updateStatusData(List<SObject> newList , Map<Id, sObject> newMap,Map<Id, sObject> oldMap)
     {
-      /*  String assessmentId=(String)newList[0].get('Rhythm__Assessment__c');        
-        String accountId=(String)newList[0].get('Rhythm__Account__c');
-        Set<Id> assessmentSet = new Set<Id>();
-        Set<Id> templateSet = new Set<Id>();
-        Map<Id,Integer> tempQuestMap = new Map<Id,Integer>();
-        Map<Id,Id> accAssessMap = new Map<Id,Id>();
-        for(AccountAssessmentRelation__c accAssessRel:(List<AccountAssessmentRelation__c>)newList){
-           assessmentSet.add(accAssessRel.Assessment__c);
-           accAssessMap.put(accAssessRel.Id,accAssessRel.Assessment__c);
+     	List<AccountAssessmentRelation__c> acs = (List<AccountAssessmentRelation__c>) newList;
+       
+        System.debug('newMap'+newMap);
+        System.debug('oldMap'+oldMap);
+        List<FieldHistoryTracking__c> fieldtrack = new List<FieldHistoryTracking__c>();
+        for(Id assmntId: newMap.keySet()){
+            if(newMap.get(assmntId).get('Rhythm__Status__c') != oldMap.get(assmntId).get('Rhythm__Status__c'))
+            {
+                FieldHistoryTracking__c fieldTracker = new FieldHistoryTracking__c();
+        		fieldTracker.Object_Name__c='AccountAssessmentRelation__c';
+        		fieldTracker.Object_Field_Name__c='Rhythm__Status__c';
+        		fieldTracker.Rhythm__Activity_User__c =UserInfo.getName();
+        		fieldTracker.Object_Field_Value__c=(String)newMap.get(assmntId).get('Rhythm__Status__c');
+        		fieldTracker.Rhythm__object_Record_Id__c=(String)assmntId;
+              	fieldtrack.add(fieldTracker);
+            }
         }
-        Map<Id,Assessment__c> assessmentMap = new Map<ID, Assessment__c>([SELECT Id,Name,Template__c FROM Assessment__c WHERE Id IN :assessmentSet]); 
-        for(Assessment__c assessment : assessmentMap.values()){
-            templateSet.add(assessment.Template__c);
-            
-        }      
-        AggregateResult[] templateGroup = [SELECT Assessment_Template__c,count(id) tempCount FROM Question__c WHERE Assessment_Template__c IN :templateSet Group by Assessment_Template__c];//Todo needs to recheck for template versioning
-       // newList[0].put('Rhythm__Number_of_Questions__c',questions.size());
-        for (AggregateResult ar : templateGroup){
-            tempQuestMap.put((Id)ar.get('Rhythm__Assessment_Template__c'),(Integer)ar.get('tempCount'));
-        }
+        INSERT fieldtrack;
         
-        for(AccountAssessmentRelation__c accAssessRel:(List<AccountAssessmentRelation__c>)newList){
-           accAssessRel.Number_of_Questions__c = tempQuestMap.get(assessmentMap.get(accAssessMap.get(accAssessRel.Id)).Template__c);
-        }
-        update newList;
-        */
-        
+        System.debug('fieldTracker'+fieldtrack);
     }
-    
-    
 }

@@ -338,15 +338,15 @@ export default class CustomTable extends LightningElement {
                                 recJson.classList = 'status-completed';
                             else if (recJson.value.toLowerCase() === 'deferred' || recJson.value.toLowerCase() === 'overdue' || recJson.value.toLowerCase() === 'inactive')
                                 recJson.classList = 'status-deferred';
-                            else if (recJson.value.toLowerCase() === 'in progress')
+                            else if (recJson.value.toLowerCase() === 'In Progress')
                                 recJson.classList = 'status-inprogress';
                             else if (recJson.value.toLowerCase() === 'waiting on someone else' || recJson.value.toLowerCase() === 'on hold' || recJson.value.toLowerCase() === 'new')
                                 recJson.classList = 'status-waitingonsomeoneelse';
-                                else if (recJson.value === 'In review')
+                                else if (recJson.value === 'In Review')
                                 recJson.classList = 'cad-timeline_pending';
                                  else if (recJson.value === 'Review Completed')
                                 recJson.classList = 'cad-timeline_reviewcompleted';
-                                 else if (recJson.value === 'Need more information')
+                                 else if (recJson.value === 'Need More Information')
                                 recJson.classList = 'cad-timeline_rejected';
                         }
                         if (colList[j].fieldName === 'Name') {
@@ -393,7 +393,6 @@ export default class CustomTable extends LightningElement {
     }
     
     connectedCallback() {
-        this.preparePaginationControlsData();
         let pageSizeDefaultValue = this.pageSizeOptions[0].value;
         let currentPageRecords = this.getPageRecords(this.objectRecordData, 1, pageSizeDefaultValue);
         this.viewColList = this.colList;
@@ -401,6 +400,7 @@ export default class CustomTable extends LightningElement {
         // this.accountsId = this.accountid;
         this.allRecordsList = this.recList;
         this.relatedListRecords = this.objectRecordData;
+        this.preparePaginationControlsData();
         this.gridoptions.exportRowAsCsv = (this.objName === 'Rhythm__Assessment__c' ? true : false);
         this.gridoptions.exportRowAsPdf = (this.objName === 'Rhythm__Assessment__c' ? true : false);
         this.viewColList = this.colList;
@@ -544,7 +544,7 @@ export default class CustomTable extends LightningElement {
             }
         }
         csvHeader = csvHeader + csvRows;
-        csvHeader = csvHeader.replaceAll('undefined', '').replaceAll('null', '');
+        csvHeader = csvHeader.replaceAll('undefined', '').replaceAll('null', '').replaceAll('undefine','');
         let blob = new Blob([csvHeader], { type: 'text/plain' });
         let url = window.URL.createObjectURL(blob);
         let atag = document.createElement('a');

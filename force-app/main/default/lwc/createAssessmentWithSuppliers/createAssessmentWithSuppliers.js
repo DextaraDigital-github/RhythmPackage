@@ -3,6 +3,7 @@ import { NavigationMixin } from 'lightning/navigation';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import addSuppliers from '@salesforce/apex/AssessmentController.sendAssessment';
 import getTemplateData from '@salesforce/apex/AssessmentController.getTemplateData';
+import getTodayDate from '@salesforce/apex/AssessmentController.getTodayDate';
 import TIME_ZONE from '@salesforce/i18n/timeZone';
 import LOCALE_DATA from '@salesforce/i18n/locale';
 
@@ -15,22 +16,47 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
     @track suppliersList=[];
     modalHeading = 'New Assessment';
     assessmentId ='';
+    @api values = { name: '', template: '', frequencyValue: 'One Time', startdate: '', enddate:'', category:'', frequency:'', disclosure:'', description:'' };
     @api templateId;
     dateValue;
     frequencyValue = 'One Time';
     @track assessmentRecord;
     timeZone = TIME_ZONE;
-    locale = LOCALE_DATA
-    
+    locale = LOCALE_DATA;
+    todayDate;
+    templateStatus ='';
 
+    connectedCallback() {
+        this.getTodayDate();
+    }
 
+    handleChange(event){
+        console.log('templateValue---->',JSON.stringify(event.detail.value));
+        console.log('templateValue---->',JSON.stringify(event.target.value));
+        this.templateId = event.target.value;
+    }
+
+    getTodayDate(){
+        getTodayDate()
+        .then(result => {
+            console.log(JSON.stringify(result));
+            if(result){
+                this.todayDate = result;
+            }
+        })
+        .catch(error => {
+            console.log(JSON.stringify(error));
+        });
+    }
 
     @wire(getTemplateData,{templateId:'$templateId'})
     templateRecord(result){
+        console.log('TemplateRecordResult-------->',JSON.stringify(result));
         if (result.data) {
             if(result.data.length>0){
                 console.log('TemplateRecord-------->',JSON.stringify(result.data));
-                if(result.data[0].Rhythm__Status__c === 'Inactive'){
+                this.templateStatus = result.data[0].Rhythm__Status__c;
+                if(result.data[0].Rhythm__Status__c == 'Inactive'){
                     this.isTemplateInactive = true;
                     this.showNewAssessment = false;
                 }else{
@@ -48,19 +74,26 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
     }
 
     get startDate(){
-        if(this.dateValue === undefined){
+        if(this.dateValue == undefined){
             let dateTime= new Date().toLocaleString(this.locale, {timeZone: this.timeZone})
             console.log('dateTime-------->',dateTime);
         }
         return this.dateValue;
+    }
+
+    updateValuesHandler(event)
+    {
+        this.values[event.currentTarget.dataset.id] = event.target.value;
     }
     
     handleNext(event){
         try{
             event.preventDefault();
             let validatedData = this.validateData();
+            console.log('validatedData------>',JSON.stringify(validatedData));
             if(validatedData.isSave){
                 let fields = event.detail.fields;
+                console.log('refFields--------->',JSON.stringify(fields));
                 fields = Object.assign( { 'sobjectType': 'Rhythm__Assessment__c'}, fields );
                 this.assessmentRecord = fields;
                 this.showNewAssessment = false;
@@ -80,27 +113,32 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
         validatedDetails.message = '';
         let startDate = this.template.querySelector(`[data-id="startdate"]`).value;
         let endDate = this.template.querySelector(`[data-id="enddate"]`).value;
-        let todayDate = new Date().toLocaleString(this.locale, {timeZone: this.timeZone})
-        todayDate = new Date(todayDate).toISOString().substring(0, 10);
+        let todayDate =  new Date(this.todayDate).toISOString().substring(0, 10);
         console.log('startDate----->',startDate);
         console.log('todayDate----->',todayDate);
-        if(new Date(startDate) < new Date(todayDate)){
+        if(this.templateStatus != undefined && (this.templateStatus =='New' || this.templateStatus =='Inactive')){
+            validatedDetails.isSave = false;
+            validatedDetails.message = 'Assessment can be created only for Active Template.';
+        }if(new Date(startDate) < new Date(todayDate)){
             validatedDetails.isSave = false;
             validatedDetails.message = 'Start Date cannot be a past date.'
         }
-        else if((typeof endDate !== 'undefined' && endDate !== null) && new Date(endDate) < new Date(startDate)){
+        else if((typeof endDate != 'undefined' && endDate != null) && new Date(endDate) < new Date(startDate)){
             validatedDetails.isSave = false;
             validatedDetails.message = 'End Date cannot be earlier than Start Date.'
         }
         return validatedDetails;
     }
 
-    addSuppliers(){
+    addSuppliers(event){
         try{
+            console.log('AddSuppliersMethod------->',JSON.stringify(this.suppliersList));
+            console.log('assessmentRecord--------->',JSON.stringify(this.assessmentRecord));
             if(this.suppliersList.length > 0){
                 addSuppliers({assessmentRecord:this.assessmentRecord,operationType:'new',suppliers:JSON.stringify(this.suppliersList),existingSups:'',deleteList:''})
                 .then(result => {
-                    if(result.isSuccess === true){
+                    console.log('addSuppliers Result------->'+JSON.stringify(result));
+                    if(result.isSuccess == true){
                         let successEvent = new CustomEvent("success", {
                         detail: {value:'refreshit'}
                         });
@@ -109,6 +147,8 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
                         this.assessmentId = result.recordId;
                         this.showNotification('Success','Assessment created and suppliers added successfully.','success');
                         this.navigateToRecordPage();
+                    }else{
+                        //this.showNotification('Error',result.message,'error');
                     }
                 })
                 .catch(error => {
@@ -124,12 +164,13 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
     }
 
     updateSupplierData(event){
+        console.log('updatedSupplierData------>'+JSON.stringify(event.detail));
         this.suppliersList = event.detail.newSuppliers;
     }
 
     closeModal(){
         this.showModal = false;
-        if(this.templateId !== undefined && this.templateId){
+        if(this.values.template != undefined && this.values.template){
             this.navigateRelatedListView();
         }else{
             this.navigateToObjectHome();
@@ -169,7 +210,7 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
         this[NavigationMixin.Navigate]({
             type: 'standard__recordRelationshipPage',
             attributes: {
-                recordId: this.templateId,
+                recordId: this.values.template,
                 objectApiName: 'Rhythm__Assessment_Template__c',
                 relationshipApiName: 'Rhythm__Assessments__r',
                 actionName: 'view'

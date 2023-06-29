@@ -582,11 +582,6 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>Question__c.Section__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
         <field>Response__c.Account__c</field>
         <readable>true</readable>
     </fieldPermissions>

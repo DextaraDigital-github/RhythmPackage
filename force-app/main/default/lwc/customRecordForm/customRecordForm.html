@@ -1,0 +1,45 @@
+<template>
+	<lightning-record-edit-form object-api-name={objName} onsuccess={handleSuccess} onsubmit={handleSubmit}>
+		<div class="slds-grid slds-wrap slds-p-bottom_small">
+			<template for:each={fieldsList} for:item="field">
+				<template if:false={field.hide}>
+					<template lwc:if={field.istextarea}>
+						<div class={field.class} key={field}>
+							<div class="slds-p-left_xx-small rec-textarea-cont">
+								<lightning-layout-item>
+									<div class="rec-textarea-label">{field.label}</div>
+									<textarea key={field.fieldName} class="rec-textarea"
+									field-name={field.fieldName} value={field.value} required={field.required} data-fieldname={field.fieldName} onkeyup={fieldValueChangeHandler}></textarea>
+								</lightning-layout-item>
+							</div>
+						</div>
+					</template>
+					<template lwc:else>
+						<div class={field.class} key={field}>
+							<lightning-layout-item>
+								<lightning-input-field key={field.fieldName} label={field.label}
+									field-name={field.fieldName} required={field.required}>
+								</lightning-input-field>
+							</lightning-layout-item>
+						</div>
+					</template>
+				</template>
+				<template if:true={field.showCustomLookup}>
+					<div class={field.class} key={field}>
+						<c-custom-lookup key={field.apiname} template-id={templateId} lookup-label={lookupLabel}
+							onselectedvalue={handleSelectedValue}></c-custom-lookup>
+					</div>
+					<!-- <div class="slds-col slds-size_1-of-2" key={field} style="margin-left: calc(-0.6vw);">
+						<c-custom-lookup key={field.apiname} template-id={templateId} lookup-label={lookupLabel}
+							onselectedvalue={handleSelectedValue}></c-custom-lookup>
+					</div> -->
+				</template>
+			</template>
+		</div>
+		<div style="height:10px"></div>
+		<footer class="slds-modal__footer slds-grid slds-grid_vertical-align-center slds-grid_align-center rec-footer">
+			<lightning-button variant="neutral" label="Cancel" onclick={handleCancel}></lightning-button>&nbsp;&nbsp;
+			<lightning-button variant="brand" type="submit" label="Save"></lightning-button>
+		</footer>
+	</lightning-record-edit-form>
+</template>

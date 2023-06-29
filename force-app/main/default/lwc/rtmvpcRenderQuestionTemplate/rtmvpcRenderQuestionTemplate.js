@@ -14,7 +14,7 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
     @track fileresponsemap = {};
     @track showUploadProgress;
     @api assessmentid;
-    @track checkedLabel = false;
+    @track checkedLabel;
     @api accountassessment;
     @api sectionid;
     @api accountid;
@@ -30,7 +30,10 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
             this.responses.forEach(res => {
                 if (res.isCheckbox) {
                     if (res.value === true)
-                        this.checkedLabel = res.value;
+                        this.checkedLabel = true;
+                else{
+                     this.checkedLabel = false;
+                }
                 }
             });
         }
@@ -70,24 +73,32 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
     /*handleChange is used to dispatch an event to its parent component(Questionnaire) and change the response and send back to the parent component*/
     handleChange(event) {
         var changedvalue = event.target.value;
+        console.log('changedvalue',changedvalue);
         var questionId = event.currentTarget.dataset.key;
         if(this.responses && this.responses.length > 0){
             this.responses.forEach(res => {
-                if( (typeof changedvalue === 'undefined' || changedvalue === '' || changedvalue === '[]') 
-                    && res.Id === questionId ) {
-                        changedvalue=res.defaultValue;
-                        if(res.isCheckbox === true){
-                            changedvalue = 'true';
-                        }else{
-                            changedvalue = 'false';
-                        }
+                if((typeof changedvalue === 'undefined' || changedvalue === '' || changedvalue === '[]') && res.Id === questionId ) {
+                        if(typeof res.defaultValue!=='undefined')
+                        {
+                            changedvalue=res.defaultValue;
+                        } 
+                }                      
+                if (res.Id == questionId && res.isCheckbox == true) {
+                if (event.target.checked) {
+                    changedvalue = 'true';
                 }
+                else {
+                    changedvalue = 'false';
+                }
+         }
+
             })
         }
         this.responsemap.ParentQuestion = this.responses[0].parentQuestionId;
         this.responsemap.SectionId = this.sectionid;
         this.responsemap.option = changedvalue;
         this.responsemap.questionId = questionId;
+        console.log('this.responsemap',this.responsemap);
         /*This dispatch event is used to send the data to questionnaire on onchange to perform saving.*/
         const selectedEvent = new CustomEvent('valuechange', {
             bubbles: true,
@@ -100,6 +111,35 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
     /* openChatHandler is used to dispatch an event to its parent component(Questionnaire) by sending
        the questionId to parent component to open chat conversation */
     openChatHandler() {
+
+         let quesId = event.currentTarget.dataset.id;
+        if(this.issupplier) {
+            this.chatterMap.accountType = 'supplier';
+        }
+        else{
+            this.chatterMap.accountType = 'vendor';
+        }
+        
+        if (this.chatterMap.openChat === false) {
+            this.chatterMap.openChat = true;
+            this.chatterMap.disableSendButton = false;
+        }
+        else {
+            if(this.chatterMap.questionId !== quesId){                
+                this.chatterMap.openChat = true;
+                this.chatterMap.disableSendButton = false;
+            }
+            else{
+                this.chatterMap.openChat = false;
+                this.chatterMap.disableSendButton = true;
+            }
+        }
+        this.chatterMap.questionId = quesId;
+        const selectedEvent = new CustomEvent('selectchange', {
+            detail: this.chatterMap
+        });
+        // Dispatches the event.
+        this.dispatchEvent(selectedEvent);
     }
 
     /* getShowUploadStatus  is used to show progressbar while uploading the file.This method will be invoked from Questionnaire component.*/
@@ -119,6 +159,7 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
 
     /* uploadFilesHandler is used to dispatch the file blob value to parent component(Questionnaire) with the loading on uploading the attachment*/
     uploadFilesHandler(event) {
+        console.log('hello');
         var x = new FileReader();
         var questionId = (event.currentTarget.dataset.id);
         this.fileresponsemap.questionId = questionId;
@@ -137,6 +178,10 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
         }
         let type = (event.target.files[0].name).split('.');
         this.fileresponsemap.type = type[1];
+        //let blob = new Blob(event.target.files[0],type[1]);
+        //this.fileresponsemap.url = .URL.createObjectURL(event.target.files[0]);
+        //this.fileresponsemap.url= x.readAsDataURL(event.target.files[0]);
+        //let file = event.target.files[0].name;
         this.showUploadProgress = true;
         this.fileresponsemap.isPng = false;
         this.fileresponsemap.isPdf = false;
@@ -152,7 +197,8 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
             case "doc": this.fileresponsemap.isDocx = true; break;
             default : console.log('default');
         }
-        x.addEventListener("loadend", () => {
+        let s = x.readAsDataURL(event.target.files[0]);
+        x.addEventListener("loadend", (event) => {
             this.fileresponsemap.filedata = x.result;
             this.fileresponsemap.showUploadProgress = this.showUploadProgress;
             /*To upload file and save the file in the record */
@@ -223,34 +269,7 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
         });
         this.dispatchEvent(selectquestion);
 
-        let quesId = event.currentTarget.dataset.id;
-        if(this.issupplier) {
-            this.chatterMap.accountType = 'supplier';
-        }
-        else{
-            this.chatterMap.accountType = 'vendor';
-        }
-        
-        if (this.chatterMap.openChat === false) {
-            this.chatterMap.openChat = true;
-            this.chatterMap.disableSendButton = false;
-        }
-        else {
-            if(this.chatterMap.questionId !== quesId){                
-                this.chatterMap.openChat = true;
-                this.chatterMap.disableSendButton = false;
-            }
-            else{
-                this.chatterMap.openChat = false;
-                this.chatterMap.disableSendButton = true;
-            }
-        }
-        this.chatterMap.questionId = quesId;
-        const selectedEvent = new CustomEvent('selectchange', {
-            detail: this.chatterMap
-        });
-        // Dispatches the event.
-        this.dispatchEvent(selectedEvent);
+       
     }
 
     /* selectquestionHandler method is used to dispatch an event to its parent component till it reaches the questionnaire component, in case of any nested questions */

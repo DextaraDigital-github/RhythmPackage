@@ -9,6 +9,8 @@ public class TriggerFrameworkServiceController {
                 if(objectName.equalsIgnoreCase('Assessment_Template_c') && fName.equalsIgnoreCase('Status__c')){
                     if(string.valueOf(record.get(fName)).equalsIgnoreCase('New') && string.valueOf(oldRecord.get(fName)).equalsIgnoreCase('Active')){
                         isCriteriaMet = true;
+                    }else if(string.valueOf(oldRecord.get(fName)).equalsIgnoreCase('Inactive')){
+                        isCriteriaMet = true;
                     }
                 }else{
                     if(record.get(fName) != oldRecord.get(fName)){

@@ -29,7 +29,7 @@ public with sharing class AssessmentController {
 * Gets the Question__c,Section__c information of a particular Assessment_Template__c.
 * @param templateId This is a record id of an Assessment_Template__c.  
 */
-    @AuraEnabled(cacheable=true)
+    @AuraEnabled
     public static List<SObject> getQuestionsList(String templateId){
         return [SELECT Id,Name,Section__c,Question_Type__c,Required__c,Default_Value__c,
                 Conditional_Response__c,OptionValueSet__c,Question__c,Requires_File_Upload__c,
@@ -112,8 +112,13 @@ public with sharing class AssessmentController {
         if(!assessment.isEmpty()){
             assessment[0].Status__c =(String)queryMap.get('status');
             assessment[0].PdfConvertor__c =(String)queryMap.get('pdfContnet');
+            if((String)queryMap.get('status')=='Submitted')
+            {
+                assessment[0].Submission_Date__c = DateTime.now();
+            }
             UPDATE assessment;
         }
+        System.debug('assessment'+assessment);
         
     }
     
@@ -127,6 +132,7 @@ public with sharing class AssessmentController {
         for(AccountAssessmentRelation__c assessment : accountAssessment)
         {
             assessment.Status__c = (String)queryMap.get('assessmentStatus');
+            //assessment.Submission_Date__c = DateTime.now();
         }
         UPDATE accountAssessment;
         return accountAssessment;
@@ -138,12 +144,15 @@ public with sharing class AssessmentController {
 * @param assessmentId This is a record id of an Assessment__c.
 */
     @AuraEnabled
-    public static List<Sobject> getAssessmentStatus(String assessmentId)
+    public static List<Sobject> getAssessmentStatus(String assessmentId, String objectName)
     {
-        List<Sobject> assessmentstatus =[SELECT Id, IsDeleted, ParentId, CreatedById, CreatedDate, Field, DataType, OldValue, NewValue,
-                                                CreatedBy.Name  
-                                         FROM AccountAssessmentRelation__History  
-                                         WHERE ParentId=:assessmentId AND Field ='Rhythm__Status__c' order by createdDate desc ];
+        System.debug('assessmentId'+assessmentId);
+        System.debug('objectName'+objectName);
+        List<Sobject> assessmentstatus =[SELECT Object_Field_Name__c,Object_Field_Value__c,Object_Name__c,object_Record_Id__c,Activity_User__c,CreatedDate
+                                         FROM FieldHistoryTracking__c where object_Record_Id__c=:assessmentId AND Object_Name__c=:objectName
+                                         AND Object_Field_Name__c='Rhythm__Status__c' order by createdDate desc];
+        
+        System.debug('assessmentstatus'+assessmentstatus);
         return assessmentstatus;
     }
     
@@ -205,7 +214,7 @@ public with sharing class AssessmentController {
     @AuraEnabled
     public static string getAccountId()
     {
-        //List<User> strAccId = [SELECT Contact.AccountId FROM User WHERE id=:userinfo.getuserid()];
+       // List<User> strAccId = [SELECT Contact.AccountId FROM User WHERE id=:userinfo.getuserid()];
         //return strAccId[0].Contact.AccountId;
         
          return null;
@@ -529,6 +538,9 @@ public with sharing class AssessmentController {
         return Database.query(query);
     }
     
+
+
+      
     
     /**
 * It is used to create assessment record with suppliers
@@ -994,6 +1006,11 @@ return questionListWrapper;
                 System.debug('Exception '+e);
             }
         } 
+    }
+    
+     @AuraEnabled(cacheable=true)
+    public static date getTodayDate(){
+        return Date.today();
     }
     
     /**

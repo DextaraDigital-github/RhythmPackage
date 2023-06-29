@@ -1,4 +1,6 @@
 <template>
+	<!-- Shows a grid view of records -->
+	<!-- <template lwc:if={showTable}> -->
 		<div class="slds-p-around_small">
 			<div class="cdgtitletoolbar slds-grid slds-wrap ">
 				<div class="slds-col slds-small-size_12-of-12 slds-medium-size_6-of-12 slds-large-size_6-of-12">
@@ -9,6 +11,17 @@
                         <div class="slds-text-left slds-col_bump-right">
                             <h1 class="slds-p-left_x-small" style="min-width:fit-content; font-size: 20px; font-weight: 600;">All</h1>
                         </div>
+						<!-- <div class="slds-text-left slds-col_bump-right">
+							<h4 style="min-width:fit-content;">
+								<lightning-combobox name="status" label="List of Records" variant="label-hidden"
+									placeholder="All" value={value} onchange={handleChange} options={statusOptions}>
+								</lightning-combobox>
+							</h4>
+						</div>
+						<div class="slds-col slds-text-left slds-p-left_small">
+							<lightning-button-icon variant="label-hidden" icon-name={iconName} onclick={handleClick}>
+							</lightning-button-icon>
+						</div> -->
 					</div>
 				</div>
 				<div class="slds-col slds-small-size_12-of-12 slds-medium-size_6-of-12 slds-large-size_6-of-12">
@@ -166,7 +179,7 @@
 							</div>
 							
 							<!-- Dynamically passing data to each column in a row by iterating through columns -->
-							<template for:each={rec.record} for:item="col">
+							<template key={rec.id} for:each={rec.record} for:item="col">
 								<div key={col.fieldName} class="td" data-id={rec.id} onclick={takeSurveyHandler}>
 									<div class={col.classList}>
 										<label class="slds-form-element__label">{col.label}</label>
