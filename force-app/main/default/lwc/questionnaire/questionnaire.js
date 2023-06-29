@@ -143,7 +143,7 @@ export default class Questionnaire extends LightningElement {
             accordianClassList.add('slds-is-open');
         }
     }
- 
+
 
     //Used /* Connectedcallback is used to get data on onload */
     connectedCallback() {
@@ -512,10 +512,7 @@ export default class Questionnaire extends LightningElement {
                         if (typeof questionsList[i].questions[j].value != 'undefined' ){
                             if(typeof questionsList[i].questions[j].defaultValue!='undefined')
                             {
-                                if(typeof this.accountAssessmentStatus!='undefined' || this.accountAssessmentStatus!='New')
-                                {
-                                    numberOfResponses++;
-                                }
+                                
                             }
                             else
                             {
@@ -535,7 +532,10 @@ export default class Questionnaire extends LightningElement {
                         }
                     }
                     questionsList[i].displayFlag = displayFlag;
-                    questionsList[i].numberOfResponses = numberOfResponses;
+                    if(typeof this.accountAssessmentStatus!=='undefined' && this.accountAssessmentStatus!='New')
+                        questionsList[i].numberOfResponses = numberOfResponses;
+                    else
+                        questionsList[i].numberOfResponses =0;
                 }
             }
 
@@ -1197,8 +1197,8 @@ export default class Questionnaire extends LightningElement {
                 console.log('manual', quTemp);
             }
             else {
-                if (typeof qu.Rhythm__Default_Value__c != 'undefined' && qu.Rhythm__Default_Value__c != null &&
-                typeof this.recordId!='undefined' && this.objectApiName!='Rhythm__AccountAssessmentRelation__c') {
+                if (typeof qu.Rhythm__Default_Value__c != 'undefined' && qu.Rhythm__Default_Value__c != null && this.objectApiName!='Rhythm__AccountAssessmentRelation__c'
+                ||typeof this.recordId!='undefined') {
                     console.log('koushik', qu.Rhythm__Default_Value__c);
                     if(qu.Rhythm__Question_Type__c=='Picklist')
                     {
@@ -1212,6 +1212,10 @@ export default class Questionnaire extends LightningElement {
                     else if(qu.Rhythm__Question_Type__c=='Text Area (Rich)')
                     {
                          quTemp.value ='<p>'+ JSON.parse(JSON.stringify(qu.Rhythm__Default_Value__c)) +'</p>';
+                    }
+                    else if(qu.Rhythm__Question_Type__c=='Checkbox')
+                    {
+                        quTemp.value =(Boolean)(JSON.parse(JSON.stringify(qu.Rhythm__Default_Value__c)));
                     }
                     else
                     {

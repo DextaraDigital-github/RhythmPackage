@@ -112,34 +112,7 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
        the questionId to parent component to open chat conversation */
     openChatHandler() {
 
-         let quesId = event.currentTarget.dataset.id;
-        if(this.issupplier) {
-            this.chatterMap.accountType = 'supplier';
-        }
-        else{
-            this.chatterMap.accountType = 'vendor';
-        }
         
-        if (this.chatterMap.openChat === false) {
-            this.chatterMap.openChat = true;
-            this.chatterMap.disableSendButton = false;
-        }
-        else {
-            if(this.chatterMap.questionId !== quesId){                
-                this.chatterMap.openChat = true;
-                this.chatterMap.disableSendButton = false;
-            }
-            else{
-                this.chatterMap.openChat = false;
-                this.chatterMap.disableSendButton = true;
-            }
-        }
-        this.chatterMap.questionId = quesId;
-        const selectedEvent = new CustomEvent('selectchange', {
-            detail: this.chatterMap
-        });
-        // Dispatches the event.
-        this.dispatchEvent(selectedEvent);
     }
 
     /* getShowUploadStatus  is used to show progressbar while uploading the file.This method will be invoked from Questionnaire component.*/
@@ -267,8 +240,36 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
                 id: event.currentTarget.dataset.id
             }
         });
-        this.dispatchEvent(selectquestion); 
-
+        this.dispatchEvent(selectquestion);
+     let quesId = event.currentTarget.dataset.id;
+        if(this.issupplier) {
+            this.chatterMap.accountType = 'supplier';
+        }
+        else{
+            this.chatterMap.accountType = 'vendor';
+        }
+        
+        if (this.chatterMap.openChat === false) {
+            this.chatterMap.openChat = true;
+            this.chatterMap.disableSendButton = false;
+        }
+        else {
+            if(this.chatterMap.questionId !== quesId){                
+                this.chatterMap.openChat = true;
+                this.chatterMap.disableSendButton = false;
+            }
+            else{
+                this.chatterMap.openChat = false;
+                this.chatterMap.disableSendButton = true;
+            }
+        }
+        this.chatterMap.questionId = quesId;
+        const selectedEvent = new CustomEvent('selectchange', {
+            detail: this.chatterMap
+        });
+        // Dispatches the event.
+        this.dispatchEvent(selectedEvent);
+        console.log('sampledata');
        
     }
 

@@ -79,7 +79,6 @@
 .cad-pending, .cad-timeline_pending .cad-timeline_content {background:#ffebb3; border:1px solid #dbc790;}
 .cad-needmoreinfo, .cad-timeline_needmoreinfo .cad-timeline_content {background:#d3b0e4; border:1px solid #b18ec2;}
 .cad-timeline_reviewcompleted .cad-timeline_content {background:#d1f7c4;}
-.cad-timeline_submited .cad-timeline_content {background:#97bfce;}
 
 
 .cad-timeline_customer .cad-timeline_dot { border:4px solid #af0000; }

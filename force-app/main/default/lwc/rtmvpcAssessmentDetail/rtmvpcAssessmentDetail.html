@@ -35,14 +35,14 @@
 
 				<div class="cad-cel cad-auto cad-list">
 					<div class="cad-sec_container">
-						<div class="cad-sec_header">
+						<div class="cad-sec_header cad-titlebutton_more">
 							<div class="slds-float_left slds-is-absolute" style="width:100%; padding:4px 80px 0px 31px;"
 								title="Details : ESG Assessment (Due date 05/14/2023)">
 								<div class="slds-truncate">Details : {assessmentName} {endDate}</div>
 							</div>
 
 							<div class="slds-float_left slds-is-relative">
-								<button class="cad_actions" onclick={handleLeftButtonClick} title="Show / Hide Timeline Panel"><i class="las la-bars"></i></button>
+								<button class="cad_actions" onclick={handleLeftButtonClick} title="Show / Hide Timeline Panel"><i class="las la-indent" style="transform:rotate(0deg);"></i></button>
 							</div>
 
 							<div class="slds-float_right slds-is-relative">
@@ -66,14 +66,19 @@
 								&nbsp; &nbsp;
 								
 								<template if:true={showExpand}>
-									<lightning-button-icon icon-name="utility:expand_all" variant="bare" onclick={handleAccordian} data-id="[ + ]"
-										alternative-text="Close window">
-									</lightning-button-icon>
+									<!-- <lightning-button-icon icon-name="utility:expand_all" variant="bare" onclick={handleAccordian} data-id="[ + ]"
+										alternative-text="Close window" size="medium">
+									</lightning-button-icon> -->
+
+								<button class="cad_actions" onclick={handleAccordian} title="Expand" data-id="[ + ]"><i class="las la-window-maximize"></i></button>
+
 								</template>
 								<template if:false={showExpand}>
-									<lightning-button-icon icon-name="utility:collapse_all" variant="bare" data-id="[ - ]" onclick={handleAccordian}
-										alternative-text="Close window">
-									</lightning-button-icon>
+									<!-- <lightning-button-icon icon-name="utility:collapse_all" variant="bare" data-id="[ - ]" onclick={handleAccordian}
+										alternative-text="Close window" size="medium">
+									</lightning-button-icon> -->
+
+									<button class="cad_actions" onclick={handleAccordian} title="Collapse" data-id="[ - ]"><i class="las la-window-minimize"></i></button>
 								</template>
 								<lightning-button-menu icon-name="utility:download" data-id={accountassessmentid}
 									menu-alignment="right" menu-size="medium" alternative-text="Export"
@@ -85,10 +90,10 @@
 									</lightning-menu-item>
 									<!-- <lightning-menu-item label="Excel" title="Excel" value="Excel"></lightning-menu-item> -->
 								</lightning-button-menu>
-								<button class="cad_actions" onclick={handleRightButtonClick} title="Show / Hide Info Panel"><i class="las la-bars"></i></button>
+								<button class="cad_actions" onclick={handleRightButtonClick} title="Show / Hide Info Panel"><i class="las la-indent" style="transform:rotate(180deg);"></i></button>
 							</div>
 						</div>
-						<div class="cad-sec_bodyfull1">
+						<div class="cad-sec_bodyfull1 cad-titlebutton_more">
 							<div class="cad-sec_vcontainer2_2" style="height:calc(100% - 0px)">
 								<div class="slds-scrollable_y" style="max-height:calc(100% - 40px);">
 									<div class="slds-text-align_center slds-text-heading_large">
