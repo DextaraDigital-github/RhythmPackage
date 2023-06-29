@@ -671,7 +671,7 @@ export default class CustomTable extends LightningElement {
             window.addEventListener('mouseup', (muEvent) => {
                 this.handleColumnResizeMouseUp(muEvent, cResizeDetails, resizeMouseMoveHandler);
             }, { once: true });
-        }
+        } 
     }
     handleResizeMouseMove(mmEvent, mmResizeDetails) {
         let pos1 = mmResizeDetails.resizeHandleInitPosition - mmEvent.clientX;

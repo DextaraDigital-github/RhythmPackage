@@ -214,10 +214,10 @@ public with sharing class AssessmentController {
     @AuraEnabled
     public static string getAccountId()
     {
-       // List<User> strAccId = [SELECT Contact.AccountId FROM User WHERE id=:userinfo.getuserid()];
-        //return strAccId[0].Contact.AccountId;
+        List<User> strAccId = [SELECT Contact.AccountId FROM User WHERE id=:userinfo.getuserid()];
+        return strAccId[0].Contact.AccountId;
         
-         return null;
+        // return null;
     }
     
     
@@ -603,7 +603,15 @@ public with sharing class AssessmentController {
                 assessSup.Assessment__c = assessmentId;
                 assessSup.Status__c = 'Active';
                 assessSupList.add(assessSup);
-                if(asmtStartDate == Date.Today()){
+                boolean isSend = false;
+                if(asmtEndDate != null){
+                    if(asmtStartDate >= Date.Today() && asmtEndDate<=Date.Today()){
+                        isSend = true;
+                    }
+                }else if(asmtStartDate >= Date.Today()){
+                    isSend = true;
+                }
+                if(isSend){
                     AccountAssessmentRelation__c accAssessReln = new AccountAssessmentRelation__c();
                     accAssessReln.Name = acc.Name;
                     accAssessReln.Account__c = acc.Id;

@@ -267,7 +267,7 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
                 id: event.currentTarget.dataset.id
             }
         });
-        this.dispatchEvent(selectquestion);
+        this.dispatchEvent(selectquestion); 
 
        
     }

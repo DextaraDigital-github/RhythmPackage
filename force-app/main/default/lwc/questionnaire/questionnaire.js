@@ -143,7 +143,7 @@ export default class Questionnaire extends LightningElement {
             accordianClassList.add('slds-is-open');
         }
     }
-
+ 
 
     //Used /* Connectedcallback is used to get data on onload */
     connectedCallback() {
