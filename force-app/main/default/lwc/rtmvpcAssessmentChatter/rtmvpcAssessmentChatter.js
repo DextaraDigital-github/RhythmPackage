@@ -49,6 +49,7 @@ export default class RtmvpcAssessmentChatter extends LightningElement {
       else {
          this.responseWrapper.accountassessmentId = this.accountassessmentId;
       }
+      this.newResponse = [];
       this.handleGetChatterResponse();
    }
 
@@ -112,7 +113,9 @@ export default class RtmvpcAssessmentChatter extends LightningElement {
                   this.responseMap.createdTime = result1[0].CreatedDate;
                }
             }
+            
             this.responseMap.Text = this.newChat;
+
             this.responseMap.Name = this.userName;
             let customerChatCSS = (typeof this.recordid !== 'undefined')?'cad-cd-customer':'cad-ad-customer';
             let supplierChatCSS = (typeof this.recordid !== 'undefined')?'cad-cd-supplier':'cad-ad-supplier';
@@ -142,8 +145,10 @@ export default class RtmvpcAssessmentChatter extends LightningElement {
             }
 
             if (typeof this.responseMap.Text != 'undefined' && this.responseMap.Text !== '') {
+                console.log('hhhhh',this.responseMap.Text);
                this.newResponse.push(this.responseMap);
             }
+            console.log('hhhhh',this.newResponse);
             this.callChatterResponse(this.newResponse);
             this.responseList = this.newResponse;
             this.showData = true;

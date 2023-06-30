@@ -6,12 +6,12 @@
 			<template for:each={responseList} for:item="chatItem">
 				<div class="cad-ad-default" key={chatItem}>
 					<!-- classes: cad-ad-approved, cad-ad-rejected, cad-ad-submited, cad-ad-default -->
-					<div class={chatItem.recipientType} >
+					<div class={chatItem.recipientType} key={chatItem}>
 						<!-- classes: cad-ad-customer,cad-ad-supplier -->
-						<div class="cad-ad-base" >
-							<div class="cad-ad-datentime">{chatItem.createdTime}</div>
-							<div class="cad-ad-message">{chatItem.Text}</div>
-							<div class="cad-ad-sender">- {chatItem.Name}</div>
+						<div class="cad-ad-base" key={chatItem}>
+							<div key={chatItem} class="cad-ad-datentime">{chatItem.createdTime}</div>
+							<div key={chatItem} class="cad-ad-message">{chatItem.Text}</div>
+							<div key={chatItem} class="cad-ad-sender">- {chatItem.Name}</div>
 						</div>
 					</div>
 				</div>
@@ -29,7 +29,7 @@
 		<lightning-textarea placeholder="Type your response here..." value={newChat} variant="label-hidden"
 			onchange={chatChangeHandler}>
 		</lightning-textarea>
-		<lightning-button label="Send" onclick={handleRightButtonClick}></lightning-button>
+		<lightning-button label="Save Comments" onclick={handleRightButtonClick} variant="Brand" class="slds-float--right slds-button_neutral"></lightning-button>
 	</div>
     </template>
 	 <template if:false={showData}>
@@ -37,7 +37,7 @@
 		<lightning-textarea placeholder="Type your response here..." value={newChat} variant="label-hidden"
 			disabled="true" onchange={chatChangeHandler}>
 		</lightning-textarea>
-		<lightning-button label="Send" onclick={handleRightButtonClick} disabled="true"></lightning-button>
+		<lightning-button label="Save Comments" onclick={handleRightButtonClick} disabled="true" variant="Brand" class="slds-float--right slds-button_neutral"></lightning-button>
 	</div>
     </template>
 </template>

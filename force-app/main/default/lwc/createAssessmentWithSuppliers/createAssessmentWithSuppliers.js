@@ -12,11 +12,11 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
     showModal = true;
     showNewAssessment=false;
     isTemplateInactive = false;
-    showSuppliers = false; 
+    showSuppliers = false;
     @track suppliersList=[];
     modalHeading = 'New Assessment';
     assessmentId ='';
-    @api values = { name: '', template: '', frequencyValue: 'One Time', startdate: '', enddate:'', category:'', frequency:'', disclosure:'', description:'' };
+    @api values = { name: '', template: '', frequencyvalue: 'One Time', startdate: '', enddate:'', category:'', disclosure:'', description:'' };
     @api templateId;
     dateValue;
     frequencyValue = 'One Time';

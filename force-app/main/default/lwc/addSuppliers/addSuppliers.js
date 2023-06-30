@@ -2,6 +2,7 @@ import { LightningElement, wire, track, api } from 'lwc';
 import getAllSuppliers from '@salesforce/apex/AssessmentController.getAllSuppliers';
 import getExistingSuppliers from '@salesforce/apex/AssessmentController.getExistingSuppliersWithSearch';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+
 export default class AddSuppliers extends LightningElement {
     renderedAllSuppliers = false;
     @track supplierData;
@@ -21,32 +22,30 @@ export default class AddSuppliers extends LightningElement {
     delAccounts = [];
     hasRendered = true;
 
-     renderedCallback(){
-        console.log('InRenderedcallback----->',this.recordId);
-        if(this.recordId != undefined && this.recordId){
-            console.log('existingList----->',JSON.stringify(this.existingSuppList));
-            if (this.hasRendered) {
-                this.fetchExistingSuppliers();
-                this.hasRendered = false;
-            }
+    connectedCallback() {
+        console.log('childConnectedCallBack------>',this.recordId);
+        if(this.recordId != undefined){
+            this.fetchExistingSuppliers();
         }
     }
 
     fetchExistingSuppliers(){
         getExistingSuppliers({ assessmentId:this.recordId, searchKey: '' })
             .then(result => {
+                console.log('RESULT---->',JSON.stringify(result));
                 if(result){
                     let tempList = [];
                     for (let rec of result) {
                         tempList.push(rec.Rhythm__Account__c);
                     }
-                    if (tempList.length > 0) {
-                        this.values = this.existingSuppList = JSON.parse(JSON.stringify(tempList));
-                        this.countRecords();
+                    if(tempList.length > 0) {
+                        this.existingSuppList = JSON.parse(JSON.stringify(tempList));
                     }
+                    console.log('addSuppExData---->',JSON.stringify(this.existingSuppList));
                 }
             })
             .catch(error => {
+                console.log('ERROR---->',error);
                 this.showNotification('Error', error.body.message, 'error');
             });
     }
@@ -58,30 +57,6 @@ export default class AddSuppliers extends LightningElement {
             suppList = JSON.stringify(this.existingSuppList);
         } 
         return suppList;
-    }
-
-    // // Fetches all the existing/assigned accounts from Apex
-    // @wire(getExistingSuppliers, { assessmentId: '$recordId', searchKey: '' })
-    // getExistingSuppliers_wiredData(result) {
-    //     // this.latestExSuppliers = result;
-    //     console.log('wiredExistingSuppliers----->',JSON.stringify(result));
-    //     if (result.data) {
-    //         let tempList = [];
-    //         for (let rec of result.data) {
-    //             tempList.push(rec.Rhythm__Account__c);
-    //         }
-    //         if (tempList.length > 0) {
-    //             this.values = this.existingSuppList = JSON.parse(JSON.stringify(tempList));
-    //             this.countRecords();
-    //         }
-    //     } else if (result.error) {
-    //         this.showNotification('Error', result.error.body.message, 'error');
-    //     }
-    // }
-
-    connectedCallback() {
-        console.log('in connectedCallback');
-       //this.getAllSuppliersList();
     }
 
     
@@ -120,9 +95,11 @@ export default class AddSuppliers extends LightningElement {
                         if (selectedValues.indexOf(suppData.value) !== -1 && this.existingSuppList.indexOf(suppData.value) === -1) {
                             this.newAccounts.push(suppData.value);
                             this.existingSuppList.push(suppData.value);
+                            console.log('here 1');
                             if (this.delAccounts.indexOf(suppData.value) !== -1) {
                                 this.delAccounts.splice(this.delAccounts.indexOf(suppData.value), 1);
                             }
+                             console.log('here 2');
                         }
                         else if (selectedValues.indexOf(suppData.value) === -1 && this.existingSuppList.indexOf(suppData.value) !== -1) {
                             this.delAccounts.push(suppData.value);
@@ -141,7 +118,7 @@ export default class AddSuppliers extends LightningElement {
             console.log('handleChange - END : ', this.existingSuppList);
         } catch (error) {
             console.log('handleChange error : ', error);
-        } 
+        }
     }
 
     // Updates the search value to search for account among the available accounts

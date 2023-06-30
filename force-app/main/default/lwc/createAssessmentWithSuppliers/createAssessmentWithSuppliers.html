@@ -37,13 +37,13 @@
                                         <lightning-input-field field-name="Rhythm__Category__c" data-id="category" onchange={updateValuesHandler} name="category" value={values.category} required></lightning-input-field>
                                     </lightning-layout-item>
                                     <lightning-layout-item size="6" padding="around-small">
-                                        <lightning-input-field field-name="Rhythm__Frequency__c" onchange={updateValuesHandler} name="frequencyValue" value={values.frequencyValue}></lightning-input-field>
+                                        <lightning-input-field field-name="Rhythm__Frequency__c" data-id="frequencyvalue" onchange={updateValuesHandler} name="frequencyValue" value={values.frequencyValue}></lightning-input-field>
                                     </lightning-layout-item>
                                     <lightning-layout-item size="6" padding="around-small">
-                                        <lightning-input-field field-name="Rhythm__Disclosure__c" onchange={updateValuesHandler} name="disclosure" value={values.disclosure}></lightning-input-field>
+                                        <lightning-input-field field-name="Rhythm__Disclosure__c" data-id="disclosure" onchange={updateValuesHandler} name="disclosure" value={values.disclosure}></lightning-input-field>
                                     </lightning-layout-item>
                                     <lightning-layout-item size="6" padding="around-small">
-                                        <lightning-input-field field-name="Rhythm__Description__c" onchange={updateValuesHandler} name="description" value={values.description}></lightning-input-field>
+                                        <lightning-input-field field-name="Rhythm__Description__c" data-id="description" onchange={updateValuesHandler} name="description" value={values.description}></lightning-input-field>
                                     </lightning-layout-item>
                                 </lightning-layout>
                                 
@@ -64,7 +64,7 @@
                         <div class="slds-clearfix slds-float_right">
                             <lightning-button label="OK" title="Cancel" variant="brand" onclick={closeModal}></lightning-button>
                         </div>
-                    </template> 
+                    </template>
                 </div>
 
                 <!-- modal footer start-->

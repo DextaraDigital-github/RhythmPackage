@@ -3,24 +3,32 @@ import { CloseActionScreenEvent } from 'lightning/actions';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import addSuppliers from '@salesforce/apex/AssessmentController.sendAssessment';
 import getAssessmentRecord from '@salesforce/apex/AssessmentController.getAssessmentRecord';
-import { RefreshEvent } from 'lightning/refresh';
 import { NavigationMixin } from 'lightning/navigation';
 import getTodayDate from '@salesforce/apex/AssessmentController.getTodayDate';
-import { notifyRecordUpdateAvailable } from 'lightning/uiRecordApi';
+import { CurrentPageReference } from 'lightning/navigation';
 export default class AddSuppliersforAssessment extends NavigationMixin(LightningElement) {
-    @api recordId; 
+    @api recordId;
     @track suppliersList=[];
     @track existingSuppList=[];
     @track delList;
     todayDate;
     startDate;
     endDate;
+    assessmentId;
 
-
-     connectedCallback() {
-        this.getTodayDate();
+    @wire(CurrentPageReference)
+    getPageReferenceParameters(currentPageReference) {
+       if (currentPageReference) {
+          console.log(currentPageReference);
+          this.assessmentId = currentPageReference.state.recordId;
+       }
     }
 
+    connectedCallback() {
+         console.log('PARNTRECORDID---->',this.assessmentId);
+         console.log('PARNTRECORDID---->',this.recordId);
+        this.getTodayDate();
+    }
 
     getTodayDate(){
         getTodayDate()
@@ -86,8 +94,8 @@ export default class AddSuppliersforAssessment extends NavigationMixin(Lightning
                         }
                     })
                     .catch(error => {
-                        this.error = error;
-                        this.showNotification('Error',error,'error');
+                        console.log('erroDetails----->',error);
+                        this.showNotification('Error',error.body.message,'error');
                     });
                 }else{
                     this.showNotification('Error','Please select atleast one supplier to proceed.','error');
@@ -118,7 +126,6 @@ export default class AddSuppliersforAssessment extends NavigationMixin(Lightning
 
     closeModal() {
         this.dispatchEvent(new CloseActionScreenEvent());
-        notifyRecordUpdateAvailable([{recordId: this.recordId}]);
     }
     navigateToRecordPage(){
         this[NavigationMixin.Navigate]({

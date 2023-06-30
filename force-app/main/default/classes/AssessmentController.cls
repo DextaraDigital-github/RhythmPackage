@@ -597,34 +597,25 @@ public with sharing class AssessmentController {
             List<AccountAssessmentRelation__c> accountAssessRelnsList = new List<AccountAssessmentRelation__c>();
             List<Assessment_Supplier__c> assessSupList = new List<Assessment_Supplier__c>();
             
+            Date todayDate = Date.Today();
             for(Account acc:[SELECT Id,Name FROM Account WHERE ID IN:suppliersIds]){
                 Assessment_Supplier__c assessSup = new Assessment_Supplier__c();
                 assessSup.Account__c = acc.Id;
                 assessSup.Assessment__c = assessmentId;
                 assessSup.Status__c = 'Active';
                 assessSupList.add(assessSup);
-                boolean isSend = false;
+                boolean isSave = false;
                 if(asmtEndDate != null){
-                    if(asmtStartDate >= Date.Today() && asmtEndDate>=Date.Today()){
-                        isSend = true;
+                    if(todayDate.daysBetween(asmtStartDate) <=0 && todayDate.daysBetween(asmtEndDate) >=0){
+                        isSave = true;
                     }
-                }else if(asmtStartDate >= Date.Today()){
-                    isSend = true;
+                }else{
+                    if(todayDate.daysBetween(asmtStartDate) <=0){
+                        isSave = true;
+                    }
                 }
-                if(operationType.equalsIgnoreCase('new') && asmtStartDate == Date.Today()){
-                    AccountAssessmentRelation__c accAssessReln = new AccountAssessmentRelation__c();
-                    accAssessReln.Name = acc.Name;
-                    accAssessReln.Account__c = acc.Id;
-                    accAssessReln.Assessment__c = assessmentId;
-                    if(asmtStartDate != null){
-                        accAssessReln.Start_Date__c = asmtStartDate;
-                    }
-                    if(asmtEndDate != null){
-                        accAssessReln.End_Date__c = asmtEndDate;
-                    }
-                    accAssessReln.Status__c = 'New';
-                    accountAssessRelnsList.add(accAssessReln);
-                }else if((!operationType.equalsIgnoreCase('new')) && isSend){
+
+                if(isSave){
                     AccountAssessmentRelation__c accAssessReln = new AccountAssessmentRelation__c();
                     accAssessReln.Name = acc.Name;
                     accAssessReln.Account__c = acc.Id;
@@ -822,7 +813,7 @@ public with sharing class AssessmentController {
 * @param assesmentId assessment record id
 * @param searchKey user input to search supplier
 */
-    @AuraEnabled(cacheable=true)
+    @AuraEnabled
     public static List<AccountAssessmentRelation__c> getExistingSuppliersWithSearch(string assessmentId, string searchKey){
         string query = 'SELECT Id,Account__c,Account__r.Name FROM Assessment_Supplier__c WHERE Assessment__c = \'' + assessmentId + '\'';
         if(string.isNotBlank(searchKey)){
