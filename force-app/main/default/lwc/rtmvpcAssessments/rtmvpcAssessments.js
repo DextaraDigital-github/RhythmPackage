@@ -46,7 +46,7 @@ export default class RtmvpcAssessments extends LightningElement {
         this.recList = result;
         this.show.grid=true;
         let win=window.location.search;
-        if(win && win.contains('=')){
+        if(win && win.includes('=')){
             let x=win.split('=');
            if(x[0] ==='?Rhythm__AccountAssessmentRelation__c')
            {
