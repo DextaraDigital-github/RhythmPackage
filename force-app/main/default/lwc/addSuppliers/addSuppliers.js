@@ -2,6 +2,7 @@ import { LightningElement, wire, track, api } from 'lwc';
 import { refreshApex } from '@salesforce/apex';
 import getAllSuppliers from '@salesforce/apex/AssessmentController.getAllSuppliers';
 import getExistingSuppliers from '@salesforce/apex/AssessmentController.getExistingSuppliersWithSearch';
+import ges from '@salesforce/apex/AssessmentController.getExistingSuppliersWithSearch';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 export default class AddSuppliers extends LightningElement {
     renderedAllSuppliers = false;
@@ -21,6 +22,10 @@ export default class AddSuppliers extends LightningElement {
     @api recordId;
     newAccounts = [];
     delAccounts = [];
+    @track hasRendered = true;
+
+    
+
 
     // Updates existingData with the already selected Accounts Data
     get existingData() {
@@ -30,6 +35,24 @@ export default class AddSuppliers extends LightningElement {
         } else {
             return '';
         }
+    }
+
+
+    renderedCallback(){
+        console.log('InRenderedcallback');
+        if (hasRendered) {
+            this.fetchExistingSuppliers();
+            hasRendered = false;
+        }
+    }
+
+    fetchExistingSuppliers(){
+        ges({ assessmentId:this.recordId, searchKey: '' })
+            .then(result => {
+                console.log('imperativeexistin----->',JSON.stringify(result));
+            })
+            .catch(error => {
+            });
     }
 
     // Fetches all the existing/assigned accounts from Apex
@@ -76,9 +99,9 @@ export default class AddSuppliers extends LightningElement {
             this.values = JSON.parse(JSON.stringify(this.existingSuppList));
             if (tempList.length > 0) {
                 this.supplierData = JSON.parse(JSON.stringify(tempList));
-                if (!renderedAllSuppliers) {
+                if (!this.renderedAllSuppliers) {
                     this.countRecords();
-                    renderedAllSuppliers = true;
+                    this.renderedAllSuppliers = true;
                 }
                 console.log('this.supplierData : ' + JSON.stringify(this.supplierData) + ', this.existingSuppList : ' + this.existingSuppList);
                 // this.availableSuppliersCount = this.availableSuppliersCount.split('(')[0] + '(' + (this.supplierData.length - this.existingSuppList.length) + ')';

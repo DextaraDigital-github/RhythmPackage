@@ -16,7 +16,7 @@ public with sharing class AssessmentController {
 */
     @AuraEnabled(cacheable=true)
     public static List<SObject> getSupplierAssessmentList(String assessmentId){
-        return [SELECT Id,Assessment__r.Template__c,Assessment__r.Disclosure__c,Status__c
+        return [SELECT Id,Assessment__r.Name,Assessment__r.Template__c,Assessment__r.Disclosure__c,Status__c
                 FROM AccountAssessmentRelation__c 
                 WHERE Id =:assessmentId
                 LIMIT 1];
@@ -46,7 +46,7 @@ public with sharing class AssessmentController {
 * Gets the Response__c information of an AccountAssessmentRelation__c.
 * @param assessmentId This is a record id of an AccountAssessmentRelation__c.  
 */
-    @AuraEnabled(cacheable=true)
+    @AuraEnabled
     public static List<SObject> getSupplierResponseList(String assessmentId){
         return  [SELECT Id, Question__c,Assessment__c,Question__r.Question_Type__c, 
                  Assessment__r.Name,Files__c, Response__c,CreatedBy.Name,CreatedDate, Flag__c, 
@@ -97,7 +97,7 @@ public with sharing class AssessmentController {
         }
         
         
-        List<AccountAssessmentRelation__c> assessment=[SELECT Id,Name,Status__c,Assessment__c,Account__c
+        List<AccountAssessmentRelation__c> assessment=[SELECT Id,Name,Follow_Up_Requests__c,Status__c,Assessment__c,Account__c
                                                        FROM AccountAssessmentRelation__c 
                                                        WHERE Id=:(String)queryMap.get('accountassessmentid')];
         if(!assessment.isEmpty()){
@@ -195,10 +195,10 @@ public with sharing class AssessmentController {
     @AuraEnabled
     public static string getAccountId()
     {
-        // List<User> strAccId = [SELECT Contact.AccountId FROM User WHERE id=:userinfo.getuserid()];
-        // return strAccId[0].Contact.AccountId;
+        List<User> strAccId = [SELECT Contact.AccountId FROM User WHERE id=:userinfo.getuserid()];
+        return strAccId[0].Contact.AccountId;
         
-        return null;
+         //return null;
     }
     
     
@@ -229,6 +229,25 @@ public with sharing class AssessmentController {
         System.debug('assessmentData'+assessmentData);
         return assessmentData;
     }
+    @AuraEnabled
+    public static List<AccountAssessmentRelation__c> uploadPdfContent(String pdfdata, String recordId)
+    {
+        System.debug('recordId'+recordId);
+        System.Debug('pdfdata'+pdfdata);
+        List<AccountAssessmentRelation__c> assessmentsdata =[SELECT Id, IsDeleted, Name,Account__c,Assessment__c, Assessment__r.name ,Assessment__r.Status__c,Assessment__r.Customer_Review__c,Assessment__r.Number_of_Questions__c,
+                                        Assessment__r.Additional_Requests__c,Number_of_Questions__c, Number_of_Responses__c,
+                                        Assessment__r.CreatedBy.Name,Status__c,End_Date__c,Completed__c,Follow_Up_Requests__c,PdfConvertor__c
+                                        FROM AccountAssessmentRelation__c where id=:recordId];
+        //assessmentsdata[0].PdfConvertor__c = pdfdata;
+        for(AccountAssessmentRelation__c accassessment :assessmentsdata)
+        {
+            accassessment.PdfConvertor__c = pdfdata;
+        }
+        System.debug('assessmentsdata'+assessmentsdata);
+        update assessmentsdata;
+        return assessmentsdata;
+    }
+    
     /**
 * Its used to update a flag in Response__c.
 * @param questionId record id of a Question__c.
@@ -556,7 +575,7 @@ public with sharing class AssessmentController {
                 Assessment_Supplier__c assessSup = new Assessment_Supplier__c();
                 assessSup.Account__c = acc.Id;
                 assessSup.Assessment__c = assessmentId;
-                assessSup.Status__c = 'Inactive';
+                assessSup.Status__c = 'Active';
                 assessSupList.add(assessSup);
                 if(asmtStartDate == Date.Today()){
                     AccountAssessmentRelation__c accAssessReln = new AccountAssessmentRelation__c();
@@ -601,7 +620,7 @@ public with sharing class AssessmentController {
                 }
             }
             if(successRecordsIdSet.isEmpty() == false){
-                sendEmails(successRecordsIdSet);
+                sendEmails(successRecordsIdSet,'');
             }
             resWrap.isSuccess = true;
             resWrap.recordId = assessmentId;
@@ -620,23 +639,41 @@ public with sharing class AssessmentController {
 * It is used to send assessment email to the suppliers.
 * @param recordIdsSet AccountAssessmentRelation record ids to send emails.
 */
-    public static void sendEmails(Set<Id> recordIdsSet){
+    public static void sendEmails(Set<Id> recordIdsSet, string Source){
         try{
             List<Messaging.SingleEmailMessage> emailMessagesList = new List<Messaging.SingleEmailMessage>();
-            for(AccountAssessmentRelation__c assRelRec:[SELECT Id,Account__c,Account__r.Name,Account__r.Email__c,Assessment__c FROM AccountAssessmentRelation__c WHERE ID IN:recordIdsSet]){
-                Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
-                List<String> sendTo = new List<String>();
-                sendTo.add(assRelRec.Account__r.Email__c);
-                mail.setToAddresses(sendTo);
-                mail.setSubject('Sample Survey');
-                String body = '<html><body>'+
-                    '<br><br>'+'Dear '+assRelRec.Account__r.Name+
-                    '<br><br>'+'we’d like to complete a short survey.'+
-                    '<br><br><a href="https://ruby-site-9073-dev-ed.scratch.my.site.com/">Take the survey now.</a>'+
-                    '<br><br>'+'Kind regards,'+
-                    '<br>'+'Rhythm';
-                mail.setHtmlBody(body);
-                emailMessagesList.add(mail);
+            if(string.isBlank(Source)){
+                for(AccountAssessmentRelation__c assRelRec:[SELECT Id,Account__c,Account__r.Name,Account__r.Email__c,Assessment__c FROM AccountAssessmentRelation__c WHERE ID IN:recordIdsSet]){
+                    Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
+                    List<String> sendTo = new List<String>();
+                    sendTo.add(assRelRec.Account__r.Email__c);
+                    mail.setToAddresses(sendTo);
+                    mail.setSubject('Sample Survey');
+                    String body = '<html><body>'+
+                        '<br><br>'+'Dear '+assRelRec.Account__r.Name+
+                        '<br><br>'+'we’d like to complete a short survey.'+
+                        '<br><br><a href='+System.Label.Supplier_Portal_URL+assRelRec.Id+'>Take the survey now.</a>'+
+                        '<br><br>'+'Kind regards,'+
+                        '<br>'+'Rhythm';
+                    mail.setHtmlBody(body);
+                    emailMessagesList.add(mail);
+                }
+            }else{
+                for(AccountAssessmentRelation__c assRelRec:[SELECT Id,Account__c,Account__r.Name,Account__r.Email__c,Assessment__c FROM AccountAssessmentRelation__c WHERE ID IN:recordIdsSet]){
+                    Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
+                    List<String> sendTo = new List<String>();
+                    sendTo.add(assRelRec.Account__r.Email__c);
+                    mail.setToAddresses(sendTo);
+                    mail.setSubject('Updates on the Assessment');
+                    String body = '<html><body>'+
+                        '<br><br>'+'Dear '+assRelRec.Account__r.Name+
+                        '<br><br>'+'There are few comments on the responses submitted.'+
+                        '<br><br><a href='+System.Label.Supplier_Portal_URL+assRelRec.Id+'>Click Here</a>'+
+                        '<br><br>'+'Kind regards,'+
+                        '<br>'+'Rhythm';
+                    mail.setHtmlBody(body);
+                    emailMessagesList.add(mail);
+                }
             }
             if(emailMessagesList.isEmpty() == false){
                 Messaging.sendEmail(emailMessagesList);
@@ -943,6 +980,11 @@ return questionListWrapper;
                 System.debug('Exception '+e);
             }
         } 
+    }
+
+    @AuraEnabled(cacheable=true)
+    public static date getTodayDate(){
+        return Date.today();
     }
     
     /**

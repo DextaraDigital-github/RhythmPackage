@@ -3,12 +3,32 @@ import { CloseActionScreenEvent } from 'lightning/actions';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import addSuppliers from '@salesforce/apex/AssessmentController.sendAssessment';
 import getAssessmentRecord from '@salesforce/apex/AssessmentController.getAssessmentRecord';
-import { getRecordNotifyChange } from "lightning/uiRecordApi";
+import getTodayDate from '@salesforce/apex/AssessmentController.getTodayDate';
+import { RefreshEvent } from 'lightning/refresh';
 export default class AddSuppliersforAssessment extends LightningElement {
     @api recordId;
     @track suppliersList=[];
     @track existingSuppList=[];
     @track delList;
+    todayDate;
+
+
+    connectedCallback() {
+        this.getTodayDate();
+    }
+
+    getTodayDate(){
+        getTodayDate()
+        .then(result => {
+            console.log(JSON.stringify(result));
+            if(result){
+                this.todayDate = result;
+            }
+        })
+        .catch(error => {
+            console.log(JSON.stringify(error));
+        });
+    }
 
     @wire(getAssessmentRecord, { assessmentId: '$recordId'})
     getAssessmentRecord_wiredData(result) {
@@ -32,10 +52,12 @@ export default class AddSuppliersforAssessment extends LightningElement {
              if(this.delList.length>0){
                 deleteListStr = JSON.stringify(this.delList);
             }
-            let dateValue = new Date().toISOString().substring(0, 10);
-            console.log('todayDate----->',dateValue);
+            let todayDate =  new Date(this.todayDate).toISOString().substring(0, 10);
+            console.log('todayDate----->',todayDate);
             console.log('startDate----->',this.startDate);
-            if(new Date(this.startDate) >= new Date(dateValue)){
+            console.log('newList------->',JSON.stringify(this.suppliersList));
+            console.log('removeList------->',deleteListStr);
+            if(new Date(this.startDate) >= new Date(todayDate)){
                 console.log('AddSuppliersMethod------->',JSON.stringify(this.suppliersList));
                 if(this.suppliersList.length > 0 || this.delList.length>0){
                     addSuppliers({assessmentRecord:this.assessmentRecord,operationType:'update',suppliers:JSON.stringify(this.suppliersList),existingSups:exSupListStr,deleteList:deleteListStr})
@@ -44,8 +66,8 @@ export default class AddSuppliersforAssessment extends LightningElement {
                         if(result.isSuccess == true){
                             this.showModal = false;
                             this.showNotification('Success','Suppliers Added to Assessments Successfully.','success');
+                            this.dispatchEvent(new RefreshEvent());
                             this.closeModal();
-                            getRecordNotifyChange([{ recordId: this.assessmentRecord.Id }]);
                         }else{
                             //this.showNotification('Error',result.message,'error');
                         }

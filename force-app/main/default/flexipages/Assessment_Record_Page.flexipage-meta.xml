@@ -21,6 +21,13 @@
                         </valueListItems>
                         <valueListItems>
                             <value>Rhythm__Assessment__c.Delete</value>
+                            <visibilityRule>
+                                <criteria>
+                                    <leftValue>{!Record.Number_of_invited_Suppliers__c}</leftValue>
+                                    <operator>EQUAL</operator>
+                                    <rightValue>0</rightValue>
+                                </criteria>
+                            </visibilityRule>
                         </valueListItems>
                     </valueList>
                 </componentInstanceProperties>
@@ -59,10 +66,6 @@
             </componentInstance>
         </itemInstances>
         <name>detailTabContent</name>
-        <type>Facet</type>
-    </flexiPageRegions>
-    <flexiPageRegions>
-        <name>Facet-8f170f8e-e56d-4568-869b-1a083e5e5779</name>
         <type>Facet</type>
     </flexiPageRegions>
     <flexiPageRegions>
@@ -147,20 +150,6 @@
                 </componentInstanceProperties>
                 <componentName>flexipage:tab</componentName>
                 <identifier>detailTab</identifier>
-            </componentInstance>
-        </itemInstances>
-        <itemInstances>
-            <componentInstance>
-                <componentInstanceProperties>
-                    <name>body</name>
-                    <value>Facet-8f170f8e-e56d-4568-869b-1a083e5e5779</value>
-                </componentInstanceProperties>
-                <componentInstanceProperties>
-                    <name>title</name>
-                    <value>Suppliers</value>
-                </componentInstanceProperties>
-                <componentName>flexipage:tab</componentName>
-                <identifier>flexipage_tab</identifier>
             </componentInstance>
         </itemInstances>
         <itemInstances>
