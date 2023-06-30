@@ -1,25 +1,27 @@
 <template>
 	<div>
-        <div>
-            <lightning-layout multiple-rows>
-                <lightning-layout-item size="6" padding="">
-                    <div style="margin-right: 40px;">
-                        <lightning-input type="search" data-id="newsearch" label="Search New Supplier" onchange={handleSearch}>
-                        </lightning-input>
-                    </div>
-                </lightning-layout-item>
-                <lightning-layout-item size="6" padding="">
-                    <div style="margin-right: 40px;">
-                        <lightning-input type="search" data-id="exsearch" label="Search Existing Supplier" onchange={handleExSearch}>
-                        </lightning-input>
-                    </div>
-                </lightning-layout-item>
-            </lightning-layout>
-        </div>
-        <div>
-            <lightning-dual-listbox name="supplierSelection" source-label={availableSuppliersCount}
-                selected-label={selectedSuppliersCount} options={supplierData} value={values} onchange={handleChange}>
-            </lightning-dual-listbox>
-        </div>
+		<div>
+			<lightning-layout multiple-rows>
+				<lightning-layout-item size="6" padding="">
+					<div style="margin-right: 40px;">
+						<lightning-input type="search" data-id="newsearch" label="Search New Supplier"
+							onchange={handleSearch}>
+						</lightning-input>
+					</div>
+				</lightning-layout-item>
+				<lightning-layout-item size="6" padding="">
+					<div style="margin-right: 40px;">
+						<lightning-input type="search" data-id="exsearch" label="Search Selected Supplier"
+							onchange={handleExSearch}>
+						</lightning-input>
+					</div>
+				</lightning-layout-item>
+			</lightning-layout>
+		</div>
+		<div>
+			<lightning-dual-listbox name="supplierSelection" source-label={availableSuppliersCount}
+				selected-label={selectedSuppliersCount} options={supplierData} value={values} onchange={handleChange}>
+			</lightning-dual-listbox>
+		</div>
 	</div>
 </template>

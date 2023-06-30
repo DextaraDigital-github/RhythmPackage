@@ -1,5 +1,5 @@
 import { LightningElement } from 'lwc';
-import { loadStyle, loadScript } from 'lightning/platformResourceLoader';
+import { loadStyle} from 'lightning/platformResourceLoader';
 import RtmFonts from '@salesforce/resourceUrl/rtmfonts';
 import RtmvpcStylesCSS from '@salesforce/resourceUrl/rtmvpcstyles';
 import myResource from '@salesforce/resourceUrl/rtmlogofull';

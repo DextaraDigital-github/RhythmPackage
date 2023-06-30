@@ -16,7 +16,7 @@ public with sharing class AssessmentController {
 */
     @AuraEnabled(cacheable=true)
     public static List<SObject> getSupplierAssessmentList(String assessmentId){
-        return [SELECT Id,Assessment__r.Template__c,Assessment__r.Disclosure__c,Status__c
+        return [SELECT Id,Assessment__r.Name,Assessment__r.Template__c,Assessment__r.Disclosure__c,Status__c
                 FROM AccountAssessmentRelation__c 
                 WHERE Id =:assessmentId
                 LIMIT 1];
@@ -29,7 +29,7 @@ public with sharing class AssessmentController {
 * Gets the Question__c,Section__c information of a particular Assessment_Template__c.
 * @param templateId This is a record id of an Assessment_Template__c.  
 */
-    @AuraEnabled(cacheable=true)
+    @AuraEnabled
     public static List<SObject> getQuestionsList(String templateId){
         return [SELECT Id,Name,Section__c,Question_Type__c,Required__c,Default_Value__c,
                 Conditional_Response__c,OptionValueSet__c,Question__c,Requires_File_Upload__c,
@@ -46,7 +46,7 @@ public with sharing class AssessmentController {
 * Gets the Response__c information of an AccountAssessmentRelation__c.
 * @param assessmentId This is a record id of an AccountAssessmentRelation__c.  
 */
-    @AuraEnabled(cacheable=true)
+    @AuraEnabled
     public static List<SObject> getSupplierResponseList(String assessmentId){
         return  [SELECT Id, Question__c,Assessment__c,Question__r.Question_Type__c, 
                  Assessment__r.Name,Files__c, Response__c,CreatedBy.Name,CreatedDate, Flag__c, 
@@ -97,13 +97,19 @@ public with sharing class AssessmentController {
         }
         
         
-        List<AccountAssessmentRelation__c> assessment=[SELECT Id,Name,Status__c,Assessment__c,Account__c
+        List<AccountAssessmentRelation__c> assessment=[SELECT Id,Name,Follow_Up_Requests__c,Status__c,Assessment__c,Account__c,PdfConvertor__c
                                                        FROM AccountAssessmentRelation__c 
                                                        WHERE Id=:(String)queryMap.get('accountassessmentid')];
         if(!assessment.isEmpty()){
-            assessment[0].Status__c =(string)queryMap.get('status');
+            assessment[0].Status__c =(String)queryMap.get('status');
+            assessment[0].PdfConvertor__c =(String)queryMap.get('pdfContnet');
+            if((String)queryMap.get('status')=='Submitted')
+            {
+                assessment[0].Submission_Date__c = DateTime.now();
+            }
             UPDATE assessment;
         }
+        System.debug('assessment'+assessment);
         
     }
     
@@ -117,6 +123,7 @@ public with sharing class AssessmentController {
         for(AccountAssessmentRelation__c assessment : accountAssessment)
         {
             assessment.Status__c = (String)queryMap.get('assessmentStatus');
+            //assessment.Submission_Date__c = DateTime.now();
         }
         UPDATE accountAssessment;
         return accountAssessment;
@@ -128,12 +135,15 @@ public with sharing class AssessmentController {
 * @param assessmentId This is a record id of an Assessment__c.
 */
     @AuraEnabled
-    public static List<Sobject> getAssessmentStatus(String assessmentId)
+    public static List<Sobject> getAssessmentStatus(String assessmentId, String objectName)
     {
-        List<Sobject> assessmentstatus =[SELECT Id, IsDeleted, ParentId, CreatedById, CreatedDate, Field, DataType, OldValue, NewValue,
-                                                CreatedBy.Name  
-                                         FROM AccountAssessmentRelation__History  
-                                         WHERE ParentId=:assessmentId AND Field ='Rhythm__Status__c' order by createdDate desc ];
+        System.debug('assessmentId'+assessmentId);
+        System.debug('objectName'+objectName);
+        List<Sobject> assessmentstatus =[SELECT Object_Field_Name__c,Object_Field_Value__c,Object_Name__c,object_Record_Id__c,Activity_User__c,CreatedDate
+                                         FROM FieldHistoryTracking__c where object_Record_Id__c=:assessmentId AND Object_Name__c=:objectName
+                                         AND Object_Field_Name__c='Rhythm__Status__c' order by createdDate desc];
+        
+        System.debug('assessmentstatus'+assessmentstatus);
         return assessmentstatus;
     }
     
@@ -157,7 +167,8 @@ public with sharing class AssessmentController {
                                            Assessment__r.Number_of_Questions__c,Status__c,Start_Date__c,End_Date__c,
                                            Assessment__r.Additional_Requests__c,Number_of_Questions__c,Assessment__r.CreatedDate,
                                            Assessment__r.Template__c, Number_of_Responses__c,Assessment__r.CreatedBy.Name,Assessment__r.CreatedUser__c
-                                           FROM AccountAssessmentRelation__c Where Account__c=:accountId AND Assessment__c=:assessmentId];
+                                           FROM AccountAssessmentRelation__c Where Account__c=:accountId AND Assessment__c=:assessmentId
+                                          ORDER BY CreatedDate DESC];
         return accountassessment;
     }
     /**
@@ -194,11 +205,24 @@ public with sharing class AssessmentController {
     @AuraEnabled
     public static string getAccountId()
     {
-        List<User> strAccId = [SELECT Contact.AccountId FROM User WHERE id=:userinfo.getuserid()];
-        return strAccId[0].Contact.AccountId;
+       // List<User> strAccId = [SELECT Contact.AccountId FROM User WHERE id=:userinfo.getuserid()];
+        //return strAccId[0].Contact.AccountId;
+        
+         return null;
+    }
+    
+    
+     @AuraEnabled
+    public static string getCommunityURL()
+    {
+           Id currentNetworkId = Network.getNetworkId();
+           String relativeUrlBase = URL.getSalesforceBaseUrl().toExternalForm()+'/login';
+           return relativeUrlBase;
         
        // return null;
     }
+    
+    
     /**
 * Gets the AccountAssessmentRelation__c information of all fields in AccountAssessmentRelation__c for a particular Account__c.
 * @param accountId This is a record id of an Account__c.
@@ -209,12 +233,31 @@ public with sharing class AssessmentController {
         System.debug('accountId'+accountId);
         List<SObject> assessmentData = [SELECT Id, IsDeleted, Name,Account__c,Assessment__c, Assessment__r.name ,Assessment__r.Status__c,Assessment__r.Customer_Review__c,Assessment__r.Number_of_Questions__c,
                                         Assessment__r.Additional_Requests__c,Number_of_Questions__c, Number_of_Responses__c,
-                                        Assessment__r.CreatedBy.Name,Status__c,End_Date__c,Completed__c
+                                        Assessment__r.CreatedBy.Name,Status__c,End_Date__c,Completed__c,Follow_Up_Requests__c
                                         FROM AccountAssessmentRelation__c 
-                                        WHERE Account__c=:accountId];
+                                        WHERE Account__c=:accountId order by CreatedDate DESC];
         System.debug('assessmentData'+assessmentData);
         return assessmentData;
     }
+    @AuraEnabled
+    public static List<AccountAssessmentRelation__c> uploadPdfContent(String pdfdata, String recordId)
+    {
+        System.debug('recordId'+recordId);
+        System.Debug('pdfdata'+pdfdata);
+        List<AccountAssessmentRelation__c> assessmentsdata =[SELECT Id, IsDeleted, Name,Account__c,Assessment__c, Assessment__r.name ,Assessment__r.Status__c,Assessment__r.Customer_Review__c,Assessment__r.Number_of_Questions__c,
+                                        Assessment__r.Additional_Requests__c,Number_of_Questions__c, Number_of_Responses__c,
+                                        Assessment__r.CreatedBy.Name,Status__c,End_Date__c,Completed__c,Follow_Up_Requests__c,PdfConvertor__c
+                                        FROM AccountAssessmentRelation__c where id=:recordId];
+        //assessmentsdata[0].PdfConvertor__c = pdfdata;
+        for(AccountAssessmentRelation__c accassessment :assessmentsdata)
+        {
+            accassessment.PdfConvertor__c = pdfdata;
+        }
+        System.debug('assessmentsdata'+assessmentsdata);
+        update assessmentsdata;
+        return assessmentsdata;
+    }
+    
     /**
 * Its used to update a flag in Response__c.
 * @param questionId record id of a Question__c.
@@ -277,22 +320,26 @@ public with sharing class AssessmentController {
 * @param name filename .
 */
     @AuraEnabled
-    public static Object deleteFileAttachment(String questionId,String name)
+    public static Object deleteFileAttachment(String deleteMap)
     {
+        Map<String,Object> filemap = (Map<String,Object>) JSON.deserializeUntyped(deleteMap);
+        System.debug('deleteMap'+filemap);
         List<Response__c> responseRecords = [SELECT Id, Question__c,Question__r.Name, Assessment__r.Name,Files__c, Response__c,
                                              CreatedBy.Name,CreatedDate, Flag__c, Conversation_History__c,
                                              LastModifiedDate,LastModifiedById 
                                              FROM Response__c 
-                                             WHERE Question__c=:questionId AND Is_Latest_Response__c = true
+                                             WHERE Question__c=:(String)filemap.get('questionId') AND
+                                             AccountAssessmentRelation__c =:(String)filemap.get('accountAssessmentId')
+                                             AND Is_Latest_Response__c = true
                                              LIMIT 50000];
-        
+        System.debug('responseRecords'+responseRecords);
         List<Object> responseFilesData= (List<Object>)JSON.deserializeUntyped(responseRecords[0].Files__c);
         List<object>duplicate=new List<object>();
         for(Integer i=0;i<responseFilesData.size();i++)
         {
             Map<String,Object> mp = (Map<String,Object>)responseFilesData[i];
             String responseurl = (String)mp.get('name');
-            if(responseurl==name)
+            if(responseurl==(String)filemap.get('name'))
             {
                 Object obj = responseFilesData.remove(i);
             }
@@ -482,6 +529,9 @@ public with sharing class AssessmentController {
         return Database.query(query);
     }
     
+
+
+      
     
     /**
 * It is used to create assessment record with suppliers
@@ -502,6 +552,7 @@ public with sharing class AssessmentController {
             system.debug('assessmentRecord------>'+assessmentRecord);
             assessmentId = assessmentRecord.Id;
             Date asmtStartDate = (Date)assessmentRecord.get('Start_Date__c');
+            Date asmtEndDate = (Date)assessmentRecord.get('End_Date__c') != null?(Date)assessmentRecord.get('End_Date__c'):null;
             system.debug('asmtStartDate------>'+asmtStartDate);
             system.debug('assessmentId------>'+assessmentId);
             set<string> suppliersList = new set<string>();
@@ -515,9 +566,9 @@ public with sharing class AssessmentController {
                 existingSupList = (set<string>) JSON.deserialize(existingSups, set<string>.class);
             }
             for(string newSupId:suppliersList){
-                if(!existingSupList.contains(newSupId)){
+                // if(!existingSupList.contains(newSupId)){
                     suppliersIds.add(newSupId);
-                }
+                // }
             }
             if(string.isNotBlank(deleteList)){
                 deleteSupList = (set<string>) JSON.deserialize(deleteList, set<string>.class);
@@ -528,6 +579,7 @@ public with sharing class AssessmentController {
                 }
                 List<Database.DeleteResult> deleteResult = safe.doDelete(deleteAccAssRelns);
                 List<String> errorList = SecurityCheckController.safeClassExceptionHandlerDelete(deleteResult);
+                SYstem.debug(errorList);
                 if(errorList.size()>0){
                     Database.rollback(sp);
                     throw new SecurityControllerException(String.join( errorList, ', ' ));
@@ -536,17 +588,36 @@ public with sharing class AssessmentController {
             List<AccountAssessmentRelation__c> accountAssessRelnsList = new List<AccountAssessmentRelation__c>();
             List<Assessment_Supplier__c> assessSupList = new List<Assessment_Supplier__c>();
             
+            Date todayDate = Date.Today();
             for(Account acc:[SELECT Id,Name FROM Account WHERE ID IN:suppliersIds]){
                 Assessment_Supplier__c assessSup = new Assessment_Supplier__c();
                 assessSup.Account__c = acc.Id;
                 assessSup.Assessment__c = assessmentId;
-                assessSup.Status__c = 'Inactive';
+                assessSup.Status__c = 'Active';
                 assessSupList.add(assessSup);
-                if(asmtStartDate == Date.Today()){
+                boolean isSave = false;
+                if(asmtEndDate != null){
+                    if(todayDate.daysBetween(asmtStartDate) <=0 && todayDate.daysBetween(asmtEndDate) >=0){
+                        isSave = true;
+                    }
+                }else{
+                    if(todayDate.daysBetween(asmtStartDate) <=0){
+                        isSave = true;
+                    }
+                }
+
+                if(isSave){
                     AccountAssessmentRelation__c accAssessReln = new AccountAssessmentRelation__c();
                     accAssessReln.Name = acc.Name;
                     accAssessReln.Account__c = acc.Id;
                     accAssessReln.Assessment__c = assessmentId;
+                    if(asmtStartDate != null){
+                        accAssessReln.Start_Date__c = asmtStartDate;
+                    }
+                    if(asmtEndDate != null){
+                        accAssessReln.End_Date__c = asmtEndDate;
+                    }
+                    accAssessReln.Status__c = 'New';
                     accountAssessRelnsList.add(accAssessReln);
                 }
             }
@@ -554,6 +625,7 @@ public with sharing class AssessmentController {
             if(accountAssessRelnsList.isEmpty() == false){
                 Database.SaveResult[] results = safe.doInsert(accountAssessRelnsList);
                 List<String> errorsList = SecurityCheckController.safeClassExceptionHandlerInsert(results);
+                SYstem.debug(errorsList);
                 if(errorsList.size()>0){
                     Database.rollback(sp);
                     throw new SecurityControllerException(String.join(errorsList, ', ' ));
@@ -577,7 +649,7 @@ public with sharing class AssessmentController {
                 }
             }
             if(successRecordsIdSet.isEmpty() == false){
-                sendEmails(successRecordsIdSet);
+                sendEmails(successRecordsIdSet,'');
             }
             resWrap.isSuccess = true;
             resWrap.recordId = assessmentId;
@@ -596,23 +668,41 @@ public with sharing class AssessmentController {
 * It is used to send assessment email to the suppliers.
 * @param recordIdsSet AccountAssessmentRelation record ids to send emails.
 */
-    public static void sendEmails(Set<Id> recordIdsSet){
+    public static void sendEmails(Set<Id> recordIdsSet, string Source){
         try{
             List<Messaging.SingleEmailMessage> emailMessagesList = new List<Messaging.SingleEmailMessage>();
-            for(AccountAssessmentRelation__c assRelRec:[SELECT Id,Account__c,Account__r.Name,Account__r.Email__c,Assessment__c FROM AccountAssessmentRelation__c WHERE ID IN:recordIdsSet]){
-                Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
-                List<String> sendTo = new List<String>();
-                sendTo.add(assRelRec.Account__r.Email__c);
-                mail.setToAddresses(sendTo);
-                mail.setSubject('Sample Survey');
-                String body = '<html><body>'+
-                    '<br><br>'+'Dear '+assRelRec.Account__r.Name+
-                    '<br><br>'+'we’d like to complete a short survey.'+
-                    '<br><br><a href="https://ruby-site-9073-dev-ed.scratch.my.site.com/">Take the survey now.</a>'+
-                    '<br><br>'+'Kind regards,'+
-                    '<br>'+'Rhythm';
-                mail.setHtmlBody(body);
-                emailMessagesList.add(mail);
+            if(string.isBlank(Source)){
+                for(AccountAssessmentRelation__c assRelRec:[SELECT Id,Account__c,Account__r.Name,Account__r.Email__c,Assessment__c FROM AccountAssessmentRelation__c WHERE ID IN:recordIdsSet]){
+                    Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
+                    List<String> sendTo = new List<String>();
+                    sendTo.add(assRelRec.Account__r.Email__c);
+                    mail.setToAddresses(sendTo);
+                    mail.setSubject('Sample Survey');
+                    String body = '<html><body>'+
+                        '<br><br>'+'Dear '+assRelRec.Account__r.Name+
+                        '<br><br>'+'we’d like to complete a short survey.'+
+                        '<br><br><a href='+System.Label.Supplier_Portal_URL+assRelRec.Id+'>Take the survey now.</a>'+
+                        '<br><br>'+'Kind regards,'+
+                        '<br>'+'Rhythm';
+                    mail.setHtmlBody(body);
+                    emailMessagesList.add(mail);
+                }
+            }else{
+                for(AccountAssessmentRelation__c assRelRec:[SELECT Id,Account__c,Account__r.Name,Account__r.Email__c,Assessment__c FROM AccountAssessmentRelation__c WHERE ID IN:recordIdsSet]){
+                    Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
+                    List<String> sendTo = new List<String>();
+                    sendTo.add(assRelRec.Account__r.Email__c);
+                    mail.setToAddresses(sendTo);
+                    mail.setSubject('Updates on the Assessment');
+                    String body = '<html><body>'+
+                        '<br><br>'+'Dear '+assRelRec.Account__r.Name+
+                        '<br><br>'+'There are few comments on the responses submitted.'+
+                        '<br><br><a href='+System.Label.Supplier_Portal_URL+assRelRec.Id+'>Click Here</a>'+
+                        '<br><br>'+'Kind regards,'+
+                        '<br>'+'Rhythm';
+                    mail.setHtmlBody(body);
+                    emailMessagesList.add(mail);
+                }
             }
             if(emailMessagesList.isEmpty() == false){
                 Messaging.sendEmail(emailMessagesList);
@@ -714,7 +804,7 @@ public with sharing class AssessmentController {
 * @param assesmentId assessment record id
 * @param searchKey user input to search supplier
 */
-    @AuraEnabled(cacheable=true)
+    @AuraEnabled
     public static List<AccountAssessmentRelation__c> getExistingSuppliersWithSearch(string assessmentId, string searchKey){
         string query = 'SELECT Id,Account__c,Account__r.Name FROM Assessment_Supplier__c WHERE Assessment__c = \'' + assessmentId + '\'';
         if(string.isNotBlank(searchKey)){
@@ -854,7 +944,7 @@ return questionListWrapper;
     }
     
     /* getQuestionsList method is used to get all the questions and sections */
-    @AuraEnabled(cacheable=true)
+    @AuraEnabled
     Public static List<QuestionWrapper> getQuestionsLists(String templateId){
         List<QuestionWrapper> questionListWrapper = new List<QuestionWrapper>();
         try{
@@ -919,6 +1009,11 @@ return questionListWrapper;
                 System.debug('Exception '+e);
             }
         } 
+    }
+    
+     @AuraEnabled(cacheable=true)
+    public static date getTodayDate(){
+        return Date.today();
     }
     
     /**

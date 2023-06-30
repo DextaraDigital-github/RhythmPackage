@@ -1,0 +1,164 @@
+<template>
+	<div class="">
+		<div class="">
+			<div class="cdgWrapper">
+				<template if:true={sectionList}>
+					<div class="cdgtitletoolbar slds-grid slds-wrap ">
+						<div class="slds-col slds-small-size_12-of-12 slds-medium-size_6-of-12 slds-large-size_6-of-12">
+							<div class="slds-grid slds-wrap">
+								<div class="slds-text-left">
+									<lightning-icon icon-name="standard:screen" size="small" title="">
+									</lightning-icon>
+								</div>
+								<div class="slds-text-left slds-col_bump-right slds-p-left_small">
+									<h4 style="min-width:fit-content;font-weight: bold;font-size: large;">
+										<p>{objLabel} ({recsCount})</p>
+									</h4>
+								</div>
+							</div>
+						</div>
+						<div class="slds-col slds-small-size_12-of-12 slds-medium-size_6-of-12 slds-large-size_6-of-12">
+							<div class="slds-grid slds-wrap slds-gutters_small">
+								<div class="slds-col slds-text-align_right slds-size_1-of-1 ">
+									<div class="slds-grid slds-wrap slds-grid_align-end slds-gutters_x-small">
+										<div class="slds-col"></div>
+										<template if:true={disableButtons}>
+											<div class="slds-p-left_small">
+												<lightning-button slds-button_neutral
+													style="font-size: small;color: white;" title="Reorder"
+													onclick={handleReorderSections} variant="neutral" type="submit"
+													name="Section Reorder" label="Section Reorder">
+												</lightning-button>
+											</div>
+											<div class="slds-p-left_small">
+												<lightning-button slds-button_neutral
+													style="font-size: small;color: white;" title="Reorder"
+													onclick={handleReorderQuestions} variant="neutral" type="submit"
+													name="Question Reorder" label="Question Reorder">
+												</lightning-button>
+											</div>
+											<div class="slds-p-left_small slds-p-right_small">
+												<lightning-button slds-button_neutral
+													style="font-size: small;color: white;" title="New Record"
+													onclick={handlenew} variant="neutral" type="submit" name="New"
+													label="New">
+												</lightning-button>
+											</div>
+                                            <!-- <div class="slds-p-left_small slds-p-right_small">
+												<lightning-button slds-button_neutral
+													style="font-size: small;color: white;" title="Delete Record"
+													onclick={handleDelete} variant="neutral" type="submit" name="Delete"
+													label="Delete">
+												</lightning-button>
+											</div> -->
+										</template>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="cdg">
+						<lightning-tree-grid data={sectionListData} columns={columns} key-field="Id"
+							onrowaction={handleRowActions}>
+						</lightning-tree-grid>
+					</div>
+
+				</template>
+			</div>
+		</div>
+	</div>
+
+	<template lwc:if={showModal.createModal}>
+		<div class="demo-only" style="height: 1540px; width: 832px;">
+			<section role="dialog" tabindex="-1" aria-labelledby="modal-heading-02" aria-modal="true"
+				aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+				<div class="slds-modal__container" style="max-width: 55rem; width: 60%;">
+					<header class="slds-modal__header">
+						<button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" onclick={closeCreateModal} title="Close">
+                                <lightning-icon alternative-text="close" icon-name="utility:close" size="small" variant="inverse"></lightning-icon>
+                                <span class="slds-assistive-text">Close</span>
+                            </button>
+						<h2 id="modal-heading-04" class="slds-text-heading_medium slds-hyphenate">New Section</h2>
+					</header>
+					<div class="slds-modal__content slds-p-around_medium" id="modal-content-id-4">
+						<div class="slds-grid slds-grid_vertical-align-end">
+							<div class="slds-col">
+								<c-custom-create-record-form obj-name={objectName}
+									fields-list={fieldListforCreation.Rhythm__Section__c} template-id={recordId}
+									onclose={closeCreateModal} onrefreshdata={handleSuccess}
+									onsavenew={reOpenCreateModal}>
+								</c-custom-create-record-form>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+		</div>
+		<div class="slds-backdrop slds-backdrop_open"></div>
+	</template>
+
+	<template lwc:elseif={showModal.deleteModal}>
+		<div class="demo-only" style="height: 1540px;">
+			<section role="dialog" tabindex="-1" aria-labelledby="modal-heading-07" aria-modal="true"
+				aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+				<div class="slds-modal__container">
+					<header class="slds-modal__header">
+						<button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" onclick={closeDeleteModal} title="Close">
+                                <lightning-icon alternative-text="close" icon-name="utility:close" size="small" variant="inverse"></lightning-icon>
+                                <span class="slds-assistive-text">Close</span>
+                            </button>
+						<h2 id="modal-heading-07" class="slds-text-heading_medium slds-hyphenate">Delete Section</h2>
+					</header>
+					<div class="slds-modal__content slds-p-around_medium" id="modal-content-id-7">
+						<p style="text-align:center;">
+							{deletePopupMessage}
+						</p>
+					</div>
+					<footer class="slds-modal__footer">
+						<lightning-button label="Cancel" variant="neutral" onclick={closeDeleteModal}>
+						</lightning-button>
+						&nbsp;&nbsp;&nbsp;&nbsp;
+						<lightning-button label="Delete" class="whiteclr" style="color: #f9f2f2!important;"
+							variant="brand" onclick={deleteRecordsHandler} disabled={disableNext}> </lightning-button>
+					</footer>
+				</div>
+			</section>
+		</div>
+		<div class="slds-backdrop slds-backdrop_open"></div>
+	</template>
+
+	<!--Re-order Sections Modal Popup-->
+	<template if:true={isReorderModalOpen}>
+		<section role="dialog" tabindex="-1" aria-labelledby="modal-heading-02" aria-modal="true"
+			aria-describedby="modal-content-id-2" class="slds-modal slds-fade-in-open">
+			<div class="slds-modal__container">
+				<!-- Modal/Popup Box header here -->
+				<header class="slds-modal__header">
+					<!-- Button to close the popup -->
+					<button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeReorderSectionModal}>
+                        <lightning-icon icon-name="utility:close"
+                            alternative-text="close"
+                            variant="inverse"
+                            size="small" ></lightning-icon>
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+					<h2 id="modal-heading-02" class="slds-text-heading_medium slds-hyphenate">{reorderHeaderName}
+					</h2>
+				</header>
+				<!-- Modal/Popup Box body starts here -->
+				<div class="slds-modal__content slds-p-around_medium dx-duallisthide" id="modal-content-id-2">
+					<!-- Displays list of selected columns and options to reorder the columns -->
+					<lightning-dual-listbox id="shuffleColumns" options={reorderOptions} value={selectedReorderOptions}
+						onchange={handleOrderChange}>
+					</lightning-dual-listbox>
+				</div>
+				<!-- Modal/Popup Box footer starts here -->
+				<footer class="slds-modal__footer">
+					<button class="slds-button slds-button_neutral" onclick={closeReorderSectionModal} title="Cancel">Cancel</button>
+					<button class="slds-button slds-button_brand" onclick={saveReorder} title="Save">Save</button>
+				</footer>
+			</div>
+		</section>
+		<div class="slds-backdrop slds-backdrop_open"></div>
+	</template>
+</template>

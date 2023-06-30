@@ -7,6 +7,10 @@
 .cad-w300 {width:300px}
 .cad-wauto {width:auto}
 
+.cad-mw50 {min-width:50px}
+.cad-mw60 {min-width:60px}
+.cad-mw65 {min-width:65px}
+
 .cad-pl16 { padding-left:16px;}
 .cad-pl8 { padding-left:5px;}
 .cad-pr8 { padding-right:5px;}

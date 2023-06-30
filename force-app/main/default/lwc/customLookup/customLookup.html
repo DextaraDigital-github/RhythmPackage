@@ -1,0 +1,52 @@
+<template>
+	<!-- <div class="slds-p-horizontal_small"> -->
+	<div class="row">
+		<div class="slds-form-element">
+			<div class="slds-form-element__control">
+				<div class="slds-combobox_container">
+					<div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click" aria-expanded="false"
+						aria-haspopup="listbox" role="combobox">
+						<div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right"
+							role="none">
+							<lightning-input type="search" id="combobox-id-16" value={lookupName}
+								onchange={handleKeyChange}  onkeydown={handleClick}
+								onclick={handleClick} aria-activedescendant="option1" label={lookupLabel}
+								aria-autocomplete="list" aria-controls="listbox-id-12" role="textbox"
+								placeholder={lookupLabel} onblur={hideValues}>
+							</lightning-input>
+							<!-- <button
+                            class="slds-button slds-button_icon slds-input__icon slds-input__icon_right searchButtonStyle"
+                                title="Remove selected option">
+                                <lightning-button-icon icon-name="utility:search" variant="bare" alternative-text="Search"
+                                    aria-hidden="true" onclick={handleOpenModal} >
+                                </lightning-button-icon>
+                                </button> -->
+						</div>
+						<!-- Start : Parent Search Result -->
+						<!-- <div if:true={messageResult}>
+							No Result Found!
+						</div> -->
+						<template if:true={showSearchedValues}>
+							<div class="slds-box" style="width: 100%; max-height: 135px; padding: 0px; overflow-y: auto; position: absolute; background-color: white; z-index: 2; top: 56px;" tabindex="-1">
+								<ul class="" role="">
+									<template for:each={lookupValuesList} for:item="rec">
+										<li class="slds-p-top_x-small slds-p-bottom_x-small slds-p-left_medium"
+											style="cursor: pointer;border-bottom: 1px solid #f3f3f3;" key={rec.Id}
+											onclick={handleParentSelection} data-value={rec.Id} data-label={rec.Name}>
+											<lightning-icon icon-name="standard:screen" alternative-text={lookupLabel}
+												title={lookupLabel} size="x-small"></lightning-icon>
+											&nbsp;
+											{rec.Name}
+										</li>
+									</template>
+								</ul>
+							</div>
+						</template>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- </div> -->
+	<!-- </template> -->
+</template>

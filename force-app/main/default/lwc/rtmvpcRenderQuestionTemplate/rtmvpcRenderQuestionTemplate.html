@@ -1,30 +1,24 @@
 <!-- This html is used to display different types of questions in sections -->
 <template>
 	<template if:true={responses}>
-
 		<template for:each={responses} for:item="questionary">
 			<div key={questionary.Id} class="temp_question_border-bottom">
 
-
-				<template if:true={questionary.isText}>
-
-					<div class="qactivelabelcont" key={questionary.Id} data-id={questionary.Id}
-						onclick={highlightQuestionHandler}>
-
-						<div
-							class="slds-grid slds-text-align_left slds-p-top_x-small slds-p-horizontal_medium slds-p-bottom_small">
-							<div class="slds-col">
-								<!-- Question Number Starts here -->
-								<span class="slds-form-element__labelttnor no-wordbreak">
+				<div class="qactivelabelcont" data-id={questionary.Id} onclick={highlightQuestionHandler}>
+					<div
+						class="slds-grid slds-text-align_left slds-p-top_x-small slds-p-horizontal_medium slds-p-bottom_small">
+						<div class="slds-col">
+							<!-- Question Number Starts here -->
+							<span class="slds-form-element__labelttnor no-wordbreak">
 								{questionary.snumber}
 								</span>
-								<!-- Question Number Ends here -->
-							</div>
-							<div class="slds-col slds-size_12-of-12">
-								<div class="slds-grid slds-wrap">
-									<div class="slds-col slds-size_12-of-12" data-id={questionary.Id}
-										key={questionary.Id} onclick={openChatHandler}>
-										<span class="slds-form-element__labelttnor">
+							<!-- Question Number Ends here -->
+						</div>
+						<div class="slds-col slds-size_12-of-12">
+							<div class="slds-grid slds-wrap">
+								<div class="slds-col slds-size_12-of-12" data-id={questionary.Id}
+									onclick={openChatHandler}>
+									<span class="slds-form-element__labelttnor">
 										<!-- Question & Mandatory Starts here -->
 											<template if:true={questionary.required}>
 												<abbr class="slds-required" title="required">*</abbr>
@@ -32,967 +26,176 @@
 											{questionary.question}
 										<!-- Question & Mandatory Ends here -->
 										</span>
-										<!-- Help icon Starts here -->
-										<template if:true={questionary.helptext}>
-											<lightning-helptext content={questionary.helptext}></lightning-helptext>
-										</template>
-										<!-- Help icon Ends here -->
-									</div>
-									<div class="slds-col slds-size_11-of-12 slds-p-top_xx-small">
-										<!-- Form Control Starts here -->
-										<lightning-input key={questionary.Id} name={questionary.question}
-											data-key={questionary.Id} data-con={questionary.conditional} type="text"
-											variant="label-hidden" disabled={questionary.isEditable}
-											onchange={handleChange} value={questionary.value}
-											required={questionary.required} onclick={openChatHandler}>
+									<!-- Help icon Starts here -->
+									<template if:true={questionary.helptext}>
+										<lightning-helptext content={questionary.helptext}></lightning-helptext>
+									</template>
+									<!-- Help icon Ends here -->
+								</div>
+								<div class="slds-col slds-size_11-of-12 slds-p-top_xx-small">
+									<!-- Form Control Starts here -->
+									<template if:true={questionary.isText}>
+										<lightning-input name={questionary.question} data-key={questionary.Id}
+											data-con={questionary.conditional} type="text" variant="label-hidden"
+											disabled={questionary.isEditable} onchange={handleChange}
+											value={questionary.value} required={questionary.required}
+											onclick={openChatHandler}>
 											<lightning-icon size="xx-small" alternative-text="help"
-												icon-name="utility:info" title="Name" variant="info"></lightning-icon>
+												icon-name="utility:info" title="Name" variant="info">
+											</lightning-icon>
 										</lightning-input>
-										<!-- Form Control Ends here -->
-									</div>
-									<div class="slds-col slds-size_1-of-12 slds-text-align_right">
-										<!-- Flag Starts here -->
-										<template if:true={issupplier}>
-											<template if:true={questionary.Rhythm__Flag__c}>
-												<lightning-icon data-id={questionary.Id} key={questionary.Id}
-													icon-name="utility:priority" size="small"
-													class="cib-flag slds-m-right_medium" onclick={openChatHandler}>
-												</lightning-icon>
-											</template></template>
-										<template if:true={questionary.customerFlag}>
-											<template if:true={questionary.Rhythm__Flag__c}>
-												<lightning-icon data-id={questionary.Id} key={questionary.Id}
-													icon-name="utility:priority" size="small"
-													class="cib-flag slds-m-right_medium" onclick={openReview}>
-												</lightning-icon>
-											</template>
-											<template if:false={questionary.Rhythm__Flag__c}>
-												<lightning-icon data-id={questionary.Id} key={questionary.Id}
-													icon-name="utility:priority" size="small"
-													class="cib-forward:hover slds-m-right_medium" onclick={openReview}>
-												</lightning-icon>
-											</template>
-										</template>
-										<!-- Flag Ends here -->
-									</div>
-								</div>
-							</div>
-						</div>
-
-					</div>
-				</template>
-
-
-				<template if:true={questionary.isTextArea}>
-					<div class="qactivelabelcont" key={questionary.Id} data-id={questionary.Id}
-						onclick={highlightQuestionHandler}>
-
-						<div
-							class="slds-grid slds-text-align_left slds-p-top_x-small slds-p-horizontal_medium slds-p-bottom_small">
-							<div class="slds-col">
-								<!-- Question Number Starts here -->
-								<span class="slds-form-element__labelttnor no-wordbreak">
-								{questionary.snumber}
-								</span>
-								<!-- Question Number Ends here -->
-							</div>
-							<div class="slds-col slds-size_12-of-12">
-								<div class="slds-grid slds-wrap">
-									<div class="slds-col slds-size_12-of-12" data-id={questionary.Id}
-										key={questionary.Id} onclick={openChatHandler}>
-										<span class="slds-form-element__labelttnor">
-										<!-- Question & Mandatory Starts here -->
-											<template if:true={questionary.required}>
-												<abbr class="slds-required" title="required">*</abbr>
-											</template>
-											{questionary.question}
-										<!-- Question & Mandatory Ends here -->
-										</span>
-										<!-- Help icon Starts here -->
-										<template if:true={questionary.helptext}>
-											<lightning-helptext content={questionary.helptext}></lightning-helptext>
-										</template>
-										<!-- Help icon Ends here -->
-									</div>
-									<div class="slds-col slds-size_11-of-12 slds-p-top_xx-small">
-										<!-- Form Control Starts here -->
-										<lightning-input-rich-text key={questionary.Id} name={questionary.question}
-											data-key={questionary.Id} data-con={questionary.conditional} type="text"
-											variant="label-hidden" disabled={questionary.isEditable}
-											onchange={handleChange} value={questionary.value}
-											required={questionary.required} onclick={openChatHandler}>
+									</template>
+									<template if:true={questionary.isNumber}>
+										<lightning-input name={questionary.question} data-key={questionary.Id}
+											data-con={questionary.conditional} type="Number" variant="label-hidden"
+											disabled={questionary.isEditable} onchange={handleChange}
+											value={questionary.value} required={questionary.required}
+											onclick={openChatHandler}>
 											<lightning-icon size="xx-small" alternative-text="help"
-												icon-name="utility:info" title="Name" variant="info"></lightning-icon>
+												icon-name="utility:info" title="Name" variant="info">
+											</lightning-icon>
+										</lightning-input>
+									</template>
+									<template if:true={questionary.isTextArea}>
+										<lightning-input-rich-text name={questionary.question} data-key={questionary.Id}
+											data-con={questionary.conditional} type="text" variant="label-hidden"
+											disabled={questionary.isEditable} onchange={handleChange}
+											value={questionary.value} required={questionary.required}
+											onclick={openChatHandler}>
+											<lightning-icon size="xx-small" alternative-text="help"
+												icon-name="utility:info" title="Name" variant="info">
+											</lightning-icon>
 										</lightning-input-rich-text>
-										<!-- Form Control Ends here -->
-									</div>
-									<div class="slds-col slds-size_1-of-12 slds-text-align_right">
-										<!-- Flag Starts here -->
-										<template if:true={issupplier}>
-											<template if:true={questionary.Rhythm__Flag__c}>
-												<lightning-icon data-id={questionary.Id} key={questionary.Id}
-													icon-name="utility:priority" size="small"
-													class="cib-flag slds-m-right_medium" onclick={openChatHandler}>
-												</lightning-icon>
-											</template></template>
-										<template if:true={questionary.customerFlag}>
-											<template if:true={questionary.Rhythm__Flag__c}>
-												<lightning-icon data-id={questionary.Id} key={questionary.Id}
-													icon-name="utility:priority" size="small"
-													class="cib-flag slds-m-right_medium" onclick={openReview}>
-												</lightning-icon>
-											</template>
-											<template if:false={questionary.Rhythm__Flag__c}>
-												<lightning-icon data-id={questionary.Id} key={questionary.Id}
-													icon-name="utility:priority" size="small"
-													class="cib-forward:hover slds-m-right_medium" onclick={openReview}>
-												</lightning-icon>
-											</template>
-										</template>
-										<!-- Flag Ends here -->
-									</div>
-								</div>
-							</div>
-						</div>
-
-					</div>
-				</template>
-
-
-
-
-				<template if:true={questionary.isPicklist}>
-					<div class="qactivelabelcont" key={questionary.Id} data-id={questionary.Id}
-						onclick={highlightQuestionHandler}>
-
-						<div
-							class="slds-grid slds-text-align_left slds-p-top_x-small slds-p-horizontal_medium slds-p-bottom_small">
-							<div class="slds-col">
-								<!-- Question Number Starts here -->
-								<span class="slds-form-element__labelttnor no-wordbreak">
-								{questionary.snumber}
-								</span>
-								<!-- Question Number Ends here -->
-							</div>
-							<div class="slds-col slds-size_12-of-12">
-								<div class="slds-grid slds-wrap">
-									<div class="slds-col slds-size_12-of-12" data-id={questionary.Id}
-										key={questionary.Id} onclick={openChatHandler}>
-										<span class="slds-form-element__labelttnor">
-										<!-- Question & Mandatory Starts here -->
-											<template if:true={questionary.required}>
-												<abbr class="slds-required" title="required">*</abbr>
-											</template>
-											{questionary.question}
-										<!-- Question & Mandatory Ends here -->
-										</span>
-										<!-- Help icon Starts here -->
-										<template if:true={questionary.helptext}>
-											<lightning-helptext content={questionary.helptext}></lightning-helptext>
-										</template>
-										<!-- Help icon Ends here -->
-									</div>
-									<div class="slds-col slds-size_11-of-12 slds-p-top_xx-small">
-										<!-- Form Control Starts here -->
-										<lightning-combobox key={questionary.Id} data-key={questionary.Id}
-											data-con={questionary.conditional} name={questionary.question}
-											variant="label-hidden" value={questionary.value}
+									</template>
+									<template if:true={questionary.isPicklist}>
+										<lightning-combobox data-key={questionary.Id} data-con={questionary.conditional}
+											name={questionary.question} variant="label-hidden" value={questionary.value}
 											options={questionary.optionsWrapper.pickListOptions}
 											disabled={questionary.isEditable} onchange={handleChange}
 											required={questionary.required} onclick={openChatHandler}>
 										</lightning-combobox>
-										<!-- Form Control Ends here -->
-									</div>
-									<div class="slds-col slds-size_1-of-12 slds-text-align_right">
-										<!-- Flag Starts here -->
-										<template if:true={issupplier}>
-											<template if:true={questionary.Rhythm__Flag__c}>
-												<lightning-icon data-id={questionary.Id} key={questionary.Id}
-													icon-name="utility:priority" size="small"
-													class="cib-flag slds-m-right_medium" onclick={openChatHandler}>
-												</lightning-icon>
-											</template></template>
-										<template if:true={questionary.customerFlag}>
-											<template if:true={questionary.Rhythm__Flag__c}>
-												<lightning-icon data-id={questionary.Id} key={questionary.Id}
-													icon-name="utility:priority" size="small"
-													class="cib-flag slds-m-right_medium" onclick={openReview}>
-												</lightning-icon>
-											</template>
-											<template if:false={questionary.Rhythm__Flag__c}>
-												<lightning-icon data-id={questionary.Id} key={questionary.Id}
-													icon-name="utility:priority" size="small"
-													class="cib-forward:hover slds-m-right_medium" onclick={openReview}>
-												</lightning-icon>
-											</template></template>
-											<!-- Flag Ends here -->
-									</div>
-								</div>
-							</div>
-						</div>
-
-					</div>
-				</template>
-
-
-				<template if:true={questionary.isMultiPicklist}>
-					<div class="qactivelabelcont" key={questionary.Id} data-id={questionary.Id}
-						onclick={highlightQuestionHandler}>
-
-						<div
-							class="slds-grid slds-text-align_left slds-p-top_x-small slds-p-horizontal_medium slds-p-bottom_small">
-							<div class="slds-col">
-								<!-- Question Number Starts here -->
-								<span class="slds-form-element__labelttnor no-wordbreak">
-								{questionary.snumber}
-								</span>
-								<!-- Question Number Ends here -->
-							</div>
-							<div class="slds-col slds-size_12-of-12">
-								<div class="slds-grid slds-wrap">
-									<div class="slds-col slds-size_12-of-12" data-id={questionary.Id}
-										key={questionary.Id} onclick={openChatHandler}>
-										<span class="slds-form-element__labelttnor">
-										<!-- Question & Mandatory Starts here -->
-											<template if:true={questionary.required}>
-												<abbr class="slds-required" title="required">*</abbr>
-											</template>
-											{questionary.question}
-										<!-- Question & Mandatory Ends here -->
-										</span>
-										<!-- Help icon Starts here -->
-										<template if:true={questionary.helptext}>
-											<lightning-helptext content={questionary.helptext}></lightning-helptext>
-										</template>
-										<!-- Help icon Ends here -->
-									</div>
-									<div class="slds-col slds-size_11-of-12 slds-p-top_xx-small">
-										<!-- Form Control Starts here -->
-										<lightning-dual-listbox key={questionary.Id} data-key={questionary.Id}
+									</template>
+									<template if:true={questionary.isMultiPicklist}>
+										<lightning-dual-listbox data-key={questionary.Id}
 											data-con={questionary.conditional} name={questionary.question}
 											variant="label-hidden"
 											options={questionary.optionsWrapper.multiPickListOptions} size="4"
 											disabled={questionary.isEditable} onchange={handleChange}
 											value={questionary.optionsWrapper.selectedListOptions}
-											field-level-help={questionary.helptext} disable-reordering="true">
+											field-level-help={questionary.helptext} disable-reordering="true"
+											onclick={openChatHandler}>
 										</lightning-dual-listbox>
-										<!-- Form Control Ends here -->
-									</div>
-									<div class="slds-col slds-size_1-of-12 slds-text-align_right">
-										<!-- Flag Starts here -->
-										<template if:true={issupplier}>
-											<template if:true={questionary.Rhythm__Flag__c}>
-												<lightning-icon data-id={questionary.Id} key={questionary.Id}
-													icon-name="utility:priority" size="small"
-													class="cib-flag slds-m-right_medium" onclick={openChatHandler}>
-												</lightning-icon>
-											</template></template>
-										<template if:true={questionary.customerFlag}>
-											<template if:true={questionary.Rhythm__Flag__c}>
-												<lightning-icon data-id={questionary.Id} key={questionary.Id}
-													icon-name="utility:priority" size="small"
-													class="cib-flag slds-m-right_medium" onclick={openReview}>
-												</lightning-icon>
-											</template>
-											<template if:false={questionary.Rhythm__Flag__c}>
-												<lightning-icon data-id={questionary.Id} key={questionary.Id}
-													icon-name="utility:priority" size="small"
-													class="cib-forward:hover slds-m-right_medium" onclick={openReview}>
-												</lightning-icon>
-											</template></template>
-											<!-- Flag Ends here -->
-									</div>
-								</div>
-							</div>
-						</div>
-
-					</div>
-				</template>
-
-
-
-				<template if:true={questionary.isDate}>
-					<div class="qactivelabelcont" key={questionary.Id} data-id={questionary.Id}
-						onclick={highlightQuestionHandler}>
-
-						<div
-							class="slds-grid slds-text-align_left slds-p-top_x-small slds-p-horizontal_medium slds-p-bottom_small">
-							<div class="slds-col" data-id={questionary.Id} key={questionary.Id}
-								onclick={openChatHandler}>
-								<!-- Question Number Starts here -->
-								<span class="slds-form-element__labelttnor no-wordbreak">
-								{questionary.snumber}
-								</span>
-								<!-- Question Number Ends here -->
-							</div>
-							<div class="slds-col slds-size_12-of-12">
-								<div class="slds-grid slds-wrap">
-									<div class="slds-col slds-size_12-of-12"  data-id={questionary.Id}
-										key={questionary.Id} onclick={openChatHandler}>
-										<span class="slds-form-element__labelttnor">
-										<!-- Question & Mandatory Starts here -->
-											<template if:true={questionary.required}>
-												<abbr class="slds-required" title="required">*</abbr>
-											</template>
-											{questionary.question}
-										<!-- Question & Mandatory Ends here -->
-										</span>
-										<!-- Help icon Starts here -->
-										<template if:true={questionary.helptext}>
-											<lightning-helptext content={questionary.helptext}></lightning-helptext>
-										</template>
-										<!-- Help icon Ends here -->
-									</div>
-									<div class="slds-col slds-size_11-of-12 slds-p-top_xx-small">
-										<!-- Form Control Starts here -->
+									</template>
+									<template if:true={questionary.isDate}>
 										<lightning-input type="date" value={questionary.value}
-											data-con={questionary.conditional} key={questionary.Id}
-											name={questionary.question} data-key={questionary.Id}
-											disabled={questionary.isEditable} onchange={handleChange}
-											variant="label-hidden" style="max-width:150px;">
+											data-con={questionary.conditional} name={questionary.question}
+											data-key={questionary.Id} disabled={questionary.isEditable}
+											onchange={handleChange} variant="label-hidden" style="max-width:150px;"
+											onclick={openChatHandler}>
 										</lightning-input>
-										<!-- Form Control Ends here -->
-									</div>
-									<div class="slds-col slds-size_1-of-12 slds-text-align_right">
-										<!-- Flag Starts here -->
-										<template if:true={issupplier}>
-											<template if:true={questionary.Rhythm__Flag__c}>
-												<lightning-icon data-id={questionary.Id} key={questionary.Id}
-													icon-name="utility:priority" size="small"
-													class="cib-flag slds-m-right_medium" onclick={openChatHandler}>
-												</lightning-icon>
-											</template></template>
-										<template if:true={questionary.customerFlag}>
-											<template if:true={questionary.Rhythm__Flag__c}>
-												<lightning-icon data-id={questionary.Id} key={questionary.Id}
-													icon-name="utility:priority" size="small"
-													class="cib-flag slds-m-right_medium" onclick={openReview}>
-												</lightning-icon>
-											</template>
-											<template if:false={questionary.Rhythm__Flag__c}>
-												<lightning-icon data-id={questionary.Id} key={questionary.Id}
-													icon-name="utility:priority" size="small"
-													class="cib-forward:hover slds-m-right_medium" onclick={openReview}>
-												</lightning-icon>
-											</template></template>
-											<!-- Flag Ends here -->
-									</div>
-								</div>
-							</div>
-						</div>
-
-					</div>
-				</template>
-
-
-								<template if:true={questionary.isDateTime}>
-					<div class="qactivelabelcont" key={questionary.Id} data-id={questionary.Id}
-						onclick={highlightQuestionHandler}>
-
-						<div
-							class="slds-grid slds-text-align_left slds-p-top_x-small slds-p-horizontal_medium slds-p-bottom_small">
-							<div class="slds-col" data-id={questionary.Id} key={questionary.Id}
-								onclick={openChatHandler}>
-								<!-- Question Number Starts here -->
-								<span class="slds-form-element__labelttnor no-wordbreak">
-								{questionary.snumber}
-								</span>
-								<!-- Question Number Ends here -->
-							</div>
-							<div class="slds-col slds-size_12-of-12">
-								<div class="slds-grid slds-wrap">
-									<div class="slds-col slds-size_12-of-12"  data-id={questionary.Id}
-										key={questionary.Id} onclick={openChatHandler}>
-										<span class="slds-form-element__labelttnor">
-										<!-- Question & Mandatory Starts here -->
-											<template if:true={questionary.required}>
-												<abbr class="slds-required" title="required">*</abbr>
-											</template>
-											{questionary.question}
-										<!-- Question & Mandatory Ends here -->
-										</span>
-										<!-- Help icon Starts here -->
-										<template if:true={questionary.helptext}>
-											<lightning-helptext content={questionary.helptext}></lightning-helptext>
-										</template>
-										<!-- Help icon Ends here -->
-									</div>
-									<div class="slds-col slds-size_11-of-12 slds-p-top_xx-small">
-										<!-- Form Control Starts here -->
+									</template>
+									<template if:true={questionary.isDateTime}>
 										<lightning-input type="datetime" value={questionary.value}
-											data-con={questionary.conditional} key={questionary.Id}
-											name={questionary.question} data-key={questionary.Id}
-											disabled={questionary.isEditable} onchange={handleChange}
-											variant="label-hidden" style="max-width:150px;">
+											data-con={questionary.conditional} name={questionary.question}
+											data-key={questionary.Id} disabled={questionary.isEditable}
+											onchange={handleChange} variant="label-hidden" style="max-width:150px;"
+											onclick={openChatHandler}>
 										</lightning-input>
-										<!-- Form Control Ends here -->
-									</div>
-									<div class="slds-col slds-size_1-of-12 slds-text-align_right">
-										<!-- Flag Starts here -->
-										<template if:true={issupplier}>
-											<template if:true={questionary.Rhythm__Flag__c}>
-												<lightning-icon data-id={questionary.Id} key={questionary.Id}
-													icon-name="utility:priority" size="small"
-													class="cib-flag slds-m-right_medium" onclick={openChatHandler}>
-												</lightning-icon>
-											</template></template>
-										<template if:true={questionary.customerFlag}>
-											<template if:true={questionary.Rhythm__Flag__c}>
-												<lightning-icon data-id={questionary.Id} key={questionary.Id}
-													icon-name="utility:priority" size="small"
-													class="cib-flag slds-m-right_medium" onclick={openReview}>
-												</lightning-icon>
-											</template>
-											<template if:false={questionary.Rhythm__Flag__c}>
-												<lightning-icon data-id={questionary.Id} key={questionary.Id}
-													icon-name="utility:priority" size="small"
-													class="cib-forward:hover slds-m-right_medium" onclick={openReview}>
-												</lightning-icon>
-											</template></template>
-											<!-- Flag Ends here -->
-									</div>
-								</div>
-							</div>
-						</div>
-
-					</div>
-				</template>
-
-
-
-				<template if:true={questionary.isCheckbox}>
-					<div class="qactivelabelcont" key={questionary.Id} data-id={questionary.Id}
-						onclick={highlightQuestionHandler}>
-
-						<div
-							class="slds-grid slds-text-align_left slds-p-top_x-small slds-p-horizontal_medium slds-p-bottom_small">
-							<div class="slds-col">
-								<!-- Question Number Starts here -->
-								<span class="slds-form-element__labelttnor no-wordbreak">
-								{questionary.snumber}
-								</span>
-								<!-- Question Number Ends here -->
-							</div>
-							<div class="slds-col slds-size_12-of-12">
-								<div class="slds-grid slds-wrap">
-									<div class="slds-col slds-size_12-of-12" data-id={questionary.Id}
-										key={questionary.Id} onclick={openChatHandler}>
-										<span class="slds-form-element__labelttnor">
-										<!-- Question & Mandatory Starts here -->
-											<template if:true={questionary.required}>
-												<abbr class="slds-required" title="required">*</abbr>
-											</template>
-											<lightning-formatted-text value={questionary.question} title={questionary.question}
-												key={questionary.Id} data-con={questionary.conditional} data-key={questionary.Id}
-												disabled={questionary.isEditable} name={questionary.question}>
-											</lightning-formatted-text>
-										<!-- Question & Mandatory Ends here -->
-										</span>
-										<!-- Help icon Starts here -->
-										<template if:true={questionary.helptext}>
-											<lightning-helptext content={questionary.helptext}></lightning-helptext>
-										</template>
-										<!-- Help icon Ends here -->
-									</div>
-									<div class="slds-col slds-size_11-of-12 slds-p-top_xx-small">
-										<!-- Form Control Starts here -->
+									</template>
+									<template if:true={questionary.isCheckbox}>
 										<template if:true={checkedLabel}>
 											<lightning-input type="Checkbox" value={questionary.value}
 												variant="label-hidden" data-checkbox={questionary.Id}
-												key={questionary.Id} data-con={questionary.conditional}
-												data-key={questionary.Id} onchange={handleChange}
-												checked={questionary.value}>
+												data-con={questionary.conditional} data-key={questionary.Id}
+												onchange={handleChange} checked={questionary.value}
+												onclick={openChatHandler} disabled={questionary.isEditable}>
 											</lightning-input>
 										</template>
 										<template if:false={checkedLabel}>
 											<lightning-input type="Checkbox" value={questionary.value}
 												variant="label-hidden" data-checkbox={questionary.Id}
-												key={questionary.Id} data-con={questionary.conditional}
-												data-key={questionary.Id} onchange={handleChange} unchecked="true">
+												data-con={questionary.conditional} data-key={questionary.Id}
+												onchange={handleChange} unchecked="true" onclick={openChatHandler}
+												disabled={questionary.isEditable}>
 											</lightning-input>
 										</template>
-										<!-- Form Control Ends here -->
-									</div>
-									<div class="slds-col slds-size_1-of-12 slds-text-align_right">
-										<!-- Flag Starts here -->
-										<template if:true={issupplier}>
-											<template if:true={questionary.Rhythm__Flag__c}>
-												<lightning-icon data-id={questionary.Id} key={questionary.Id}
-													icon-name="utility:priority" size="small"
-													class="cib-flag slds-m-right_medium" onclick={openChatHandler}>
-												</lightning-icon>
-											</template></template>
-										<template if:true={questionary.customerFlag}>
-											<template if:true={questionary.Rhythm__Flag__c}>
-												<lightning-icon data-id={questionary.Id} key={questionary.Id}
-													icon-name="utility:priority" size="small"
-													class="cib-flag slds-m-right_medium" onclick={openReview}>
-												</lightning-icon>
-											</template>
-											<template if:false={questionary.Rhythm__Flag__c}>
-												<lightning-icon data-id={questionary.Id} key={questionary.Id}
-													icon-name="utility:priority" size="small"
-													class="cib-forward:hover slds-m-right_medium" onclick={openReview}>
-												</lightning-icon>
-											</template></template>
-											<!-- Flag Ends here -->
-									</div>
-								</div>
-							</div>
-						</div>
-
-					</div>
-				</template>
-
-
-
-
-				<template if:true={questionary.isNumber}>
-					<div class="qactivelabelcont" key={questionary.Id} data-id={questionary.Id}
-						onclick={highlightQuestionHandler}>
-
-
-						<div
-							class="slds-grid slds-text-align_left slds-p-top_x-small slds-p-horizontal_medium slds-p-bottom_small">
-							<div class="slds-col">
-								<!-- Question Number Starts here -->
-								<span class="slds-form-element__labelttnor no-wordbreak">
-								{questionary.snumber}
-								</span>
-								<!-- Question Number Ends here -->
-							</div>
-							<div class="slds-col slds-size_12-of-12">
-								<div class="slds-grid slds-wrap">
-									<div class="slds-col slds-size_12-of-12" data-id={questionary.Id}
-										key={questionary.Id} onclick={openChatHandler}>
-										<span class="slds-form-element__labelttnor" >
-										<!-- Question & Mandatory Starts here -->
-											<template if:true={questionary.required}>
-												<abbr class="slds-required" title="required">*</abbr>
-											</template>
-											{questionary.question}
-										<!-- Question & Mandatory Ends here -->
-										</span>
-										<!-- Help icon Starts here -->
-										<template if:true={questionary.helptext}>
-											<lightning-helptext content={questionary.helptext}></lightning-helptext>
-										</template>
-										<!-- Help icon Ends here -->
-									</div>
-									<div class="slds-col slds-size_11-of-12 slds-p-top_xx-small">
-										<!-- Form Control Starts here -->
-										<lightning-input type="phone" value={questionary.value}
-											data-con={questionary.conditional} key={questionary.Id}
-											name={questionary.question} data-key={questionary.Id} variant="label-hidden"
-											style="max-width:150px;" disabled={questionary.isEditable}
-											onchange={handleChange}>
-										</lightning-input>
-										<!-- Form Control Ends here -->
-									</div>
-									<div class="slds-col slds-size_1-of-12 slds-text-align_right">
-										<!-- Flag Starts here -->
-										<template if:true={issupplier}>
-											<template if:true={questionary.Rhythm__Flag__c}>
-												<lightning-icon data-id={questionary.Id} key={questionary.Id}
-													icon-name="utility:priority" size="small"
-													class="cib-flag slds-m-right_medium" onclick={openChatHandler}>
-												</lightning-icon>
-											</template></template>
-										<template if:true={questionary.customerFlag}>
-											<template if:true={questionary.Rhythm__Flag__c}>
-												<lightning-icon data-id={questionary.Id} key={questionary.Id}
-													icon-name="utility:priority" size="small"
-													class="cib-flag slds-m-right_medium" onclick={openReview}>
-												</lightning-icon>
-											</template>
-											<template if:false={questionary.Rhythm__Flag__c}>
-												<lightning-icon data-id={questionary.Id} key={questionary.Id}
-													icon-name="utility:priority" size="small"
-													class="cib-forward:hover slds-m-right_medium" onclick={openReview}>
-												</lightning-icon>
-											</template></template>
-											<!-- Flag Ends here -->
-									</div>
-								</div>
-							</div>
-						</div>
-
-					</div>
-				</template>
-
-				<template if:true={questionary.isPhone}>
-					<div class="qactivelabelcont" key={questionary.Id} data-id={questionary.Id}
-						onclick={highlightQuestionHandler}>
-
-						<div
-							class="slds-grid slds-text-align_left slds-p-top_x-small slds-p-horizontal_medium slds-p-bottom_small">
-							<div class="slds-col">
-								<!-- Question Number Starts here -->
-								<span class="slds-form-element__labelttnor no-wordbreak">
-								{questionary.snumber}
-								</span>
-								<!-- Question Number Ends here -->
-							</div>
-							<div class="slds-col slds-size_12-of-12">
-								<div class="slds-grid slds-wrap">
-									<div class="slds-col slds-size_12-of-12" data-id={questionary.Id}
-										key={questionary.Id} onclick={openChatHandler}>
-										<span class="slds-form-element__labelttnor">
-										<!-- Question & Mandatory Starts here -->
-											<template if:true={questionary.required}>
-												<abbr class="slds-required" title="required">*</abbr>
-											</template>
-											{questionary.question}
-										<!-- Question & Mandatory Ends here -->
-										</span>
-										<!-- Help icon Starts here -->
-										<template if:true={questionary.helptext}>
-											<lightning-helptext content={questionary.helptext}></lightning-helptext>
-										</template>
-										<!-- Help icon Ends here -->
-									</div>
-									<div class="slds-col slds-size_11-of-12 slds-p-top_xx-small">
-										<!-- Form Control Starts here -->
+									</template>
+									<template if:true={questionary.isPhone}>
 										<lightning-input type="tel" value={questionary.value}
 											data-con={questionary.conditional} variant="label-hidden"
-											style="max-width:150px;" key={questionary.Id} name={questionary.question}
+											style="max-width:150px;" name={questionary.question}
 											data-key={questionary.Id} placeholder="xxx-xxx-xxxx"
 											disabled={questionary.isEditable} onchange={handleChange}
-											pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}">
+											pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" onclick={openChatHandler}>
 										</lightning-input>
-										<!-- Form Control Ends here -->
-									</div>
-									<div class="slds-col slds-size_1-of-12 slds-text-align_right">
-										<!-- Flag Starts here -->
-										<template if:true={issupplier}>
-											<template if:true={questionary.Rhythm__Flag__c}>
-												<lightning-icon data-id={questionary.Id} key={questionary.Id}
-													icon-name="utility:priority" size="small"
-													class="cib-flag slds-m-right_medium" onclick={openChatHandler}>
-												</lightning-icon>
-											</template></template>
-										<template if:true={questionary.customerFlag}>
-											<template if:true={questionary.Rhythm__Flag__c}>
-												<lightning-icon data-id={questionary.Id} key={questionary.Id}
-													icon-name="utility:priority" size="small"
-													class="cib-flag slds-m-right_medium" onclick={openReview}>
-												</lightning-icon>
-											</template>
-											<template if:false={questionary.Rhythm__Flag__c}>
-												<lightning-icon data-id={questionary.Id} key={questionary.Id}
-													icon-name="utility:priority" size="small"
-													class="cib-forward:hover slds-m-right_medium" onclick={openReview}>
-												</lightning-icon>
-											</template></template>
-											<!-- Flag Ends here -->
-									</div>
-								</div>
-							</div>
-						</div>
-
-					</div>
-				</template>
-
-
-				<template if:true={questionary.isCurrency}>
-					<div class="qactivelabelcont" key={questionary.Id} data-id={questionary.Id}
-						onclick={highlightQuestionHandler}>
-
-						<div
-							class="slds-grid slds-text-align_left slds-p-top_x-small slds-p-horizontal_medium slds-p-bottom_small">
-							<div class="slds-col">
-								<!-- Question Number Starts here -->
-								<span class="slds-form-element__labelttnor no-wordbreak">
-								{questionary.snumber}
-								</span>
-								<!-- Question Number Ends here -->
-							</div>
-							<div class="slds-col slds-size_12-of-12">
-								<div class="slds-grid slds-wrap">
-									<div class="slds-col slds-size_12-of-12" data-id={questionary.Id}
-										key={questionary.Id} onclick={openChatHandler}>
-										<span class="slds-form-element__labelttnor">
-										<!-- Question & Mandatory Starts here -->
-											<template if:true={questionary.required}>
-												<abbr class="slds-required" title="required">*</abbr>
-											</template>
-											{questionary.question}
-										<!-- Question & Mandatory Ends here -->
-										</span>
-										<!-- Help icon Starts here -->
-										<template if:true={questionary.helptext}>
-											<lightning-helptext content={questionary.helptext}></lightning-helptext>
-										</template>
-										<!-- Help icon Ends here -->
-									</div>
-									<div class="slds-col slds-size_11-of-12 slds-p-top_xx-small">
-										<!-- Form Control Starts here -->
+									</template>
+									<template if:true={questionary.isCurrency}>
 										<lightning-input type="number" formatter="currency"
 											data-currency={questionary.Id} variant="label-hidden"
 											value={questionary.value} data-con={questionary.conditional}
-											key={questionary.Id} name={questionary.question} data-key={questionary.Id}
-											disabled={questionary.isEditable} onchange={handleChange}>
+											name={questionary.question} data-key={questionary.Id}
+											disabled={questionary.isEditable} onchange={handleChange}
+											onclick={openChatHandler}>
 										</lightning-input>
-										<!-- Form Control Ends here -->
-									</div>
-									<div class="slds-col slds-size_1-of-12 slds-text-align_right">
-										<!-- Flag Starts here -->
-										<template if:true={issupplier}>
-											<template if:true={questionary.Rhythm__Flag__c}>
-												<lightning-icon data-id={questionary.Id} key={questionary.Id}
-													icon-name="utility:priority" size="small"
-													class="cib-flag slds-m-right_medium" onclick={openChatHandler}>
-												</lightning-icon>
-											</template></template>
-										<template if:true={questionary.customerFlag}>
-											<template if:true={questionary.Rhythm__Flag__c}>
-												<lightning-icon data-id={questionary.Id} key={questionary.Id}
-													icon-name="utility:priority" size="small"
-													class="cib-flag slds-m-right_medium" onclick={openReview}>
-												</lightning-icon>
-											</template>
-											<template if:false={questionary.Rhythm__Flag__c}>
-												<lightning-icon data-id={questionary.Id} key={questionary.Id}
-													icon-name="utility:priority" size="small"
-													class="cib-forward:hover slds-m-right_medium" onclick={openReview}>
-												</lightning-icon>
-											</template></template>
-											<!-- Flag Ends here -->
-									</div>
-								</div>
-							</div>
-						</div>
-
-					</div>
-				</template>
-
-
-
-
-				<template if:true={questionary.isPercent}>
-					<div class="qactivelabelcont" key={questionary.Id} data-id={questionary.Id}
-						onclick={highlightQuestionHandler}>
-
-						<div
-							class="slds-grid slds-text-align_left slds-p-top_x-small slds-p-horizontal_medium slds-p-bottom_small">
-							<div class="slds-col">
-								<!-- Question Number Starts here -->
-								<span class="slds-form-element__labelttnor no-wordbreak">
-								{questionary.snumber}
-								</span>
-								<!-- Question Number Ends here -->
-							</div>
-							<div class="slds-col slds-size_12-of-12">
-								<div class="slds-grid slds-wrap">
-									<div class="slds-col slds-size_12-of-12" data-id={questionary.Id}
-										key={questionary.Id} onclick={openChatHandler}>
-										<span class="slds-form-element__labelttnor">
-										<!-- Question & Mandatory Starts here -->
-											<template if:true={questionary.required}>
-												<abbr class="slds-required" title="required">*</abbr>
-											</template>
-											{questionary.question}
-										<!-- Question & Mandatory Ends here -->
-										</span>
-										<!-- Help icon Starts here -->
-										<template if:true={questionary.helptext}>
-											<lightning-helptext content={questionary.helptext}></lightning-helptext>
-										</template>
-										<!-- Help icon Ends here -->
-									</div>
-									<div class="slds-col slds-size_11-of-12 slds-p-top_xx-small">
-										<!-- Form Control Starts here -->
+									</template>
+									<template if:true={questionary.isPercent}>
 										<lightning-input type="number" formatter="percent-fixed"
 											data-currency={questionary.Id} variant="label-hidden"
 											value={questionary.value} data-con={questionary.conditional}
-											key={questionary.Id} name={questionary.question} data-key={questionary.Id}
-											disabled={questionary.isEditable} onchange={handleChange}>
+											name={questionary.question} data-key={questionary.Id}
+											disabled={questionary.isEditable} onchange={handleChange}
+											onclick={openChatHandler}>
 										</lightning-input>
-										<!-- Form Control Ends here -->
-									</div>
-									<div class="slds-col slds-size_1-of-12 slds-text-align_right">
-										<!-- Flag Starts here -->
-										<template if:true={issupplier}>
-											<template if:true={questionary.Rhythm__Flag__c}>
-												<lightning-icon data-id={questionary.Id} key={questionary.Id}
-													icon-name="utility:priority" size="small"
-													class="cib-flag slds-m-right_medium" onclick={openChatHandler}>
-												</lightning-icon>
-											</template></template>
-										<template if:true={questionary.customerFlag}>
-											<template if:true={questionary.Rhythm__Flag__c}>
-												<lightning-icon data-id={questionary.Id} key={questionary.Id}
-													icon-name="utility:priority" size="small"
-													class="cib-flag slds-m-right_medium" onclick={openReview}>
-												</lightning-icon>
-											</template>
-											<template if:false={questionary.Rhythm__Flag__c}>
-												<lightning-icon data-id={questionary.Id} key={questionary.Id}
-													icon-name="utility:priority" size="small"
-													class="cib-forward:hover slds-m-right_medium" onclick={openReview}>
-												</lightning-icon>
-											</template></template>
-											<!-- Flag Ends here -->
-									</div>
-								</div>
-							</div>
-						</div>
-
-					</div>
-				</template>
-
-
-
-
-				<template if:true={questionary.isEmail}>
-					<div class="qactivelabelcont" key={questionary.Id} data-id={questionary.Id}
-						onclick={highlightQuestionHandler}>
-
-						<div
-							class="slds-grid slds-text-align_left slds-p-top_x-small slds-p-horizontal_medium slds-p-bottom_small">
-							<div class="slds-col">
-								<!-- Question Number Starts here -->
-								<span class="slds-form-element__labelttnor no-wordbreak">
-								{questionary.snumber}
-								</span>
-								<!-- Question Number Ends here -->
-							</div>
-							<div class="slds-col slds-size_12-of-12">
-								<div class="slds-grid slds-wrap">
-									<div class="slds-col slds-size_12-of-12" data-id={questionary.Id}
-										key={questionary.Id} onclick={openChatHandler}>
-										<span class="slds-form-element__labelttnor">
-										<!-- Question & Mandatory Starts here -->
-											<template if:true={questionary.required}>
-												<abbr class="slds-required" title="required">*</abbr>
-											</template>
-											{questionary.question}
-										<!-- Question & Mandatory Ends here -->
-										</span>
-										<!-- Help icon Starts here -->
-										<template if:true={questionary.helptext}>
-											<lightning-helptext content={questionary.helptext}></lightning-helptext>
-										</template>
-										<!-- Help icon Ends here -->
-									</div>
-									<div class="slds-col slds-size_11-of-12 slds-p-top_xx-small">
-										<!-- Form Control Starts here -->
+									</template>
+									<template if:true={questionary.isEmail}>
 										<lightning-input type="email" value={questionary.value}
 											data-con={questionary.conditional} variant="label-hidden"
-											key={questionary.Id} name={questionary.question} data-key={questionary.Id}
+											name={questionary.question} data-key={questionary.Id}
 											disabled={questionary.isEditable} onchange={handleChange}
-											placeholder="abc@gmail.com">
+											placeholder="abc@gmail.com" onclick={openChatHandler}>
 										</lightning-input>
-										<!-- Form Control Ends here -->
-									</div>
-									<div class="slds-col slds-size_1-of-12 slds-text-align_right">
-										<!-- Flag Starts here -->
-										<template if:true={issupplier}>
-											<template if:true={questionary.Rhythm__Flag__c}>
-												<lightning-icon data-id={questionary.Id} key={questionary.Id}
-													icon-name="utility:priority" size="small"
-													class="cib-flag slds-m-right_medium" onclick={openChatHandler}>
-												</lightning-icon>
-											</template></template>
-										<template if:true={questionary.customerFlag}>
-											<template if:true={questionary.Rhythm__Flag__c}>
-												<lightning-icon data-id={questionary.Id} key={questionary.Id}
-													icon-name="utility:priority" size="small"
-													class="cib-flag slds-m-right_medium" onclick={openReview}>
-												</lightning-icon>
-											</template>
-											<template if:false={questionary.Rhythm__Flag__c}>
-												<lightning-icon data-id={questionary.Id} key={questionary.Id}
-													icon-name="utility:priority" size="small"
-													class="cib-forward:hover slds-m-right_medium" onclick={openReview}>
-												</lightning-icon>
-											</template></template>
-											<!-- Flag Ends here -->
-									</div>
-								</div>
-							</div>
-						</div>
-
-					</div>
-				</template>
-
-
-
-
-				<template if:true={questionary.isRadio}>
-					<div class="qactivelabelcont" key={questionary.Id} data-id={questionary.Id}
-						onclick={highlightQuestionHandler}>
-
-						<div
-							class="slds-grid slds-text-align_left slds-p-top_x-small slds-p-horizontal_medium slds-p-bottom_small">
-							<div class="slds-col">
-								<!-- Question Number Starts here -->
-								<span class="slds-form-element__labelttnor no-wordbreak">
-								{questionary.snumber}
-								</span>
-								<!-- Question Number Ends here -->
-							</div>
-							<div class="slds-col slds-size_12-of-12">
-								<div class="slds-grid slds-wrap">
-									<div class="slds-col slds-size_12-of-12" data-id={questionary.Id}
-										key={questionary.Id} onclick={openChatHandler}>
-										<span class="slds-form-element__labelttnor">
-										<!-- Question & Mandatory Starts here -->
-											<template if:true={questionary.required}>
-												<abbr class="slds-required" title="required">*</abbr>
-											</template>
-											{questionary.question}
-										<!-- Question & Mandatory Ends here -->
-										</span>
-										<!-- Help icon Starts here -->
-										<template if:true={questionary.helptext}>
-											<lightning-helptext content={questionary.helptext}></lightning-helptext>
-										</template>
-										<!-- Help icon Ends here -->
-									</div>
-									<div class="slds-col slds-size_11-of-12 slds-p-top_xx-small">
-										<!-- Form Control Starts here -->
-										<lightning-radio-group key={questionary.Id} data-key={questionary.Id}
-											variant="label-hidden" data-con={questionary.conditional}
-											name={questionary.question} onchange={handleChange}
-											options={questionary.optionsWrapper.radioOptions} value={questionary.value}
-											disabled={questionary.isEditable} type="radio">
+									</template>
+									<template if:true={questionary.isRadio}>
+										<lightning-radio-group data-key={questionary.Id} variant="label-hidden"
+											data-con={questionary.conditional} name={questionary.question}
+											onchange={handleChange} options={questionary.optionsWrapper.radioOptions}
+											value={questionary.value} disabled={questionary.isEditable} type="radio"
+											onclick={openChatHandler}>
 										</lightning-radio-group>
-										<!-- Form Control Ends here -->
-									</div>
-									<div class="slds-col slds-size_1-of-12 slds-text-align_right">
-										<!-- Flag Starts here -->
-										<template if:true={issupplier}>
-											<template if:true={questionary.Rhythm__Flag__c}>
-												<lightning-icon data-id={questionary.Id} key={questionary.Id}
-													icon-name="utility:priority" size="small"
-													class="cib-flag slds-m-right_medium" onclick={openChatHandler}>
-												</lightning-icon>
-											</template></template>
-										<template if:true={questionary.customerFlag}>
-											<template if:true={questionary.Rhythm__Flag__c}>
-												<lightning-icon data-id={questionary.Id} key={questionary.Id}
-													icon-name="utility:priority" size="small"
-													class="cib-flag slds-m-right_medium" onclick={openReview}>
-												</lightning-icon>
-											</template>
-											<template if:false={questionary.Rhythm__Flag__c}>
-												<lightning-icon data-id={questionary.Id} key={questionary.Id}
-													icon-name="utility:priority" size="small"
-													class="cib-forward:hover slds-m-right_medium" onclick={openReview}>
-												</lightning-icon>
-											</template></template>
-											<!-- Flag Ends here -->
-									</div>
+									</template>
+									<!-- Form Control Ends here -->
+								</div>
+								<div class="slds-col slds-size_1-of-12 slds-text-align_right slds-m-top_x-small">
+									<!-- Flag Starts here -->
+									<template if:true={issupplier}>
+										<template if:true={questionary.Rhythm__Flag__c}>
+											<lightning-icon data-id={questionary.Id} icon-name="utility:priority"
+												size="x-small" class="cib-flag slds-m-right_medium"
+												onclick={openChatHandler}>
+											</lightning-icon>
+										</template></template>
+									<template if:true={questionary.customerFlag}>
+										<template if:true={questionary.Rhythm__Flag__c}>
+											<lightning-icon data-id={questionary.Id} icon-name="utility:priority"
+												size="x-small" class="cib-flag slds-m-right_medium" onclick={openReview}>
+											</lightning-icon>
+										</template>
+										<template if:false={questionary.Rhythm__Flag__c}>
+											<lightning-icon data-id={questionary.Id} icon-name="utility:priority"
+												size="x-small" class="cib-forward:hover slds-m-right_medium"
+												onclick={openReview}>
+											</lightning-icon>
+										</template>
+									</template>
+									<!-- Flag Ends here -->
 								</div>
 							</div>
 						</div>
-
 					</div>
-				</template>
 
+				</div>
 
-
+				<!-- File upload -->
 				<template if:true={questionary.showUpload}>
 					<!-- <lightning-button key={questionary.Id} variant="brand" label="Upload"></lightning-button> -->
 					<!-- <lightning-file-upload
@@ -1001,7 +204,7 @@
 							accept=".pdf"
 							record-id={questionary.Id} onuploadfinished={uploadFilesHandler} multiple></lightning-file-upload> -->
 					<!-- variant="label-hidden" -->
-					<div key={questionary.Id} class="slds-form-element slds-p-left_x-small slds-text-align_left">
+					<div class="slds-form-element slds-p-left_x-small slds-text-align_left">
 						<!-- 
 						<span class="slds-form-element__label" id="file-selector-primary-label-105"></span>
 						<div class="slds-form-element__control">
@@ -1040,7 +243,7 @@
 									<div class="slds-col slds-size_12-of-12">
 
 										<div class="slds-file-selector slds-file-selector_files">
-											<div class="slds-file-selector__dropzone">
+											<!-- <div class="slds-file-selector__dropzone">
 												<input data-id={questionary.Id} onchange={uploadFilesHandler} disabled={questionary.isEditable} type="file" class="slds-file-selector__input slds-assistive-text" accept="image/*, .pdf, .csv, .docx" id={questionary.inputId} aria-labelledby={questionary.inputAriaBy} />
 												<label class="slds-file-selector__body" for={questionary.inputId} id={questionary.labelId} >
 													<span class="slds-file-selector__button slds-button slds-button_neutral">
@@ -1050,7 +253,12 @@
 														Attach Files
 													</span>
 												</label>
-											</div>
+											</div> -->
+											
+											<lightning-input type="file"
+												accept=".xlsx, .xls, .csv, .png, .doc, .docx, .pdf" label="Attachment : (Limit Size : 3.5mb)"
+												data-id={questionary.Id} onchange={uploadFilesHandler} disabled={questionary.isEditable}>
+											</lightning-input>
 										</div>
 
 									</div>
@@ -1064,73 +272,88 @@
 													</div>
 												</div>
 											</template> -->
+											<template if:true={uploadingFile}>
+												<div class="slds-m-left_xx-small slds-m-right_small slds-m-vertical_small cad-tnailcard2">
+													<div class="slds-grid slds-wrap">
+														<div class="slds-col slds-m-left_x-small slds-m-vertical_xx-small"
+															style="width:95px;" title="Click to Download">
+															<lightning-spinner alternative-text="Loading"
+																size="x-small"></lightning-spinner>
+														</div>
+													</div>
+												</div>
+											</template>
 											<template if:true={questionary.Files__c}>
 												<template for:each={questionary.Files__c} for:item="file">
 													<div class="slds-m-right_small slds-m-vertical_small cad-tnailcard2"
 														key={file}>
 														<div class="slds-grid slds-wrap">
-														<div class="slds-col slds-m-left_x-small slds-m-vertical_xx-small" style="width:0px"
-															key={file} title="Click to Download">
+															<div class="slds-col slds-m-left_x-small slds-m-vertical_xx-small"
+																style="width:0px" title="Click to Download">
 
-															<template if:true={file.isPng}>
-																<a href={file.url}>
-																	<lightning-icon icon-name="doctype:image" size="small">
-																	</lightning-icon>
-																</a>
-																<template if:true={issupplier}>
-																	<lightning-button-icon icon-name="utility:close"
-																		variant="bare" data-id={questionary.Id}
-																		data-key={file.name} onclick={deleteFile}
-																		alternative-text="Delete file"
-																		class="closericon">
-																	</lightning-button-icon>
+																<template if:true={file.isPng}>
+																	<a href={file.url}>
+																		<lightning-icon icon-name="doctype:image"
+																			size="small">
+																		</lightning-icon>
+																	</a>
+																	<template if:false={questionary.isEditable}>
+																		<lightning-button-icon icon-name="utility:close"
+																			variant="bare" data-id={questionary.Id}
+																			data-key={file.name} onclick={deleteFile}
+																			alternative-text="Delete file"
+																			class="closericon">
+																		</lightning-button-icon>
+																	</template>
 																</template>
-															</template>
-															<template if:true={file.isPdf}>
-																<a href={file.url}>
-																	<lightning-icon icon-name="doctype:pdf" size="small">
-																	</lightning-icon>
-																</a>
-																<template if:true={issupplier}>
-																	<lightning-button-icon icon-name="utility:close"
-																		variant="bare" data-id={questionary.Id}
-																		data-key={file.name} onclick={deleteFile}
-																		alternative-text="Delete file"
-																		class="closericon">
-																	</lightning-button-icon>
+																<template if:true={file.isPdf}>
+																	<a href={file.url}>
+																		<lightning-icon icon-name="doctype:pdf"
+																			size="small">
+																		</lightning-icon>
+																	</a>
+																	<template if:false={questionary.isEditable}>
+																		<lightning-button-icon icon-name="utility:close"
+																			variant="bare" data-id={questionary.Id}
+																			data-key={file.name} onclick={deleteFile}
+																			alternative-text="Delete file"
+																			class="closericon">
+																		</lightning-button-icon>
+																	</template>
 																</template>
-															</template>
-															<template if:true={file.isDocx}>
-																<a href={file.url}>
-																	<lightning-icon icon-name="doctype:word" size="small">
-																	</lightning-icon>
-																</a>
-																<template if:true={issupplier}>
-																	<lightning-button-icon icon-name="utility:close"
-																		variant="bare" data-id={questionary.Id}
-																		data-key={file.name} onclick={deleteFile}
-																		alternative-text="Delete file"
-																		class="closericon">
-																	</lightning-button-icon>
+																<template if:true={file.isDocx}>
+																	<a href={file.url}>
+																		<lightning-icon icon-name="doctype:word"
+																			size="small">
+																		</lightning-icon>
+																	</a>
+																	<template if:false={questionary.isEditable}>
+																		<lightning-button-icon icon-name="utility:close"
+																			variant="bare" data-id={questionary.Id}
+																			data-key={file.name} onclick={deleteFile}
+																			alternative-text="Delete file"
+																			class="closericon">
+																		</lightning-button-icon>
+																	</template>
 																</template>
-															</template>
-															<template if:true={file.isCsv}>
-																<a href={file.url}>
-																	<lightning-icon icon-name="doctype:csv" size="small">
-																	</lightning-icon>
-																</a>
-																<template if:true={issupplier}>
-																	<lightning-button-icon icon-name="utility:close"
-																		variant="bare" data-id={questionary.Id}
-																		data-key={file.name} onclick={deleteFile}
-																		alternative-text="Delete file"
-																		class="closericon">
-																	</lightning-button-icon>
+																<template if:true={file.isCsv}>
+																	<a href={file.url}>
+																		<lightning-icon icon-name="doctype:csv"
+																			size="small">
+																		</lightning-icon>
+																	</a>
+																	<template if:false={questionary.isEditable}>
+																		<lightning-button-icon icon-name="utility:close"
+																			variant="bare" data-id={questionary.Id}
+																			data-key={file.name} onclick={deleteFile}
+																			alternative-text="Delete file"
+																			class="closericon">
+																		</lightning-button-icon>
+																	</template>
 																</template>
-															</template>
 
-														</div>
-														<div class="slds-col" style="overflow:hidden; width:100px;">
+															</div>
+															<div class="slds-col" style="overflow:hidden; width:100px;">
 																<a href={file.url}>
 																	<div class="slds-m-around_x-small"
 																		style="font-size:12px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;"
@@ -1138,7 +361,7 @@
 																		{file.name}
 																	</div>
 																</a>
-														</div>
+															</div>
 														</div>
 													</div>
 												</template>

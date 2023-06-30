@@ -1,7 +1,7 @@
 <template>
     <lightning-quick-action-panel header="Manage Suppliers">
         <div>
-            <c-add-suppliers onupdatedsupliers={updateSupplierData} record-id={recordId}></c-add-suppliers>
+            <c-add-suppliers onupdatedsupliers={updateSupplierData} record-id={assessmentId}></c-add-suppliers>
         </div>
         <div slot="footer" class="slds-align_absolute-right">
             <lightning-button
@@ -15,4 +15,5 @@
             </lightning-button>
         </div>
     </lightning-quick-action-panel>
+    
 </template>

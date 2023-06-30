@@ -270,11 +270,7 @@
         <field>Assessment_Template__c.Historical_Id__c</field>
         <readable>true</readable>
     </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
-        <field>Assessment_Template__c.Status__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
+    
     <fieldPermissions>
         <editable>true</editable>
         <field>Assessment_Template__c.Type__c</field>
@@ -327,11 +323,6 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>Assessment__c.Frequency__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
         <field>Assessment__c.Historical_Id__c</field>
         <readable>true</readable>
     </fieldPermissions>
@@ -348,11 +339,6 @@
     <fieldPermissions>
         <editable>true</editable>
         <field>Assessment__c.Number_of_Questions__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
-        <field>Assessment__c.Number_of_Suppliers_responded_back__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -377,11 +363,6 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>Assessment__c.Status__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
         <field>Assessment__c.Submission_Date__c</field>
         <readable>true</readable>
     </fieldPermissions>
@@ -390,11 +371,7 @@
         <field>Assessment__c.Target_Completion_Date__c</field>
         <readable>true</readable>
     </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
-        <field>Assessment__c.Template__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
+    
     <fieldPermissions>
         <editable>true</editable>
         <field>Asset.AccountId</field>
@@ -1325,11 +1302,7 @@
         <field>Question__c.Question_Text__c</field>
         <readable>false</readable>
     </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
-        <field>Question__c.Question_Type__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
+    
     <fieldPermissions>
         <editable>true</editable>
         <field>Question__c.Required__c</field>
@@ -1338,11 +1311,6 @@
     <fieldPermissions>
         <editable>true</editable>
         <field>Question__c.Requires_File_Upload__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
-        <field>Question__c.Section__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>

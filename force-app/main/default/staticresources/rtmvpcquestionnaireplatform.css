@@ -48,7 +48,8 @@
 	.colorcode-project5 { background:var(--cdg-bgproject5-colorbg); color:var(--cdg-txt-colorbg); }
 	
 	.fs24 { font-size:var(--fs-24); }
-	button.cig_actions, button.cad_actions { background:transparent; font-size:var(--fs-18); word-break:keep-all; border:0px solid transparent; }
+	button.cig_actions, button.cad_actions { background:transparent; font-size:var(--fs-18); word-break:keep-all; border:0px solid transparent; color:var(--iconlink-primary-n); }
+	button.cig_actions:hover, button.cad_actions:hover { background:transparent; font-size:var(--fs-18); word-break:keep-all; border:0px solid transparent; color:var(--iconlink-primary-h); }
 	
 	.cib-tasklist .cib-statusicons .cib-flag .slds-button__icon {fill:#e32a34;}
 	.cib-flag .slds-button__icon, .cib-flag .slds-icon-text-default {fill:#e32a34;}

@@ -45,6 +45,8 @@
 		/* Links */
 		--link-primary-n:rgb(45, 103, 197);
 		--link-primary-h:rgb(33, 82, 161);
+		--iconlink-primary-n:rgb(107, 56, 136);
+		--iconlink-primary-h:rgb(86, 45, 109);
 		/* White */
 		--dbtn-bg:rgb(255, 255, 255);
 		--dbtn-bgh:rgb(243, 243, 243);
@@ -122,8 +124,15 @@
 		--cibcad-txt: ;
 		--cibcad-txthlt: ;
 		--cibcad-hlt: ;	
-		
+		.cad-cardbase {position:relative; width:100%; height:calc(100vh - 200px)!important; border-radius:0px; overflow:hidden;}
+		.cad-titlebutton_more .slds-button--icon-more, .cad-titlebutton_more .slds-button_icon-more { background-color:transparent!important; border-color:transparent!important; margin-top: -4px; }
+
+            
 		--box-shadow:0 5px 15px 0 rgba(0,0,0,.07), 0 15px 35px 0 rgba(49,105,193,.1);
+        .slds-tabs_card {padding-top:5px!important; }
+		.slds-tabs_card .slds-tabs_default__nav { height:33px; }
+        .slds-tabs_card .slds-tabs_default__link, .slds-tabs_card .slds-tabs--default__link { height: 2rem!important; line-height: 1.8rem; }
+        
 	   /*  var(--bg-section-rtmvpc)  */ 
 	}
 	
@@ -142,10 +151,13 @@
 	.slds-utility-bar__item { height:18px; }
 	.cad-cardbase.slds-p-around_small { padding:0px; }
 	.slds-accordion__list-item {border-top:0px none; }
+    .slds-accordion__summary-heading, .slds-accordion__summary-heading .slds-button { font-size:14px;text-transform: uppercase; }
+    .slds-accordion__summary-heading .slds-button:focus { text-decoration:none; }
+	.slds-form-element__control .slds-radio, .slds-form-element__control .slds-checkbox { display: inline-block; }
 	.column.region-main {width:75%!important; max-width:100%;}
 	.column.region-sidebar-right {width:25%!important; max-width:25%;}
 	.column.region-sidebar-right article.slds-card {background:#e6eef6; }
- 
+
 	.lwcAppFlexipage app_flexipage-header { display:none !important;}
 	
 	

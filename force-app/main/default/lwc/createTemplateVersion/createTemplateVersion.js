@@ -10,12 +10,10 @@ export default class CreateTemplateVersion extends LightningElement {
         this.dispatchEvent(new CloseActionScreenEvent());
     }
     createNewVersion(){
-        console.log('recordId---->',this.recordId);
         createTemplateVersion({recordId:this.recordId})
         .then(result => {
             this.isLoaded = true;
-            console.log('createNewVersion------>',JSON.stringify(result));
-            if(result.isSuccess == true){
+            if(result.isSuccess === true){
                 this.showNotification('Success','New Version Created Successfully.','success');
                 this.closeModal();
                 this.isLoaded = false;
