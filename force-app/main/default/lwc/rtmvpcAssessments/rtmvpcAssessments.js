@@ -9,7 +9,7 @@ import getSupplierAssessmentList from '@salesforce/apex/AssessmentController.get
 export default class RtmvpcAssessments extends LightningElement {
     
 @track recList= [];
-@track accId;//='0017i00001QCVtwAAH';
+@track accId='0017i00001QCVtwAAH';
 @track assessmentId;
 @track accountassessmentId;
 @track pageSize = 15;
@@ -23,6 +23,7 @@ export default class RtmvpcAssessments extends LightningElement {
                             { label: 'Target Completion Date', fieldName: 'Rhythm__End_Date__c',type:'date' },
                             { label: 'Assessment Status', fieldName: 'Rhythm__Status__c'},
                             { label: '#Additional Requests',fieldName:'Rhythm__Follow_Up_Requests__c'},
+                            { label: '% Completed',fieldName:'Rhythm__Completed__c', type:'progressBar' },
                         ];
 
     connectedCallback(){
@@ -32,10 +33,10 @@ export default class RtmvpcAssessments extends LightningElement {
                 this.fieldsList.push(this.objName + '.' + tabList.fieldName);
             })
         }   
-        getAccountId({}).then((result) => {
-         this.accId = result;
-         this.fetchingRecords(); 
-      });
+    //     getAccountId({}).then((result) => {
+    //      this.accId = result;
+    //      this.fetchingRecords(); 
+    //   });
     this.fetchingRecords();    
     
     }  
@@ -51,22 +52,19 @@ export default class RtmvpcAssessments extends LightningElement {
            if(x[0] ==='?Rhythm__AccountAssessmentRelation__c')
            {
                this.accountassessmentId=x[1];        
-               this.show.survey = true;
+              this.show.survey = true;
                this.show.grid=false;
            }
         }
-        });
-         
+        });         
     }
-
-
 
     openSurveyHandler(event){
         this.show.grid = false;
         this.accountassessmentId = event.detail.accountassessmentId;
         this.show.survey = true;
-        let urlparam = '/?Rhythm__AccountAssessmentRelation__c'+'='+this.accountassessmentId;
-        window.location.href = 'https://'+window.location.host+urlparam;
+       // let urlparam = '/?Rhythm__AccountAssessmentRelation__c'+'='+this.accountassessmentId;
+       // window.location.href = 'https://'+window.location.host+urlparam;
         // let inputUrl = new URL('https://'+window.location.host);
         // let inputParams = new URLSearchParams(inputUrl.search);
         // inputParams.append('Rhythm__AccountAssessmentRelation__c', this.accountassessmentId);
@@ -203,7 +201,7 @@ export default class RtmvpcAssessments extends LightningElement {
             }).catch(error => {
                 errorLogRecord({ componentName: 'CustomTable', methodName: 'getQuestionsList', className: 'AssessmentController', errorData: error.message }).then((result) => {
                 });
-            }) 
+            })
         }).catch(error => {
             errorLogRecord({ componentName: 'CustomTable', methodName: 'getSupplierAssessmentList', className: 'AssessmentController', errorData: error.message }).then((result) => {
             });

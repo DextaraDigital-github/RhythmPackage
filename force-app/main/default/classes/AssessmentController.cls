@@ -205,10 +205,10 @@ public with sharing class AssessmentController {
     @AuraEnabled
     public static string getAccountId()
     {
-       // List<User> strAccId = [SELECT Contact.AccountId FROM User WHERE id=:userinfo.getuserid()];
-        //return strAccId[0].Contact.AccountId;
+        List<User> strAccId = [SELECT Contact.AccountId FROM User WHERE id=:userinfo.getuserid()];
+       return strAccId[0].Contact.AccountId;
         
-         return null;
+       //  return null;
     }
     
     

@@ -1,17 +1,18 @@
 <template>
 	<!-- Shows a grid view of records -->
 	<!-- <template lwc:if={showTable}> -->
-		<div class="slds-p-around_small">
-			<div class="cdgtitletoolbar slds-grid slds-wrap ">
-				<div class="slds-col slds-small-size_12-of-12 slds-medium-size_6-of-12 slds-large-size_6-of-12">
-					<div class="slds-grid slds-wrap slds-p-bottom_xx-small slds-grid_vertical-align-center">
-						<div class="slds-text-left">
-							<lightning-icon icon-name="standard:budget" size="medium" title=""></lightning-icon>
-						</div>
-                        <div class="slds-text-left slds-col_bump-right">
-                            <h1 class="slds-p-left_x-small" style="min-width:fit-content; font-size: 20px; font-weight: 600;">All</h1>
-                        </div>
-						<!-- <div class="slds-text-left slds-col_bump-right">
+	<div class="slds-p-around_small">
+		<div class="cdgtitletoolbar slds-grid slds-wrap ">
+			<div class="slds-col slds-small-size_12-of-12 slds-medium-size_6-of-12 slds-large-size_6-of-12">
+				<div class="slds-grid slds-wrap slds-p-bottom_xx-small slds-grid_vertical-align-center">
+					<div class="slds-text-left">
+						<lightning-icon icon-name="standard:budget" size="medium" title=""></lightning-icon>
+					</div>
+					<div class="slds-text-left slds-col_bump-right">
+						<h1 class="slds-p-left_x-small"
+							style="min-width:fit-content; font-size: 20px; font-weight: 600;">All</h1>
+					</div>
+					<!-- <div class="slds-text-left slds-col_bump-right">
 							<h4 style="min-width:fit-content;">
 								<lightning-combobox name="status" label="List of Records" variant="label-hidden"
 									placeholder="All" value={value} onchange={handleChange} options={statusOptions}>
@@ -22,76 +23,73 @@
 							<lightning-button-icon variant="label-hidden" icon-name={iconName} onclick={handleClick}>
 							</lightning-button-icon>
 						</div> -->
-					</div>
 				</div>
-				<div class="slds-col slds-small-size_12-of-12 slds-medium-size_6-of-12 slds-large-size_6-of-12">
-					<div class="slds-grid slds-wrap slds-gutters_small">
-						<div class="slds-col slds-text-align_right slds-size_1-of-1 ">
-							<div class="slds-grid slds-wrap slds-grid_align-end slds-gutters_x-small">
-								<div class="slds-col"></div>
-								<!-- Option to Delete Records -->
-								<div class="slds-p-left_small">
-									<template if:true={gridoptions.deleteRecords}>
-										<lightning-button title="Delete" icon-name="utility:delete" icon-position="left"
-											variant="Destructive" class="slds-m-right_x-small" onclick={deleteHandler}>
+			</div>
+			<div class="slds-col slds-small-size_12-of-12 slds-medium-size_6-of-12 slds-large-size_6-of-12">
+				<div class="slds-grid slds-wrap slds-gutters_small">
+					<div class="slds-col slds-text-align_right slds-size_1-of-1 ">
+						<div class="slds-grid slds-wrap slds-grid_align-end slds-gutters_x-small">
+							<div class="slds-col"></div>
+							<!-- Option to Delete Records -->
+							<div class="slds-p-left_small">
+								<template if:true={gridoptions.deleteRecords}>
+									<lightning-button title="Delete" icon-name="utility:delete" icon-position="left"
+										variant="Destructive" class="slds-m-right_x-small" onclick={deleteHandler}>
+									</lightning-button>
+								</template>
+							</div>
+
+							<!-- Options to show different Calendar views -->
+							<div class="slds-p-left_small">
+								<template if:true={gridoptions.calendarViews}>
+									<lightning-button-group class="slds-m-right_x-small">
+										<lightning-button-icon label="Day View" title="Day View" variant="label-hidden"
+											icon-name="utility:dayview" icon-position="left">
+										</lightning-button-icon>
+										<lightning-button-icon label="Weekly View" title="Weekly View"
+											variant="label-hidden" icon-name="utility:weeklyview" icon-position="left">
+										</lightning-button-icon>
+										<lightning-button-icon label="Monthly View" title="Monthly View"
+											variant="label-hidden" icon-name="utility:monthlyview" icon-position="left">
+										</lightning-button-icon>
+									</lightning-button-group>
+								</template>
+							</div>
+
+							<!-- Options to show buttons for creation of new records with different criteria -->
+							<div class="slds-p-left_small">
+								<lightning-button-group style="margin-bottom:-3px; ">
+									<template if:true={gridoptions.bulkCreation}>
+										<lightning-button variant="label-hidden" title="Upload List"
+											icon-name="utility:upload" icon-position="left"></lightning-button>
+									</template>
+									<template if:true={gridoptions.newRecord}>
+										<lightning-button variant="label-hidden" title="Add New" icon-name="utility:new"
+											icon-position="left">
 										</lightning-button>
 									</template>
-								</div>
-
-								<!-- Options to show different Calendar views -->
-								<div class="slds-p-left_small">
-									<template if:true={gridoptions.calendarViews}>
-										<lightning-button-group class="slds-m-right_x-small">
-											<lightning-button-icon label="Day View" title="Day View"
-												variant="label-hidden" icon-name="utility:dayview" icon-position="left">
-											</lightning-button-icon>
-											<lightning-button-icon label="Weekly View" title="Weekly View"
-												variant="label-hidden" icon-name="utility:weeklyview"
-												icon-position="left">
-											</lightning-button-icon>
-											<lightning-button-icon label="Monthly View" title="Monthly View"
-												variant="label-hidden" icon-name="utility:monthlyview"
-												icon-position="left">
-											</lightning-button-icon>
-										</lightning-button-group>
+									<template if:true={gridoptions.newEmployee}>
+										<lightning-button variant="label-hidden" title="New Employee"
+											icon-name="utility:adduser" icon-position="left"></lightning-button>
 									</template>
-								</div>
+								</lightning-button-group>
+							</div>
 
-								<!-- Options to show buttons for creation of new records with different criteria -->
-								<div class="slds-p-left_small">
-									<lightning-button-group style="margin-bottom:-3px; ">
-										<template if:true={gridoptions.bulkCreation}>
-											<lightning-button variant="label-hidden" title="Upload List"
-												icon-name="utility:upload" icon-position="left"></lightning-button>
-										</template>
-										<template if:true={gridoptions.newRecord}>
-											<lightning-button variant="label-hidden" title="Add New"
-												icon-name="utility:new" icon-position="left">
-											</lightning-button>
-										</template>
-										<template if:true={gridoptions.newEmployee}>
-											<lightning-button variant="label-hidden" title="New Employee"
-												icon-name="utility:adduser" icon-position="left"></lightning-button>
-										</template>
-									</lightning-button-group>
-								</div>
+							<!-- Options to export the grid in CSV, PDF -->
+							<div class="slds-p-left_small">
+								<lightning-button-menu icon-name="utility:download" menu-alignment="right"
+									menu-size="medium" alternative-text="Export" variant="label-hidden" title="Export">
+									<lightning-menu-item label="PDF" title="PDF" value="PDF"
+										onclick={exportGridAsPdfHandler}>
+									</lightning-menu-item>
+									<lightning-menu-item label="CSV" title="CSV" value="CSV"
+										onclick={exportGridAsCsvHandler}>
+									</lightning-menu-item>
+								</lightning-button-menu>
+							</div>
 
-								<!-- Options to export the grid in CSV, PDF -->
-								<div class="slds-p-left_small">
-									<lightning-button-menu icon-name="utility:download" menu-alignment="right"
-										menu-size="medium" alternative-text="Export" variant="label-hidden"
-										title="Export">
-										<lightning-menu-item label="PDF" title="PDF" value="PDF"
-											onclick={exportGridAsPdfHandler}>
-										</lightning-menu-item>
-										<lightning-menu-item label="CSV" title="CSV" value="CSV"
-											onclick={exportGridAsCsvHandler}>
-										</lightning-menu-item>
-									</lightning-button-menu>
-								</div>
-
-								<!-- Options related to list view - Creating, Cloning, Renaming, Deleting a list view -->
-								<!-- <div class="slds-p-left_small">
+							<!-- Options related to list view - Creating, Cloning, Renaming, Deleting a list view -->
+							<!-- <div class="slds-p-left_small">
 									<lightning-button-menu icon-name="utility:settings" menu-alignment="right"
 										menu-size="medium" alternative-text="Settings" variant="label-hidden"
 										title="Settings">
@@ -107,8 +105,8 @@
 									</lightning-button-menu>
 								</div> -->
 
-								<!-- Options related to grid columns - Showing/Hiding columns, Reordering the columns -->
-								<!-- <div class="slds-p-left_small slds-m-right_small ">
+							<!-- Options related to grid columns - Showing/Hiding columns, Reordering the columns -->
+							<!-- <div class="slds-p-left_small slds-m-right_small ">
 									<lightning-button-menu icon-name="utility:table_settings" menu-alignment="right"
 										menu-size="medium" alternative-text="Column Settings" variant="label-hidden"
 										title="Column Settings">
@@ -120,173 +118,184 @@
 										</lightning-menu-item>
 									</lightning-button-menu>
 								</div> -->
-							</div>
 						</div>
 					</div>
 				</div>
 			</div>
+		</div>
 
-			<div class="cdgWrapperinner">
-				<div class="cdg">
-					<!-- Grid Row Header to display column names -->
-					<div class="tr">
-						<!-- First column with checkbox which when selected, selects all the checkboxes in the same column -->
-						<div class="th">
-							<br/>
-							<lightning-input data-id='allCheckboxes' type="checkbox" variant="label-hidden"
-								onchange={checkboxChangeHandler}>
-							</lightning-input>
-						</div>
-						<!-- Dynamically displaying the column names in the grid -->
-						<template for:each={viewColList} for:item="col">
-							<div key={col.fieldName} class="th" data-columnheader={col.fieldName}>
-								<!-- Column label -->
-								<div class="slds-truncate">{col.label}</div>
-								<!-- Arrow icon/button to sort data in that column -->
-								<i data-id={col.fieldName} onclick={sortClickHandler} data-sorticon class="las la-angle-down sort-inactive"></i>
-								<!-- Inputs text to search data in that column -->
-								<div>
-									<input type="text" data-filtertextbox data-id={col.fieldName} onkeyup={inputChangeHandler} class="slds-input"/>
+		<div class="cdgWrapperinner">
+			<div class="cdg">
+				<!-- Grid Row Header to display column names -->
+				<div class="tr">
+					<!-- First column with checkbox which when selected, selects all the checkboxes in the same column -->
+					<div class="th">
+						<br/>
+						<lightning-input data-id='allCheckboxes' type="checkbox" variant="label-hidden"
+							onchange={checkboxChangeHandler}>
+						</lightning-input>
+					</div>
+					<!-- Dynamically displaying the column names in the grid -->
+					<template for:each={viewColList} for:item="col">
+						<div key={col.fieldName} class="th" data-columnheader={col.fieldName}>
+							<!-- Column label -->
+							<div class="slds-truncate">{col.label}</div>
+							<!-- Arrow icon/button to sort data in that column -->
+							<i data-id={col.fieldName} onclick={sortClickHandler} data-sorticon class="las la-angle-down sort-inactive"></i>
+							<!-- Inputs text to search data in that column -->
+							<div>
+								<input type="text" data-filtertextbox data-id={col.fieldName} onkeyup={inputChangeHandler} class="slds-input"/>
 								</div>
-									<div class="slds-resizable">
-										<span class="slds-resizable__handle" onmousedown={handleResizeMouseDown} data-resizefield={col.fieldName}>
-										<span class="slds-resizable__divider"></span>
-										</span>
-									</div>
-								</div>
-						</template>
-						<!-- Option to display a progress bar -->
-						<template lwc:if={showProgressBar}>
-							<div class="th">% Completed
 								<div class="slds-resizable">
-									<span class="slds-resizable__handle">
+									<span class="slds-resizable__handle" onmousedown={handleResizeMouseDown} data-resizefield={col.fieldName}>
 										<span class="slds-resizable__divider"></span>
 									</span>
 								</div>
 							</div>
-						</template>
-						<!-- Empty column name to accomodate the actions column -->
-						<div class="th"></div>
-					</div>
-
-					<!-- Grid Rows with data. Iterating through rows.-->
-					<template for:each={recList} for:item="rec">
-						<div key={rec} class="tr" data-id={rec.id}>
-							<!-- Column with checkbox to select that particular row -->
-							<div class="td">
-								<lightning-input class="recCheckbox" data-id={rec.id} type="checkbox"
-									variant="label-hidden" onchange={checkboxChangeHandler}></lightning-input>
-							</div>
-							
-							<!-- Dynamically passing data to each column in a row by iterating through columns -->
-							<template key={rec.id} for:each={rec.record} for:item="col">
-								<div key={col.fieldName} class="td" data-id={rec.id} onclick={takeSurveyHandler}>
-									<div class={col.classList}>
-										<label class="slds-form-element__label">{col.label}</label>
-										<div class="" data-id={col.fieldName} title={col.value}>
-											<template lwc:if={col.isHyperlink}>
-												<a>{col.value}</a>
-											</template>
-											<template lwc:elseif={col.isHtml}>
-												<div class={col.classList}></div>
-											</template>
-											<template lwc:else>
-												{col.value}
-											</template>
-											<template if:true={col.surveySymbol}>
-												<lightning-icon icon-name={col.surveySymbol} size="x-small"
-													style="float:right"></lightning-icon>
-											</template>
-											<template if:true={col.flagSymbol}>
-												<lightning-icon icon-name={col.flagSymbol} size="x-small"
-													class="cib-flag" style="margin:5px 5px 0px 10px; float:right">
-												</lightning-icon>
-											</template>
-										</div>
-									</div>
-								</div>
-							</template>
-
-							<!-- Option to display progress bar in each row -->
-							<template if:true={showProgressBar}>
-								<div class="td">
-									<div class="slds-grid slds-wrap slds-gutters_xx-small">
-										<div class="slds-col slds-size_8-of-12 slds-p-top_x-small">
-											<lightning-progress-bar style="background-color: green "
-												value={rec.progressBarValue}></lightning-progress-bar>
-										</div>
-										<div class="slds-col slds-size_4-of-12 slds-col_bump-left">
-											<span>{rec.progressBarValue}</span></div>
-									</div>
-								</div>
-							</template>
-
-							<!-- Column to display row actions - Export as PDF, Export as CSV, etc -->
-							<div class="td">
-								<!-- <template if:true={rec.viewButton}> -->
-								<lightning-button-menu alternative-text="Show menu" menu-alignment="right"
-									icon-name="utility:threedots_vertical" icon-size="small">
-									<template if:true={gridoptions.exportRowAsPdf}>
-										<lightning-menu-item label="PDF" title="PDF" value="PDF" data-id={rec.id}
-											onclick={exportRowAsPdfHandler}>
-										</lightning-menu-item>
-									</template>
-									<!-- Option to import data in the row as CSV. Only available for Assessments as of now. -->
-									<template if:true={gridoptions.exportRowAsCsv}>
-										<lightning-menu-item label="CSV" title="CSV" value="CSV" data-id={rec.id}
-											onclick={exportRowAsCsvHandler}>
-										</lightning-menu-item>
-									</template>
-								</lightning-button-menu>
+					</template>
+					<!-- Option to display a progress bar -->
+					<!-- <template lwc:if={showProgressBar}>
+						<div class="th">% Completed
+							<div class="slds-resizable">
+								<span class="slds-resizable__handle">
+										<span class="slds-resizable__divider"></span>
+								</span>
 							</div>
 						</div>
-					</template>
+					</template> -->
+					<!-- Empty column name to accomodate the actions column -->
+					<div class="th"></div>
 				</div>
-			</div>
 
-			<!-- Options related to Pagination -->
-			<table style="width:auto; margin:auto; margin-top:8px;">
-				<tr>
-					<td>Showing : </td>
-					<!-- Displays options with various sizes for number of records to be displayed in each page -->
-					<td class="slds-p-horizontal_small">
-						<lightning-combobox name="pageSize" label="Page Size" variant="label-hidden"
-							value={selectedPageSize} dropdown-alignment="auto" placeholder="5" options={pageSizeOptions}
-							onchange={handlePageSizeChange}>
-						</lightning-combobox>
-					</td>
-					<td class="slds-p-right_medium"> per page</td>
-					<!-- Button to navigate to the first page -->
-					<td style="vertical-align:bottom;text-align:center;">
-						<lightning-button-icon variant="label-hidden" icon-name="utility:jump_to_left" title="First"
-							onclick={handlePreviousClick} class="slds-m-right_xx-small"></lightning-button-icon>
-					</td>
-					<!-- Button to navigate to the previous page -->
-					<td style="vertical-align:bottom;text-align:center;">
-						<lightning-button-icon variant="label-hidden" icon-name="utility:chevronleft" title="Previous"
-							onclick={handlePreviousClick} class="slds-m-right_x-small">
-						</lightning-button-icon>
-					</td>
-					<!-- Displays page numbers to navigate to that particular page when a page number is clicked -->
-					<td>
-						<lightning-combobox name="pageNumber" label="Page Number" variant="label-hidden"
-							value={selectedPageNumber} dropdown-alignment="auto" placeholder="Page Number"
-							options={pageNumberOptions} onchange={handlePageNumberChange}>
-						</lightning-combobox>
-					</td>
-					<!-- Button to navigate to the next page -->
-					<td style="vertical-align:bottom;text-align:center;">
-						<lightning-button-icon variant="label-hidden" icon-name="utility:chevronright" title="Next"
-							onclick={handleNextClick}></lightning-button-icon>
-					</td>
-					<!-- Button to navigate to the last page -->
-					<td style="vertical-align:bottom;text-align:center;">
-						<lightning-button-icon variant="label-hidden" icon-name="utility:jump_to_right" title="Last"
-							onclick={handleNextClick} class="slds-m-left_xx-small"></lightning-button-icon>
-					</td>
-				</tr>
-			</table>
+				<!-- Grid Rows with data. Iterating through rows.-->
+				<template for:each={recList} for:item="rec">
+					<div key={rec} class="tr" data-id={rec.id}>
+						<!-- Column with checkbox to select that particular row -->
+						<div class="td">
+							<lightning-input class="recCheckbox" data-id={rec.id} type="checkbox" variant="label-hidden"
+								onchange={checkboxChangeHandler}></lightning-input>
+						</div>
+
+						<!-- Dynamically passing data to each column in a row by iterating through columns -->
+						<template key={rec.id} for:each={rec.record} for:item="col">
+							<div key={col.fieldName} class="td" data-id={rec.id} onclick={takeSurveyHandler}>
+								<div class={col.classList}>
+									<label class="slds-form-element__label">{col.label}</label>
+									<div class="" data-id={col.fieldName} title={col.value}>
+										<template lwc:if={col.isHyperlink}>
+											<a>{col.value}</a>
+										</template>
+										<template lwc:elseif={col.isHtml}>
+											<div class={col.classList}></div>
+										</template>
+										<template lwc:elseif={col.isProgressBar}>
+											<div class="slds-grid slds-wrap slds-gutters_xx-small">
+												<div class="slds-col slds-size_8-of-12 slds-p-top_x-small">
+													<lightning-progress-bar style="background-color: blue "
+														value={col.value}></lightning-progress-bar>
+												</div>
+												<div class="slds-col slds-size_4-of-12 slds-col_bump-left">
+													<span>{col.value}%</span>
+												</div>
+											</div>
+										</template>
+										<template lwc:else>
+											{col.value}
+										</template>
+										<template if:true={col.surveySymbol}>
+											<lightning-icon icon-name={col.surveySymbol} size="x-small"
+												style="float:right"></lightning-icon>
+										</template>
+										<template if:true={col.flagSymbol}>
+											<lightning-icon icon-name={col.flagSymbol} size="x-small" class="cib-flag"
+												style="margin:5px 5px 0px 10px; float:right">
+											</lightning-icon>
+										</template>
+									</div>
+								</div>
+							</div>
+						</template>
+
+						<!-- Option to display progress bar in each row -->
+						<!-- <template if:true={showProgressBar}>
+							<div class="td">
+								<div class="slds-grid slds-wrap slds-gutters_xx-small">
+									<div class="slds-col slds-size_8-of-12 slds-p-top_x-small">
+										<lightning-progress-bar style="background-color: green "
+											value={rec.progressBarValue}></lightning-progress-bar>
+									</div>
+									<div class="slds-col slds-size_4-of-12 slds-col_bump-left">
+										<span>{rec.progressBarValue}</span></div>
+								</div>
+							</div>
+						</template> -->
+
+						<!-- Column to display row actions - Export as PDF, Export as CSV, etc -->
+						<div class="td">
+							<!-- <template if:true={rec.viewButton}> -->
+							<lightning-button-menu alternative-text="Show menu" menu-alignment="right"
+								icon-name="utility:threedots_vertical" icon-size="small">
+								<template if:true={gridoptions.exportRowAsPdf}>
+									<lightning-menu-item label="PDF" title="PDF" value="PDF" data-id={rec.id}
+										onclick={exportRowAsPdfHandler}>
+									</lightning-menu-item>
+								</template>
+								<!-- Option to import data in the row as CSV. Only available for Assessments as of now. -->
+								<template if:true={gridoptions.exportRowAsCsv}>
+									<lightning-menu-item label="CSV" title="CSV" value="CSV" data-id={rec.id}
+										onclick={exportRowAsCsvHandler}>
+									</lightning-menu-item>
+								</template>
+							</lightning-button-menu>
+						</div>
+					</div>
+				</template>
+			</div>
 		</div>
+
+		<!-- Options related to Pagination -->
+		<table style="width:auto; margin:auto; margin-top:8px;">
+			<tr>
+				<td>Showing : </td>
+				<!-- Displays options with various sizes for number of records to be displayed in each page -->
+				<td class="slds-p-horizontal_small">
+					<lightning-combobox name="pageSize" label="Page Size" variant="label-hidden"
+						value={selectedPageSize} dropdown-alignment="auto" placeholder="5" options={pageSizeOptions}
+						onchange={handlePageSizeChange}>
+					</lightning-combobox>
+				</td>
+				<td class="slds-p-right_medium"> per page</td>
+				<!-- Button to navigate to the first page -->
+				<td style="vertical-align:bottom;text-align:center;">
+					<lightning-button-icon variant="label-hidden" icon-name="utility:jump_to_left" title="First"
+						onclick={handlePreviousClick} class="slds-m-right_xx-small"></lightning-button-icon>
+				</td>
+				<!-- Button to navigate to the previous page -->
+				<td style="vertical-align:bottom;text-align:center;">
+					<lightning-button-icon variant="label-hidden" icon-name="utility:chevronleft" title="Previous"
+						onclick={handlePreviousClick} class="slds-m-right_x-small">
+					</lightning-button-icon>
+				</td>
+				<!-- Displays page numbers to navigate to that particular page when a page number is clicked -->
+				<td>
+					<lightning-combobox name="pageNumber" label="Page Number" variant="label-hidden"
+						value={selectedPageNumber} dropdown-alignment="auto" placeholder="Page Number"
+						options={pageNumberOptions} onchange={handlePageNumberChange}>
+					</lightning-combobox>
+				</td>
+				<!-- Button to navigate to the next page -->
+				<td style="vertical-align:bottom;text-align:center;">
+					<lightning-button-icon variant="label-hidden" icon-name="utility:chevronright" title="Next"
+						onclick={handleNextClick}></lightning-button-icon>
+				</td>
+				<!-- Button to navigate to the last page -->
+				<td style="vertical-align:bottom;text-align:center;">
+					<lightning-button-icon variant="label-hidden" icon-name="utility:jump_to_right" title="Last"
+						onclick={handleNextClick} class="slds-m-left_xx-small"></lightning-button-icon>
+				</td>
+			</tr>
+		</table>
+	</div>
 	<!-- </template> -->
 
 	<!-- Show/Hide Columns Modal Popup -->

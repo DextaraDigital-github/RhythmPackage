@@ -63,6 +63,7 @@ export default class Questionnaire extends LightningElement {
     @track showAccordionQuestions;
     @track accordionFlag = false;
     @track accordionQuestionFlag = false;
+    @track showRefreshbutton = false;
     @track showspinner;
     sectionidslist = [];
     @track buttonlabel = '[ + ]';
@@ -90,6 +91,10 @@ export default class Questionnaire extends LightningElement {
             this.accordionFlag = false;
             this.showAccordion = 'slds-accordion__section slds-is-close';
         }
+    }
+    handleRefreshButton()
+    {
+        this.handleOnload();
     }
     @api
     handleCollapseExpand(accordianId) {
@@ -274,7 +279,7 @@ export default class Questionnaire extends LightningElement {
                                     this.questionsList[i]['responsesPercentage'] = Math.floor((Number(this.questionsList[i].numberOfResponses) / Number(this.questionsList[i].numberOfQuestions)) * 100);
                                 }
                                 if (this.accountAssessmentStatus === 'Need More Information') {
-                                    this.handleFilterFlag(true);
+                                    //this.handleFilterFlag(true);
                                 }
                                 this.loading = false;
                                 console.log('this.questionsAndAnswerss', this.questionsAndAnswerss);
@@ -297,6 +302,7 @@ export default class Questionnaire extends LightningElement {
 
             }
             else {
+                this.showRefreshbutton = true;
                 this.savedResponseMap = {};
                 getQuestionsList({ templateId: this.recordId }).then(result => {
                     var resultMap = result;
@@ -459,7 +465,7 @@ export default class Questionnaire extends LightningElement {
 
                         if (this.accountAssessmentStatus === 'Need More Information') {
                             console.log('Into the if to call handlefilterflag');
-                            this.handleFilterFlag(true);
+                            //this.handleFilterFlag(true);
                         }
                         this.loading = false;
                         console.log('this.questionsAndAnswerss', this.questionsAndAnswerss);
@@ -665,7 +671,8 @@ export default class Questionnaire extends LightningElement {
             console.log('this.questionsAndAnswerss>>>', this.questionsAndAnswerss);
             // this.template.querySelector('c-rtmvpc-render-question-template').fileUploadHandler('false');
             this.uploadingFile = false;
-        });
+            //this.handleOnload();
+        }); 
     }
 
     //Used /* handledeletefile method is used to store the uploaded attachments into response records  */
@@ -1152,11 +1159,6 @@ export default class Questionnaire extends LightningElement {
                     }
                 }
             }
-            if (this.objectApiName == 'Rhythm__AccountAssessmentRelation__c') {
-
-                quTemp.isEditable = true;
-            }
-
             if (qu.Rhythm__Required__c == true) {
                 this.requiredQuestionList.push(qu.Id);
             }
@@ -1202,7 +1204,6 @@ export default class Questionnaire extends LightningElement {
             }
             else {
                 if (typeof qu.Rhythm__Default_Value__c != 'undefined' && qu.Rhythm__Default_Value__c != null && (this.objectApiName!='Rhythm__AccountAssessmentRelation__c'||typeof this.recordId!='undefined')) {
-                    console.log('koushik', qu.Rhythm__Default_Value__c);
                     if (qu.Rhythm__Question_Type__c == 'Picklist') {
                         quTemp.value = JSON.parse(JSON.stringify(qu.Rhythm__Default_Value__c));
                     }
@@ -1288,6 +1289,24 @@ export default class Questionnaire extends LightningElement {
             quTemp.optionsWrapper.multiPickListOptions = optionList;
             console.log('qu.Rhythm__Question__c', qu.Id);
             quTemp.value = undefined;
+             if (typeof qu.Rhythm__Default_Value__c != 'undefined' && qu.Rhythm__Default_Value__c != null && (this.objectApiName!='Rhythm__AccountAssessmentRelation__c'||typeof this.recordId!='undefined')) {
+                    if (qu.Rhythm__Question_Type__c == 'Picklist') {
+                        quTemp.value = JSON.parse(JSON.stringify(qu.Rhythm__Default_Value__c));
+                    }
+                    else if (qu.Rhythm__Question_Type__c == 'Picklist (Multi-Select)') {
+                        quTemp.optionsWrapper.selectedListOptions = JSON.parse('[' + JSON.stringify(qu.Rhythm__Default_Value__c) + ']');
+                        quTemp.value = JSON.stringify(quTemp.optionsWrapper.selectedListOptions);
+                    }
+                    else if (qu.Rhythm__Question_Type__c == 'Text Area (Rich)') {
+                        quTemp.value = '<p>' + JSON.parse(JSON.stringify(qu.Rhythm__Default_Value__c)) + '</p>';
+                    }
+                    else if (qu.Rhythm__Question_Type__c == 'Checkbox') {
+                        quTemp.value = (Boolean)(JSON.parse(JSON.stringify(qu.Rhythm__Default_Value__c)));
+                    }
+                    else {
+                        quTemp.value = JSON.parse(JSON.stringify(qu.Rhythm__Default_Value__c));
+                    }
+                }
             if(this.isTemplate)
             {
                 quTemp.isEditable = true;
@@ -1477,6 +1496,8 @@ export default class Questionnaire extends LightningElement {
         //this.template.querySelectorAll('c-rtmvpc-render-question-template')[0].checkCustomerFlags();
         var param = {};
         var bool = false;
+        this.showcustomerbuttons = false;
+        this.showSaveAndSubmit = false;
         console.log('this.questionsAndAnswerss in handleSubmit', this.questionsAndAnswerss);
         for (var i = 0; i < this.questionsAndAnswerss.length; i++) {
             for (var j = 0; j < this.questionsAndAnswerss[i].questions.length; j++) {
@@ -1502,7 +1523,8 @@ export default class Questionnaire extends LightningElement {
                 detail: param
             });
             this.dispatchEvent(selectedEvent);
-            setTimeout(() => { this.handleOnload() }, 150);
+            
+            this.handleOnload();
 
         }).catch(error => {
             console.log('error', error);

@@ -37,7 +37,10 @@
 						</div>
 					</div>
 					<!-- Displays button and picklist for navigations --END-->
-
+					<div>
+					<template if:true={showRefreshbutton}>
+						<lightning-button variant="base" label="Refresh" title="Refresh" onclick={handleRefreshButton}></lightning-button></template>
+					</div>
 					<div
 						style="position:absolute; display:inline-block; right:13px; margin-top:-47px; font-weight:bold;">
 						<template if:true={isTemplate}>
