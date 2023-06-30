@@ -52,6 +52,8 @@
 		/* Links */
 		--link-primary-n:rgb(45, 103, 197);
 		--link-primary-h:rgb(33, 82, 161);
+		--iconlink-primary-n:rgb(107, 56, 136);
+		--iconlink-primary-h:rgb(86, 45, 109);
 		/* White */
 		--dbtn-bg:rgb(255, 255, 255);
 		--dbtn-bgh:rgb(243, 243, 243);
@@ -332,9 +334,10 @@
 	div.cdg slds-resizable__handle { z-index:99;}
 	div.cdg .slds-resizable__divider:before { background-color:transparent;}
 	div.cdg div.th:first-child, div.cdg div.td:first-child span.slds-checkbox_faux { margin-right:0px;; }
-	
+	div.cdg .slds-progress-bar__value { background:#04844b !important; }
 	.fs24 { font-size:var(--fs-24); }
-	button.cig_actions, button.cad_actions { background:transparent; font-size:var(--fs-18); word-break:keep-all; border:0px solid transparent; }
+	button.cig_actions, button.cad_actions { background:transparent; font-size:var(--fs-18); word-break:keep-all; border:0px solid transparent; color:var(--iconlink-primary-n); }
+	button.cig_actions:hover, button.cad_actions:hover { background:transparent; font-size:var(--fs-18); word-break:keep-all; border:0px solid transparent; color:var(--iconlink-primary-h); }
 	
 	/* Floating Action Menu Starts here */
 	.rtmvpc-actionbutton { width:45px; height:45px; border-radius:50%; background:#db4437; position:fixed; bottom:30px; right:30px; cursor:pointer; box-shadow:0px 2px 10px rgba(0,0,0,0.2); }
@@ -418,7 +421,7 @@
 	.cib-sec_vcontainer3 textarea { height:60px; }
 	.cad-sec_vcontainer3 textarea { height:60px; }
 
-	.cad-titlebutton_more .slds-button--icon-more, .cad-titlebutton_more .slds-button_icon-more { background-color:transparent!important; border-color:transparent!important; }
+	.cad-titlebutton_more .slds-button--icon-more, .cad-titlebutton_more .slds-button_icon-more { background-color:transparent!important; border-color:transparent!important;margin-top: -2px; }
 
 	.cib-dis-no {display:none;}
 	.cib-dis-ib {display:inline-block;}
