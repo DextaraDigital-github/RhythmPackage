@@ -9,7 +9,7 @@ import getSupplierAssessmentList from '@salesforce/apex/AssessmentController.get
 export default class RtmvpcAssessments extends LightningElement {
     
 @track recList= [];
-@track accId='0017i00001QCVtwAAH';
+@track accId;
 @track assessmentId;
 @track accountassessmentId;
 @track pageSize = 15;
@@ -33,11 +33,11 @@ export default class RtmvpcAssessments extends LightningElement {
                 this.fieldsList.push(this.objName + '.' + tabList.fieldName);
             })
         }   
-    //     getAccountId({}).then((result) => {
-    //      this.accId = result;
-    //      this.fetchingRecords(); 
-    //   });
-    this.fetchingRecords();    
+        getAccountId({}).then((result) => {
+         this.accId = result;
+         this.fetchingRecords(); 
+      });
+    //this.fetchingRecords();    
     
     }  
     

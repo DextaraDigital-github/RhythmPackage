@@ -30,7 +30,7 @@ export default class CustomTable extends LightningElement {
     @track isShuffleColumnsModalOpen = false;
     @api objName;
     @api colList;
-    // @api showProgressBar;
+    @api showProgressBar;
     @api defPageSize = 15;
     @track recList = [];
     @track selectedPageNumber;
@@ -212,7 +212,7 @@ export default class CustomTable extends LightningElement {
             }
         }
     }
-
+    
     // Prepare data for pagination
     preparePaginationControlsData(perPage) {
         if (!perPage) {
@@ -289,7 +289,7 @@ export default class CustomTable extends LightningElement {
             let bFieldDetails = getFieldDetailsByName(b, sortFieldName);
             let aFieldValue = (aFieldDetails.value) ? aFieldDetails.value : '';
             let bFieldValue = (bFieldDetails.value) ? bFieldDetails.value : '';
-            let compareVal = false;
+            let compareVal  = false;
             if (sortType === "ASC") {
                 compareVal = aFieldValue.localeCompare(bFieldValue);
             }
@@ -321,15 +321,6 @@ export default class CustomTable extends LightningElement {
                                 recJson.value = months[Number(x.split('-')[1]) - 1] + '-' + x.split('-')[2] + '-' + x.split('-')[0];
                             }
                         }
-                        else if (colList[j].type === 'progressBar') {
-                            recJson.isProgressBar = true;
-                            if (typeof relatedListRecords[i].Rhythm__Completed__c != 'undefined') {
-                                recJson.value = relatedListRecords[i].Rhythm__Completed__c.split('%')[0];
-                            }
-                            else {
-                                recJson.value = '0';
-                            }
-                        }
                         else {
                             if (typeof relatedListRecords[i][colList[j].fieldName] !== 'undefined' && colList[j].fieldName !== 'Name') {
                                 recJson.value = relatedListRecords[i][colList[j].fieldName];
@@ -351,11 +342,11 @@ export default class CustomTable extends LightningElement {
                                 recJson.classList = 'cad-timeline_pending';
                             else if (recJson.value.toLowerCase() === 'waiting on someone else' || recJson.value.toLowerCase() === 'on hold' || recJson.value.toLowerCase() === 'new')
                                 recJson.classList = 'status-waitingonsomeoneelse';
-                            else if (recJson.value === 'In Review')
+                                else if (recJson.value === 'In Review')
                                 recJson.classList = 'cad-timeline_pending';
-                            else if (recJson.value === 'Review Completed')
+                                 else if (recJson.value === 'Review Completed')
                                 recJson.classList = 'cad-timeline_reviewcompleted';
-                            else if (recJson.value === 'Need More Information')
+                                 else if (recJson.value === 'Need More Information')
                                 recJson.classList = 'cad-timeline_rejected';
                         }
                         if (colList[j].fieldName === 'Name') {
@@ -377,11 +368,11 @@ export default class CustomTable extends LightningElement {
                                 }
                         }
                         recArray.push(recJson);
-                        // if (this.showProgressBar === "true") {
-                        //     if (typeof relatedListRecords[i].Rhythm__Completed__c !== 'undefined') {
-                        //         recDetails.progressBarValue = relatedListRecords[i].Rhythm__Completed__c;
-                        //     }
-                        // }
+                        if (this.showProgressBar === "true") {
+                            if (typeof relatedListRecords[i].Rhythm__Completed__c !== 'undefined') {
+                                recDetails.progressBarValue = relatedListRecords[i].Rhythm__Completed__c;
+                            }
+                        }
                         recDetails.id = relatedListRecords[i].Id;
                     }
                 }
@@ -400,7 +391,7 @@ export default class CustomTable extends LightningElement {
         });
         this.dispatchEvent(rowclick);
     }
-
+    
     connectedCallback() {
         let pageSizeDefaultValue = this.pageSizeOptions[0].value;
         let currentPageRecords = this.getPageRecords(this.objectRecordData, 1, pageSizeDefaultValue);
@@ -516,20 +507,20 @@ export default class CustomTable extends LightningElement {
 
     // Extracts the row as CSV
     exportRowAsCsvHandler(event) {
-        const exportrowascsv = new CustomEvent('exportrowascsv', {
-            detail: { value: event.currentTarget.dataset.id }
-        });
+        const exportrowascsv = new CustomEvent('exportrowascsv',{
+            detail: {value: event.currentTarget.dataset.id}
+        }); 
         this.dispatchEvent(exportrowascsv);
     }
 
     // Extracts the row as PDF
     exportRowAsPdfHandler(event) {
-        const exportrowaspdf = new CustomEvent('exportrowaspdf', {
-            detail: { value: event.currentTarget.dataset.id }
-        });
+        const exportrowaspdf = new CustomEvent('exportrowaspdf',{
+            detail: {value: event.currentTarget.dataset.id}
+        });  
         this.dispatchEvent(exportrowaspdf);
     }
-
+    
     exportGridAsCsvHandler() {
         if (!(!!this.recList && this.recList.length > 0)) {
             return;
@@ -547,13 +538,13 @@ export default class CustomTable extends LightningElement {
                 for (let j = 0; j < recordDetails.record.length; j++) {
                     csvRow += recordDetails.record[j].value + ',';
                 }
-                csvRow = csvRow + this.recList[i].progressBarValue;
+                csvRow=csvRow+this.recList[i].progressBarValue;
                 csvRow = csvRow.substring(0, csvRow.length - 1) + '\n';
                 csvRows += csvRow;
             }
         }
         csvHeader = csvHeader + csvRows;
-        csvHeader = csvHeader.replaceAll('undefined', '').replaceAll('null', '').replaceAll('undefine', '');
+        csvHeader = csvHeader.replaceAll('undefined', '').replaceAll('null', '').replaceAll('undefine','');
         let blob = new Blob([csvHeader], { type: 'text/plain' });
         let url = window.URL.createObjectURL(blob);
         let atag = document.createElement('a');
@@ -583,9 +574,9 @@ export default class CustomTable extends LightningElement {
                 else {
                     tableHtml += '<td>' + this.recList[i].record[j].value + '</td>';
                 }
-
+                 
             }
-            tableHtml += '<td>' + this.recList[i].progressBarValue + '</td>';
+            tableHtml += '<td>' + this.recList[i].progressBarValue + '</td>'; 
             tableHtml += '</tr>';
         }
         tableHtml += '</tbody></table>';
@@ -598,7 +589,7 @@ export default class CustomTable extends LightningElement {
         win.print();
         win.close();
     }
-
+    
     // Handles the selection of checkboxes in the table
     checkboxChangeHandler(event) {
         var dataId = event.currentTarget.dataset.id;
@@ -708,7 +699,7 @@ export default class CustomTable extends LightningElement {
         console.log('setAllColumnHeadersWidth');
         let columnHeaders = this.template.querySelectorAll('[data-columnheader]');
         if (!!columnHeaders && columnHeaders.length > 0) {
-            columnHeaders.forEach(colHeader => {
+            columnHeaders.forEach( colHeader =>{
                 let cWidth = colHeader.offsetWidth;
                 colHeader.setAttribute("style", "width:" + cWidth + "px");
             })

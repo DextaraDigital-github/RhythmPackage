@@ -188,7 +188,7 @@
 										<template lwc:elseif={col.isHtml}>
 											<div class={col.classList}></div>
 										</template>
-										<template lwc:elseif={col.isProgressBar}>
+										<!-- <template lwc:elseif={col.isProgressBar}>
 											<div class="slds-grid slds-wrap slds-gutters_xx-small">
 												<div class="slds-col slds-size_8-of-12 slds-p-top_x-small">
 													<lightning-progress-bar style="background-color: blue "
@@ -198,7 +198,7 @@
 													<span>{col.value}%</span>
 												</div>
 											</div>
-										</template>
+										</template> -->
 										<template lwc:else>
 											{col.value}
 										</template>

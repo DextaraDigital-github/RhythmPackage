@@ -1259,6 +1259,14 @@ export default class Questionnaire extends LightningElement {
                     this.questionMap.set(qu.Rhythm__Section__r.Id, quesList);
                 }
             }
+            if(this.isTemplate)
+            {
+                quTemp.isEditable = true;
+            }
+            if(this.objectApiName=='Rhythm__AccountAssessmentRelation__c')
+            {
+                quTemp.isEditable = true;
+            }
 
             console.log('this.questionMap', this.questionMap);
 
@@ -1308,6 +1316,10 @@ export default class Questionnaire extends LightningElement {
                     }
                 }
             if(this.isTemplate)
+            {
+                quTemp.isEditable = true;
+            }
+            if(this.objectApiName=='Rhythm__AccountAssessmentRelation__c')
             {
                 quTemp.isEditable = true;
             }
