@@ -323,11 +323,6 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>Assessment__c.Frequency__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
         <field>Assessment__c.Historical_Id__c</field>
         <readable>true</readable>
     </fieldPermissions>

@@ -1,24 +1,24 @@
 {
-  "packageDirectories": [
-    {
-      "path": "force-app",
-      "package": "RhythmQATest",
-      "versionName": "ver 0.1",
-      "versionNumber": "0.1.0.0",
-      "default": true,
-      "versionDescription": "",
-      "definitionFile": "config/project-scratch-def.json"
+    "packageDirectories": [
+        {
+            "path": "force-app",
+            "package": "RhythmDevTest",
+            "versionName": "ver 0.1",
+            "versionNumber": "0.1.0.0",
+            "default": true,
+            "versionDescription": "",
+            "definitionFile": "config/project-scratch-def.json"
+        }
+    ],
+    "name": "RythmProject",
+    "namespace": "Rhythm",
+    "sfdcLoginUrl": "https://login.salesforce.com",
+    "sourceApiVersion": "57.0",
+    "packageAliases": {
+        "RhythmTest": "0Ho5w000000PBDQCA4",
+        "RhythmTest@0.1.0-0": "04t5w000004ckk0AAA",
+        "RhythmDevTest": "0Ho5w000000PBDVCA4",
+        "RhythmDevTest@0.1.0-0": "04t5w000004ckmGAAQ",
+        "RhythmQATest": "0HoDp0000004CMJKA2"
     }
-  ],
-  "name": "RythmProject",
-  "namespace": "Rhythm",
-  "sfdcLoginUrl": "https://login.salesforce.com",
-  "sourceApiVersion": "57.0",
-  "packageAliases": {
-    "RhythmTest": "0Ho5w000000PBDQCA4",
-    "RhythmTest@0.1.0-0": "04t5w000004ckk0AAA",
-    "RhythmDevTest": "0Ho5w000000PBDVCA4",
-    "RhythmDevTest@0.1.0-0": "04t5w000004ckkUAAQ",
-    "RhythmQATest": "0HoDp0000004CMJKA2"
-  }
 }
