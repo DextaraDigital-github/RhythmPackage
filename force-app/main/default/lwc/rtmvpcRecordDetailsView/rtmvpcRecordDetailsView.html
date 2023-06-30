@@ -1,4 +1,5 @@
 <template>
+	<!--
 	<div class="rtmvpc-card rtmvpc-tabset">
 		<template lwc:if={isCustomDetailPage}>
 			<lightning-layout class="slds-grid slds-wrap" multiple-rows="true">
@@ -27,16 +28,9 @@
 											<lightning-accordion allow-multiple-sections-open
 												active-section-name={activeSections}>
 												<template for:each={uiPageLayoutView.sections} for:item="section">
-													<!-- <div key={section.id} -->
-													<!-- class="test-id__section slds-m-vertical_none slds-section has-header slds-p-bottom_medium slds-is-open"> -->
-													<!-- <h3
-											class="test-id__section-header-container slds-section__title slds-theme--shade">
-											<span
-                                class="test-id__section-header-title section-header-title slds-p-horizontal--small">{section.heading}</span>
-										</h3> -->
+													
 													<lightning-accordion-section class="slds-section-title--divider"
 														key={section.id} name={section.heading} label={section.heading}>
-														<!-- <div class="test-id__section-content slds-section__content section__content align-with-title slds-p-horizontal_medium"> -->
 														<div>
 															<lightning-layout multiple-rows="true">
 																<template for:each={section.layoutRows}
@@ -70,8 +64,7 @@
 															</lightning-layout>
 														</div>
 													</lightning-accordion-section>
-													<!-- </div> -->
-												</template>
+													</template>
 											</lightning-accordion>
 										</div>
 									</template>
@@ -109,10 +102,7 @@
 											tabs-data={tabchild.tabsData} table-label={tabchild.label}
 											onshowchilddetailpage={changeRecordPageView}>
 										</c-custom-table>
-										<!-- <c-custom-table is-child-table='true' rec-id={recordId} obj-name={tabchild.objName}
-											rel-name={tabchild.relName} col-list={tabchild.colList}
-											record-type='012000000000000AAA' tabs-data={tabchild.tabsData} table-label={tabchild.label} onshowchilddetailpage={changeRecordPageView}>
-										</c-custom-table> -->
+										
 									</div>
 								</template>
 							</lightning-tab>
@@ -127,16 +117,9 @@
 						<div class="slds-p-horizontal_medium slds-p-bottom_large">
 							<lightning-accordion allow-multiple-sections-open active-section-name={activeSections}>
 								<template for:each={uiPageLayoutView.sections} for:item="section">
-									<!-- <div key={section.id} -->
-									<!-- class="test-id__section slds-m-vertical_none slds-section has-header slds-p-bottom_medium slds-is-open"> -->
-									<!-- <h3
-											class="test-id__section-header-container slds-section__title slds-theme--shade">
-											<span
-                                class="test-id__section-header-title section-header-title slds-p-horizontal--small">{section.heading}</span>
-										</h3> -->
+								
 									<lightning-accordion-section class="slds-section-title--divider" key={section.id}
 										name={section.heading} label={section.heading}>
-										<!-- <div class="test-id__section-content slds-section__content section__content align-with-title slds-p-horizontal_medium"> -->
 										<div>
 											<lightning-layout multiple-rows="true">
 												<template for:each={section.layoutRows} for:item="layoutRow">
@@ -164,8 +147,7 @@
 											</lightning-layout>
 										</div>
 									</lightning-accordion-section>
-									<!-- </div> -->
-								</template>
+									</template>
 							</lightning-accordion>
 						</div>
 					</template>
@@ -173,4 +155,5 @@
 			</template>
 		</template>
 	</div>
+	-->
 </template>

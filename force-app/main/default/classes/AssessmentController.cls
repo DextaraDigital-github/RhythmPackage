@@ -100,15 +100,6 @@ public with sharing class AssessmentController {
         List<AccountAssessmentRelation__c> assessment=[SELECT Id,Name,Follow_Up_Requests__c,Status__c,Assessment__c,Account__c,PdfConvertor__c
                                                        FROM AccountAssessmentRelation__c 
                                                        WHERE Id=:(String)queryMap.get('accountassessmentid')];
-        Set<Id> respSet = new Set<Id>();
-        for(AccountAssessmentRelation__c assmtRln:assessment){
-            if(assmtRln.Follow_Up_Requests__c != null && assmtRln.Follow_Up_Requests__c > 0){
-                respSet.add(assmtRln.Id);
-            }
-        }
-        if(respSet.isEmpty() == false){
-            sendEmails(respSet,'FUR');
-        }
         if(!assessment.isEmpty()){
             assessment[0].Status__c =(String)queryMap.get('status');
             assessment[0].PdfConvertor__c =(String)queryMap.get('pdfContnet');

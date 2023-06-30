@@ -16,7 +16,7 @@ export default class RtmvpcMaster extends NavigationMixin(LightningElement) {
     rtmvpclogotypepic1Url = '';//RtmvpcLogotypePic1;
     rtmvpclogofullpic1Url = RtmvpcLogofullPic1;
 
-    isHome = true; 
+    isHome = false; 
     isInbox = false; 
     isCalendar = false; 
     isAssessments = false; 

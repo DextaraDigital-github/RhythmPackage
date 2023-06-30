@@ -11,10 +11,11 @@ import { NavigationMixin } from 'lightning/navigation';
 const actions = [
     { label: 'View', name: 'view' },
     { label: 'Edit', name: 'edit' },
+    { label: 'Delete', name: 'delete' },
 ];
 
 export default class TemplateSections extends NavigationMixin(LightningElement) {
-
+    @track deletePopupMessage = 'Are you sure you want to delete this Questions?';
     @api objLabel = 'Sections';
     @api recsCount = 0;
     @api recordId;
@@ -80,6 +81,15 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
         this.showModal.createModal = true;
     }
 
+    //Save and New Functionality for New Record
+    reOpenCreateModal() {
+        // this.showModal.createModal = false;
+        // this.showModal.createModal = true;
+        setTimeout(() => {
+            this.handlenew();
+        }, 500);
+    }
+
     //Save the record and Open new reocrd creation
     handleSaveNew(event) {
         this.handlenew();
@@ -100,27 +110,6 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
     // Close Edit Modal
     closeEditModal() {
         this.showModal.editModal = false;
-    }
-
-    // checks if selected atleast one record to delete
-    handleDelete(event) {
-        var selRows = this.template.querySelector("lightning-tree-grid").getSelectedRows();
-        console.log('Selected rows ---' + JSON.parse(JSON.stringify(this.selectedRows)));
-        selRows && selRows.forEach(row => {
-            this.selectedRows.push(row.Id);
-        });
-        console.log(this.selectedRows);
-        if (this.selectedRows.length != 0)
-            this.showModal.deleteModal = true;
-        else {
-            this.dispatchEvent(
-                new ShowToastEvent({
-                    title: 'No Records are selected',
-                    message: 'Select Records',
-                    variant: 'error'
-                })
-            );
-        }
     }
 
     //Record View and Eit actions
@@ -146,6 +135,11 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
                         actionName: 'edit'
                     }
                 });
+                break;
+            case 'delete':
+                this.selectedRows = [];
+                this.selectedRows.push(row.Id);
+                this.handleDelete(event);
                 break;
             default:
         }
@@ -252,6 +246,13 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
         }
         updateQuestionList({ qstnList: questionlist }).then(result => {
             console.log('sucessfully created Response result==>' + result);
+            this.dispatchEvent(
+                    new ShowToastEvent({
+                        title: 'Success',
+                        message: 'Reordered Questions Successfully',
+                        variant: 'success'
+                    })
+                );
             this.closeReorderSectionModal();
             this.handleRefresh();
         }).catch(error => {
@@ -270,6 +271,13 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
         }
         updateSectionList({ secList: sectionList }).then(result => {
             console.log('sucessfully created Response result==>' + result);
+             this.dispatchEvent(
+                    new ShowToastEvent({
+                        title: 'Success',
+                        message: 'Reordered Sections Successfully',
+                        variant: 'success'
+                    })
+                );
             this.closeReorderSectionModal();
             this.handleRefresh();
         }).catch(error => {
@@ -292,9 +300,46 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
     }
     //Reorder Functionality Ends
 
+
+    //Delete Functionality Starts
     // Close Delete Modal
     closeDeleteModal() {
         this.showModal.deleteModal = false;
+    }
+
+    // checks if selected atleast one record to delete
+    handleDelete(event) {
+        this.deletePopupMessage = 'Are you sure you want to delete this Questions?'
+         /* var selRows = this.template.querySelector("lightning-tree-grid").getSelectedRows();
+         console.log('Selected rows ---' + JSON.parse(JSON.stringify(this.selectedRows)));
+         var selIds;
+         this.sectionListData && this.sectionListData.forEach(rec => {
+             selIds = selRows.find(row => row.id === rec.Id);
+         });
+         if (selIds == null || selIds == undefined(selIds != null && selIds.length > 0)) {
+             this.deletePopupMessage = 'Are you sure you want to delete this Questions?';
+         }
+         selRows && selRows.forEach(row => {
+             this.selectedRows.push(row.Id);
+         });*/
+        console.log(this.selectedRows);
+        if (this.selectedRows.length != 0) {
+            this.sectionListData && this.sectionListData.forEach(rec => {
+                if (this.selectedRows[0] === rec.Id) {
+                    this.deletePopupMessage = 'Are you sure you want to delete this Section and Questions?';
+                }
+            });
+            this.showModal.deleteModal = true;
+        }
+        else {
+            this.dispatchEvent(
+                new ShowToastEvent({
+                    title: 'No Records are selected',
+                    message: 'Select Records',
+                    variant: 'error'
+                })
+            );
+        }
     }
 
     // Delete selected Records
@@ -310,7 +355,7 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
                     })
                 );
                 this.showModal.deleteModal = false;
-                location.reload();
+                this.handleRefresh();
             }
             else {
                 console.log('Deleted Unsuccessful');
@@ -320,17 +365,16 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
             console.log('deleteRecords Error', JSON.stringify(error));
         });
     }
+    //Delete Functionality Ends
 
     // To Get Refresh the Records Data
     handleRefresh() {
         this.tempRecsLimit = this.recsLimit;
-        
         getQuestionsList({ templateId: this.recordId }).then(data => {
             this.questionsList = JSON.parse(JSON.stringify(data));
             getSectionRecsCount({ templateId: this.recordId, objName: this.tableLabel }).then(data => {
                 this.totalRecsCount = data;
                 this.handleSectionsData(JSON.parse(JSON.stringify(data)));
-
             }).catch(error => {
                 console.log('Error' + error);
             });
@@ -355,7 +399,6 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
 
     //Mapping Sections and Questions JSON
     prepareSectionsQuestionaire() {
-        
         if (!this.sectionList) {
             return;
         }
@@ -370,15 +413,14 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
                     tempqueslist.push(questionJson);
                 }
             });
-            section["_children"] = tempqueslist;
+            if (tempqueslist && tempqueslist.length > 0) {
+                section["_children"] = tempqueslist;
+            }
         });
-
         if (this.sectionList && this.sectionList.length > 0) {
             this.recsCount = this.sectionList.length;
         }
-        
         this.sectionListData = JSON.parse(JSON.stringify(this.sectionList));
-
         console.log('this.sectionListData -- ', this.sectionListData);
     }
 

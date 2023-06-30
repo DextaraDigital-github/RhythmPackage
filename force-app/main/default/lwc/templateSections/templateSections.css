@@ -4,7 +4,7 @@ div.cdgWrapperinner{ overflow:auto; max-height:auto; max-width:calc(100vw - 58px
 .cdgWrapperinner { max-height:calc(100vh - 220px); overflow-x:auto; background:rgba(0,0,0,0.02); border:1px solid var(--cdg-bdrouter-color); border-radius:0px 0px 3px 3px;}
 div.cdgtitletoolbar { background:#f3f3f3; font-size:var(--fs-16); line-height:24px; padding:10px 10px 8px 10px;border-radius:3px 3px 0px 0px ;border:1px solid var(--cdg-bdrouter-color); border-bottom:0px; }
 .fs24 {font-size:var(--fs-24);}
-div.cdg { display:block; width:calc(100vw - 66px); margin:0; border:1px solid var(--cdg-bdrouter-color); /*background:var(--bg-primary-color1);*/ border-collapse:separate; border-spacing:0; overflow:auto!important; } 
+div.cdg { display:block; width:calc(100vw - 58px); margin:0; border:1px solid var(--cdg-bdrouter-color); /*background:var(--bg-primary-color1);*/ border-collapse:separate; border-spacing:0; overflow:auto!important; } 
 div.cdg .tr {display:table-row;}
 div.cdg div.th { display:table-cell; background:#f3f3f3; border-right:1px solid transparent; color:rgb(0 0 0 / 80%); padding:3px; position:sticky; top:0; min-width:25%; width:50%; max-width:100%; z-index:1; font-weight:var(--fw-600); }
 div.th:hover{cursor:pointer;}

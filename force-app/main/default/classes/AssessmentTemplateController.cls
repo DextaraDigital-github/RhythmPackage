@@ -22,7 +22,7 @@ public with sharing class AssessmentTemplateController {
         return secList; 
     }
     
- //Get Template Details
+    //Get Template Details
     @AuraEnabled(Cacheable=true)
     Public static Boolean getTemplateDetails(String templateId) {
         boolean hasStatusNew = false;
@@ -44,7 +44,7 @@ public with sharing class AssessmentTemplateController {
         }
         return hasStatusNew;
     }
-   
+    
     /* getRecordsCount method is used to get the count of Records to particular Assessment Template */
     @AuraEnabled
     Public static Integer getRecordsCount(String templateId, String objName) {
@@ -84,7 +84,7 @@ public with sharing class AssessmentTemplateController {
     }
     
     /* getQuestionsLists method is used to get all the questions */
-    @AuraEnabled(cacheable=true)
+    @AuraEnabled
     Public static List<Question__c> getQuestionsLists(String templateId) {
         try {
             if(templateId!=null) {
@@ -137,7 +137,19 @@ public with sharing class AssessmentTemplateController {
             if(recIdList.size()>0) {
                 Database.DeleteResult[] drchildList;
                 if(delchildobjrecs==true) {
-                    drchildList=safe.doDelete([SELECT Id from Question__c where section__c IN:recIdList]);
+                    List<Question__c> questionList=[SELECT Id from Question__c where section__c IN:recIdList];
+                    List<Question__c> subquestionList=[SELECT Id from Question__c where Id IN:recIdList];
+                    if(questionList.size() > 0) {  
+                       /* for(Question__c ques: subquestionList) {
+                            if(recIdList.contains(ques.Id)) {
+                                recIdList.remove(recIdList.indexof(ques.Id));
+                            } 
+                        }
+                        if(subquestionList.size() > 0) {  
+                            drchildList=safe.doDelete(subquestionList);
+                        }*/
+                        drchildList=safe.doDelete(questionList);
+                    }
                 }
                 Database.DeleteResult[] drList=Database.delete(recIdList,true);
                 for(Database.DeleteResult dr:drchildList) {
@@ -155,6 +167,7 @@ public with sharing class AssessmentTemplateController {
         return status;
     }
     
+    //Get Questions Count
     @AuraEnabled
     public static Object questionsCount(Id sectionId)
     {
@@ -162,6 +175,7 @@ public with sharing class AssessmentTemplateController {
         return s[0].get('q');
     }
     
+    //Get Sections Count
     @AuraEnabled
     public static Object sectionsCount(Id templateId)
     {

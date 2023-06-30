@@ -19,7 +19,7 @@ public class AccountAssessmentRelationHandler implements ITriggerHandler{
         set<Id> acctAssmtSet = new set<Id>();
         Map<Id,AccountAssessmentRelation__c> oldRecordsMap = (Map<Id,AccountAssessmentRelation__c>)oldMap;
         for(AccountAssessmentRelation__c acctAsmt:(List<AccountAssessmentRelation__c>)newList){
-            if(acctAsmt.Status__c.equalsIgnoreCase('Need more information')  && oldRecordsMap.get(acctAsmt.Id).Status__c.equalsIgnoreCase('In review') && (!oldRecordsMap.get(acctAsmt.Id).Status__c.equalsIgnoreCase('Need more information'))){
+            if(acctAsmt.Status__c.equalsIgnoreCase('Need more information')  && oldRecordsMap.get(acctAsmt.Id).Status__c.equalsIgnoreCase('In review')){
                 acctAssmtSet.add(string.valueOf(acctAsmt.get('Id')));
             }
         }
