@@ -214,10 +214,10 @@ public with sharing class AssessmentController {
     @AuraEnabled
     public static string getAccountId()
     {
-        List<User> strAccId = [SELECT Contact.AccountId FROM User WHERE id=:userinfo.getuserid()];
-        return strAccId[0].Contact.AccountId;
+       // List<User> strAccId = [SELECT Contact.AccountId FROM User WHERE id=:userinfo.getuserid()];
+        //return strAccId[0].Contact.AccountId;
         
-        // return null;
+         return null;
     }
     
     
@@ -605,13 +605,26 @@ public with sharing class AssessmentController {
                 assessSupList.add(assessSup);
                 boolean isSend = false;
                 if(asmtEndDate != null){
-                    if(asmtStartDate >= Date.Today() && asmtEndDate<=Date.Today()){
+                    if(asmtStartDate >= Date.Today() && asmtEndDate>=Date.Today()){
                         isSend = true;
                     }
                 }else if(asmtStartDate >= Date.Today()){
                     isSend = true;
                 }
-                if(isSend){
+                if(operationType.equalsIgnoreCase('new') && asmtStartDate == Date.Today()){
+                    AccountAssessmentRelation__c accAssessReln = new AccountAssessmentRelation__c();
+                    accAssessReln.Name = acc.Name;
+                    accAssessReln.Account__c = acc.Id;
+                    accAssessReln.Assessment__c = assessmentId;
+                    if(asmtStartDate != null){
+                        accAssessReln.Start_Date__c = asmtStartDate;
+                    }
+                    if(asmtEndDate != null){
+                        accAssessReln.End_Date__c = asmtEndDate;
+                    }
+                    accAssessReln.Status__c = 'New';
+                    accountAssessRelnsList.add(accAssessReln);
+                }else if((!operationType.equalsIgnoreCase('new')) && isSend){
                     AccountAssessmentRelation__c accAssessReln = new AccountAssessmentRelation__c();
                     accAssessReln.Name = acc.Name;
                     accAssessReln.Account__c = acc.Id;

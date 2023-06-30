@@ -126,7 +126,7 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
                                             statustrack.status = 'End Date';
                                             statustrack.classlist = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_default';
                                             statustrack.name = accAssessment.Rhythm__Assessment__r.Rhythm__CreatedUser__c;
-                                            this.assessmentTimeline.push(statustrack);
+                                            //this.assessmentTimeline.push(statustrack);
                                         }
                                     }
                                 }

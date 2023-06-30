@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AssessmentforNew</fullName>
+    <active>true</active>
+    <description>AssessmentTemplate should be created only when the Status is New not Inactive and Active</description>
+    <errorConditionFormula>(ISNEW()  &amp;&amp; ((ISPICKVAL(Status__c, &apos;Active&apos;) )   ||   (ISPICKVAL(Status__c, &apos;Inactive&apos;))))</errorConditionFormula>
+    <errorMessage>Status should be &apos;New&apos; while creating a template</errorMessage>
+</ValidationRule>

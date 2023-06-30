@@ -23,6 +23,7 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
     @track deletefiledata = {};
     @api recid;
     @track acceptedFormats=['.pdf', '.png','.pdf', '.csv','.docx'];
+    @api uploadingFile = false;
     connectedCallback() {
         this.chatterMap.openChat = false;
         this.chatterMap.disableSendButton = true;
@@ -300,4 +301,11 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
         }
     }
 
+    @api
+    fileUploadHandler(status)
+    {
+        console.log('status from fileUploadHandler', status);
+        this.uploadingFile = true;
+        console.log('status from fileUploadHandler', this.uploadingFile);
+    }
 }

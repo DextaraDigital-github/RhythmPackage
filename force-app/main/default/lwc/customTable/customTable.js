@@ -339,7 +339,7 @@ export default class CustomTable extends LightningElement {
                             else if (recJson.value.toLowerCase() === 'deferred' || recJson.value.toLowerCase() === 'overdue' || recJson.value.toLowerCase() === 'inactive')
                                 recJson.classList = 'status-deferred';
                             else if (recJson.value.toLowerCase() === 'In Progress')
-                                recJson.classList = 'status-inprogress';
+                                recJson.classList = 'cad-timeline_pending';
                             else if (recJson.value.toLowerCase() === 'waiting on someone else' || recJson.value.toLowerCase() === 'on hold' || recJson.value.toLowerCase() === 'new')
                                 recJson.classList = 'status-waitingonsomeoneelse';
                                 else if (recJson.value === 'In Review')
@@ -671,7 +671,7 @@ export default class CustomTable extends LightningElement {
             window.addEventListener('mouseup', (muEvent) => {
                 this.handleColumnResizeMouseUp(muEvent, cResizeDetails, resizeMouseMoveHandler);
             }, { once: true });
-        } 
+        }
     }
     handleResizeMouseMove(mmEvent, mmResizeDetails) {
         let pos1 = mmResizeDetails.resizeHandleInitPosition - mmEvent.clientX;
