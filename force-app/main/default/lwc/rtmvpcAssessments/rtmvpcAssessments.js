@@ -37,7 +37,6 @@ export default class RtmvpcAssessments extends LightningElement {
          this.accId = result;
          this.fetchingRecords(); 
       });
-    //this.fetchingRecords();    
     
     }  
     
@@ -63,13 +62,6 @@ export default class RtmvpcAssessments extends LightningElement {
         this.show.grid = false;
         this.accountassessmentId = event.detail.accountassessmentId;
         this.show.survey = true;
-       // let urlparam = '/?Rhythm__AccountAssessmentRelation__c'+'='+this.accountassessmentId;
-       // window.location.href = 'https://'+window.location.host+urlparam;
-        // let inputUrl = new URL('https://'+window.location.host);
-        // let inputParams = new URLSearchParams(inputUrl.search);
-        // inputParams.append('Rhythm__AccountAssessmentRelation__c', this.accountassessmentId);
-        //if(!(window.location.href+'').contains('Rhythm__AccountAssessmentRelation__c'))
-        //window.location.href=window.location.href+'/?Rhythm__AccountAssessmentRelation__c'+'='+this.accountassessmentId;
     }
 
     backClickHandler(){
@@ -86,8 +78,8 @@ export default class RtmvpcAssessments extends LightningElement {
             var assessmentTemplateId = resultData[0].Rhythm__Assessment__r.Rhythm__Template__c;
             getQuestionsList({ templateId: assessmentTemplateId }).then(result => {
                 var resultMap = result;
-                getSupplierResponseList({ assessmentId: assessmentId }).then(result => {
-                    result.forEach(qres => {
+                getSupplierResponseList({ assessmentId: assessmentId }).then(suppRespResult => {
+                    suppRespResult.forEach(qres => {
                         var savedResponseList = new Map();
                         savedResponseList.set('value', qres.Rhythm__Response__c);
                         if (('Rhythm__Conversation_History__c' in qres)) {
@@ -99,27 +91,30 @@ export default class RtmvpcAssessments extends LightningElement {
                         this.savedResponseMap.set(qres.Rhythm__Question__c, savedResponseList);
                     });
                     this.finalSection = this.constructWrapper(resultMap, this.savedResponseMap);
-                    var str = 'Section,Question,Answer,ConversationHistory,NumberOfAttachments\n';
+                    let str = 'Section,Question,Answer,ConversationHistory,NumberOfAttachments\n';
                     for (const key of this.finalSection.keys()) {
-                        for (var i = 0; i < this.finalSection.get(key).length; i++) {
-                            if (typeof this.finalSection.get(key)[i].conversationHistory != "undefined") {
-                                var tempstr = '';
-                                for (var j = 0; j < JSON.parse(this.finalSection.get(key)[i].conversationHistory).length; j++) {
-                                    tempstr = tempstr + JSON.parse(this.finalSection.get(key)[i].conversationHistory)[j].Name + ':' + JSON.parse(this.finalSection.get(key)[i].conversationHistory)[j].Text + '\n';
+                        for (let i = 0; i < this.finalSection.get(key).length; i++) {
+                            if (typeof this.finalSection.get(key)[i].conversationHistory !== "undefined"
+                                && this.isJsonString(this.finalSection.get(key)[i].conversationHistory)) {
+                                let tempstr = '';
+                                let convHistory = JSON.parse(this.finalSection.get(key)[i].conversationHistory);
+                                for (let j = 0; j < convHistory.length; j++) {
+                                    tempstr = tempstr + convHistory[j].Name + ':' + convHistory[j].Text + '\n';
                                 }
                                 this.finalSection.get(key)[i].conversationHistory = tempstr;
                             }
-                            if (typeof this.finalSection.get(key)[i].files != "undefined") {
+                            if (typeof this.finalSection.get(key)[i].files !== "undefined" 
+                                && this.isJsonString(this.finalSection.get(key)[i].files)) {
                                 this.finalSection.get(key)[i].files = JSON.parse(this.finalSection.get(key)[i].files).length;
                             }
-                            str += '"' + key + '","' + (i + 1) + '.' + ' ' + this.finalSection.get(key)[i].question + '","' + this.finalSection.get(key)[i].value + '","' + this.finalSection.get(key)[i].conversationHistory + '","' + this.finalSection.get(key)[i].files + '"\n';
+                            str += '"' + key + '","' + (i + 1) + '. ' + this.finalSection.get(key)[i].question + '","' + this.finalSection.get(key)[i].value + '","' + this.finalSection.get(key)[i].conversationHistory + '","' + this.finalSection.get(key)[i].files + '"\n';
                         }
                         str += '\n';
                     }
                     str = str.replaceAll('undefined', '').replaceAll('null', '');
-                    var blob = new Blob([str], { type: 'text/plain' });
-                    var url = window.URL.createObjectURL(blob);
-                    var atag = document.createElement('a');
+                    let blob = new Blob([str], { type: 'text/plain' });
+                    let url = window.URL.createObjectURL(blob);
+                    let atag = document.createElement('a');
                     atag.setAttribute('href', url);
                     atag.setAttribute('download', resultData[0].Rhythm__Assessment__r.Name + '.csv');
                     atag.click();
@@ -145,8 +140,8 @@ export default class RtmvpcAssessments extends LightningElement {
             var assessmentTemplateId = resultData[0].Rhythm__Assessment__r.Rhythm__Template__c;
             getQuestionsList({ templateId: assessmentTemplateId }).then(result => {
                 var resultMap = result;
-                getSupplierResponseList({ assessmentId: x }).then(result => {
-                    result.forEach(qres => {
+                getSupplierResponseList({ assessmentId: x }).then(suppRespResult => {
+                    suppRespResult.forEach(qres => {
                         var savedResponseList = new Map();
                         savedResponseList.set('value', qres.Rhythm__Response__c);
                         if (('Rhythm__Conversation_History__c' in qres)) {
@@ -158,10 +153,10 @@ export default class RtmvpcAssessments extends LightningElement {
                         this.savedResponseMap.set(qres.Rhythm__Question__c, savedResponseList);
                     });
                     this.finalSection = this.constructWrapper(resultMap, this.savedResponseMap);
-                    var tableHtml = '<table><thead><tr>';
+                    let tableHtml = '<table><thead><tr>';
                     tableHtml += '<th>Section</th><th colspan="2">Question</th><th>Response</th><th>ConversationHistory</th><th>NumberOfAttachments</th>';
                     tableHtml += '</tr></thead><tbody>';
-                    var count = 0;
+                    let count = 0;
                     for (const key of this.finalSection.keys()) {
                         count += 1;
                         if (count % 2 === 0) {
@@ -170,24 +165,26 @@ export default class RtmvpcAssessments extends LightningElement {
                         else {
                             tableHtml += '<tr><td class="oddLeftTd" rowspan=' + this.finalSection.get(key).length + '>' + key + '</td>';
                         }
-                        for (var i = 0; i < this.finalSection.get(key).length; i++) {
-                            if (typeof this.finalSection.get(key)[i].conversationHistory != "undefined") {
-                                var str = '';
-                                for (var j = 0; j < JSON.parse(this.finalSection.get(key)[i].conversationHistory).length; j++) {
-                                    str = str + JSON.parse(this.finalSection.get(key)[i].conversationHistory)[j].Name + ':' + JSON.parse(this.finalSection.get(key)[i].conversationHistory)[j].Text + '\n';
+                        for (let i = 0; i < this.finalSection.get(key).length; i++) {
+                            if (typeof this.finalSection.get(key)[i].conversationHistory !== "undefined" && this.isJsonString(this.finalSection.get(key)[i].conversationHistory)) {
+                                let str = '';
+                                let convHistory = JSON.parse(this.finalSection.get(key)[i].conversationHistory);
+                                for (let j = 0; j < convHistory.length; j++) {
+                                    str = str + convHistory[j].Name + ':' + convHistory[j].Text + '\n';
                                 }
                                 this.finalSection.get(key)[i].conversationHistory = str;
                             }
-                            if (typeof this.finalSection.get(key)[i].files != "undefined") {
+                            if (typeof this.finalSection.get(key)[i].files !== "undefined" && this.isJsonString(this.finalSection.get(key)[i].files)) {
                                 this.finalSection.get(key)[i].files = JSON.parse(this.finalSection.get(key)[i].files).length;
                             }
-                            tableHtml += '<td class="align-to-top">' + (i + 1) + '.' + '</td><td>' + this.finalSection.get(key)[i].question + '</td><td>' + this.finalSection.get(key)[i].value + '</td><td> ' + this.finalSection.get(key)[i].conversationHistory + '</td><td> ' + this.finalSection.get(key)[i].files + '</td></tr>';
+                            tableHtml += '<td class="align-to-top">' + (i + 1) + '.</td><td>' + this.finalSection.get(key)[i].question + '</td><td>' + this.finalSection.get(key)[i].value + '</td><td> ' + this.finalSection.get(key)[i].conversationHistory + '</td><td> ' + this.finalSection.get(key)[i].files + '</td></tr>';
                         }
+                        
                         tableHtml += '<tr><td></td><td></td><td></td><td></td></tr>';
                     }
                     tableHtml += '</tbody></table>';
-                    var win = window.open('', '', 'width=' + (window.innerWidth * 0.9) + ',height=' + (window.innerHeight * 0.9) + ',location=no, top=' + (window.innerHeight * 0.1) + ', left=' + (window.innerWidth * 0.1));
-                    var style = '<style>@media print { * {-webkit-print-color-adjust:exact;}}} @page{ margin: 0px;} *{margin: 0px; padding: 0px; height: 0px; font-family: Source Sans Pro, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif !important;} .headerDiv{width: 100%; height: 56px; padding: 20px; background-color: #03314d;} .headerText{font-size: 40px; color: white; font-weight: bold} .tableDiv{padding: 20px;} table {border-collapse:collapse; font-size: 14px;} table td, th{ padding: 4px;} table tr:nth-child(odd) td {background-color: #F9F9F9;} .oddLeftTd{background-color: #E9E9E9 !important;} .evenLeftTd{background-color: #F1F1F1 !important;} table th{ border: 1px solid #E9E9E9; background-color:#B5BEC58F} table { page-break-inside:auto; } tr { page-break-inside:avoid; page-break-after:auto; } .align-to-top{ vertical-align: top; }</style>';
+                    let win = window.open('', '', 'width=' + (window.innerWidth * 0.9) + ',height=' + (window.innerHeight * 0.9) + ',location=no, top=' + (window.innerHeight * 0.1) + ', left=' + (window.innerWidth * 0.1));
+                    let style = '<style>@media print { * {-webkit-print-color-adjust:exact;}}} @page{ margin: 0px;} *{margin: 0px; padding: 0px; height: 0px; font-family: Source Sans Pro, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif !important;} .headerDiv{width: 100%; height: 56px; padding: 20px; background-color: #03314d;} .headerText{font-size: 40px; color: white; font-weight: bold} .tableDiv{padding: 20px;} table {border-collapse:collapse; font-size: 14px;} table td, th{ padding: 4px;} table tr:nth-child(odd) td {background-color: #F9F9F9;} .oddLeftTd{background-color: #E9E9E9 !important;} .evenLeftTd{background-color: #F1F1F1 !important;} table th{ border: 1px solid #E9E9E9; background-color:#B5BEC58F} table { page-break-inside:auto; } tr { page-break-inside:avoid; page-break-after:auto; } .align-to-top{ vertical-align: top; }</style>';
                     win.document.getElementsByTagName('head')[0].innerHTML += style;
                     win.document.getElementsByTagName('body')[0].innerHTML += '<div class="headerDiv slds-p-around_small"><span class="headerText">Rhythm</span></div><br/>';
                     tableHtml = tableHtml.replaceAll('undefined', '').replaceAll('null', '');
@@ -208,6 +205,14 @@ export default class RtmvpcAssessments extends LightningElement {
         })
     }
 
+    isJsonString(str) {
+        try {
+            JSON.parse(str);
+        } catch (e) {
+            return false;
+        }
+        return true;
+    }
     constructWrapper(questionResp, savedResp) {
         var questionMap = new Map();
         console.log('responsemap', savedResp);
@@ -215,22 +220,19 @@ export default class RtmvpcAssessments extends LightningElement {
             var quTemp = {};
             quTemp.questionId = qu.Id;
             quTemp.question = qu.Rhythm__Question__c;
-            if (qu.Rhythm__Required__c == true) {
-                var str = '';
-                str = str + qu.Rhythm__Question__c + '*';
-                quTemp.question = str;
+            if (qu.Rhythm__Required__c === true) {
+                quTemp.question = qu.Rhythm__Question__c + '*';
             }
             if (questionMap.has(qu.Rhythm__Section__r.Name)) {
                 questionMap.get(qu.Rhythm__Section__r.Name).push(quTemp);
             } else {
-                var quesList = [];
-                quesList.push(quTemp);
-                questionMap.set(qu.Rhythm__Section__r.Name, quesList);
+                questionMap.set(qu.Rhythm__Section__r.Name, [quTemp]);
             }
-            if (typeof (savedResp.get(quTemp.questionId)) != 'undefined' && savedResp.get(quTemp.questionId).conversationHistory == 'undefined') {
+
+            if (typeof (savedResp.get(quTemp.questionId)) !== 'undefined' && savedResp.get(quTemp.questionId).conversationHistory === 'undefined') {
                 quTemp.value = savedResp.get(quTemp.questionId).get('value');
             }
-            else if (typeof (savedResp.get(quTemp.questionId)) != 'undefined') {
+            else if (typeof (savedResp.get(quTemp.questionId)) !== 'undefined') {
                 quTemp.value = savedResp.get(quTemp.questionId).get('value');
                 quTemp.conversationHistory = savedResp.get(quTemp.questionId).get('history');
                 quTemp.files = savedResp.get(quTemp.questionId).get('files');

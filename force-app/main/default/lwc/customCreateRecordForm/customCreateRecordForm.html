@@ -4,8 +4,8 @@
 			<template for:each={fieldsList} for:item="field">
 				<template if:false={field.hide}>
 					<div class={field.class} key={field}>
-						<lightning-layout-item>
-							<lightning-input-field key={field.fieldName} label={field.label}
+						<lightning-layout-item >
+							<lightning-input-field  label={field.label}
 								field-name={field.fieldName} required={field.required}>
 							</lightning-input-field>
 						</lightning-layout-item>

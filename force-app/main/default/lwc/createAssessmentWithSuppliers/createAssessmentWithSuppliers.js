@@ -56,7 +56,7 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
             if(result.data.length>0){
                 console.log('TemplateRecord-------->',JSON.stringify(result.data));
                 this.templateStatus = result.data[0].Rhythm__Status__c;
-                if(result.data[0].Rhythm__Status__c == 'Inactive'){
+                if(result.data[0].Rhythm__Status__c === 'Inactive'){
                     this.isTemplateInactive = true;
                     this.showNewAssessment = false;
                 }else{
@@ -74,7 +74,7 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
     }
 
     get startDate(){
-        if(this.dateValue == undefined){
+        if(this.dateValue === undefined){
             let dateTime= new Date().toLocaleString(this.locale, {timeZone: this.timeZone})
             console.log('dateTime-------->',dateTime);
         }
@@ -116,7 +116,7 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
         let todayDate =  new Date(this.todayDate).toISOString().substring(0, 10);
         console.log('startDate----->',startDate);
         console.log('todayDate----->',todayDate);
-        if(this.templateStatus != undefined && (this.templateStatus =='New' || this.templateStatus =='Inactive')){
+        if(this.templateStatus !== undefined && (this.templateStatus ==='New' || this.templateStatus =='Inactive')){
             validatedDetails.isSave = false;
             validatedDetails.message = 'Assessment can be created only for Active Template.';
         }if(new Date(startDate) < new Date(todayDate)){
@@ -130,7 +130,7 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
         return validatedDetails;
     }
 
-    addSuppliers(event){
+    addSuppliers(){
         try{
             console.log('AddSuppliersMethod------->',JSON.stringify(this.suppliersList));
             console.log('assessmentRecord--------->',JSON.stringify(this.assessmentRecord));
@@ -138,7 +138,7 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
                 addSuppliers({assessmentRecord:this.assessmentRecord,operationType:'new',suppliers:JSON.stringify(this.suppliersList),existingSups:'',deleteList:''})
                 .then(result => {
                     console.log('addSuppliers Result------->'+JSON.stringify(result));
-                    if(result.isSuccess == true){
+                    if(result.isSuccess === true){
                         let successEvent = new CustomEvent("success", {
                         detail: {value:'refreshit'}
                         });
@@ -170,12 +170,12 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
 
     closeModal(){
         this.showModal = false;
-        if(this.values.template != undefined && this.values.template){
+        if(this.values.template !== undefined && this.values.template){
             this.navigateRelatedListView();
         }else{
             this.navigateToObjectHome();
         }
-        eval("$A.get('e.force:refreshView').fire();");
+        eval("$A.get('e.force:refreshView').fire();");//Todo Prudvi please check this
     }
     showNotification(title,message,variant) {
         const evt = new ShowToastEvent({

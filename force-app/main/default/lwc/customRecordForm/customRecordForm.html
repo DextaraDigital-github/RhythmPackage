@@ -17,7 +17,7 @@
 					<template lwc:else>
 						<div class={field.class} key={field}>
 							<lightning-layout-item>
-								<lightning-input-field key={field.fieldName} label={field.label}
+								<lightning-input-field label={field.label}
 									field-name={field.fieldName} required={field.required}>
 								</lightning-input-field>
 							</lightning-layout-item>
@@ -26,7 +26,7 @@
 				</template>
 				<template if:true={field.showCustomLookup}>
 					<div class={field.class} key={field}>
-						<c-custom-lookup key={field.apiname} template-id={templateId} lookup-label={lookupLabel}
+						<c-custom-lookup  template-id={templateId} lookup-label={lookupLabel}
 							onselectedvalue={handleSelectedValue}></c-custom-lookup>
 					</div>
 					<!-- <div class="slds-col slds-size_1-of-2" key={field} style="margin-left: calc(-0.6vw);">

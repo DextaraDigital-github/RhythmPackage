@@ -1,21 +1,5 @@
 <template>
 	<div class="rtmvpc-card slds-m-horizontal_medium">
-		<!-- <div class="relatedListRecords">
-			<template for:each={relatedListRecords} for:item="rec">
-				<div key={rec.id}>
-					<div data-id={rec.id}
-						class="slds-m-around_medium slds-p-around_small slds-border_bottom slds-border_top slds-border_left slds-border_right"
-						onclick={openRecordHandler}>
-						{rec.fields.Name.value}
-					</div>
-				</div>
-			</template>
-		</div>
-		<div class="recordDetail" style="display: none">
-            <div class="slds-m-bottom_small" onclick={backHandler}>Back</div>
-			<c-rtmvpc-record-detail-page rec-id={relRecId} obj-name={objName}>
-			</c-rtmvpc-record-detail-page>
-		</div> -->
 		<lightning-datatable
                 key-field="id"
                 data={recDataList}

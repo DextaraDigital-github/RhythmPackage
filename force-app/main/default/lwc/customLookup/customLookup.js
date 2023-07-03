@@ -1,4 +1,4 @@
-import { LightningElement, track, wire,api } from 'lwc';
+import { LightningElement, track, api } from 'lwc';
 import getRecordsList from '@salesforce/apex/AssessmentTemplateController.getSections';
 export default class SearchComponentLwc extends  LightningElement{
     @track lookupName='';
@@ -14,12 +14,10 @@ export default class SearchComponentLwc extends  LightningElement{
    
    hideValues()
    {
-     console.log('Yes');
      var _this = this;
      const myTimeout = setTimeout(()=>{_this.showSearchedValues = false;}, 300);
     }
-   handleClick(event){
-     console.log('Yeah');
+   handleClick(){
         getRecordsList({sectionName:this.lookupName,templateId:this.templateId})
         .then(data => {
         this.messageResult=false;
@@ -31,10 +29,10 @@ export default class SearchComponentLwc extends  LightningElement{
                this.showSearchedValues = true; 
                this.messageResult=false;
            }            
-           else if(data.length==0){
+           else if(data.length===0){
                this.lookupValuesList = [];                
                this.showSearchedValues = false;
-               if(this.lookupName!='')
+               if(this.lookupName!=='')
                    this.messageResult=true;               
            } 
          } 
@@ -45,6 +43,7 @@ export default class SearchComponentLwc extends  LightningElement{
             this.lookupValuesList=[];           
             this.showSearchedValues = false;
             this.messageResult=true;
+            console.log('handleClick-getRecordsList'+error);
       });
         
    

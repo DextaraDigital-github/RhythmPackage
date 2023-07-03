@@ -71,7 +71,7 @@ export default class AddSuppliersforAssessment extends NavigationMixin(Lightning
             console.log('endDate----->',this.endDate);
             let todayDate =  new Date(this.todayDate).toISOString().substring(0, 10);
             let save = false;
-            if(this.endDate != undefined){
+            if(this.endDate !== undefined){
                 if(new Date(todayDate)>=new Date(this.startDate) &&  new Date(todayDate) <=new Date(this.endDate)){
                     save = true;
                 }
@@ -84,7 +84,7 @@ export default class AddSuppliersforAssessment extends NavigationMixin(Lightning
                     addSuppliers({assessmentRecord:this.assessmentRecord,operationType:'update',suppliers:JSON.stringify(this.suppliersList),existingSups:exSupListStr,deleteList:deleteListStr})
                     .then(result => {
                         console.log('addSuppliers Result------->'+JSON.stringify(result));
-                        if(result.isSuccess == true){
+                        if(result.isSuccess === true){
                             this.showModal = false;
                             this.showNotification('Success','Suppliers Added to Assessments Successfully.','success');
                             this.closeModal();
