@@ -207,8 +207,17 @@ public with sharing class AssessmentTemplateController {
             if(recIdList.size()>0) {
                 Database.DeleteResult[] drchildList;
                 if(delchildobjrecs==true) {
-                    List<Question__c> questionList=[SELECT Id from Question__c where section__c IN:recIdList];
-                    List<Question__c> subquestionList=[SELECT Id from Question__c where Id IN:recIdList];
+                    string queQuery = 'SELECT Id'
+                                    +' FROM Question__c'
+                                    +' WHERE section__c IN:recIdList';
+                    Map<String, Object> bindVariables = new Map<String, Object>{'recIdList' => recIdList};
+                    List<Question__c> questionList = safe.doQueryWithBinds(queQuery,bindVariables);
+
+                    string queSubQuery = 'SELECT Id'
+                                    +' FROM Question__c'
+                                    +' WHERE Id IN:recIdList';
+                    
+                    List<Question__c> subquestionList = safe.doQueryWithBinds(queSubQuery,bindVariables);
                     if(questionList.size() > 0) { 
                         drchildList=safe.doDelete(questionList);
                     }

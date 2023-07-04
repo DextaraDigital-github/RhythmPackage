@@ -678,10 +678,10 @@ public with sharing class AssessmentController {
     public static List<Account> getAllSuppliers(string existingData, string searchKey, string exSearchKey){
         List<Account> supplierList = new List<Account>();
         set<string> selSet = new set<string>();
+        set<Id> existingSups = new set<Id>();
         selSet.add(existingData);
         string query = '';
         try{
-            set<Id> existingSups = new set<Id>();
             if(string.isNotBlank(existingData)){
                 existingSups = (set<Id>) JSON.deserialize(existingData, set<Id>.class);
             }
@@ -716,7 +716,8 @@ public with sharing class AssessmentController {
             String errorMsg = e.getMessage();
             throw new AuraHandledException(ErrorMsg);
         }
-        return safe.doQuery(query);
+        Map<String, Object> bindVariables = new Map<String, Object>{'existingSups' => existingSups};
+        return safe.doQueryWithBinds(query,bindVariables);
     }
     
 
@@ -749,6 +750,8 @@ public with sharing class AssessmentController {
                         assessmentId = assmtList[0].Id;
                     }
                 }
+            }else{
+                assessmentId = assessmentRecord.Id;
             }
             Date asmtStartDate = (Date)assessmentRecord.get('Start_Date__c');
             Date asmtEndDate = (Date)assessmentRecord.get('End_Date__c') != null?(Date)assessmentRecord.get('End_Date__c'):null;
@@ -769,7 +772,8 @@ public with sharing class AssessmentController {
                 deleteSupList = (set<string>) JSON.deserialize(deleteList, set<string>.class);
                 List<Assessment_Supplier__c> deleteAccAssRelns = new List<Assessment_Supplier__c>();
                 string assSupQuery = 'SELECT Id FROM Assessment_Supplier__c WHERE Account__c IN:deleteSupList';
-                List<Assessment_Supplier__c> assSuppList = safe.doQuery(assSupQuery);
+                Map<String, Object> bindVariables = new Map<String, Object>{'deleteSupList' => deleteSupList};
+                List<Assessment_Supplier__c> assSuppList = safe.doQueryWithBinds(assSupQuery,bindVariables);
                 if(assSuppList.isEmpty() == false){
                     for(Assessment_Supplier__c assReln:assSuppList){
                         deleteAccAssRelns.add(assReln);
@@ -790,7 +794,8 @@ public with sharing class AssessmentController {
             
             Date todayDate = Date.Today();
             string query = 'SELECT Id,Name FROM Account WHERE ID IN:suppliersIds';
-            List<Account> accList = safe.doQuery(query);
+            Map<String, Object> bindVariables = new Map<String, Object>{'suppliersIds' => suppliersIds};
+            List<Account> accList = safe.doQueryWithBinds(query,bindVariables);
             if(accList.isEmpty() == false){
                 for(Account acc:accList){
                     Assessment_Supplier__c assessSup = new Assessment_Supplier__c();
@@ -872,41 +877,48 @@ public with sharing class AssessmentController {
     public static void sendEmails(Set<Id> recordIdsSet, string Source){
         try{
             List<Messaging.SingleEmailMessage> emailMessagesList = new List<Messaging.SingleEmailMessage>();
-            if(string.isBlank(Source)){
-                for(AccountAssessmentRelation__c assRelRec:[SELECT Id,Account__c,Account__r.Name,Account__r.Email__c,Assessment__c FROM AccountAssessmentRelation__c WHERE ID IN:recordIdsSet]){
-                    Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
-                    List<String> sendTo = new List<String>();
-                    sendTo.add(assRelRec.Account__r.Email__c);
-                    mail.setToAddresses(sendTo);
-                    mail.setSubject('Sample Survey');
-                    String body = '<html><body>'+
-                        '<br><br>'+'Dear '+assRelRec.Account__r.Name+
-                        '<br><br>'+'we’d like to complete a short survey.'+
-                        '<br><br><a href='+System.Label.Supplier_Portal_URL+assRelRec.Id+'>Take the survey now.</a>'+
-                        '<br><br>'+'Kind regards,'+
-                        '<br>'+'Rhythm';
-                    mail.setHtmlBody(body);
-                    emailMessagesList.add(mail);
+            string assRelQuery = 'SELECT Id,Account__c,Account__r.Name,Account__r.Email__c,Assessment__c'
+                                   +' FROM AccountAssessmentRelation__c'
+                                   +' WHERE ID IN:recordIdsSet';
+            Map<String, Object> bindVariables = new Map<String, Object>{'recordIdsSet' => recordIdsSet};
+            List<AccountAssessmentRelation__c> assRlnsList = safe.doQueryWithBinds(assRelQuery,bindVariables);
+            if(assRlnsList.isEmpty() == false){
+                if(string.isBlank(Source)){
+                    for(AccountAssessmentRelation__c assRelRec:assRlnsList){
+                        Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
+                        List<String> sendTo = new List<String>();
+                        sendTo.add(assRelRec.Account__r.Email__c);
+                        mail.setToAddresses(sendTo);
+                        mail.setSubject('Sample Survey');
+                        String body = '<html><body>'+
+                            '<br><br>'+'Dear '+assRelRec.Account__r.Name+
+                            '<br><br>'+'we’d like to complete a short survey.'+
+                            '<br><br><a href='+System.Label.Supplier_Portal_URL+assRelRec.Id+'>Take the survey now.</a>'+
+                            '<br><br>'+'Kind regards,'+
+                            '<br>'+'Rhythm';
+                        mail.setHtmlBody(body);
+                        emailMessagesList.add(mail);
+                    }
+                }else{
+                    for(AccountAssessmentRelation__c assRelRec:assRlnsList){
+                        Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
+                        List<String> sendTo = new List<String>();
+                        sendTo.add(assRelRec.Account__r.Email__c);
+                        mail.setToAddresses(sendTo);
+                        mail.setSubject('Updates on the Assessment');
+                        String body = '<html><body>'+
+                            '<br><br>'+'Dear '+assRelRec.Account__r.Name+
+                            '<br><br>'+'There are few comments on the responses submitted.'+
+                            '<br><br><a href='+System.Label.Supplier_Portal_URL+assRelRec.Id+'>Click Here</a>'+
+                            '<br><br>'+'Kind regards,'+
+                            '<br>'+'Rhythm';
+                        mail.setHtmlBody(body);
+                        emailMessagesList.add(mail);
+                    }
                 }
-            }else{
-                for(AccountAssessmentRelation__c assRelRec:[SELECT Id,Account__c,Account__r.Name,Account__r.Email__c,Assessment__c FROM AccountAssessmentRelation__c WHERE ID IN:recordIdsSet]){
-                    Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
-                    List<String> sendTo = new List<String>();
-                    sendTo.add(assRelRec.Account__r.Email__c);
-                    mail.setToAddresses(sendTo);
-                    mail.setSubject('Updates on the Assessment');
-                    String body = '<html><body>'+
-                        '<br><br>'+'Dear '+assRelRec.Account__r.Name+
-                        '<br><br>'+'There are few comments on the responses submitted.'+
-                        '<br><br><a href='+System.Label.Supplier_Portal_URL+assRelRec.Id+'>Click Here</a>'+
-                        '<br><br>'+'Kind regards,'+
-                        '<br>'+'Rhythm';
-                    mail.setHtmlBody(body);
-                    emailMessagesList.add(mail);
+                if(emailMessagesList.isEmpty() == false){
+                    Messaging.sendEmail(emailMessagesList);
                 }
-            }
-            if(emailMessagesList.isEmpty() == false){
-                Messaging.sendEmail(emailMessagesList);
             }
         }catch(exception e){
             String errorMsg = e.getMessage();
