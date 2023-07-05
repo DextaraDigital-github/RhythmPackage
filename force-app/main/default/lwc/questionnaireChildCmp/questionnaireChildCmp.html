@@ -26,9 +26,9 @@
 				</template>
 				<template if:true={questionary.isCheckbox}>
 					<b key={questionary.Id}>
-                      <lightning-formatted-text value={questionary.question} title={questionary.question} key={questionary.Id} data-key={questionary.Id} name={questionary.question}></lightning-formatted-text>
+                      <lightning-formatted-text value={questionary.question} title={questionary.question}  data-key={questionary.Id} name={questionary.question}></lightning-formatted-text>
                     </b>
-					<template key={questionary.Id} data-key={questionary.Id}
+					<template 
 						for:each={questionary.optionsWrapper.checkboxOptions} for:item="option">
 						<div key={option.id}>
 							<lightning-input type="checkbox" label={option.label} value={option.isChecked}
@@ -54,8 +54,8 @@
 					</lightning-radio-group>
 				</template>
 				<!-- Write Here for Conditional Questioning  -->
-				<template if:true={questionary.Children} key={questionary.Id}>
-					<template if:true={visible} key={questionary.Id}>
+				<template if:true={questionary.Children} >
+					<template if:true={visible} >
 						<c-questionnaire-child-cmp key={questionary.Id} input={questionary.Children}>
 						</c-questionnaire-child-cmp>
 					</template>
@@ -63,5 +63,4 @@
 				</template>
 			</template>
 		</template>
-	</template>
 </template>

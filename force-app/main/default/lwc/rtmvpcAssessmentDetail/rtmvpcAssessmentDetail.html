@@ -4,7 +4,7 @@
 	<div class="cad-cardbase slds-p-around_small">
 		<div class="cad-tbl">
 			<div class="cad-row">
-				<div class="cad-cel cad-w230 cad-type cadshowleft cad-pr8" data-id="cadtype" aura:id="cadtype">
+				<div class="cad-cel cad-w230 cad-type cadshowleft cad-pr8" data-id="cadtype" >
 					<div class="cad-sec_container">
 						<div class="cad-sec_header">
 							<button class="cad_actions" onclick={handleLeftButtonClick} title="Close Timeline Panel" style="z-index:1; position:inherit;">
@@ -67,17 +67,11 @@
 								&nbsp; &nbsp;
 								
 								<template if:true={showExpand}>
-									<!-- <lightning-button-icon icon-name="utility:expand_all" variant="bare" onclick={handleAccordian} data-id="[ + ]"
-										alternative-text="Close window" size="medium">
-									</lightning-button-icon> -->
 
 									<button class="cad_actions" onclick={handleAccordian} title="Expand" data-id="[ + ]"><i class="las la-window-maximize"></i></button>
 
 								</template>
 								<template if:false={showExpand}>
-									<!-- <lightning-button-icon icon-name="utility:collapse_all" variant="bare" data-id="[ - ]" onclick={handleAccordian}
-										alternative-text="Close window" size="medium">
-									</lightning-button-icon> -->
 
 									<button class="cad_actions" onclick={handleAccordian} title="Collapse" data-id="[ - ]"><i class="las la-window-minimize"></i></button>
 								</template>

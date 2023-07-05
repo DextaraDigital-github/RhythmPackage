@@ -20,11 +20,10 @@ export default class AddSuppliers extends LightningElement {
     @api recordId;
     newAccounts = [];
     delAccounts = [];
-    hasRendered = true;
 
     connectedCallback() {
         console.log('childConnectedCallBack------>',this.recordId);
-        if(this.recordId != undefined){
+        if(this.recordId !== undefined){
             this.fetchExistingSuppliers();
         }
     }

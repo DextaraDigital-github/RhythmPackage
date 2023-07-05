@@ -14,7 +14,7 @@ public with sharing class AssessmentController {
 * Gets the assessment information.
 * @param assessmentId This is a record id of an Assessment__c.  
 */
-    @AuraEnabled(cacheable=true)
+    @AuraEnabled
     public static List<SObject> getSupplierAssessmentList(string assessmentId){
         try{
             string query =  'SELECT Id,Assessment__r.Name,Assessment__r.Template__c,'

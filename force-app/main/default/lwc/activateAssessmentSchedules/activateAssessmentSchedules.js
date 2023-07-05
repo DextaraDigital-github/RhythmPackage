@@ -10,11 +10,11 @@ export default class ActivateAssessmentSchedules extends LightningElement {
         this.dispatchEvent(new CloseActionScreenEvent());
     }
     handleConfirm(){
-        console.log('handleConfirm------->',this.recordId);
+        console.log('handleConfirm------->');
         updateAssessmentSuppliers({assessmentId:this.recordId})
         .then(result => {
             console.log('updateAssessmentSuppliers:Result------->',JSON.stringify(result));
-            if(result.isSuccess == true){
+            if(result.isSuccess === true){
                 this.showNotification('Success','Assessments Scheduled Successfully','success');
                 this.closeModal();
             }else{
@@ -22,7 +22,7 @@ export default class ActivateAssessmentSchedules extends LightningElement {
             }
         })
         .catch(error => {
-            console.log('handleConfirm:Error------->',JSON.stringify(result));
+            console.log('handleConfirm:Error------->');
             this.showNotification('Error',error,'error');
         });
     }

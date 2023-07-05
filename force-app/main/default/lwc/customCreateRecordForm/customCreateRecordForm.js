@@ -52,7 +52,7 @@ export default class CustomRecordForm extends LightningElement {
             fields[field.fieldName] = field.value;
           }
         });
-        if (this.selLookupId != null && this.selLookupId != '') {
+        if (this.selLookupId != null && this.selLookupId !== '') {
           console.log(fields.Rhythm__OptionValueSet__c + 'fields.Rhythm__OptionValueSet__c');
           if ((fields.Rhythm__Question_Type__c === 'Radio' || fields.Rhythm__Question_Type__c === 'Picklist' || fields.Rhythm__Question_Type__c === 'Picklist (Multi-Select)') && (fields.Rhythm__OptionValueSet__c === undefined || fields.Rhythm__OptionValueSet__c === null || fields.Rhythm__OptionValueSet__c === '')) {
             this.dispatchEvent(
@@ -88,7 +88,7 @@ export default class CustomRecordForm extends LightningElement {
                 }),
               );
             }).catch(error => {
-
+              console.log('getRecsCount==>'+error);
             });
           }
         }
@@ -115,7 +115,7 @@ export default class CustomRecordForm extends LightningElement {
               variant: 'success',
             }),
           );
-          if (this.newFlag == true) {
+          if (this.newFlag === true) {
             const selEvent = new CustomEvent('savenew');
             this.dispatchEvent(selEvent);
           }
