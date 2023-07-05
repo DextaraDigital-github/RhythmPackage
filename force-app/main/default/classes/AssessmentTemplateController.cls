@@ -218,7 +218,7 @@ public with sharing class AssessmentTemplateController {
                                     +' WHERE Id IN:recIdList';
                     
                     List<Question__c> subquestionList = safe.doQueryWithBinds(queSubQuery,bindVariables);
-                    if(questionList.size() > 0) { 
+                    if(questionList.isEmpty() == false) {
                         drchildList=safe.doDelete(questionList);
                     }
                 }

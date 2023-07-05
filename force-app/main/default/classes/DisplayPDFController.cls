@@ -1,10 +1,14 @@
 public with sharing class DisplayPDFController {
+    public static SecurityCheckController safe = new SecurityCheckController();
 	public String displayText {get; set;}
     public DisplayPDFController()
     {
         String recordId = apexpages.currentpage().getparameters().get('id');
-		AccountAssessmentRelation__c record = [select id,PdfConvertor__c from AccountAssessmentRelation__c where id = : recordId];
-        System.debug('record.PdfConvertor__c'+record.PdfConvertor__c);
-        displayText = record.PdfConvertor__c; 
+        string query = 'SELECT Id,PdfConvertor__c'
+                     +' FROM AccountAssessmentRelation__c'
+                     + ' WHERE Id=\'' + string.escapeSingleQuotes(recordId) + '\'';
+    
+		List<AccountAssessmentRelation__c> asmtRelnRecord = safe.doQuery(query);
+        displayText = asmtRelnRecord[0].PdfConvertor__c; 
     }
 }
