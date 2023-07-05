@@ -1,4 +1,7 @@
 public class AccountAssessmentRelationHandler implements ITriggerHandler{
+    public static SecurityCheckController safe = new SecurityCheckController();//use singleton pattern
+    private static Savepoint sp;//prudhvi to work
+
 	public void beforeInsert(List<sObject> newList) {
         system.debug('beforeInsert----->');
          
@@ -47,9 +50,6 @@ public class AccountAssessmentRelationHandler implements ITriggerHandler{
     public void updateStatusData(List<SObject> newList , Map<Id, sObject> newMap,Map<Id, sObject> oldMap)
     {
      	List<AccountAssessmentRelation__c> acs = (List<AccountAssessmentRelation__c>) newList;
-       
-        System.debug('newMap'+newMap);
-        System.debug('oldMap'+oldMap);
         List<FieldHistoryTracking__c> fieldtrack = new List<FieldHistoryTracking__c>();
         for(Id assmntId: newMap.keySet()){
             if(newMap.get(assmntId).get('Rhythm__Status__c') != oldMap.get(assmntId).get('Rhythm__Status__c'))
@@ -63,8 +63,17 @@ public class AccountAssessmentRelationHandler implements ITriggerHandler{
               	fieldtrack.add(fieldTracker);
             }
         }
-        INSERT fieldtrack;
+        if (sp == null) sp = Database.setSavepoint();
+        if(fieldtrack.isEmpty() == false){
+            Database.SaveResult[] results = safe.doInsert(fieldtrack);
+            List<String> errorsList = SecurityCheckController.safeClassExceptionHandlerInsert(results);
+            if(errorsList.size()>0){
+                Database.rollback(sp);
+                throw new SecurityControllerException(String.join(errorsList, ', ' ));
+            }
+        }
+    }
+    public class SecurityControllerException extends Exception{
         
-        System.debug('fieldTracker'+fieldtrack);
     }
 }
