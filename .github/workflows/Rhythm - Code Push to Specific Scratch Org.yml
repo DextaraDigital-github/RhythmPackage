@@ -10,11 +10,11 @@ on:
       #username to the scratch-org which needs to be created
       required: true
       
-      scratch-org_consumerkey: 
+     scratch-org_consumerkey: 
       #consumerkey to the scratch-org which needs to be created
       required: true
       
-      scratch-org_loginurl: 
+     scratch-org_loginurl: 
       #loginurl to the scratch-org which needs to be created
       required: true
 
