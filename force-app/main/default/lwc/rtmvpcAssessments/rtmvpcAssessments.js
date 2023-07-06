@@ -1,12 +1,12 @@
-import { LightningElement, api,track } from 'lwc';
+import { LightningElement, api,track,wire} from 'lwc';
 import getAccountId from '@salesforce/apex/AssessmentController.getAccountId';
 import getAssessmentJunctionRecords from '@salesforce/apex/AssessmentController.getAssessmentJunctionRecords';
 import errorLogRecord from '@salesforce/apex/AssessmentController.errorLogRecord';
 import getQuestionsList from '@salesforce/apex/AssessmentController.getQuestionsList'; //To fetch all the Questions from the Assessment_Template__c Id from the Supplier_Assessment__c record
 import getSupplierResponseList from '@salesforce/apex/AssessmentController.getSupplierResponseList'; //To fetch all the Supplier_Response__c records related to the Supplier_Assessment__c record
 import getSupplierAssessmentList from '@salesforce/apex/AssessmentController.getSupplierAssessmentList'; //To fetch the Assessment_Template__c Id from the Supplier_Assessment__c record
-
-export default class RtmvpcAssessments extends LightningElement {
+import { CurrentPageReference,NavigationMixin } from 'lightning/navigation';
+export default class RtmvpcAssessments extends NavigationMixin(LightningElement) {
     
 @track recList= [];
 @track accId;
@@ -18,14 +18,15 @@ export default class RtmvpcAssessments extends LightningElement {
 @track finalSection;
 @track savedResponseMap=new Map();
 @track objName='Rhythm__Assessment__c';
+@track urlId;
 @api tablefieldList =  [
                             { label: 'Assessment Name', fieldName: 'Name' },
                             { label: 'Target Completion Date', fieldName: 'Rhythm__End_Date__c',type:'date' },
                             { label: 'Assessment Status', fieldName: 'Rhythm__Status__c'},
                             { label: '#Additional Requests',fieldName:'Rhythm__Follow_Up_Requests__c'},
                             { label: '% Completed',fieldName:'Rhythm__Completed__c', type:'progressBar' },
-                        ];
-
+                        ]; 
+ /* connectedCallback is used to get accountAssessment data based on the account Id */
     connectedCallback(){
         this.fieldsList = [];
         if(this.tablefieldList && this.tablefieldList.length >0){
@@ -39,45 +40,89 @@ export default class RtmvpcAssessments extends LightningElement {
       });
     
     }  
-    
+ @wire(CurrentPageReference)
+    getStateParameters(currentPageReference) {
+       if (currentPageReference) {
+          this.urlId = currentPageReference.state?.Rhythm__AccountAssessmentRelation__c;
+          console.log('sample',this.urlId);
+          console.log('sample111',currentPageReference);
+       }
+    }
+   
+  /* fetchingRecords is used to get accountAssessment data based on the account Id and URL navigation */  
     fetchingRecords(){
         getAssessmentJunctionRecords({ accountId: this.accId}).then(result=>{
         console.log(' Assesments result sh -- ', result.length);
         this.recList = result;
         this.show.grid=true;
-        let win=window.location.search;
-        if(win && win.includes('=')){
-            let x=win.split('=');
-           if(x[0] ==='?Rhythm__AccountAssessmentRelation__c')
-           {
-               this.accountassessmentId=x[1];        
-              this.show.survey = true;
-               this.show.grid=false;
-           }
+        if( this.urlId !=null && typeof this.urlId !='undefined')
+        {
+            this.accountassessmentId=this.urlId;        
+            this.show.survey = true;
+              this.show.grid=false;
         }
+        // let win=window.location.search;
+        // if(win && win.includes('=')){
+        //     let x=win.split('=');
+        //    if(x[0] ==='?Rhythm__AccountAssessmentRelation__c')
+        //    {
+        //        this.accountassessmentId=x[1];        
+        //       this.show.survey = true;
+        //        this.show.grid=false;
+        //    }
+        // }
+        
         });         
     }
 
+  /* openSurveyHandler is used to hide the custom table component and display assessment detail component */
     openSurveyHandler(event){
         this.show.grid = false;
         this.accountassessmentId = event.detail.accountassessmentId;
         this.show.survey = true;
+         const pageRef = {
+    type: 'comm__namedPage',
+    attributes: {
+      name: 'Home' // Replace with your community page name
+    },
+    state: {
+      // Define your parameters here
+      Rhythm__AccountAssessmentRelation__c:this.accountassessmentId 
+    }
+  };
+  // Navigate to the community page
+  this[NavigationMixin.Navigate](pageRef);
     }
 
+ /* backClickHandler is used to show the custom table component and hide the assessment detail component when clicked on back button */
     backClickHandler(){
+         this.fetchingRecords(); 
         this.show.survey = false;
         this.assessmentId = undefined;
         this.show.grid = true;
+         const pageRef = {
+    type: 'comm__namedPage',
+    attributes: {
+      name: 'Home' // Replace with your community page name
+    }
+   
+  };
+  // Navigate to the community page
+  this[NavigationMixin.Navigate](pageRef);
+    
     }
 
-
+/* exportRowAsCsvHandler is used to generate assessment data in the csv format. It is being called from its child component customtable by 
+   dispatching an event */
     exportRowAsCsvHandler(event) {
         var assessmentId = event.detail.value;
-        console.log('jjjjj',assessmentId);
+        /* getSupplierAssessmentList apex method is used to get account assessment data */
         getSupplierAssessmentList({ assessmentId: assessmentId }).then(resultData => {
             var assessmentTemplateId = resultData[0].Rhythm__Assessment__r.Rhythm__Template__c;
+            /* getQuestionsList is used to get the questions based on the template Id */
             getQuestionsList({ templateId: assessmentTemplateId }).then(result => {
                 var resultMap = result;
+                /* getSupplierResponseList is used to get all latest responses for the questions in the account assessment */
                 getSupplierResponseList({ assessmentId: assessmentId }).then(suppRespResult => {
                     suppRespResult.forEach(qres => {
                         var savedResponseList = new Map();
@@ -119,27 +164,46 @@ export default class RtmvpcAssessments extends LightningElement {
                     atag.setAttribute('download', resultData[0].Rhythm__Assessment__r.Name + '.csv');
                     atag.click();
                 }).catch(error => {
-                    errorLogRecord({ componentName: 'CustomTable', methodName: 'getSupplierResponseList', className: 'AssessmentController', errorData: error.message }).then((result) => {
-                    });
+                   var errormap = {};
+                        errormap.componentName = 'RtmvpcAssessments';
+                        errormap.methodName = 'getSupplierResponseList';
+                        errormap.className = 'AssessmentController';
+                        errormap.errorData = error.message;
+                        errorLogRecord({ errorLogWrapper: JSON.stringify(errormap) }).then(() => {
+                        });
                 })
             }).catch(error => {
-                errorLogRecord({ componentName: 'CustomTable', methodName: 'getQuestionsList', className: 'AssessmentController', errorData: error.message }).then((result) => {
-                });
+                var errormap = {};
+                        errormap.componentName = 'RtmvpcAssessments';
+                        errormap.methodName = 'getQuestionsList';
+                        errormap.className = 'AssessmentController';
+                        errormap.errorData = error.message;
+                        errorLogRecord({ errorLogWrapper: JSON.stringify(errormap) }).then(() => {
+                        });
             })
         }).catch(error => {
-            errorLogRecord({ componentName: 'CustomTable', methodName: 'getSupplierAssessmentList', className: 'AssessmentController', errorData: error.message }).then((result) => {
-            });
+          var errormap = {};
+                        errormap.componentName = 'RtmvpcAssessments';
+                        errormap.methodName = 'getSupplierAssessmentList';
+                        errormap.className = 'AssessmentController';
+                        errormap.errorData = error.message;
+                        errorLogRecord({ errorLogWrapper: JSON.stringify(errormap) }).then(() => {
+                        });
         })
     }
 
-    // Extracts the row as PDF
+    /* exportRowAsPdfHandler is used to generate assessment data in the pdf format. It is being called from its child component customtable by 
+   dispatching an event */
     exportRowAsPdfHandler(event) {
         var x = event.detail.value;
         console.log('jjjjj',x);
+        /* getSupplierAssessmentList apex method is used to get account assessment data */
         getSupplierAssessmentList({ assessmentId: x }).then(resultData => {
             var assessmentTemplateId = resultData[0].Rhythm__Assessment__r.Rhythm__Template__c;
+             /* getQuestionsList is used to get the questions based on the template Id */
             getQuestionsList({ templateId: assessmentTemplateId }).then(result => {
                 var resultMap = result;
+                 /* getSupplierResponseList is used to get all latest responses for the questions in the account assessment */
                 getSupplierResponseList({ assessmentId: x }).then(suppRespResult => {
                     suppRespResult.forEach(qres => {
                         var savedResponseList = new Map();
@@ -192,16 +256,31 @@ export default class RtmvpcAssessments extends LightningElement {
                     win.print();
                     win.close();
                 }).catch(error => {
-                    errorLogRecord({ componentName: 'CustomTable', methodName: 'getSupplierResponseList', className: 'AssessmentController', errorData: error.message }).then((result) => {
-                    });
+                    var errormap = {};
+                        errormap.componentName = 'RtmvpcAssessments';
+                        errormap.methodName = 'getSupplierResponseList';
+                        errormap.className = 'AssessmentController';
+                        errormap.errorData = error.message;
+                        errorLogRecord({ errorLogWrapper: JSON.stringify(errormap) }).then(() => {
+                        });
                 })
             }).catch(error => {
-                errorLogRecord({ componentName: 'CustomTable', methodName: 'getQuestionsList', className: 'AssessmentController', errorData: error.message }).then((result) => {
-                });
+                var errormap = {};
+                        errormap.componentName = 'RtmvpcAssessments';
+                        errormap.methodName = 'getQuestionsList';
+                        errormap.className = 'AssessmentController';
+                        errormap.errorData = error.message;
+                        errorLogRecord({ errorLogWrapper: JSON.stringify(errormap) }).then(() => {
+                        });
             })
         }).catch(error => {
-            errorLogRecord({ componentName: 'CustomTable', methodName: 'getSupplierAssessmentList', className: 'AssessmentController', errorData: error.message }).then((result) => {
-            });
+            var errormap = {};
+                        errormap.componentName = 'RtmvpcAssessments';
+                        errormap.methodName = 'getSupplierAssessmentList';
+                        errormap.className = 'AssessmentController';
+                        errormap.errorData = error.message;
+                        errorLogRecord({ errorLogWrapper: JSON.stringify(errormap) }).then(() => {
+                        });
         })
     }
 
@@ -213,6 +292,7 @@ export default class RtmvpcAssessments extends LightningElement {
         }
         return true;
     }
+    /* constructWrapper is used is used to build the wrapper data properly to the questions*/
     constructWrapper(questionResp, savedResp) {
         var questionMap = new Map();
         console.log('responsemap', savedResp);

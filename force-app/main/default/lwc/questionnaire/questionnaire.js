@@ -477,7 +477,11 @@ export default class Questionnaire extends LightningElement {
                     for (let j = 0; j < questionsList[i].questions.length; j++) {
                         if (typeof questionsList[i].questions[j].value !== 'undefined') {
                             if (typeof questionsList[i].questions[j].defaultValue === 'undefined') {
-                                numberOfResponses++;
+                                if(questionsList[i].questions[j].value!=='' && questionsList[i].questions[j].value!=='[]')
+                                {
+                                     numberOfResponses++;
+                                }
+                               
                             }
                             else if(typeof this.accountAssessmentStatus !== 'undefined' && this.accountAssessmentStatus !== 'New'){
                                 numberOfResponses++;
@@ -497,7 +501,10 @@ export default class Questionnaire extends LightningElement {
                     }
                     questionsList[i].displayFlag = displayFlag;
                     if (typeof this.accountAssessmentStatus !== 'undefined' && this.accountAssessmentStatus !== 'New')
+                     {
+                         
                         questionsList[i].numberOfResponses = numberOfResponses;
+                     }
                     else
                         questionsList[i].numberOfResponses = 0;
                 }
@@ -803,6 +810,7 @@ export default class Questionnaire extends LightningElement {
                 if (typeof question.Files__c !== 'undefined') {
                     filesmap[question.Id] = question.Files__c;
                 }
+                if(typeof question.value !='undefined'){
                 if (question.isEmail === true && !(question.value.match(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/))) {
                     isAssessmentValidated = true;
                     this.showspinner = false;
@@ -810,12 +818,14 @@ export default class Questionnaire extends LightningElement {
                     this.success = false;
                     this.totastmessage = 'Please enter the valid email:';
                 }
+                
                 if (question.isPhone === true && !(question.value.match('[0-9]{3}-[0-9]{3}-[0-9]{4}'))) {
                     isAssessmentValidated = true;
                     this.showspinner = false;
                     this.showToast = true;
                     this.success = false;
                     this.totastmessage = 'Please enter the valid phone number in the format xxx-xxx-xxxx:';
+                }
                 }
                 //This loop is to iterate over the Child Questions for a particular sections and Questions in the wrapper.
                 question.Children.forEach(subQuestion => {

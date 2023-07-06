@@ -1,6 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
     <labels>
+        <fullName>Prevent_Active_Template</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Prevent Active Template</shortDescription>
+        <value>Template status can&apos;t be changed to &apos;Active&apos; as it has no questions.</value>
+    </labels>
+    <labels>
+        <fullName>Prevent_Delete_Assessment</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Displays this label when a user attempts to delete a assessment</shortDescription>
+        <value>Assessment can&apos;t be deleted as it is already sent to Suppliers.</value>
+    </labels>
+    <labels>
         <fullName>Supplier_Portal_URL</fullName>
         <language>en_US</language>
         <protected>true</protected>
