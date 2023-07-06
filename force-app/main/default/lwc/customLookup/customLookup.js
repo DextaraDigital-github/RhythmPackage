@@ -29,10 +29,10 @@ export default class SearchComponentLwc extends  LightningElement{
                this.showSearchedValues = true; 
                this.messageResult=false;
            }            
-           else if(data.length===0){
+           else if(data.length === 0){
                this.lookupValuesList = [];                
                this.showSearchedValues = false;
-               if(this.lookupName!=='')
+               if(this.lookupName !== '')
                    this.messageResult=true;               
            } 
          } 

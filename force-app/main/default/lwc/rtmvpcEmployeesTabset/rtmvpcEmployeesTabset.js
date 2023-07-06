@@ -1,7 +1,7 @@
-import { LightningElement, api } from 'lwc';
+import { LightningElement } from 'lwc';
 
 export default class RtmvpcEmployeesTabset extends LightningElement {
-    showTabFour;
+ /*   showTabFour;
     @api fieldList = {
         "Employee_Onsite__c": [{ label: 'Name', fieldName: 'Name' },
         { label: 'Designation', fieldName: 'Designation__c' },
@@ -89,23 +89,7 @@ export default class RtmvpcEmployeesTabset extends LightningElement {
         this.showTabFour = !this.showTabFour;
     }
 
-    // gotoParentHandler(event)
-    // {
-    //     console.log('ProjectsTabset',JSON.stringify(event.detail));
-    //     var gotoParentPage=new CustomEvent('getchildnavobjectfromtabset',{
-    //         detail:event.detail
-    //     });
-    //     this.dispatchEvent(gotoParentPage);
-    // }
-
-    // gotoParentonBackClickHandler(event)
-    // {
-    //     console.log('ProjectsTabset',JSON.stringify(event.detail));
-    //     var gotoParentPageOnBackClick=new CustomEvent('getchildnavobjectfromtabsetonbackclick',{
-    //         detail:event.detail
-    //     });
-    //     this.dispatchEvent(gotoParentPageOnBackClick);
-    // }
+   
 
     gotoParentHandler(event)
     {
@@ -124,4 +108,5 @@ export default class RtmvpcEmployeesTabset extends LightningElement {
         });
         this.dispatchEvent(gotoParentPageOnBackClick);
     }
+    */
 }

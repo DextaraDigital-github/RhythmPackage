@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>OptionValueSetValidation</fullName>
+    <active>false</active>
+    <errorConditionFormula>OR(AND(ISPICKVAL( Question_Type__c , &apos;Picklist&apos;), !ISNULL( OptionValueSet__c)), AND(ISPICKVAL( Question_Type__c , &apos;Picklist (Multi-Select)&apos;), !ISNULL( OptionValueSet__c)),AND(ISPICKVAL( Question_Type__c , &apos;Radio&apos;), !ISNULL( OptionValueSet__c)),AND(ISPICKVAL( Question_Type__c , &apos;Checkbox&apos;), !ISNULL( OptionValueSet__c)))</errorConditionFormula>
+    <errorDisplayField>OptionValueSet__c</errorDisplayField>
+    <errorMessage>Plese fill the options value set</errorMessage>
+</ValidationRule>
