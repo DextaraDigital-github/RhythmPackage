@@ -380,7 +380,6 @@ export default class CustomTable extends LightningElement {
             recDetails.record = recArray;
             recDataList.push(recDetails);
         }
-        console.log('recDataList', JSON.stringify(recDataList));
         return recDataList;
     }
 
@@ -481,7 +480,6 @@ export default class CustomTable extends LightningElement {
             }
         }
         this.viewColList = columnDetailsList;
-        console.log('items ', JSON.stringify(this.relatedListRecords));
         let currentPageRecords = this.getPageRecords(this.relatedListRecords, this.selectedPageNumber, this.selectedPageSize);
         this.recList = this.assignData(currentPageRecords, this.viewColList);
         this.allRecordsList = this.recList;
@@ -639,8 +637,8 @@ export default class CustomTable extends LightningElement {
                 console.log('Deleted Unsuccessful');
             }
         }).catch(error => {
-            console.log('Deletion Unsuccessful');
-            console.log('deleteRecords Error', JSON.stringify(error));
+            console.log(error);
+            
         });
     }
 

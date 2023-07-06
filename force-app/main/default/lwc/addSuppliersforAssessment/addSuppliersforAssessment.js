@@ -25,28 +25,24 @@ export default class AddSuppliersforAssessment extends NavigationMixin(Lightning
     }
 
     connectedCallback() {
-         console.log('PARNTRECORDID---->',this.assessmentId);
-         console.log('PARNTRECORDID---->',this.recordId);
         this.getTodayDate();
     }
 
     getTodayDate(){
         getTodayDate()
         .then(result => {
-            console.log(JSON.stringify(result));
             if(result){
                 this.todayDate = result;
             }
         })
         .catch(error => {
-            console.log(JSON.stringify(error));
+            console.log(error);
         });
     }
 
     @wire(getAssessmentRecord, { assessmentId: '$recordId'})
     getAssessmentRecord_wiredData(result) {
         if (result.data) {
-            console.log('getAssessmentRecord : ',JSON.stringify(result.data));
             this.assessmentRecord = result.data[0];
             this.startDate = result.data[0].Rhythm__Start_Date__c;
             this.endDate = result.data[0].Rhythm__End_Date__c;
@@ -79,11 +75,9 @@ export default class AddSuppliersforAssessment extends NavigationMixin(Lightning
                 save = true;
             }
             if(save){
-                console.log('AddSuppliersMethod------->',JSON.stringify(this.suppliersList));
                 if(this.suppliersList.length > 0 || this.delList.length>0){
                     addSuppliers({assessmentRecord:this.assessmentRecord,operationType:'update',suppliers:JSON.stringify(this.suppliersList),existingSups:exSupListStr,deleteList:deleteListStr})
                     .then(result => {
-                        console.log('addSuppliers Result------->'+JSON.stringify(result));
                         if(result.isSuccess === true){
                             this.showModal = false;
                             this.showNotification('Success','Suppliers Added to Assessments Successfully.','success');
@@ -109,7 +103,6 @@ export default class AddSuppliersforAssessment extends NavigationMixin(Lightning
     }
 
     updateSupplierData(event){
-        console.log('addSuppliersAssessment------>'+JSON.stringify(event.detail));
         this.suppliersList = event.detail.newSuppliers;
         this.existingSuppList = event.detail.existingSupps;
         this.delList = event.detail.delList;

@@ -234,7 +234,7 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
     }
     /* chatHistory is used to get the question id, assessment id and flag boolean from the child component (Questionnaire) and pass it to the child component(AssessmentChatter)*/
     chatHistory(event) {
-        this.showChat = JSON.parse(JSON.stringify(event.detail));
+        this.showChat = event.detail;
         this.showChat.accountassessmentId = this.accountassessmentid;
         this.showData = this.showChat.openChat;
         this.showconverstion = this.showChat.disableSendButton;

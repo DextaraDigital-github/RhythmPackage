@@ -13,7 +13,6 @@ export default class ActivateAssessmentSchedules extends LightningElement {
         console.log('handleConfirm------->');
         updateAssessmentSuppliers({assessmentId:this.recordId})
         .then(result => {
-            console.log('updateAssessmentSuppliers:Result------->',JSON.stringify(result));
             if(result.isSuccess === true){
                 this.showNotification('Success','Assessments Scheduled Successfully','success');
                 this.closeModal();

@@ -24,7 +24,7 @@ export default class Chart extends LightningElement {
    })
    .catch(error => {
      console.log(error);
-     console.log(JSON.stringify(error));
+     
     this.dispatchEvent(
      new ShowToastEvent({
       title: 'Error loading ChartJS',

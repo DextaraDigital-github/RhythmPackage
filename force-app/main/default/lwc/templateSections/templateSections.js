@@ -366,8 +366,7 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
                 console.log('Deleted Unsuccessful');
             }
         }).catch(error => {
-            console.log('Deleted Unsuccessful');
-            console.log('deleteRecords Error', JSON.stringify(error));
+            console.log(error);
         });
     }
     //Delete Functionality Ends
