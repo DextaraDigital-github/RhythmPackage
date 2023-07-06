@@ -1,4 +1,5 @@
 public class AssessmentTriggerHandler implements ITriggerHandler{
+    public static SecurityCheckController safe = new SecurityCheckController();
     public static TriggerFrameworkServiceController serviceController = new TriggerFrameworkServiceController();
     public void beforeInsert(List<sObject> newList) {
         system.debug('beforeInsert----->');
@@ -48,8 +49,14 @@ public class AssessmentTriggerHandler implements ITriggerHandler{
             	templateMap.put(assessment.Template__c,new List<Assessment__c>{assessment});
             }
         }
-        AggregateResult[] templateGroup = [SELECT COUNT(id) quesCount, Assessment_Template__c FROM Question__c group by Assessment_Template__c having Assessment_Template__c
-                                      IN :templateMap.keySet()];
+        set<Id> templateIds = templateMap.keySet();
+        Map<String, Object> bindVariables = new Map<String, Object>{'templateIds' => templateIds};
+        string query = 'SELECT COUNT(id) quesCount, Assessment_Template__c'
+                     +' FROM Question__c'
+                     +' GROUP BY Assessment_Template__c'
+                     +' HAVING Assessment_Template__c IN:templateIds';
+
+        AggregateResult[] templateGroup = safe.doQueryWithBinds(query,bindVariables);
         for (AggregateResult ar : templateGroup){
             String templateId = (Id)ar.get('Rhythm__Assessment_Template__c');
             for(Assessment__c assessment : templateMap.get(templateId) ){
