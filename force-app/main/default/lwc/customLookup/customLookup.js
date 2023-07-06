@@ -15,7 +15,7 @@ export default class SearchComponentLwc extends  LightningElement{
    hideValues()
    {
      var _this = this;
-     const myTimeout = setTimeout(()=>{_this.showSearchedValues = false;}, 300);
+     setTimeout(()=>{_this.showSearchedValues = false;}, 300);
     }
    handleClick(){
         getRecordsList({sectionName:this.lookupName,templateId:this.templateId})

@@ -171,7 +171,9 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
         let sectionQuestions = [];
         this.reorderHeaderName = 'Reorder Questions';
         let selRows = this.template.querySelector("lightning-tree-grid").getSelectedRows();
-        if (selRows === null || typeof selRows === 'undefined' || (selRows !== null && selRows.length === 0)) {
+        let isreturn = false;
+        if ((selRows === null || typeof selRows === 'undefined' || (selRows !== null && selRows.length === 0))
+            && !isreturn){
             this.dispatchEvent(
                 new ShowToastEvent({
                     title: 'Error',
@@ -179,9 +181,9 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
                     variant: 'error'
                 })
             );
-            return;
+            isreturn = true;
         }
-        else if (selRows.length > 1) {
+        else if (selRows.length > 1 && !isreturn) {
             this.dispatchEvent(
                 new ShowToastEvent({
                     title: 'Error',
@@ -189,9 +191,9 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
                     variant: 'error'
                 })
             );
-            return;
+            isreturn = true;
         }
-        else if (selRows.length === 1) {
+        else if (selRows.length === 1 && !isreturn) {
             if(this.sectionListData && typeof this.sectionListData !== 'undefined')
              this.sectionListData.forEach(section => {
                 if (section.Id === selRows[0].Id) {
@@ -216,11 +218,12 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
                                 variant: 'error'
                             })
                         );
-                        return;
+                        isreturn = true;
                     }
                 }
             });
         }
+        return  isreturn ;
     }
 
     // Open the modal with section reordering feature

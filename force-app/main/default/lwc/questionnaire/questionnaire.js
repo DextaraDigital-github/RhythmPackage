@@ -572,7 +572,7 @@ export default class Questionnaire extends LightningElement {
 
         let responseId = '';
         if (this.savedResponseMap !== null) {
-            if (this.savedResponseMap.hasOwnProperty(this.fileResponseData.questionId)) {
+            if (Object.hasOwn(this.savedResponseMap,this.fileResponseData.questionId)) {
                 responseId = this.savedResponseMap.get(this.fileResponseData.questionId).Id;
             }
         }
@@ -618,7 +618,7 @@ export default class Questionnaire extends LightningElement {
                     }
                 }
             }
-            let quesResponse = { "Id": result[0].Id, "questionType": this.fileResponseData.type, "value": '', "Files__c": result[0].Rhythm__Files__c, "Flag__c": this.fileResponseData['flag'], "Conversation_History__c": this.fileResponseData['conversationHistory'] };
+            let quesResponse = { "Id": result[0].Id, "questionType": this.fileResponseData.type, "value": '', "Files__c": result[0].Rhythm__Files__c, "Flag__c": this.fileResponseData.flag, "Conversation_History__c": this.fileResponseData.conversationHistory };
             this.savedResponseMap.set(this.fileResponseData.questionId, quesResponse);
             this.responseMap.set(this.fileResponseData.questionId, quesResponse);
             console.log('this.questionsAndAnswerss>>>', this.questionsAndAnswerss);
@@ -811,7 +811,7 @@ export default class Questionnaire extends LightningElement {
                     filesmap[question.Id] = question.Files__c;
                 }
                 if(typeof question.value !='undefined'){
-                if (question.isEmail === true && !(question.value.match(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/))) {
+                if (question.isEmail === true && !(question.value.match(/^\w+([\\.-]?\w+)*@\w+([\\.-]?\w+)*(\.\w{2,3})+$/))) {
                     isAssessmentValidated = true;
                     this.showspinner = false;
                     this.showToast = true;
@@ -929,6 +929,7 @@ export default class Questionnaire extends LightningElement {
             responseQueryMap.pdfContnet = tabledata;
             /* This method is used to create the response for the questions*/
             createSupplierResponse({ suppResponseList: responseList, paramMap: JSON.stringify(responseQueryMap) }).then(result => {
+                console.log(result);
                 this.totastmessage = 'Responses saved successfully';
                 if (isSubmit) {
                     this.questionsAndAnswerss.forEach(questionAnswer => {
