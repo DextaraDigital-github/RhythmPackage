@@ -73,4 +73,4 @@ jobs:
         
       # Code Push to Scratch org
       - name: 'code push'
-        run: sfdx force:source:push --targetusername=${{github.event.inputs.scratch-org_username}} --wait 20 --loglevel debug
+        run: sfdx force:source:push --targetusername=${{github.event.inputs.scratch-org_username}} --wait 20 -f --loglevel debug
