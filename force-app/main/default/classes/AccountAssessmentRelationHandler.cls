@@ -1,24 +1,21 @@
-public class AccountAssessmentRelationHandler implements ITriggerHandler{
+public with sharing class AccountAssessmentRelationHandler implements ITriggerHandler{
     public static SecurityCheckController safe = new SecurityCheckController();//use singleton pattern
     private static Savepoint sp;//prudhvi to work
 
 	public void beforeInsert(List<sObject> newList) {
-        system.debug('beforeInsert----->');
          
     }
     
     public void afterInsert(List<sObject> newList , Map<Id, sObject> newMap) {
-        system.debug('afterInsert----->');
-        //getQuestionsCount( newList ,newMap);
-       
+    
     }
     
     public void beforeUpdate(List<sObject> newList, Map<Id, sObject> newMap, List<sObject> oldList, Map<Id, sObject> oldMap) {
-        system.debug('beforeUpdate----->');
+        
     }
     
     public void afterUpdate(List<sObject> newList, Map<Id, sObject> newMap,  List<sObject> oldList, Map<Id, sObject> oldMap) {
-        system.debug('afterUpdate----->');
+
         set<Id> acctAssmtSet = new set<Id>();
         Map<Id,AccountAssessmentRelation__c> oldRecordsMap = (Map<Id,AccountAssessmentRelation__c>)oldMap;
         for(AccountAssessmentRelation__c acctAsmt:(List<AccountAssessmentRelation__c>)newList){
@@ -33,17 +30,15 @@ public class AccountAssessmentRelationHandler implements ITriggerHandler{
     }
     
     public void beforeDelete(List<sObject> oldList , Map<Id, sObject> oldMap) {
-        system.debug('beforeDelete----->');
         
     }
     
     public void afterDelete(List<sObject> oldList , Map<Id, sObject> oldMap) {
-        system.debug('afterDelete----->');
         
     }
     
     public void afterUnDelete(List<sObject> newList, Map<Id, sObject> newMap) {
-        system.debug('afterUnDelete----->');
+
     }
     
     
@@ -63,7 +58,9 @@ public class AccountAssessmentRelationHandler implements ITriggerHandler{
               	fieldtrack.add(fieldTracker);
             }
         }
-        if (sp == null) sp = Database.setSavepoint();
+        if(sp == null){
+            sp = Database.setSavepoint();
+        }
         if(fieldtrack.isEmpty() == false){
             Database.SaveResult[] results = safe.doInsert(fieldtrack);
             List<String> errorsList = SecurityCheckController.safeClassExceptionHandlerInsert(results);

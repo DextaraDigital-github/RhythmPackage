@@ -15,16 +15,17 @@ public with sharing class AssessmentController {
 * @param assessmentId This is a record id of an Assessment__c.  
 */
     @AuraEnabled
-    public static List<SObject> getSupplierAssessmentList(string assessmentId){
+    public static List<SObject> getSupplierAssessmentList(String assessmentId){
         try{
-            string query =  'SELECT Id,Assessment__r.Name,Assessment__r.Template__c,'
+            String query =  'SELECT Id,Assessment__r.Name,Assessment__r.Template__c,'
                             +'Assessment__r.Disclosure__c,Status__c'
                             + ' FROM AccountAssessmentRelation__c'
-                            + ' WHERE Id=\'' + string.escapeSingleQuotes(assessmentId) + '\''
+                            + ' WHERE Id=\'' + String.escapeSingleQuotes(assessmentId) + '\''
+                            + ' WITH SECURITY_ENFORCED'
                             + ' LIMIT 1';
             return safe.doQuery(query);
         }catch(exception e){
-            string errorMsg = e.getMessage();
+            String errorMsg = e.getMessage();
             throw new AuraHandledException(errorMsg);
         }
     }
@@ -36,16 +37,17 @@ public with sharing class AssessmentController {
     @AuraEnabled
     public static List<SObject> getQuestionsList(String templateId){
         try{
-            string query = 'SELECT Id,Name,Section__c,Question_Type__c,'
+            String query = 'SELECT Id,Name,Section__c,Question_Type__c,'
                           +'Required__c,Default_Value__c,Conditional_Response__c,'
                           +'OptionValueSet__c,Question__c,Requires_File_Upload__c,'
                           +'Parent_Question__c,HelpText__c,Section__r.Name,Section__r.Id,Assessment_Template__c'
                           +' FROM Question__c'
                           +' WHERE Assessment_Template__c =\'' + String.escapeSingleQuotes(templateId) + '\''
+                          +' WITH SECURITY_ENFORCED'
                           +' ORDER BY  Section__r.Section_Sequence_Number__c,Question_Sequence_Number__c';
             return safe.doQuery(query);
         }catch(exception e){
-            string errorMsg = e.getMessage();
+            String errorMsg = e.getMessage();
             throw new AuraHandledException(errorMsg);
         }
     }
@@ -57,17 +59,18 @@ public with sharing class AssessmentController {
 * @param assessmentId This is a record id of an AccountAssessmentRelation__c.  
 */
     @AuraEnabled
-    public static List<SObject> getSupplierResponseList(string assessmentId){
+    public static List<SObject> getSupplierResponseList(String assessmentId){
         try{
-            string query = 'SELECT Id, Question__c,Assessment__c,Question__r.Question_Type__c,'
+            String query = 'SELECT Id, Question__c,Assessment__c,Question__r.Question_Type__c,'
                          + 'Assessment__r.Name,Files__c, Response__c,CreatedBy.Name,'
-                         + 'CreatedDate, Flag__c, Conversation_History__c,LastModifiedDate,LastModifiedById,'
-                         +' FROM Response__c'
-                         +' WHERE AccountAssessmentRelation__c=\'' + String.escapeSingleQuotes(assessmentId) + '\''
-                         +' AND Is_Latest_Response__c= true';
+                         + 'CreatedDate, Flag__c, Conversation_History__c,LastModifiedDate,LastModifiedById'
+                         + ' FROM Response__c'
+                         + ' WHERE AccountAssessmentRelation__c=\'' + String.escapeSingleQuotes(assessmentId) + '\''
+                         + ' AND Is_Latest_Response__c= true'
+                         + ' WITH SECURITY_ENFORCED';
             return safe.doQuery(query);
         }catch(exception e){
-            string errorMsg = e.getMessage();
+            String errorMsg = e.getMessage();
             throw new AuraHandledException(errorMsg);
         }
     }
@@ -83,7 +86,7 @@ public with sharing class AssessmentController {
     public static void createSupplierResponse(List<SObject> suppResponseList,String paramMap){
         try{
             Map<String,object> queryMap = (Map<String,Object>)JSON.deserializeUntyped(paramMap);
-            string accAssmtId =(string)queryMap.get('accountassessmentid');
+            String accAssmtId =(string)queryMap.get('accountassessmentid');
             List<Id> questionIds = new List<Id>();
             Map<Id,SObject> suppResponseMap = new Map<Id,SObject>();
             for(SObject response:suppResponseList){
@@ -92,15 +95,18 @@ public with sharing class AssessmentController {
             }
             List<Response__c> existingResponses = new List<Response__c>();
             if(!questionIds.isEmpty()){
-                string query = 'SELECT Id,Name,Question__c,Response__c,Files__c,Assessment__c'
+                string query = 'SELECT Id,Name,Question__c,Response__c,Files__c,Assessment__c,'
                         + 'Flag__c,Is_Latest_Response__c,AccountAssessmentRelation__c'
                         +' FROM Response__c'
                         +' WHERE Question__c IN:questionIds'
                         +' AND AccountAssessmentRelation__c=\'' + String.escapeSingleQuotes(accAssmtId) + '\''
-                        +' AND AND Is_Latest_Response__c = true';
-                existingResponses = safe.doQuery(query);
+                        +' AND Is_Latest_Response__c = true';
+                Map<String, Object> bindVariables = new Map<String, Object>{'questionIds' => questionIds};
+                existingResponses = safe.doQueryWithBinds(query,bindVariables);
             }
-            if (sp == null) sp = Database.setSavepoint();
+            if (sp == null){
+                sp = Database.setSavepoint();
+            }
             if(existingResponses.isEmpty() == false){
                 for(Response__c resp :existingResponses){
                     ((Response__c)suppResponseMap.get(resp.Question__c)).put('Files__c', resp.Files__c);
@@ -122,10 +128,11 @@ public with sharing class AssessmentController {
                 }
             }
 
-            string assmtQuery =  'SELECT Id,Name,Follow_Up_Requests__c,Status__c,'
+            String assmtQuery =  'SELECT Id,Name,Follow_Up_Requests__c,Status__c,'
                                +'Assessment__c,Account__c,PdfConvertor__c'
                                +' FROM AccountAssessmentRelation__c'
-                               +' WHERE Id=\'' + String.escapeSingleQuotes(accAssmtId) + '\'';
+                               +' WHERE Id=\'' + String.escapeSingleQuotes(accAssmtId) + '\''
+                               +' WITH SECURITY_ENFORCED';
 
             List<AccountAssessmentRelation__c> assessment = safe.doQuery(assmtQuery);
             if(!assessment.isEmpty()){
@@ -152,12 +159,15 @@ public with sharing class AssessmentController {
     {
         try{
             Map<String,object> queryMap = (Map<String,Object>)JSON.deserializeUntyped(paramMap);
-            string accAssmtId =(String)queryMap.get('accountassessmentid');
-            string query = 'SELECT Id,Name,Status__c,Assessment__c,Account__c'
+            String accAssmtId =(String)queryMap.get('recId');
+            String query = 'SELECT Id,Name,Status__c,Assessment__c,Account__c'
                          +' FROM AccountAssessmentRelation__c'
-                         +' WHERE Id=\'' + String.escapeSingleQuotes(accAssmtId) + '\'';
+                         +' WHERE Id=\'' + String.escapeSingleQuotes(accAssmtId) + '\''
+                         +' WITH SECURITY_ENFORCED';
             List<AccountAssessmentRelation__c> accountAssessment = safe.doQuery(query);
-            if (sp == null) sp = Database.setSavepoint();
+            if (sp == null){
+                sp = Database.setSavepoint();
+            }
             if(accountAssessment.isEmpty() == false){
                 for(AccountAssessmentRelation__c assessment : accountAssessment){
                     assessment.Status__c = (String)queryMap.get('assessmentStatus');
@@ -171,7 +181,7 @@ public with sharing class AssessmentController {
             }
             return accountAssessment;
         }catch(exception e){
-            string errorMsg = e.getMessage();
+            String errorMsg = e.getMessage();
             throw new AuraHandledException(errorMsg);
         }
     }
@@ -180,7 +190,7 @@ public with sharing class AssessmentController {
 * @param assessmentId This is a record id of an Assessment__c.
 */
     @AuraEnabled
-    public static List<Sobject> getAssessmentStatus(String assessmentId, String objectName){
+    public static List<SObject> getAssessmentStatus(String assessmentId, String objectName){
         try{
             string fName = 'Rhythm__Status__c';
             string query = 'SELECT Object_Field_Name__c,Object_Field_Value__c,'
@@ -189,9 +199,10 @@ public with sharing class AssessmentController {
                          +' WHERE object_Record_Id__c=\'' + String.escapeSingleQuotes(assessmentId) + '\''
                          +' AND Object_Name__c=\'' + String.escapeSingleQuotes(objectName) + '\''
                          +' AND Object_Field_Name__c=\'' + String.escapeSingleQuotes(fName) + '\''
+                         +' WITH SECURITY_ENFORCED'
                          +' ORDER BY CreatedDate DESC';
 
-            List<Sobject> assessmentstatus = safe.doQuery(query);
+            List<SObject> assessmentstatus = safe.doQuery(query);
             return assessmentstatus;
         }catch(exception e){
             string errorMsg = e.getMessage();
@@ -205,15 +216,16 @@ public with sharing class AssessmentController {
     public static List<Object> getAssesmentRecords()
     {
         try{
-            string query = 'SELECT Name,Target_Completion_Date__c,Status__c,Additional_Requests__c,'
+            String query = 'SELECT Name,Target_Completion_Date__c,Status__c,Additional_Requests__c,'
                          + 'Customer_Review__c,Number_of_Questions__c,Start_Date__c,'
                          + 'End_Date__c,CreatedDate,CreatedUser__c'
                          +' FROM Assessment__c'
+                         +' WITH SECURITY_ENFORCED'
                          +' LIMIT 100';
             List<Assessment__c> assessmentRecords = safe.doQuery(query);
             return assessmentRecords;
         }catch(exception e){
-            string errorMsg = e.getMessage();
+            String errorMsg = e.getMessage();
             throw new AuraHandledException(errorMsg);
         }
     }
@@ -222,7 +234,7 @@ public with sharing class AssessmentController {
     public static List<Object> getAccountAssesmentRecords(String accountId, String assessmentId)
     {
         try{
-            string query = 'SELECT Id,IsDeleted,Name,Account__c,Assessment__c,Assessment__r.name,'
+            String query = 'SELECT Id,IsDeleted,Name,Account__c,Assessment__c,Assessment__r.name,'
                         + 'Assessment__r.Status__c,Assessment__r.Customer_Review__c,CreatedDate,'
                         + 'Assessment__r.Number_of_Questions__c,Status__c,Start_Date__c,End_Date__c,'
                         + 'Assessment__r.Additional_Requests__c,Number_of_Questions__c,Assessment__r.CreatedDate,'
@@ -230,11 +242,12 @@ public with sharing class AssessmentController {
                         + ' FROM AccountAssessmentRelation__c'
                         + ' WHERE Account__c=\'' + String.escapeSingleQuotes(accountId) + '\''
                         + ' AND Assessment__c=\'' + String.escapeSingleQuotes(assessmentId) + '\''
+                        + ' WITH SECURITY_ENFORCED'
                         + ' ORDER BY CreatedDate DESC';
             List<SObject> accountAssessment = safe.doQuery(query);
             return accountAssessment;
         }catch(exception e){
-            string errorMsg = e.getMessage();
+            String errorMsg = e.getMessage();
             throw new AuraHandledException(errorMsg);
         }
     }
@@ -248,13 +261,14 @@ public with sharing class AssessmentController {
     {
         try{
             Map<String,Object> responseMap = (Map<String,Object>)JSON.deserializeUntyped(responseWrapper);
-            string quesId = (String)responseMap.get('questionId');
-            string accAssmtId = (String)responseMap.get('accountassessmentId');
-            string query = 'SELECT Conversation_History__c,createdDate'
+            String quesId = (String)responseMap.get('questionId');
+            String accAssmtId = (String)responseMap.get('accountassessmentId');
+            String query = 'SELECT Conversation_History__c,createdDate'
                             +' FROM Response__c'
                             +' WHERE AccountAssessmentRelation__c=\'' + String.escapeSingleQuotes(accAssmtId) + '\''
                             +' AND Question__c=\'' + String.escapeSingleQuotes(quesId) + '\''
-                            +' AND Is_Latest_Response__c=true';
+                            +' AND Is_Latest_Response__c=true'
+                            +' WITH SECURITY_ENFORCED';
             List<Response__c> responseRecords = safe.doQuery(query);
             return responseRecords;
         }catch(exception e){
@@ -265,26 +279,32 @@ public with sharing class AssessmentController {
     
     /* getUserName method is used to get the username */
     @AuraEnabled
-    public static string getUserName()
+    public static String getUserName()
     {
-        string userName=UserInfo.getName();
+        String userName=UserInfo.getName();
         return userName;
     }
     /**
 * Gets the AccountId information of a user who logged in to portal.
 */ 
     @AuraEnabled
-    public static string getAccountId()
+    public static String getAccountId()
     {
         try{
-            string userId = userinfo.getuserid();
-            string query = 'SELECT Contact.AccountId'
+            String userId = userinfo.getuserid();
+            String query = 'SELECT Contact.AccountId'
                          +' FROM User'
-                         +' WHERE Id=\'' + String.escapeSingleQuotes(userId) + '\'';
-            List<User> strAccId = safe.doQuery(query);
-            return strAccId[0].Contact.AccountId;
+                         +' WHERE Id=\'' + String.escapeSingleQuotes(userId) + '\''
+                         +' WITH SECURITY_ENFORCED';
+            List<User> userList = safe.doQuery(query);
+            if(userList.isEmpty() == false){
+                return userList[0].Contact.AccountId;
+            }else{
+                String errorMsg = 'User Not Found';
+                throw new AuraHandledException(errorMsg);
+            }
         }catch(exception e){
-            string errorMsg = e.getMessage();
+            String errorMsg = e.getMessage();
             throw new AuraHandledException(errorMsg);
         }
     }
@@ -297,7 +317,7 @@ public with sharing class AssessmentController {
             String relativeUrlBase = URL.getSalesforceBaseUrl().toExternalForm()+'/login';
             return relativeUrlBase;
         }catch(exception e){
-            string errorMsg = e.getMessage();
+            String errorMsg = e.getMessage();
             throw new AuraHandledException(errorMsg);
         }
     }
@@ -311,32 +331,38 @@ public with sharing class AssessmentController {
     public static List<SObject> getAssessmentJunctionRecords(String accountId)
     {
         try{
-            string query = 'SELECT Id, IsDeleted, Name,Account__c,Assessment__c, Assessment__r.name'
-                        +'Assessment__r.Status__c,Assessment__r.Customer_Review__c,Assessment__r.Number_of_Questions__c'
+            String query = 'SELECT Id,IsDeleted,Name,Account__c,Assessment__c,Assessment__r.name,'
+                        +'Assessment__r.Status__c,Assessment__r.Customer_Review__c,Assessment__r.Number_of_Questions__c,'
                         +'Assessment__r.CreatedBy.Name,Status__c,End_Date__c,Completed__c,Follow_Up_Requests__c'
                         +' FROM AccountAssessmentRelation__c'
                         +' WHERE Account__c=\'' + String.escapeSingleQuotes(accountId) + '\''
+                        +' WITH SECURITY_ENFORCED'
                         +' ORDER BY CreatedDate DESC';
             List<SObject> assessmentData = safe.doQuery(query);
             return assessmentData;
         }catch(exception e){
-            string errorMsg = e.getMessage();
-            throw new AuraHandledException(errorMsg);
+            String errorMsg = e.getMessage();
+            AuraHandledException auraEx = new AuraHandledException(errorMsg);
+            auraEx.setMessage(errorMsg);
+            throw auraEx;
         }
     }
     @AuraEnabled
     public static List<AccountAssessmentRelation__c> uploadPdfContent(String pdfdata, String recordId)
     {
         try{
-            string query = 'SELECT Id,IsDeleted,Name,Account__c,Assessment__c,'
+            String query = 'SELECT Id,IsDeleted,Name,Account__c,Assessment__c,'
                         + 'Assessment__r.name,Assessment__r.Status__c,Assessment__r.Customer_Review__c,'
                         + 'Assessment__r.Number_of_Questions__c,Assessment__r.Additional_Requests__c,'
                         + 'Number_of_Questions__c, Number_of_Responses__c,Assessment__r.CreatedBy.Name,'
                         + 'Status__c,End_Date__c,Completed__c,Follow_Up_Requests__c,PdfConvertor__c'
                         +' FROM AccountAssessmentRelation__c'
-                        +' WHERE Id=\'' + String.escapeSingleQuotes(recordId) + '\'';
+                        +' WHERE Id=\'' + String.escapeSingleQuotes(recordId) + '\''
+                        +' WITH SECURITY_ENFORCED';
             List<AccountAssessmentRelation__c> assessmentsdata = safe.doQuery(query);
-            if (sp == null) sp = Database.setSavepoint();
+            if (sp == null){
+                sp = Database.setSavepoint();
+            }
             if(assessmentsdata.isEmpty() == false){
                 for(AccountAssessmentRelation__c accassessment :assessmentsdata){
                     accassessment.PdfConvertor__c = pdfdata;
@@ -350,7 +376,7 @@ public with sharing class AssessmentController {
             }
             return assessmentsdata;
         }catch(exception e){
-            string errorMsg = e.getMessage();
+            String errorMsg = e.getMessage();
             throw new AuraHandledException(errorMsg);
         }
     }
@@ -363,18 +389,19 @@ public with sharing class AssessmentController {
     public static List<Sobject> getAccountAssessmentRecordData(String assrecordId)
     {
         try{
-            string query = 'SELECT Id, IsDeleted, Name,Account__c,Assessment__c, Assessment__r.Name,'
+            String query = 'SELECT Id, IsDeleted, Name,Account__c,Assessment__c, Assessment__r.Name,'
                      + 'Assessment__r.Status__c,Assessment__r.Customer_Review__c,CreatedDate,'
                      + 'Assessment__r.Number_of_Questions__c,Start_Date__c,End_Date__c,Status__c,'
                      + 'Assessment__r.Additional_Requests__c,Number_of_Questions__c,Assessment__r.CreatedDate,'
                      + 'Assessment__r.Template__c, Number_of_Responses__c,Assessment__r.CreatedBy.Name,'
                      + 'Assessment__r.CreatedUser__c,CreatedBy.Name'
                      + ' FROM AccountAssessmentRelation__c'
-                     + ' WHERE Id=\'' + String.escapeSingleQuotes(assrecordId) + '\'';
+                     + ' WHERE Id=\'' + String.escapeSingleQuotes(assrecordId) + '\''
+                     + ' WITH SECURITY_ENFORCED';
             List<SObject> accountassessment = safe.doQuery(query);
             return accountassessment;
         }catch(exception e){
-            string errorMsg = e.getMessage();
+            String errorMsg = e.getMessage();
             throw new AuraHandledException(errorMsg);
         }
     }
@@ -386,15 +413,18 @@ public with sharing class AssessmentController {
     public static List<SObject> getResponseFlag(String questionId, String accountAssessmentId)
     {
         try{
-            string query =  'SELECT Id, Question__c,Assessment__c,Question__r.Question_Type__c,'
+            String query =  'SELECT Id, Question__c,Assessment__c,Question__r.Question_Type__c,'
                           + 'Assessment__r.Name,Files__c, Response__c,CreatedBy.Name,CreatedDate, Flag__c,'
                           + 'Conversation_History__c,LastModifiedDate,LastModifiedById'
                           + ' FROM Response__c'
                           + ' WHERE Question__c=\'' + String.escapeSingleQuotes(questionId) + '\''
                           + ' AND AccountAssessmentRelation__c=\'' + String.escapeSingleQuotes(accountAssessmentId) + '\''
-                          + ' AND Is_Latest_Response__c= true';
+                          + ' AND Is_Latest_Response__c= true'
+                          + ' WITH SECURITY_ENFORCED';
             List<Response__c> supplierResponseList =  safe.doQuery(query);
-            if (sp == null) sp = Database.setSavepoint();
+            if (sp == null){
+                sp = Database.setSavepoint();
+            }
             if(!supplierResponseList.isEmpty())
             {
                 for(Response__c response :supplierResponseList)
@@ -427,7 +457,7 @@ public with sharing class AssessmentController {
                 return (new List<Response__c>());
             }
         }catch(exception e){
-            string errorMsg = e.getMessage();
+            String errorMsg = e.getMessage();
             throw new AuraHandledException(errorMsg);
         }
     }
@@ -442,20 +472,23 @@ public with sharing class AssessmentController {
     {
         try{
             Map<String,Object> filemap = (Map<String,Object>) JSON.deserializeUntyped(deleteMap);
-            string quesId = (String)filemap.get('questionId');
-            string accAssmtId = (String)filemap.get('accountAssessmentId');
-            string query = 'SELECT Id,Question__c,Question__r.Name,Assessment__r.Name,'
+            String quesId = (String)filemap.get('questionId');
+            String accAssmtId = (String)filemap.get('accountAssessmentId');
+            String query = 'SELECT Id,Question__c,Question__r.Name,Assessment__r.Name,'
                          + 'Files__c,Response__c,CreatedBy.Name,CreatedDate,Flag__c,'
                          + 'Conversation_History__c,LastModifiedDate,LastModifiedById'
                          + ' FROM Response__c'
                          + ' WHERE Question__c=\'' + String.escapeSingleQuotes(quesId) + '\''
                          + ' AND AccountAssessmentRelation__c=\'' + String.escapeSingleQuotes(accAssmtId) + '\''
                          + ' AND Is_Latest_Response__c= true'
+                         + ' WITH SECURITY_ENFORCED'
                          + ' LIMIT 50000';
             List<Response__c> responseRecords = safe.doQuery(query);
             List<Object> responseFilesData= (List<Object>)JSON.deserializeUntyped(responseRecords[0].Files__c);
             List<object>duplicate=new List<object>();
-            if (sp == null) sp = Database.setSavepoint();
+            if (sp == null){
+                sp = Database.setSavepoint();
+            }
             for(Integer i=0;i<responseFilesData.size();i++)
             {
                 Map<String,Object> mp = (Map<String,Object>)responseFilesData[i];
@@ -474,7 +507,7 @@ public with sharing class AssessmentController {
             }
             return responseRecords[0].Files__c;
         }catch(exception e){
-            string errorMsg = e.getMessage();
+            String errorMsg = e.getMessage();
             throw new AuraHandledException(errorMsg);
         }
     }
@@ -491,15 +524,18 @@ public with sharing class AssessmentController {
     {
         try{
             Map<String,Object> chatMap = (Map<String,Object>)JSON.deserializeUntyped(chatWrapperstring);
-            string quesId = (String)chatMap.get('accountassessmentId');
-            string accAssmtId = (String)chatMap.get('questionId');
-            string query = 'SELECT Conversation_History__c,createdDate'
+            String quesId = (String)chatMap.get('accountassessmentId');
+            String accAssmtId = (String)chatMap.get('questionId');
+            String query = 'SELECT Conversation_History__c,createdDate'
                          + ' FROM Response__c'
                          + ' WHERE AccountAssessmentRelation__c=\'' + String.escapeSingleQuotes(accAssmtId) + '\''
                          + ' AND Question__c=\'' + String.escapeSingleQuotes(quesId) + '\''
-                         + ' AND Is_Latest_Response__c=true';
+                         + ' AND Is_Latest_Response__c=true'
+                         + ' WITH SECURITY_ENFORCED';
             List<Response__c> responseRecords = safe.doQuery(query);
-            if (sp == null) sp = Database.setSavepoint();
+            if (sp == null){ 
+                sp = Database.setSavepoint();
+            }
             if(!responseRecords.isEmpty()){
                 responseRecords[0].put('Conversation_History__c',JSON.serialize(chatMap.get('responseList')));
                 Database.SaveResult[] saveResult = safe.doUpdate(responseRecords);
@@ -525,7 +561,7 @@ public with sharing class AssessmentController {
                 }
             }
         }catch(exception e){
-            string errorMsg = e.getMessage();
+            String errorMsg = e.getMessage();
             throw new AuraHandledException(errorMsg);
         }
     }
@@ -548,7 +584,9 @@ public with sharing class AssessmentController {
             errorRecord.Error_Stack_Trace__c=(String)errorLogMap.get('errorData');
             List<ErrorTransactionLog__c> errLogList = new List<ErrorTransactionLog__c>();
             errLogList.add(errorRecord);
-            if (sp == null) sp = Database.setSavepoint();
+            if (sp == null){ 
+                sp = Database.setSavepoint();
+            }
             if(errLogList.isEmpty() == false){
                 Database.SaveResult[] results = safe.doInsert(errLogList);
                 List<String> errorsList = SecurityCheckController.safeClassExceptionHandlerInsert(results);
@@ -559,14 +597,16 @@ public with sharing class AssessmentController {
                 }
             }
         }catch(exception e){
-            string errorMsg = e.getMessage();
+            String errorMsg = e.getMessage();
             throw new AuraHandledException(errorMsg);
         }
     }
     @AuraEnabled
-    public static Boolean updateSectionSequence(list<Section__c> secList){//Todo priyanka to work
+    public static Boolean updateSectionSequence(List<Section__c> secList){//Todo priyanka to work
         try{
-            if (sp == null) sp = Database.setSavepoint();
+            if (sp == null){
+                sp = Database.setSavepoint();
+            }
             if(secList.isEmpty() == false){
                 Database.SaveResult[] results = safe.doUpdate(secList);
                 List<String> errorsList = SecurityCheckController.safeClassExceptionHandlerInsert(results);
@@ -578,7 +618,7 @@ public with sharing class AssessmentController {
             }
             return true;
         }catch(exception e){
-            string errorMsg = e.getMessage();
+            String errorMsg = e.getMessage();
             throw new AuraHandledException(errorMsg);
         }
     }
@@ -593,12 +633,12 @@ public with sharing class AssessmentController {
 * @param assessmentId record id of an Assessment__c.
 */
     @AuraEnabled    
-    public static List<sObject> uploadFile(String fileResp)
+    public static List<SObject> uploadFile(String fileResp)
     {
         try{
             Map<String,Object> filemap = (Map<String,Object>) JSON.deserializeUntyped(fileResp);
-            string quesId = (String)filemap.get('quesId');
-            string accAssmtId = (String)filemap.get('assessmentId');
+            String quesId = (String)filemap.get('quesId');
+            String accAssmtId = (String)filemap.get('assessmentId');
             String baseUrl = URL.getSalesforceBaseUrl().toExternalForm();
             String fileblob = (String)filemap.get('fileBlob');
             Blob file=EncodingUtil.base64Decode(fileblob.split(',')[1]);
@@ -607,7 +647,9 @@ public with sharing class AssessmentController {
             cv.PathOnClient=(String)filemap.get('name');
             List<ContentVersion> cvList = new List<ContentVersion>();
             cvList.add(cv);
-            if (sp == null) sp = Database.setSavepoint();
+            if (sp == null){
+                sp = Database.setSavepoint();
+            }
             string cvId = ''; 
             if(cvList.isEmpty() == false){
                 Database.SaveResult[] results = safe.doInsert(cvList);
@@ -620,18 +662,20 @@ public with sharing class AssessmentController {
                 cvId = cvList[0].Id;
             }
             List<Response__c> srList = new List<Response__c>();
-            string query = 'SELECT Id, ContentDocumentId'
+            String query = 'SELECT Id, ContentDocumentId'
                             +' FROM ContentVersion'
-                            +' WHERE Id=\'' + String.escapeSingleQuotes(cvId) + '\'';
+                            +' WHERE Id=\'' + String.escapeSingleQuotes(cvId) + '\''
+                            +' WITH SECURITY_ENFORCED';
             List<ContentVersion> cversionList= safe.doQuery(query);
             String ftype = ((String)filemap.get('name')).substringAfter('.');
 
-            if(string.isNotBlank(quesId) && string.isNotBlank(accAssmtId)){
-                string questionQuery = 'SELECT Id,Files__c,Question__c'
+            if(String.isNotBlank(quesId) && String.isNotBlank(accAssmtId)){
+                String questionQuery = 'SELECT Id,Files__c,Question__c'
                                         +' FROM Response__c'
-                                        +' WHERE Question__c =\'' + string.escapeSingleQuotes(quesId) + '\''
+                                        +' WHERE Question__c =\'' + String.escapeSingleQuotes(quesId) + '\''
                                         +' AND AccountAssessmentRelation__c =\'' + String.escapeSingleQuotes(accAssmtId) + '\''
-                                        +' AND Is_Latest_Response__c = true';
+                                        +' AND Is_Latest_Response__c = true'
+                                        +' WITH SECURITY_ENFORCED';
 
                 srList = safe.doQuery(questionQuery);
                 if(srList.isEmpty() == false){
@@ -650,7 +694,7 @@ public with sharing class AssessmentController {
                     res.Question__c= quesId;
                     res.AccountAssessmentRelation__c= accAssmtId;
                     String fileUrl = baseUrl+'/sfc/servlet.shepherd/document/download/'+cvList[0].ContentDocumentId+'?operationContext=S1';
-                    string fileJson = '[{"name":"'+(String)filemap.get('name')+'","url":"'+fileUrl+'","type":"'+ftype+'"}]';
+                    String fileJson = '[{"name":"'+(String)filemap.get('name')+'","url":"'+fileUrl+'","type":"'+ftype+'"}]';
                     res.Files__c = fileJson;
                     res.Is_Latest_Response__c = true;
                     srList.add(res);
@@ -665,7 +709,7 @@ public with sharing class AssessmentController {
             return srList;
         }
         catch(Exception e){
-            string errorMsg = e.getMessage();
+            String errorMsg = e.getMessage();
             throw new AuraHandledException(errorMsg);
         }
     }
@@ -675,18 +719,18 @@ public with sharing class AssessmentController {
 * @param searchKey userinput for the search.
 */
     @AuraEnabled(cacheable=true)
-    public static List<Account> getAllSuppliers(string existingData, string searchKey, string exSearchKey){
+    public static List<Account> getAllSuppliers(String existingData, String searchKey, String exSearchKey){
         List<Account> supplierList = new List<Account>();
-        set<string> selSet = new set<string>();
-        set<Id> existingSups = new set<Id>();
+        Set<String> selSet = new Set<String>();
+        Set<Id> existingSups = new Set<Id>();
         selSet.add(existingData);
-        string query = '';
+        String query = '';
         try{
-            if(string.isNotBlank(existingData)){
-                existingSups = (set<Id>) JSON.deserialize(existingData, set<Id>.class);
+            if(String.isNotBlank(existingData)){
+                existingSups = (Set<Id>) JSON.deserialize(existingData, Set<Id>.class);
             }
             query = 'SELECT Id,Name FROM Account';
-            string filter = '';
+            String filter = '';
             if(string.isNotBlank(searchKey)){
                 string sKey = '\'%'+searchKey+'%\'';
                 filter += ' WHERE ((Name LIKE '+sKey+') ';
@@ -711,7 +755,7 @@ public with sharing class AssessmentController {
             {
                 filter+=' )';
             }
-            query = query+filter+' Order By CreatedDate DESC limit 10 ';
+            query = query+filter+' ORDER BY CreatedDate DESC LIMIT 10';
         }catch(exception e){
             String errorMsg = e.getMessage();
             throw new AuraHandledException(ErrorMsg);
@@ -732,12 +776,14 @@ public with sharing class AssessmentController {
 */
     
     @AuraEnabled
-    public static ResultWrapper sendAssessment(sObject assessmentRecord,string operationType, string suppliers,string existingSups, string deleteList){
+    public static ResultWrapper sendAssessment(SObject assessmentRecord,String operationType, String suppliers,String existingSups, String deleteList){
         ResultWrapper resWrap = new ResultWrapper();
         try{
-            string assessmentId = '';
-            List<sObject> assmtList = new List<sObject>();
-            if (sp == null) sp = Database.setSavepoint();
+            String assessmentId = '';
+            List<SObject> assmtList = new List<sObject>();
+            if (sp == null){
+                sp = Database.setSavepoint();
+            }
             if(operationType.equalsIgnoreCase('new')){
                 assmtList.add(assessmentRecord);
                 if(assmtList.isEmpty() == false){
@@ -755,23 +801,25 @@ public with sharing class AssessmentController {
             }
             Date asmtStartDate = (Date)assessmentRecord.get('Start_Date__c');
             Date asmtEndDate = (Date)assessmentRecord.get('End_Date__c') != null?(Date)assessmentRecord.get('End_Date__c'):null;
-            set<string> suppliersList = new set<string>();
-            set<string> deleteSupList = new set<string>();
-            set<string> existingSupList = new set<string>();
-            set<string> suppliersIds = new set<string>();
-            if(string.isNotBlank(suppliers)){
+            Set<String> suppliersList = new Set<String>();
+            Set<String> deleteSupList = new Set<String>();
+            Set<String> existingSupList = new Set<String>();
+            Set<String> suppliersIds = new Set<String>();
+            if(String.isNotBlank(suppliers)){
                 suppliersList = (set<string>) JSON.deserialize(suppliers, set<string>.class);
             }
-            if(string.isNotBlank(existingSups)){
+            if(String.isNotBlank(existingSups)){
                 existingSupList = (set<string>) JSON.deserialize(existingSups, set<string>.class);
             }
-            for(string newSupId:suppliersList){
+            for(String newSupId:suppliersList){
                 suppliersIds.add(newSupId);
             }
-            if(string.isNotBlank(deleteList)){
+            if(String.isNotBlank(deleteList)){
                 deleteSupList = (set<string>) JSON.deserialize(deleteList, set<string>.class);
                 List<Assessment_Supplier__c> deleteAccAssRelns = new List<Assessment_Supplier__c>();
-                string assSupQuery = 'SELECT Id FROM Assessment_Supplier__c WHERE Account__c IN:deleteSupList';
+                String assSupQuery = 'SELECT Id'
+                                    +' FROM Assessment_Supplier__c' 
+                                    +' WHERE Account__c IN:deleteSupList';
                 Map<String, Object> bindVariables = new Map<String, Object>{'deleteSupList' => deleteSupList};
                 List<Assessment_Supplier__c> assSuppList = safe.doQueryWithBinds(assSupQuery,bindVariables);
                 if(assSuppList.isEmpty() == false){
@@ -782,7 +830,6 @@ public with sharing class AssessmentController {
                 if(deleteAccAssRelns.isEmpty() == false){
                     List<Database.DeleteResult> deleteResult = safe.doDelete(deleteAccAssRelns);
                     List<String> errorList = SecurityCheckController.safeClassExceptionHandlerDelete(deleteResult);
-                    SYstem.debug(errorList);
                     if(errorList.size()>0){
                         Database.rollback(sp);
                         throw new SecurityControllerException(String.join( errorList, ', ' ));
@@ -793,7 +840,9 @@ public with sharing class AssessmentController {
             List<Assessment_Supplier__c> assessSupList = new List<Assessment_Supplier__c>();
             
             Date todayDate = Date.Today();
-            string query = 'SELECT Id,Name FROM Account WHERE ID IN:suppliersIds';
+            String query = 'SELECT Id,Name'
+                          +' FROM Account'
+                          +' WHERE ID IN:suppliersIds';
             Map<String, Object> bindVariables = new Map<String, Object>{'suppliersIds' => suppliersIds};
             List<Account> accList = safe.doQueryWithBinds(query,bindVariables);
             if(accList.isEmpty() == false){
@@ -829,7 +878,9 @@ public with sharing class AssessmentController {
                     }
                 }
             }
-            if(sp == null) sp = Database.setSavepoint();
+            if(sp == null){ 
+                sp = Database.setSavepoint();
+            }
             if(assessSupList.isEmpty() == false){
                 Database.SaveResult[] results = safe.doInsert(assessSupList);
                 List<String> errorsList = SecurityCheckController.safeClassExceptionHandlerInsert(results);
@@ -839,16 +890,15 @@ public with sharing class AssessmentController {
                 }
             }
 
-            set<Id> successRecordsIdSet = new set<Id>();
+            Set<Id> successRecordsIdSet = new Set<Id>();
             if(accountAssessRelnsList.isEmpty() == false){
                 Database.SaveResult[] results = safe.doInsert(accountAssessRelnsList);
                 List<String> errorsList = SecurityCheckController.safeClassExceptionHandlerInsert(results);
-                SYstem.debug(errorsList);
                 if(errorsList.size()>0){
                     Database.rollback(sp);
                     throw new SecurityControllerException(String.join(errorsList, ', ' ));
                 }
-                for(Database.SaveResult result : results) {
+                for(Database.SaveResult result : results){
                     if(result.isSuccess()){
                         successRecordsIdSet.add(result.getId());
                     }
@@ -863,9 +913,10 @@ public with sharing class AssessmentController {
             resWrap.errorCode = '';
         }catch(exception e){
             resWrap.isSuccess = false;
-            resWrap.recordId = '';
             resWrap.message = e.getMessage();
             resWrap.errorCode = '';
+            String errorMsg = e.getMessage();
+            throw new AuraHandledException(ErrorMsg);
         }
         return resWrap;
     }
@@ -874,16 +925,16 @@ public with sharing class AssessmentController {
 * It is used to send assessment email to the suppliers.
 * @param recordIdsSet AccountAssessmentRelation record ids to send emails.
 */
-    public static void sendEmails(Set<Id> recordIdsSet, string Source){
+    public static void sendEmails(Set<Id> recordIdsSet, String source){
         try{
             List<Messaging.SingleEmailMessage> emailMessagesList = new List<Messaging.SingleEmailMessage>();
-            string assRelQuery = 'SELECT Id,Account__c,Account__r.Name,Account__r.Email__c,Assessment__c'
+            String assRelQuery = 'SELECT Id,Account__c,Account__r.Name,Account__r.Email__c,Assessment__c'
                                    +' FROM AccountAssessmentRelation__c'
                                    +' WHERE ID IN:recordIdsSet';
             Map<String, Object> bindVariables = new Map<String, Object>{'recordIdsSet' => recordIdsSet};
             List<AccountAssessmentRelation__c> assRlnsList = safe.doQueryWithBinds(assRelQuery,bindVariables);
             if(assRlnsList.isEmpty() == false){
-                if(string.isBlank(Source)){
+                if(string.isBlank(source)){
                     for(AccountAssessmentRelation__c assRelRec:assRlnsList){
                         Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
                         List<String> sendTo = new List<String>();
@@ -922,7 +973,9 @@ public with sharing class AssessmentController {
             }
         }catch(exception e){
             String errorMsg = e.getMessage();
-            throw new AuraHandledException(ErrorMsg);
+            AuraHandledException auraEx = new AuraHandledException(errorMsg);
+            auraEx.setMessage(errorMsg);
+            throw auraEx;
         }
     }
     
@@ -932,7 +985,7 @@ public with sharing class AssessmentController {
 * @param suppliers strigified list of suppliers selected.
 */
     @AuraEnabled
-    public static ResultWrapper addSuppliers(string assesmentId, string suppliers){
+    public static ResultWrapper addSuppliers(String assesmentId, String suppliers){
         ResultWrapper resWrap = new ResultWrapper();
         try{
             List<Assessment_Supplier__c> assessSupList = new List<Assessment_Supplier__c>();
@@ -944,7 +997,9 @@ public with sharing class AssessmentController {
                 assessSup.Status__c = 'Inactive';
                 assessSupList.add(assessSup);
             }
-            if(sp == null) sp = Database.setSavepoint();
+            if(sp == null){
+                sp = Database.setSavepoint();
+            }
             if(assessSupList.isEmpty() ==false){
                 Database.SaveResult[] results = safe.doInsert(assessSupList);
                 List<String> errorsList = SecurityCheckController.safeClassExceptionHandlerInsert(results);
@@ -976,15 +1031,18 @@ public with sharing class AssessmentController {
     public static ResultWrapper updateAssessmentSuppliers(string assessmentId){
         ResultWrapper resWrap = new ResultWrapper();
         try{
-            string status = 'Inactive';
-            string query = 'SELECT Id'
+            String status = 'Inactive';
+            String query = 'SELECT Id'
                         + ' FROM Assessment_Supplier__c'
                         + ' WHERE Assessment__c= \'' + String.escapeSingleQuotes(assessmentId) + '\''
-                        + ' AND Status__c= \'' + String.escapeSingleQuotes(status) + '\'';
+                        + ' AND Status__c= \'' + String.escapeSingleQuotes(status) + '\''
+                        + ' WITH SECURITY_ENFORCED';
             
             List<Assessment_Supplier__c> assessSuppList = safe.doQuery(query);
 
-            if (sp == null) sp = Database.setSavepoint();
+            if (sp == null){
+                sp = Database.setSavepoint();
+            }
             if(assessSuppList.isEmpty() == false){
                 for(Assessment_Supplier__c assesSup:assessSuppList){
                     assesSup.Status__c = 'Active';
@@ -1015,9 +1073,13 @@ public with sharing class AssessmentController {
 */
     
     @AuraEnabled(cacheable=true)
-    public static List<Assessment__c> getAssessmentRecord(string assessmentId){
+    public static List<Assessment__c> getAssessmentRecord(String assessmentId){
         try{
-            string query = 'SELECT Id,Start_Date__c,End_Date__c FROM Assessment__c WHERE Id=\'' + string.escapeSingleQuotes(assessmentId) + '\' LIMIT 1';
+            String query = 'SELECT Id,Start_Date__c,End_Date__c'
+                        +' FROM Assessment__c'
+                        +' WHERE Id=\'' + String.escapeSingleQuotes(assessmentId) + '\''
+                        +' WITH SECURITY_ENFORCED'
+                        +' LIMIT 1';      
             return safe.doQuery(query);
         }catch(exception e){
             String errorMsg = e.getMessage();
@@ -1032,14 +1094,22 @@ public with sharing class AssessmentController {
 */
     @AuraEnabled
     public static List<AccountAssessmentRelation__c> getExistingSuppliersWithSearch(string assessmentId, string searchKey){
-        string query = 'SELECT Id,Account__c,Account__r.Name FROM Assessment_Supplier__c WHERE Assessment__c = \'' + assessmentId + '\'';
-        if(string.isNotBlank(searchKey)){
-            string sKey = '\'%'+searchKey+'%\'';
-            query = query+' AND Account__r.Name LIKE '+sKey;
-        }else{
-            query = query+' LIMIT 500';
+        try{
+            String query = 'SELECT Id,Account__c,Account__r.Name'
+                     +' FROM Assessment_Supplier__c'
+                     +' WHERE Assessment__c = \'' + String.escapeSingleQuotes(assessmentId) + '\'';
+            if(String.isNotBlank(searchKey)){
+                string sKey = '\'%'+searchKey+'%\'';
+                query = query+' AND Account__r.Name LIKE '+sKey;
+                query = query+' WITH SECURITY_ENFORCED';
+            }else{
+                query = query+' WITH SECURITY_ENFORCED LIMIT 500';
+            }
+            return safe.doQuery(query);
+        }catch(exception e){
+            String errorMsg = e.getMessage();
+            throw new AuraHandledException(ErrorMsg);
         }
-        return safe.doQuery(query);
     }
     
     @AuraEnabled
@@ -1048,8 +1118,12 @@ public with sharing class AssessmentController {
         try{
             string query = 'SELECT Id'
                         + ' FROM Assessment__c'
-                        + ' WHERE Id= \'' + String.escapeSingleQuotes(assessmentId) + '\'';
+                        + ' WHERE Id= \'' + String.escapeSingleQuotes(assessmentId) + '\''
+                        + ' WITH SECURITY_ENFORCED';
             List<Assessment__c> deleteAssmtsList = safe.doQuery(query);
+            if (sp == null){
+                sp = Database.setSavepoint();
+            }
             if(deleteAssmtsList.isEmpty() == false){
                 List<Database.DeleteResult> deleteResult = safe.doDelete(deleteAssmtsList);
                 List<String> errorList = SecurityCheckController.safeClassExceptionHandlerDelete(deleteResult);
@@ -1077,9 +1151,10 @@ public with sharing class AssessmentController {
     @AuraEnabled(cacheable=true)
     public static List<Assessment_Template__c> getTemplateData(string templateId){
         try{
-            string query = 'SELECT Id,Status__c,Name'
-                         + ' FROM Assessment_Template__c'
-                         + ' WHERE Id=\'' + String.escapeSingleQuotes(templateId) + '\'';
+            String query = 'SELECT Id,Status__c,Name'
+                         +' FROM Assessment_Template__c'
+                         +' WHERE Id=\'' + String.escapeSingleQuotes(templateId) + '\''
+                         +' WITH SECURITY_ENFORCED';
             List<Assessment_Template__c> templateList = safe.doQuery(query);
             return templateList;
         }catch(exception e){
@@ -1091,9 +1166,10 @@ public with sharing class AssessmentController {
     @AuraEnabled(cacheable=true)
     public static List<Assessment__c> getAssessmentRecordData(string accountId){
         try{
-            string query = 'SELECT Id,Start_Date__c,Name'
+            String query = 'SELECT Id,Start_Date__c,Name'
                         + ' FROM Assessment__c'
-                        + ' WHERE Account__c= \'' + String.escapeSingleQuotes(accountId) + '\'';
+                        + ' WHERE Account__c= \'' + String.escapeSingleQuotes(accountId) + '\''
+                        + ' WITH SECURITY_ENFORCED';
             return safe.doQuery(query);
         }catch(exception e){
             String errorMsg = e.getMessage();
@@ -1104,11 +1180,12 @@ public with sharing class AssessmentController {
     /* getSectionsRecCount method is used to get all the Sections count to particular Assessment Template */
     @AuraEnabled
     public static Integer getSectionsRecCount(String templateId){
-        integer totalRecsCount=0;
+        Integer totalRecsCount=0;
         try{
             string query = 'SELECT Id'
-                         + ' FROM Section__c'
-                         + ' WHERE Assessment_Template__c =\'' + String.escapeSingleQuotes(templateId) + '\'';
+                         +' FROM Section__c'
+                         +' WHERE Assessment_Template__c =\'' + String.escapeSingleQuotes(templateId) + '\''
+                         +' WITH SECURITY_ENFORCED';
             List<Section__c> sectionList=safe.doQuery(query);
             totalRecsCount=sectionList.size();
             return totalRecsCount;
@@ -1120,11 +1197,12 @@ public with sharing class AssessmentController {
     
     @AuraEnabled
     public static Integer getQuestionsRecCount(String templateId){
-        integer totalRecsCount=0;
+        Integer totalRecsCount=0;
         try{
-            string query = 'SELECT Id'
+            String query = 'SELECT Id'
                          +' FROM Question__c'
-                         +' WHERE Assessment_Template__c = \'' + String.escapeSingleQuotes(templateId) + '\'';
+                         +' WHERE Assessment_Template__c = \'' + String.escapeSingleQuotes(templateId) + '\''
+                         +' WITH SECURITY_ENFORCED';
             List<Section__c> sectionList = safe.doQuery(query);
             totalRecsCount = sectionList.size();
             return totalRecsCount;
@@ -1140,9 +1218,10 @@ public with sharing class AssessmentController {
     public static List<SectionWrapper> getTemplateSections(String templateId,Integer recslimit){
         List<SectionWrapper> sectionwraplist=new List<SectionWrapper>();
         try{
-            string query = 'SELECT Status__c'
+            String query = 'SELECT Status__c'
                           +' FROM Assessment_Template__c'
                           +' WHERE Id=\'' + String.escapeSingleQuotes(templateId) + '\''
+                          +' WITH SECURITY_ENFORCED'
                           +' LIMIT 1';
             List<Assessment_Template__c> assessmentList= safe.doQuery(query);
 
@@ -1153,6 +1232,7 @@ public with sharing class AssessmentController {
                                 +  'No_of_Questions__c, Section_Sequence_Number__c, Historical_Id__c,Cloned_Record_Id__c'
                                 + ' FROM Section__c'
                                 + ' WHERE Assessment_Template__c = \'' + String.escapeSingleQuotes(templateId) + '\''
+                                + ' WITH SECURITY_ENFORCED'
                                 + ' ORDER BY Section_Sequence_Number__c ASC'
                                 + ' LIMIT '+recslimit;
 
@@ -1166,8 +1246,9 @@ public with sharing class AssessmentController {
                     sectionwrap.assessmenttemplateId=sec.Assessment_Template__c;
                     sectionwrap.sectionId=sec.Id;
                     if(assessmenttemp!=null ){
-                        if(assessmenttemp.Status__c=='New')
-                            sectionwrap.assessmentstatus=true;
+                        if(assessmenttemp.Status__c.equalsIgnoreCase('New')){
+                            sectionwrap.assessmentstatus = true;
+                        }
                     }
                     sectionwraplist.add(sectionwrap);
                 }
@@ -1189,6 +1270,9 @@ public with sharing class AssessmentController {
                 sec.Assessment_Template__c=AssessmentTempalteId;
                 sec.Name=SectionName;
                 List<Section__c> secList = new List<Section__c>();
+                if (sp == null){
+                    sp = Database.setSavepoint();
+                }
                 if(secList.isEmpty() == false){
                     Database.SaveResult[] saveResult = safe.doInsert(secList);
                     List<String> errorList = SecurityCheckController.safeClassExceptionHandlerInsert(saveResult);
@@ -1235,7 +1319,7 @@ public with sharing class AssessmentController {
         @AuraEnabled
         public String question{get;set;}
         @AuraEnabled
-        public String Name{get;set;}
+        public String name{get;set;}
         @AuraEnabled
         public String sectionId{get;set;}
         @AuraEnabled
@@ -1243,7 +1327,7 @@ public with sharing class AssessmentController {
         @AuraEnabled
         public String parentQuestion{get;set;}
         @AuraEnabled
-        public String Type{get;set;}
+        public String type{get;set;}
         @AuraEnabled
         public String sectionName{get;set;}
         @AuraEnabled
@@ -1261,15 +1345,15 @@ public with sharing class AssessmentController {
         @AuraEnabled
         public List<childQuestionWrapper> childQuestions{get;set;}
     }
-    public class childQuestionWrapper{
+    public class ChildQuestionWrapper{
         @AuraEnabled
-        public String Question{get;set;}
+        public String question{get;set;}
         @AuraEnabled
-        public String Name{get;set;}
+        public String name{get;set;}
         @AuraEnabled
         public String parentQuestion{get;set;}
         @AuraEnabled
-        public String Type{get;set;}
+        public String type{get;set;}
     } 
     public class SectionWrapper{
         @AuraEnabled

@@ -2,16 +2,14 @@ public class AssessmentTriggerHandler implements ITriggerHandler{
     public static SecurityCheckController safe = new SecurityCheckController();
     public static TriggerFrameworkServiceController serviceController = new TriggerFrameworkServiceController();
     public void beforeInsert(List<sObject> newList) {
-        system.debug('beforeInsert----->');
         getQuestionsCount(newList,null);
     }
      
     public void afterInsert(List<sObject> newList , Map<Id, sObject> newMap) {
-        system.debug('afterInsert----->');
+        
     }
      
     public void beforeUpdate(List<sObject> newList, Map<Id, sObject> newMap, List<sObject> oldList, Map<Id, sObject> oldMap) {
-       system.debug('inThebeforeUpdate-----');
        
         for(sObject assmt:newMap.values()){
             Decimal supplierCount = (Decimal)assmt.get('Number_of_Invited_Suppliers__c');
@@ -24,19 +22,19 @@ public class AssessmentTriggerHandler implements ITriggerHandler{
     }
      
     public void afterUpdate(List<sObject> newList, Map<Id, sObject> newMap,  List<sObject> oldList, Map<Id, sObject> oldMap) {
-        system.debug('afterUpdate----->');
+        
     }
      
     public void beforeDelete(List<sObject> oldList , Map<Id, sObject> oldMap) {
-        system.debug('beforeDelete----->');
+        
     }
      
     public void afterDelete(List<sObject> oldList , Map<Id, sObject> oldMap) {
-        system.debug('afterDelete----->');
+       
     }
      
     public void afterUnDelete(List<sObject> newList, Map<Id, sObject> newMap) {
-        system.debug('afterUnDelete----->');
+        
     }
     public static void getQuestionsCount(List<sObject> newList,Map<Id, sObject> newMap)
     {
@@ -53,10 +51,12 @@ public class AssessmentTriggerHandler implements ITriggerHandler{
         Map<String, Object> bindVariables = new Map<String, Object>{'templateIds' => templateIds};
         string query = 'SELECT COUNT(id) quesCount, Assessment_Template__c'
                      +' FROM Question__c'
+                     +' WITH SECURITY_ENFORCED'
                      +' GROUP BY Assessment_Template__c'
                      +' HAVING Assessment_Template__c IN:templateIds';
 
-        AggregateResult[] templateGroup = safe.doQueryWithBinds(query,bindVariables);
+        //AggregateResult[] templateGroup = safe.doQueryWithBinds(query,bindVariables);
+        AggregateResult[] templateGroup = database.query(query);
         for (AggregateResult ar : templateGroup){
             String templateId = (Id)ar.get('Rhythm__Assessment_Template__c');
             for(Assessment__c assessment : templateMap.get(templateId) ){
@@ -66,6 +66,5 @@ public class AssessmentTriggerHandler implements ITriggerHandler{
                 }
             }
         }
-        System.debug('newMap==>'+newMap);
     }
 }

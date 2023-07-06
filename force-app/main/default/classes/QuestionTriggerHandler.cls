@@ -3,18 +3,15 @@ public class QuestionTriggerHandler implements ITriggerHandler{
     private static Savepoint sp;//prudhvi to work
 
     public void beforeInsert(List<sObject> newList) {
-        system.debug('beforeInsert----->');
         restrictRecordActions(newList);
         recordAddSequenceNumber(newList);
     }
     
     public void afterInsert(List<sObject> newList , Map<Id, sObject> newMap) {
-        system.debug('afterInsert----->');
         getQuestionsCount(newList,new Set<Id>{});
     }
     
     public void beforeUpdate(List<sObject> newList, Map<Id, sObject> newMap, List<sObject> oldList, Map<Id, sObject> oldMap) {
-        system.debug('beforeUpdate----->');
         List<Question__c> newQustnlst=new List<Question__c>();
         List<Question__c> questionLst=new List<Question__c>();
         for(Question__c qustn:(List<Question__c>)newList) {
@@ -35,7 +32,6 @@ public class QuestionTriggerHandler implements ITriggerHandler{
     }
     
     public void afterUpdate(List<sObject> newList, Map<Id, sObject> newMap,  List<sObject> oldList, Map<Id, sObject> oldMap) {
-        system.debug('afterUpdate----->');
         List<Question__c> qustnlst=new List<Question__c>();
         Set<Id> SectnsIds=new Set<Id>();
         for(Question__c qustn:(List<Question__c>)newMap.values()) {
@@ -50,18 +46,16 @@ public class QuestionTriggerHandler implements ITriggerHandler{
     }
     
     public void beforeDelete(List<sObject> oldList , Map<Id, sObject> oldMap) {
-        system.debug('beforeDelete----->');
         restrictRecordActions(oldList);
         recordSequenceNumber(oldList);
     }
     
     public void afterDelete(List<sObject> oldList , Map<Id, sObject> oldMap) {
-        system.debug('afterDelete----->');
         getQuestionsCount(oldList,new Set<Id>{});
     }
     
     public void afterUnDelete(List<sObject> newList, Map<Id, sObject> newMap) {
-        system.debug('afterUnDelete----->');
+
     }
     
     
@@ -81,23 +75,25 @@ public class QuestionTriggerHandler implements ITriggerHandler{
             }
             if(secIds.isEmpty() == false){
                 string secQuery = 'SELECT Id, No_of_Questions__c,'
-                                +' (SELECT Id from Questions__r)'
+                                +'(SELECT Id from Questions__r)'
                                 +' FROM Section__c'
                                 +' WHERE Id IN:secIds';
                 Map<String, Object> bindVariables = new Map<String, Object>{'secIds' => secIds};            
                 List<Section__c> seclst= safe.doQueryWithBinds(secQuery,bindVariables);
                 for(Section__c secs:seclst) {
-                    Integer Qustncount=0;
-                    for(Question__c Qustn:secs.Questions__r) {
-                        Qustncount=Qustncount+1;
+                    Integer qustnCount=0;
+                    for(Question__c qustn:secs.Questions__r) {
+                        qustnCount=qustnCount+1;
                     }
-                    sectionwithQuestionscountMap.put(secs.Id,Qustncount);
+                    sectionwithQuestionscountMap.put(secs.Id,qustnCount);
                 }
                 for(Section__c secs:seclst) {
                     secs.No_of_Questions__c=sectionwithQuestionscountMap.get(secs.Id);
                     updateSectionslst.add(secs);
                 }
-                if (sp == null) sp = Database.setSavepoint();
+                if (sp == null){ 
+                    sp = Database.setSavepoint();
+                }
                 if(updateSectionslst.isEmpty() == false) {
                     Database.SaveResult[] saveResult = safe.doUpdate(updateSectionslst);
                     List<String> errorList = SecurityCheckController.safeClassExceptionHandlerInsert(saveResult);
@@ -108,7 +104,7 @@ public class QuestionTriggerHandler implements ITriggerHandler{
                 }
             }
         }catch(exception e){
-            system.debug('Exception e==='+e.getMessage());
+            
         }
     }
     public void restrictRecordActions(List<Question__c> qusLst) {
@@ -138,7 +134,7 @@ public class QuestionTriggerHandler implements ITriggerHandler{
             }
         }
         catch(exception e){
-            system.debug('Exception e==='+e.getMessage());
+            
         }
     }
     public void recordValidations(List<Question__c> questionLst) {
@@ -147,7 +143,7 @@ public class QuestionTriggerHandler implements ITriggerHandler{
                 question.addError('You cannot change Assessment Template');
             }
         }catch(exception e) {
-            system.debug('Exception e==='+e.getMessage());
+            
         }
     }
     public void recordAddSequenceNumber(List<Question__c> qusLst) {
@@ -180,7 +176,7 @@ public class QuestionTriggerHandler implements ITriggerHandler{
             }
         }
         catch(exception e) {
-            system.debug('Exception e==='+e.getMessage());
+            
         }
     }
     public void recordSequenceNumber(List<Question__c> quesLst) {
@@ -205,7 +201,9 @@ public class QuestionTriggerHandler implements ITriggerHandler{
                         question.Question_Sequence_Number__c = sequenceNumber;
                         updateQuestionList.add(question);
                     }
-                    if (sp == null) sp = Database.setSavepoint();
+                    if (sp == null){ 
+                        sp = Database.setSavepoint();
+                    }
                     if(updateQuestionList.isEmpty() == false) {
                         Database.SaveResult[] saveResult = safe.doUpdate(updateQuestionList);
                         List<String> errorList = SecurityCheckController.safeClassExceptionHandlerInsert(saveResult);
@@ -218,7 +216,7 @@ public class QuestionTriggerHandler implements ITriggerHandler{
             }
         }
         catch(exception e) {
-            system.debug('Exception e==='+e.getMessage());
+            
         }
     }
     public class SecurityControllerException extends Exception{

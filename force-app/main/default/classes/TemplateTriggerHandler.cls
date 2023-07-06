@@ -1,15 +1,15 @@
 public class TemplateTriggerHandler implements ITriggerHandler{
     public static TriggerFrameworkServiceController serviceController = new TriggerFrameworkServiceController();
     public void beforeInsert(List<sObject> newList) {
-        system.debug('beforeInsert----->');
+        
     }
      
     public void afterInsert(List<sObject> newList , Map<Id, sObject> newMap) {
-        system.debug('afterInsert----->');
+        
     }
      
     public void beforeUpdate(List<sObject> newList, Map<Id, sObject> newMap, List<sObject> oldList, Map<Id, sObject> oldMap) {
-        system.debug('inThebeforeUpdate-----');
+        
         for(sObject templt:newMap.values()){
             Decimal assessmentCount = (Decimal)templt.get('Number_of_Assessments__c');
             boolean isCriteriaMet = serviceController.checkEntryCriteria(templt,oldMap.get(templt.Id),'Assessment_Template_c');
@@ -20,7 +20,7 @@ public class TemplateTriggerHandler implements ITriggerHandler{
     }
 
     public void afterUpdate(List<sObject> newList, Map<Id, sObject> newMap,  List<sObject> oldList, Map<Id, sObject> oldMap) {
-        system.debug('afterUpdate----->');
+        
     }
      
     public void beforeDelete(List<sObject> oldList , Map<Id, sObject> oldMap) {
@@ -34,10 +34,10 @@ public class TemplateTriggerHandler implements ITriggerHandler{
     }
      
     public void afterDelete(List<sObject> oldList , Map<Id, sObject> oldMap) {
-        system.debug('afterDelete----->');
+        
     }
      
     public void afterUnDelete(List<sObject> newList, Map<Id, sObject> newMap) {
-        system.debug('afterUnDelete----->');
+        
     }
 }

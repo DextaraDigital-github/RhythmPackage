@@ -1,40 +1,34 @@
 public class ResponseHandler implements ITriggerHandler{
     public static SecurityCheckController safe = new SecurityCheckController();//use singleton pattern
     private static Savepoint sp;//prudhvi to work
-     public void afterInsert(List<sObject> newList , Map<Id, sObject> newMap) {
+    public void afterInsert(List<sObject> newList , Map<Id, sObject> newMap) {
         getResponseCount(newList);
-       
     }
-     public void beforeInsert(List<sObject> newList) {
-        system.debug('afterInsert----->');
+    public void beforeInsert(List<sObject> newList) {
        
     }
     
     public void beforeUpdate(List<sObject> newList, Map<Id, sObject> newMap, List<sObject> oldList, Map<Id, sObject> oldMap) {
-        system.debug('beforeUpdate----->');
-    }
-    
-    public void afterUpdate(List<sObject> newList, Map<Id, sObject> newMap,  List<sObject> oldList, Map<Id, sObject> oldMap) {
-        system.debug('afterUpdate----->');
-        getResponseCount(newList);
         
     }
     
+    public void afterUpdate(List<sObject> newList, Map<Id, sObject> newMap,  List<sObject> oldList, Map<Id, sObject> oldMap) {
+        getResponseCount(newList);
+    }
+    
     public void beforeDelete(List<sObject> oldList , Map<Id, sObject> oldMap) {
-        system.debug('beforeDelete----->');
         
     }
     
     public void afterDelete(List<sObject> oldList , Map<Id, sObject> oldMap) {
-        system.debug('afterDelete----->');
         
     }
     
     public void afterUnDelete(List<sObject> newList, Map<Id, sObject> newMap) {
-        system.debug('afterUnDelete----->');
+        
     }
            
- public void getResponseCount(List<sObject> newList){
+    public void getResponseCount(List<sObject> newList){
         Set<Id> accAssessmentSet = new Set<Id>();
         for(Response__c res : (List<Response__c>)newList){
             if(string.isNotBlank(res.AccountAssessmentRelation__c)){
@@ -48,7 +42,9 @@ public class ResponseHandler implements ITriggerHandler{
                                 + ' WHERE Id IN :accAssessmentSet';
             Map<String, Object> bindVariables = new Map<String, Object>{'accAssessmentSet' => accAssessmentSet};
             List<AccountAssessmentRelation__c> accountAssessmentList = safe.doQueryWithBinds(asmtRlnQuery,bindVariables);
-            if (sp == null) sp = Database.setSavepoint();
+            if (sp == null){
+                sp = Database.setSavepoint();
+            }
             if(accountAssessmentList.isEmpty() == false){
                 for(AccountAssessmentRelation__c accAssRel :accountAssessmentList){
                     accAssRel.Number_of_Responses__c = accAssRel.Supplier_Response__r.size();

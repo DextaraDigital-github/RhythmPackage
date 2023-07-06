@@ -3,18 +3,15 @@ public class SectionTriggerHandler implements ITriggerHandler {
     private static Savepoint sp;//prudhvi to work
     
     public void beforeInsert(List<sObject> newList) {
-        system.debug('beforeInsert----->');
         restrictRecordActions(newList);
         recordAddSequenceNumber(newList);
     }
     
     public void afterInsert(List<sObject> newList , Map<Id, sObject> newMap) {
-        system.debug('afterInsert----->');
         
     }
     
     public void beforeUpdate(List<sObject> newList, Map<Id, sObject> newMap, List<sObject> oldList, Map<Id, sObject> oldMap) {
-        system.debug('beforeUpdate----->');
         List<Section__c> newSeclst=new List<Section__c>();
         List<Section__c> sectionLst=new List<Section__c>();
         for(Section__c sect:(List<Section__c>)newList) {
@@ -31,21 +28,19 @@ public class SectionTriggerHandler implements ITriggerHandler {
     }
     
     public void afterUpdate(List<sObject> newList, Map<Id, sObject> newMap,  List<sObject> oldList, Map<Id, sObject> oldMap) {
-        system.debug('afterUpdate----->');
+        
     }
     
     public void beforeDelete(List<sObject> oldList , Map<Id, sObject> oldMap) {
-        system.debug('beforeDelete----->');
         restrictRecordActions(oldList); 
         recordSequenceNumber(oldList);
     }
     
     public void afterDelete(List<sObject> oldList , Map<Id, sObject> oldMap) {
-        system.debug('afterDelete----->');
+        
     }
     
     public void afterUnDelete(List<sObject> newList, Map<Id, sObject> newMap) {
-        system.debug('afterUnDelete----->');
     }
     
     
@@ -75,7 +70,7 @@ public class SectionTriggerHandler implements ITriggerHandler {
             }
         }
         catch(exception e) {
-            system.debug('Exception e==='+e.getMessage());
+            
         }
     }
     public void recordValidations(List<Section__c> secLst) {
@@ -85,7 +80,7 @@ public class SectionTriggerHandler implements ITriggerHandler {
             }
         }
         catch(exception e) {
-            system.debug('Exception e==='+e.getMessage());
+            
         }
     }
     public void recordAddSequenceNumber(List<Section__c> secLst) {
@@ -119,7 +114,7 @@ public class SectionTriggerHandler implements ITriggerHandler {
                 }
             }
         }catch(exception e) {
-            system.debug('Exception e==='+e.getMessage());
+            
         }
     }
     public void recordSequenceNumber(List<Section__c> secLst) {
@@ -147,7 +142,9 @@ public class SectionTriggerHandler implements ITriggerHandler {
                         updateSectionList.add(section);
                         
                     }
-                    if (sp == null) sp = Database.setSavepoint();
+                    if (sp == null){
+                         sp = Database.setSavepoint();
+                    }
                     if(updateSectionList.size() > 0) {
                         Database.SaveResult[] saveResult = safe.doUpdate(updateSectionList);
                         List<String> errorList = SecurityCheckController.safeClassExceptionHandlerInsert(saveResult);
@@ -159,7 +156,7 @@ public class SectionTriggerHandler implements ITriggerHandler {
                 }
             }
         }catch(exception e) {
-            system.debug('Exception e==='+e.getMessage());
+            
         }
     }
     public class SecurityControllerException extends Exception{
