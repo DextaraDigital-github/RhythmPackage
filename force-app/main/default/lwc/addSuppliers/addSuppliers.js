@@ -20,11 +20,9 @@ export default class AddSuppliers extends LightningElement {
     @api recordId;
     newAccounts = [];
     delAccounts = [];
-    hasRendered = true;
 
     connectedCallback() {
-        console.log('childConnectedCallBack------>',this.recordId);
-        if(this.recordId != undefined){
+        if(this.recordId !== undefined){
             this.fetchExistingSuppliers();
         }
     }
@@ -32,7 +30,6 @@ export default class AddSuppliers extends LightningElement {
     fetchExistingSuppliers(){
         getExistingSuppliers({ assessmentId:this.recordId, searchKey: '' })
             .then(result => {
-                console.log('RESULT---->',JSON.stringify(result));
                 if(result){
                     let tempList = [];
                     for (let rec of result) {
@@ -41,7 +38,6 @@ export default class AddSuppliers extends LightningElement {
                     if(tempList.length > 0) {
                         this.existingSuppList = JSON.parse(JSON.stringify(tempList));
                     }
-                    console.log('addSuppExData---->',JSON.stringify(this.existingSuppList));
                 }
             })
             .catch(error => {

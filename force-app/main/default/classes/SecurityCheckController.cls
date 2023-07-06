@@ -115,6 +115,16 @@ public with sharing class SecurityCheckController {
         return securityDecision.getRecords();
     }
 
+    public List<SObject> doQueryWithBinds(String query, Map<String, Object> bindVariables) {
+        system.debug('query----->'+query);
+        List<SObject> records = Database.queryWithBinds(query, bindVariables,AccessLevel.USER_MODE);
+        SObjectAccessDecision securityDecision = guardAgainstRemovedFields(
+            AccessType.READABLE,
+            records
+        );
+        return securityDecision.getRecords();
+    }
+
     /// Private Methods
     private List<Database.SaveResult> doDML(
         System.AccessType accessType,

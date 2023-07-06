@@ -75,7 +75,7 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
     handleChange(event) {
         var changedvalue = event.target.value;
         console.log('changedvalue',changedvalue);
-        var questionId = event.currentTarget.dataset.key;
+        let questionId = event.currentTarget.dataset.key;
         if(this.responses && this.responses.length > 0){
             this.responses.forEach(res => {
                 if((typeof changedvalue === 'undefined' || changedvalue === '' || changedvalue === '[]') && res.Id === questionId ) {
@@ -84,7 +84,7 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
                             changedvalue=res.defaultValue;
                         } 
                 }                      
-                if (res.Id == questionId && res.isCheckbox == true) {
+                if (res.Id === questionId && res.isCheckbox === true) {
                 if (event.target.checked) {
                     changedvalue = 'true';
                 }
@@ -133,7 +133,6 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
 
     /* uploadFilesHandler is used to dispatch the file blob value to parent component(Questionnaire) with the loading on uploading the attachment*/
     uploadFilesHandler(event) {
-        console.log('hello');
         var x = new FileReader();
         var questionId = (event.currentTarget.dataset.id);
         this.fileresponsemap.questionId = questionId;
@@ -152,10 +151,6 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
         }
         let type = (event.target.files[0].name).split('.');
         this.fileresponsemap.type = type[1];
-        //let blob = new Blob(event.target.files[0],type[1]);
-        //this.fileresponsemap.url = .URL.createObjectURL(event.target.files[0]);
-        //this.fileresponsemap.url= x.readAsDataURL(event.target.files[0]);
-        //let file = event.target.files[0].name;
         this.showUploadProgress = true;
         this.fileresponsemap.isPng = false;
         this.fileresponsemap.isPdf = false;
@@ -171,8 +166,7 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
             case "doc": this.fileresponsemap.isDocx = true; break;
             default : console.log('default');
         }
-        let s = x.readAsDataURL(event.target.files[0]);
-        x.addEventListener("loadend", (event) => {
+        x.addEventListener("loadend", () => {
             this.fileresponsemap.filedata = x.result;
             this.fileresponsemap.showUploadProgress = this.showUploadProgress;
             /*To upload file and save the file in the record */

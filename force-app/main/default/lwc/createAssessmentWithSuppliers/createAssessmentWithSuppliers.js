@@ -31,32 +31,27 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
     }
 
     handleChange(event){
-        console.log('templateValue---->',JSON.stringify(event.detail.value));
-        console.log('templateValue---->',JSON.stringify(event.target.value));
         this.templateId = event.target.value;
     }
 
     getTodayDate(){
         getTodayDate()
         .then(result => {
-            console.log(JSON.stringify(result));
             if(result){
                 this.todayDate = result;
             }
         })
         .catch(error => {
-            console.log(JSON.stringify(error));
+            console.log(error);
         });
     }
 
     @wire(getTemplateData,{templateId:'$templateId'})
     templateRecord(result){
-        console.log('TemplateRecordResult-------->',JSON.stringify(result));
         if (result.data) {
             if(result.data.length>0){
-                console.log('TemplateRecord-------->',JSON.stringify(result.data));
                 this.templateStatus = result.data[0].Rhythm__Status__c;
-                if(result.data[0].Rhythm__Status__c == 'Inactive'){
+                if(result.data[0].Rhythm__Status__c === 'Inactive'){
                     this.isTemplateInactive = true;
                     this.showNewAssessment = false;
                 }else{
@@ -74,7 +69,7 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
     }
 
     get startDate(){
-        if(this.dateValue == undefined){
+        if(this.dateValue === undefined){
             let dateTime= new Date().toLocaleString(this.locale, {timeZone: this.timeZone})
             console.log('dateTime-------->',dateTime);
         }
@@ -90,10 +85,8 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
         try{
             event.preventDefault();
             let validatedData = this.validateData();
-            console.log('validatedData------>',JSON.stringify(validatedData));
             if(validatedData.isSave){
                 let fields = event.detail.fields;
-                console.log('refFields--------->',JSON.stringify(fields));
                 fields = Object.assign( { 'sobjectType': 'Rhythm__Assessment__c'}, fields );
                 this.assessmentRecord = fields;
                 this.showNewAssessment = false;
@@ -116,29 +109,26 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
         let todayDate =  new Date(this.todayDate).toISOString().substring(0, 10);
         console.log('startDate----->',startDate);
         console.log('todayDate----->',todayDate);
-        if(this.templateStatus != undefined && (this.templateStatus =='New' || this.templateStatus =='Inactive')){
+        if(this.templateStatus !== undefined && (this.templateStatus ==='New' || this.templateStatus ==='Inactive')){
             validatedDetails.isSave = false;
             validatedDetails.message = 'Assessment can be created only for Active Template.';
         }if(new Date(startDate) < new Date(todayDate)){
             validatedDetails.isSave = false;
             validatedDetails.message = 'Start Date cannot be a past date.'
         }
-        else if((typeof endDate != 'undefined' && endDate != null) && new Date(endDate) < new Date(startDate)){
+        else if((typeof endDate !== 'undefined' && endDate !== null) && new Date(endDate) < new Date(startDate)){
             validatedDetails.isSave = false;
             validatedDetails.message = 'End Date cannot be earlier than Start Date.'
         }
         return validatedDetails;
     }
 
-    addSuppliers(event){
+    addSuppliers(){
         try{
-            console.log('AddSuppliersMethod------->',JSON.stringify(this.suppliersList));
-            console.log('assessmentRecord--------->',JSON.stringify(this.assessmentRecord));
             if(this.suppliersList.length > 0){
                 addSuppliers({assessmentRecord:this.assessmentRecord,operationType:'new',suppliers:JSON.stringify(this.suppliersList),existingSups:'',deleteList:''})
                 .then(result => {
-                    console.log('addSuppliers Result------->'+JSON.stringify(result));
-                    if(result.isSuccess == true){
+                    if(result.isSuccess === true){
                         let successEvent = new CustomEvent("success", {
                         detail: {value:'refreshit'}
                         });
@@ -164,18 +154,17 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
     }
 
     updateSupplierData(event){
-        console.log('updatedSupplierData------>'+JSON.stringify(event.detail));
         this.suppliersList = event.detail.newSuppliers;
     }
 
     closeModal(){
         this.showModal = false;
-        if(this.values.template != undefined && this.values.template){
+        if(this.values.template !== undefined && this.values.template){
             this.navigateRelatedListView();
         }else{
             this.navigateToObjectHome();
         }
-        eval("$A.get('e.force:refreshView').fire();");
+       // eval("$A.get('e.force:refreshView').fire();");//Todo Prudvi please check this
     }
     showNotification(title,message,variant) {
         const evt = new ShowToastEvent({

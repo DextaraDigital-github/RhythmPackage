@@ -1,5 +1,7 @@
 public class QuestionTriggerHandler implements ITriggerHandler{
-    
+    public static SecurityCheckController safe = new SecurityCheckController();//use singleton pattern
+    private static Savepoint sp;//prudhvi to work
+
     public void beforeInsert(List<sObject> newList) {
         system.debug('beforeInsert----->');
         restrictRecordActions(newList);
@@ -63,37 +65,49 @@ public class QuestionTriggerHandler implements ITriggerHandler{
     }
     
     
-    public void getQuestionsCount(List<Question__c> Qustlst, Set<Id> SectionsIds)
+    public void getQuestionsCount(List<Question__c> qustlst, Set<Id> sectionsIds)
     {
         try {
-            Set<Id> SecIds=new Set<Id>();
-            List<Section__c> updateSectionslst=new List<Section__c>();
+            Set<Id> secIds=new Set<Id>();
+            List<Section__c> updateSectionslst = new List<Section__c>();
             map<Id,Integer> sectionwithQuestionscountMap=new map<Id,Integer>();
-            if(Qustlst.size()>0) {
-                for(Question__c Qustn:Qustlst){
-                    SecIds.add(Qustn.section__c);
+            if(qustlst.isEmpty() == false) {
+                for(Question__c qustn:qustlst){
+                    secIds.add(qustn.section__c);
                 }
             }
             else {
-                SecIds=SectionsIds;
+                secIds=sectionsIds;
             }
-            List<Section__c> Seclst=[SELECT Id, No_of_Questions__c, (SELECT Id from Questions__r) FROM Section__c where Id IN:SecIds];
-            for(Section__c Secs:Seclst) {
-                Integer Qustncount=0;
-                for(Question__c Qustn:Secs.Questions__r) {
-                    Qustncount=Qustncount+1;
+            if(secIds.isEmpty() == false){
+                string secQuery = 'SELECT Id, No_of_Questions__c,'
+                                +' (SELECT Id from Questions__r)'
+                                +' FROM Section__c'
+                                +' WHERE Id IN:secIds';
+                Map<String, Object> bindVariables = new Map<String, Object>{'secIds' => secIds};            
+                List<Section__c> seclst= safe.doQueryWithBinds(secQuery,bindVariables);
+                for(Section__c secs:seclst) {
+                    Integer Qustncount=0;
+                    for(Question__c Qustn:secs.Questions__r) {
+                        Qustncount=Qustncount+1;
+                    }
+                    sectionwithQuestionscountMap.put(secs.Id,Qustncount);
                 }
-                sectionwithQuestionscountMap.put(Secs.Id,Qustncount);
+                for(Section__c secs:seclst) {
+                    secs.No_of_Questions__c=sectionwithQuestionscountMap.get(secs.Id);
+                    updateSectionslst.add(secs);
+                }
+                if (sp == null) sp = Database.setSavepoint();
+                if(updateSectionslst.isEmpty() == false) {
+                    Database.SaveResult[] saveResult = safe.doUpdate(updateSectionslst);
+                    List<String> errorList = SecurityCheckController.safeClassExceptionHandlerInsert(saveResult);
+                    if(errorList.size()>0){
+                        Database.rollback(sp);
+                        throw new SecurityControllerException(String.join( errorList, ', ' ));
+                    }
+                }
             }
-            for(Section__c Secs:Seclst) {
-                Secs.No_of_Questions__c=sectionwithQuestionscountMap.get(Secs.Id);
-                updateSectionslst.add(Secs);
-            }
-            if(updateSectionslst.size()>0) {
-                Database.update(updateSectionslst);
-            }
-        }
-        Catch(Exception e){
+        }catch(exception e){
             system.debug('Exception e==='+e.getMessage());
         }
     }
@@ -104,29 +118,35 @@ public class QuestionTriggerHandler implements ITriggerHandler{
             for(Question__c qus:qusLst)  {
                 templateIds.add(qus.Assessment_template__c);
             }
-            if(templateIds.size() >0){
-                List<Assessment_template__c> templateList=[Select Id,status__c from Assessment_template__c where Id IN:templateIds];
-                for(Assessment_template__c template:templateList) {
-                    templateStatusMap.put(template.Id,template.Status__c);
-                }
-                for(Question__c qus:qusLst) {
-                    if(templateStatusMap.get(qus.Assessment_template__c)!='New') {
-                        qus.addError('You can not perform any operations on this record because of Template Status');
-                    } 
+            if(templateIds.isEmpty() == false){
+                string tempQuery = 'SELECT Id,status__c'
+                                 + ' FROM Assessment_template__c'
+                                 + ' WHERE Id IN:templateIds';
+                
+                Map<String, Object> bindVariables = new Map<String, Object>{'templateIds' => templateIds};
+                List<Assessment_template__c> templateList = safe.doQueryWithBinds(tempQuery,bindVariables);
+                if(templateList.isEmpty() == false){
+                    for(Assessment_template__c template:templateList) {
+                        templateStatusMap.put(template.Id,template.Status__c);
+                    }
+                    for(Question__c qus:qusLst) {
+                        if(templateStatusMap.get(qus.Assessment_template__c)!='New') {
+                            qus.addError('You can not perform any operations on this record because of Template Status');
+                        } 
+                    }
                 }
             }
         }
-        Catch(Exception e){
+        catch(exception e){
             system.debug('Exception e==='+e.getMessage());
         }
     }
     public void recordValidations(List<Question__c> questionLst) {
-        try {
+        try{
             for(Question__c question:questionLst) {
                 question.addError('You cannot change Assessment Template');
             }
-        }
-        Catch(Exception e) {
+        }catch(exception e) {
             system.debug('Exception e==='+e.getMessage());
         }
     }
@@ -136,21 +156,30 @@ public class QuestionTriggerHandler implements ITriggerHandler{
             for(Question__c question: qusLst) {
                 templateIds.add(question.Assessment_Template__c);
             }
-            List<Question__c> questionList=[Select Id,Question_Sequence_Number__c from Question__c where Assessment_Template__c IN:templateIds order by Question_Sequence_Number__c ASC];
-            Integer sequenceNumber = 0;
-            for(Question__c question: questionList) {
-                if(question.Question_Sequence_Number__c != null) {
-                    if(sequenceNumber < question.Question_Sequence_Number__c) {
-                        sequenceNumber = (Integer)question.Question_Sequence_Number__c;
+            if(templateIds.isEmpty() == false){
+                string queQuery = 'SELECT Id,Question_Sequence_Number__c'
+                                + ' FROM Question__c'
+                                + ' WHERE Assessment_Template__c IN:templateIds'
+                                + ' ORDER BY Question_Sequence_Number__c ASC';
+                Map<String, Object> bindVariables = new Map<String, Object>{'templateIds' => templateIds};
+                List<Question__c> questionList = safe.doQueryWithBinds(queQuery,bindVariables);
+                if(questionList.isEmpty() == false){
+                    integer sequenceNumber = 0;
+                    for(Question__c question: questionList) {
+                        if(question.Question_Sequence_Number__c != null) {
+                            if(sequenceNumber < question.Question_Sequence_Number__c) {
+                                sequenceNumber = (Integer)question.Question_Sequence_Number__c;
+                            }
+                        }
+                    }
+                    for(Question__c ques: qusLst) {
+                        sequenceNumber = sequenceNumber+1;
+                        ques.Question_Sequence_Number__c = sequenceNumber;
                     }
                 }
             }
-            for(Question__c ques: qusLst) {
-                sequenceNumber = sequenceNumber+1;
-                ques.Question_Sequence_Number__c = sequenceNumber;
-            } 
         }
-        Catch(Exception e) {
+        catch(exception e) {
             system.debug('Exception e==='+e.getMessage());
         }
     }
@@ -161,20 +190,38 @@ public class QuestionTriggerHandler implements ITriggerHandler{
             for(Question__c question: quesLst) {
                 templateIds.add(question.Assessment_Template__c);
             }
-            List<Question__c> questionList=[Select Id,Question_Sequence_Number__c from Question__c where Assessment_Template__c IN:templateIds AND Id NOT IN: quesLst order by Question_Sequence_Number__c ASC];
-            Integer sequenceNumber = 0;
-            for(Question__c question: questionList) {
-                sequenceNumber = sequenceNumber+1;
-                question.Question_Sequence_Number__c = sequenceNumber;
-                updateQuestionList.add(question);
-                
-            }
-            if(updateQuestionList.size() > 0) {
-                update updateQuestionList;
+            if(templateIds.isEmpty() == false){
+                string queQuery = 'SELECT Id,Question_Sequence_Number__c'
+                                + ' FROM Question__c'
+                                + ' WHERE Assessment_Template__c IN:templateIds'
+                                + ' AND Id NOT IN: quesLst'
+                                + ' ORDER BY Question_Sequence_Number__c ASC';
+                Map<String, Object> bindVariables = new Map<String, Object>{'templateIds' => templateIds,'quesLst' => quesLst};                               
+                List<Question__c> questionList = safe.doQueryWithBinds(queQuery,bindVariables);
+                if(questionList.isEmpty() == false){
+                    integer sequenceNumber = 0;
+                    for(Question__c question: questionList) {
+                        sequenceNumber = sequenceNumber+1;
+                        question.Question_Sequence_Number__c = sequenceNumber;
+                        updateQuestionList.add(question);
+                    }
+                    if (sp == null) sp = Database.setSavepoint();
+                    if(updateQuestionList.isEmpty() == false) {
+                        Database.SaveResult[] saveResult = safe.doUpdate(updateQuestionList);
+                        List<String> errorList = SecurityCheckController.safeClassExceptionHandlerInsert(saveResult);
+                        if(errorList.size()>0){
+                            Database.rollback(sp);
+                            throw new SecurityControllerException(String.join( errorList, ', ' ));
+                        }
+                    }
+                }
             }
         }
-        Catch(Exception e) {
+        catch(exception e) {
             system.debug('Exception e==='+e.getMessage());
         }
+    }
+    public class SecurityControllerException extends Exception{
+        
     }
 }
