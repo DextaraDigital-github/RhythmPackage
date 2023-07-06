@@ -38,7 +38,7 @@ export default class CustomRecordForm extends LightningElement {
   }
 
   //To close the new modal popup
-  handleCancel(event) {
+  handleCancel() {
     const selectedEvent = new CustomEvent('close', { detail: this.lookupId });
     this.dispatchEvent(selectedEvent);
   }
@@ -111,7 +111,7 @@ export default class CustomRecordForm extends LightningElement {
                 }),
               );
             }).catch(error => {
-
+              console.log(error);
             });
           }
         }
@@ -138,7 +138,7 @@ export default class CustomRecordForm extends LightningElement {
               variant: 'success',
             }),
           );
-        }).catch(error => { });
+        }).catch(error => { console.log(error);});
       }
     }
     else {
