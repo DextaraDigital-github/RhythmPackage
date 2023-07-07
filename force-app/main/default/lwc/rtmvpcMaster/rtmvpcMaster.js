@@ -45,8 +45,7 @@ export default class RtmvpcMaster extends NavigationMixin(LightningElement) {
       });
       getCommunityURL({}).then((resultURL) => {
          this.logoutURL = resultURL;
-      });
-      console.log('username',this.logoutURL);      
+      });      
     }
 
     renderedCallback() {        
@@ -83,7 +82,6 @@ export default class RtmvpcMaster extends NavigationMixin(LightningElement) {
             this.isSettings = false;
         }
         this.template.querySelector('c-rtmvpc-leftmenu').changeactivemenuitem();
-        console.log(this.activeRecId);
     }
 
     handleRenderUI(event){
@@ -149,7 +147,6 @@ export default class RtmvpcMaster extends NavigationMixin(LightningElement) {
     collapseMenuHandler()
     {
         var ele=this.template.querySelectorAll('[data-id="leftmenu"]');
-        console.log('MenuLeft',ele[0].classList);
         ele[0].classList.remove("show");
     }
 

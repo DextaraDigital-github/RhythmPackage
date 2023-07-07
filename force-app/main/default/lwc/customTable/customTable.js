@@ -106,7 +106,6 @@ export default class CustomTable extends LightningElement {
                     if (!!currentRecord.record && currentRecord.record.length > 0) {
                         for (let k = 0; k < currentRecord.record.length; k++) {
                             let fieldDetails = currentRecord.record[k];
-                            //console.log('fieldDetails===>'+ fieldDetails);
                             if (fieldDetails.fieldName === fieldName) {
                                 if (typeof fieldDetails.value === 'undefined' || !(typeof fieldDetails.value !== 'undefined' && fieldDetails.value.toString().toUpperCase().includes(filterValue))) {
                                     isRecordMatched = false;
@@ -303,8 +302,6 @@ export default class CustomTable extends LightningElement {
     // Formats the data into the format which can be displayed in the table
     assignData(relatedListRecords, colList) {
         var recDataList = [];
-        console.log('relatedListRecords', relatedListRecords);
-        console.log('colList', colList);
         for (let i = 0; i < relatedListRecords.length; i++) {
             let recDetails = {};
             let recArray = [];
@@ -622,7 +619,6 @@ export default class CustomTable extends LightningElement {
         deleteRecords({ recIdList: this.rowDataIdList }).then(result => {
             if (result === 'Success') {
                 let reclist_dup = this.recList;
-                console.log('Deleted Successfully');
                 for (let j = 0; j < this.rowDataIdList.length; j++) {
                     for (let i = 0; i < this.recList.length; i++) {
                         if (reclist_dup[i].id.toString() === this.rowDataIdList[j].toString()) {
@@ -632,9 +628,6 @@ export default class CustomTable extends LightningElement {
                     }
                 }
                 this.recList = reclist_dup;
-            }
-            else {
-                console.log('Deleted Unsuccessful');
             }
         }).catch(error => {
             console.log(error);
@@ -673,7 +666,6 @@ export default class CustomTable extends LightningElement {
     }
     handleResizeMouseMove(mmEvent, mmResizeDetails) {
         let pos1 = mmResizeDetails.resizeHandleInitPosition - mmEvent.clientX;
-        console.log('pos1 -- ', pos1);
         mmResizeDetails.resizeHandleInitPosition = mmEvent.clientX;
         let mmResizeHandle = mmResizeDetails.columnResizeHandle;
         mmResizeHandle.style.left = (mmResizeHandle.offsetLeft - pos1) + "px";
@@ -694,7 +686,6 @@ export default class CustomTable extends LightningElement {
         this.columnResizeDetails.columnResizeHandle = null;
     }
     setAllColumnHeadersWidth() {
-        console.log('setAllColumnHeadersWidth');
         let columnHeaders = this.template.querySelectorAll('[data-columnheader]');
         if (!!columnHeaders && columnHeaders.length > 0) {
             columnHeaders.forEach( colHeader =>{

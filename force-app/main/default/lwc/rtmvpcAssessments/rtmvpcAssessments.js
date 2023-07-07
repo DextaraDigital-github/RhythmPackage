@@ -44,15 +44,12 @@ export default class RtmvpcAssessments extends NavigationMixin(LightningElement)
     getStateParameters(currentPageReference) {
        if (currentPageReference) {
           this.urlId = currentPageReference.state?.Rhythm__AccountAssessmentRelation__c;
-          console.log('sample',this.urlId);
-          console.log('sample111',currentPageReference);
        }
     }
    
   /* fetchingRecords is used to get accountAssessment data based on the account Id and URL navigation */  
     fetchingRecords(){
         getAssessmentJunctionRecords({ accountId: this.accId}).then(result=>{
-        console.log(' Assesments result sh -- ', result.length);
         this.recList = result;
         this.show.grid=true;
         if( this.urlId !=null && typeof this.urlId !='undefined')
@@ -196,7 +193,6 @@ export default class RtmvpcAssessments extends NavigationMixin(LightningElement)
    dispatching an event */
     exportRowAsPdfHandler(event) {
         var x = event.detail.value;
-        console.log('jjjjj',x);
         /* getSupplierAssessmentList apex method is used to get account assessment data */
         getSupplierAssessmentList({ assessmentId: x }).then(resultData => {
             var assessmentTemplateId = resultData[0].Rhythm__Assessment__r.Rhythm__Template__c;
@@ -295,7 +291,6 @@ export default class RtmvpcAssessments extends NavigationMixin(LightningElement)
     /* constructWrapper is used is used to build the wrapper data properly to the questions*/
     constructWrapper(questionResp, savedResp) {
         var questionMap = new Map();
-        console.log('responsemap', savedResp);
         questionResp.forEach(qu => {
             var quTemp = {};
             quTemp.questionId = qu.Id;

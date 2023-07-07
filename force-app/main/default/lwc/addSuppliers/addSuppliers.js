@@ -41,7 +41,6 @@ export default class AddSuppliers extends LightningElement {
                 }
             })
             .catch(error => {
-                console.log('ERROR---->',error);
                 this.showNotification('Error', error.body.message, 'error');
             });
     }
@@ -84,18 +83,15 @@ export default class AddSuppliers extends LightningElement {
 
     handleChange(event) {
         try {
-            console.log('handleChange - START : ', this.existingSuppList);
             let selectedValues = event.detail.value;
                 if(this.supplierData && this.supplierData.length > 0){
                     this.supplierData.forEach( suppData => {
                         if (selectedValues.indexOf(suppData.value) !== -1 && this.existingSuppList.indexOf(suppData.value) === -1) {
                             this.newAccounts.push(suppData.value);
                             this.existingSuppList.push(suppData.value);
-                            console.log('here 1');
                             if (this.delAccounts.indexOf(suppData.value) !== -1) {
                                 this.delAccounts.splice(this.delAccounts.indexOf(suppData.value), 1);
                             }
-                             console.log('here 2');
                         }
                         else if (selectedValues.indexOf(suppData.value) === -1 && this.existingSuppList.indexOf(suppData.value) !== -1) {
                             this.delAccounts.push(suppData.value);
@@ -111,7 +107,6 @@ export default class AddSuppliers extends LightningElement {
             })
             this.dispatchEvent(custEvent);
             this.countRecords();
-            console.log('handleChange - END : ', this.existingSuppList);
         } catch (error) {
             console.log('handleChange error : ', error);
         }
@@ -156,6 +151,5 @@ export default class AddSuppliers extends LightningElement {
             this.selectedSuppliersCount = this.selectedSuppliersCount.split('(')[0] + '(' + selectedAccounts + ')';
             this.availableSuppliersCount = this.availableSuppliersCount.split('(')[0] + '(' + (this.supplierData.length - selectedAccounts) + ')';
         }
-        console.log('selectedSuppliersCount : ' + selectedAccounts + ', availableSuppliersCount : ' + (this.supplierData.length - selectedAccounts));
     }
 }
