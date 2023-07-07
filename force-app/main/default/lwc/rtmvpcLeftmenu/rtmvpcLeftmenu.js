@@ -6,8 +6,7 @@ export default class RtmvpcLeftmenu extends LightningElement {
             detail:'clicked'
         });
         this.dispatchEvent(collapseMenuEvent);
-        const targetId = event.currentTarget.dataset.id;
-        console.log(targetId);        
+        const targetId = event.currentTarget.dataset.id;     
         const targetElement = this.template.querySelector('[data-id="'+targetId+'"]');
         if(targetElement){
             // Remove "active" class from all other elements
