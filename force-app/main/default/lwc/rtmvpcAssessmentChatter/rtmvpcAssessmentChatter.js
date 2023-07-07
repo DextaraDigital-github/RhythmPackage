@@ -28,7 +28,6 @@ export default class RtmvpcAssessmentChatter extends LightningElement {
    @api
    displayConversation(chatmap) {
       this.newChat = '';
-      console.log('testing purpose11');
       this.responseWrapper = {};
       this.showData = chatmap.openChat;
       if (typeof chatmap !== 'undefined' && chatmap) {
@@ -60,7 +59,6 @@ export default class RtmvpcAssessmentChatter extends LightningElement {
       chatterBody.scrollTop = chatterBody.scrollHeight;
    }
    connectedCallback() {
-      console.log('testing purpose');
    }
    /*callChatterResponse is used to save the conversation history between vendor and customer in the response record */
    callChatterResponse(response) {
@@ -148,10 +146,8 @@ export default class RtmvpcAssessmentChatter extends LightningElement {
             }
 
             if (typeof this.responseMap.Text != 'undefined' && this.responseMap.Text !== '') {
-                console.log('hhhhh',this.responseMap.Text);
-               this.newResponse.push(this.responseMap);
+                this.newResponse.push(this.responseMap);
             }
-            console.log('hhhhh',this.newResponse);
             if(this.newResponse.length >0){
             this.callChatterResponse(this.newResponse);
             }

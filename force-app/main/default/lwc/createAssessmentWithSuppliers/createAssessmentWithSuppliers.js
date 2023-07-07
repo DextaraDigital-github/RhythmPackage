@@ -61,7 +61,7 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
                 this.showNewAssessment = true;
             }
         }else if (result.error) {
-            console.log('TemplateRecord:Error------->',result.error);
+            console.log(result.error);
             this.showNotification('Error',result.error.body.message,'error');
         }else{
             this.showNewAssessment = true;
@@ -69,9 +69,8 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
     }
 
     get startDate(){
-        if(this.dateValue === undefined){
-            let dateTime= new Date().toLocaleString(this.locale, {timeZone: this.timeZone})
-            console.log('dateTime-------->',dateTime);
+        if(typeof this.dateValue === 'undefined'){
+            this.dateValue= new Date().toLocaleString(this.locale, {timeZone: this.timeZone})
         }
         return this.dateValue;
     }
@@ -107,8 +106,6 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
         let startDate = this.template.querySelector(`[data-id="startdate"]`).value;
         let endDate = this.template.querySelector(`[data-id="enddate"]`).value;
         let todayDate =  new Date(this.todayDate).toISOString().substring(0, 10);
-        console.log('startDate----->',startDate);
-        console.log('todayDate----->',todayDate);
         if(this.templateStatus !== undefined && (this.templateStatus ==='New' || this.templateStatus ==='Inactive')){
             validatedDetails.isSave = false;
             validatedDetails.message = 'Assessment can be created only for Active Template.';

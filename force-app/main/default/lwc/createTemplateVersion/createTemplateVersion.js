@@ -23,7 +23,7 @@ export default class CreateTemplateVersion extends LightningElement {
             }
         })
         .catch(error => {
-            console.log('createNewVersionError------>',error);
+            console.log(error);
             this.showNotification('Error','error',error);
             this.isLoaded = false;
         });

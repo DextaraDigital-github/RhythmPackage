@@ -10,7 +10,6 @@ export default class ActivateAssessmentSchedules extends LightningElement {
         this.dispatchEvent(new CloseActionScreenEvent());
     }
     handleConfirm(){
-        console.log('handleConfirm------->');
         updateAssessmentSuppliers({assessmentId:this.recordId})
         .then(result => {
             if(result.isSuccess === true){
@@ -21,7 +20,6 @@ export default class ActivateAssessmentSchedules extends LightningElement {
             }
         })
         .catch(error => {
-            console.log('handleConfirm:Error------->');
             this.showNotification('Error',error,'error');
         });
     }

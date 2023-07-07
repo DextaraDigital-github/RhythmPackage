@@ -23,7 +23,6 @@ export default class SearchComponentLwc extends  LightningElement{
         this.messageResult=false;
          if (data) {
            // TODO: Error handling 
-           console.log('data::'+data.length);
            if(data.length>0 && this.isShowResult){
                this.lookupValuesList = data;                
                this.showSearchedValues = true; 
@@ -43,7 +42,7 @@ export default class SearchComponentLwc extends  LightningElement{
             this.lookupValuesList=[];           
             this.showSearchedValues = false;
             this.messageResult=true;
-            console.log('handleClick-getRecordsList'+error);
+            console.log(error);
       });
         
    
@@ -66,8 +65,7 @@ export default class SearchComponentLwc extends  LightningElement{
     //Set the parent calendar id
     this.lookupId =  event.target.dataset.value;
     //Set the parent calendar label
-    this.lookupName =  event.target.dataset.label;      
-    console.log('lookupId::'+this.lookupId);    
+    this.lookupName =  event.target.dataset.label; 
     const selectedEvent = new CustomEvent('selectedvalue', { detail: this.lookupId });
         // Dispatches the event.
     this.dispatchEvent(selectedEvent);    
