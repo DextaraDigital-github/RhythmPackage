@@ -250,8 +250,7 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
             response.Rhythm__Question_Sequence_Number__c = i + 1;
             questionlist.push(response);
         }
-        updateQuestionList({ qstnList: questionlist }).then(result => {
-            console.log('sucessfully created Response result===>' + result);
+        updateQuestionList({ qstnList: questionlist }).then(() => {
             this.dispatchEvent(
                     new ShowToastEvent({
                         title: 'Success',
@@ -262,7 +261,7 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
             this.closeReorderSectionModal();
             this.handleRefresh();
         }).catch(error => {
-            console.log('Error' + error);
+            console.log(error);
         });
     }
 
@@ -275,8 +274,7 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
             response.Rhythm__Section_Sequence_Number__c = i + 1;
             sectionList.push(response);
         }
-        updateSectionList({ secList: sectionList }).then(result => {
-            console.log('sucessfully created Response result===>' + result);
+        updateSectionList({ secList: sectionList }).then(() => {
              this.dispatchEvent(
                     new ShowToastEvent({
                         title: 'Success',
@@ -315,20 +313,7 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
 
     // checks if selected atleast one record to delete
     handleDelete() {
-        this.deletePopupMessage = 'Are you sure you want to delete this Questions?'
-         /* var selRows = this.template.querySelector("lightning-tree-grid").getSelectedRows();
-         console.log('Selected rows ---' + JSON.parse(JSON.stringify(this.selectedRows)));
-         var selIds;
-         this.sectionListData && this.sectionListData.forEach(rec => {
-             selIds = selRows.find(row => row.id === rec.Id);
-         });
-         if (selIds === null || selIds === undefined(selIds !== null && selIds.length > 0)) {
-             this.deletePopupMessage = 'Are you sure you want to delete this Questions?';
-         }
-         selRows && selRows.forEach(row => {
-             this.selectedRows.push(row.Id);
-         });*/
-        console.log(this.selectedRows);
+        this.deletePopupMessage = 'Are you sure you want to delete this Questions?';
         if (this.selectedRows.length !== 0) {
             if(this.sectionListData && typeof this.sectionListData !== 'undefined'){
                 this.sectionListData.forEach(rec => {
@@ -352,7 +337,6 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
 
     // Delete selected Records
     deleteRecordsHandler() {
-        console.log(this.selectedRows);
         deleteRecords({ recIdList: this.selectedRows, delchildobjrecs: true }).then(result => {
             if (result.toString() === 'Success') {
                 this.dispatchEvent(
@@ -364,9 +348,6 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
                 );
                 this.showModal.deleteModal = false;
                 this.handleRefresh();
-            }
-            else {
-                console.log('Deleted Unsuccessful');
             }
         }).catch(error => {
             console.log(error);
@@ -383,10 +364,10 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
                 this.totalRecsCount = secData;
                 this.handleSectionsData(JSON.parse(JSON.stringify(secData)));
             }).catch(error => {
-                console.log('Error' + error);
+                console.log(error);
             });
         }).catch(error => {
-            console.log('Error' + error);
+            console.log(error);
         });
     }
 
@@ -430,7 +411,6 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
             this.recsCount = this.sectionList.length;
         }
         this.sectionListData = JSON.parse(JSON.stringify(this.sectionList));
-        console.log('this.sectionListData -- ', this.sectionListData);
     }
 
     //record form onsuccess

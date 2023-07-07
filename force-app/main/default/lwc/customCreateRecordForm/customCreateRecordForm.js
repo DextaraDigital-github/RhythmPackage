@@ -47,13 +47,11 @@ export default class CustomRecordForm extends LightningElement {
       if (this.objName === 'Rhythm__Question__c') {
         this.fieldsList.forEach(field => {
           if (field.istextarea === true) {
-            console.log('Text Area');
             field.value = event.target.value.toString().split('\n').filter(function (r) { return (r !== '' || r.trim() !== ''); }).join('\r\n');
             fields[field.fieldName] = field.value;
           }
         });
         if (this.selLookupId !== null && this.selLookupId !== '') {
-          console.log(fields.Rhythm__OptionValueSet__c + 'fields.Rhythm__OptionValueSet__c');
           if ((fields.Rhythm__Question_Type__c === 'Radio' || fields.Rhythm__Question_Type__c === 'Picklist' || fields.Rhythm__Question_Type__c === 'Picklist (Multi-Select)') && (fields.Rhythm__OptionValueSet__c === undefined || fields.Rhythm__OptionValueSet__c === null || fields.Rhythm__OptionValueSet__c === '')) {
             this.dispatchEvent(
               new ShowToastEvent({

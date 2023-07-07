@@ -133,11 +133,9 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
                         // }
                         })
                     }
-                    console.log('accountAssessmentRecord',accountAssessmentRecord);
                     /* To get the assessment tracking history to update on timeline*/
                     getAssessmentStatus({ assessmentId: accountAssessmentRecord, objectName:'AccountAssessmentRelation__c' }).then(statusResult => {
                         var assessmentStatus = statusResult;
-                        console.log('statusResult',statusResult);
                         if (typeof statusResult !== 'undefined') {   
                             if(assessmentStatus  && assessmentStatus!==null){
                             assessmentStatus.forEach(assessStatus => {
@@ -195,7 +193,7 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
             });
         });
 
-        console.log('Into assessment detail time line handler');
+        
     }
     /*To display only the flagged questions(flag colour- green) or all questions(flag colour- red) by clicking on flag */
     handleChange(event) {
@@ -361,7 +359,6 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
         }
        }
        else{
-           console.log('sample');
            getSupplierAssessmentList({ assessmentId:  this.accountassessmentid }).then(resultData => {
             var assessmentTemplateId = resultData[0].Rhythm__Assessment__r.Rhythm__Template__c;
             getQuestionsList({ templateId: assessmentTemplateId }).then(result => {
