@@ -360,7 +360,7 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
         this.tempRecsLimit = this.recsLimit;
         getQuestionsList({ templateId: this.recordId }).then(data => {
             this.questionsList = JSON.parse(JSON.stringify(data));
-            getSectionRecsCount({ templateId: this.recordId, objName: this.tableLabel }).then(secData => {
+            getSectionRecsCount({ templateId: this.recordId, objName: this.objLabel }).then(secData => {
                 this.totalRecsCount = secData;
                 this.handleSectionsData(JSON.parse(JSON.stringify(secData)));
             }).catch(error => {
