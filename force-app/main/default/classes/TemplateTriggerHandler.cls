@@ -5,7 +5,7 @@
 * @description       : It is used to perform trigger logic on Assessment_Template__c object.
 * Last Modified Date: 
 */
-public class TemplateTriggerHandler implements ITriggerHandler{
+public with sharing class TemplateTriggerHandler implements ITriggerHandler{
     public static TriggerFrameworkServiceController serviceController = new TriggerFrameworkServiceController();
     
     /**
@@ -96,6 +96,10 @@ public class TemplateTriggerHandler implements ITriggerHandler{
     public void afterUnDelete(List<sObject> newList, Map<Id, sObject> newMap) {
         
     }
+    /**
+    * @description
+    * @param templateList
+    */
      public static void recordValidations(List<Assessment_Template__c> templateList) {
         Set<Id> templateIds=new Set<Id>();
         Map<Id,Integer> templateQuestionMap=new Map<Id,Integer>();

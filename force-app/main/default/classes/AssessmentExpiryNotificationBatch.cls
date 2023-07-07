@@ -1,15 +1,17 @@
-/* 
+/**
 * Class Name        : AssessmentExpiryNotificationBatch
 * Developer         : Prudhvi   
 * Created Date      : 
-* Description       : It is to send assessment expiry notification to Suppliers.
+* @description       : It is to send assessment expiry notification to Suppliers.
 * Last Modified Date: 
 */
 
 public class AssessmentExpiryNotificationBatch implements Database.Batchable<sObject> {
 
     /**
-    * Start method to query the required records.
+    * @description Start method to query the required records.
+    * @param bc It is an instance of BatchableContext.
+    * @return
     */
     public Database.QueryLocator start(Database.BatchableContext bc){
         Date todayDate = Date.Today();
@@ -18,7 +20,9 @@ public class AssessmentExpiryNotificationBatch implements Database.Batchable<sOb
     }
 
     /**
-    * execute method to process the records.
+    * @description execute method to process the records.
+    * @param bc It is an instance of BatchableContext.
+    * @param scope It is a list of AccountAssessmentRelation__c object.
     */
     public void execute(Database.BatchableContext bc, List<AccountAssessmentRelation__c> scope){
         List<ErrorTransactionLog__c> errorList = new List<ErrorTransactionLog__c>();
@@ -60,7 +64,8 @@ public class AssessmentExpiryNotificationBatch implements Database.Batchable<sOb
     }
 
     /**
-    * execute any post-processing operations
+    * @description execute any post-processing operations.
+    * @param bc It is an instance of BatchableContext.
     */
     public void finish(Database.BatchableContext bc){
     }

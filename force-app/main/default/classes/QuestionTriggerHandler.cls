@@ -1,9 +1,16 @@
-public class QuestionTriggerHandler implements ITriggerHandler{
+/**
+* Class Name       : QuestionTriggerHandler
+* Developer         :       
+* Created Date      :
+* @description      : 
+* Last Modified Date:
+*/
+public with sharing class QuestionTriggerHandler implements ITriggerHandler{
     public static SecurityCheckController safe = new SecurityCheckController();//use singleton pattern
     private static Savepoint sp;//prudhvi to work
 
     /**
-    * To execute before insert logic
+    * @description To execute before insert logic
     * @param newList This is the new list of records.  
     */
     public void beforeInsert(List<sObject> newList) {
@@ -11,7 +18,7 @@ public class QuestionTriggerHandler implements ITriggerHandler{
         recordAddSequenceNumber(newList);
     }
      /**
-    * To execute after insert logic
+    * @description To execute after insert logic
     * @param newList This is the new list of records.
       @param newMap This is the new map of records.
     */
@@ -19,7 +26,7 @@ public class QuestionTriggerHandler implements ITriggerHandler{
         getQuestionsCount(newList,new Set<Id>{});
     }
      /**
-    * To execute before update logic
+    * @description To execute before update logic
     * @param newList This is the new list of records.
       @param newMap This is the new map of records.
       @param oldList This is the old list of records.
@@ -45,7 +52,7 @@ public class QuestionTriggerHandler implements ITriggerHandler{
         restrictRecordActions(newQustnlst);
     }
     /**
-    * To execute after update logic
+    * @description To execute after update logic
     * @param newList This is the new list of records.
       @param newMap This is the new map of records.
       @param oldList This is the old list of records.
@@ -53,19 +60,19 @@ public class QuestionTriggerHandler implements ITriggerHandler{
     */
     public void afterUpdate(List<sObject> newList, Map<Id, sObject> newMap,  List<sObject> oldList, Map<Id, sObject> oldMap) {
         List<Question__c> qustnlst=new List<Question__c>();
-        Set<Id> SectnsIds=new Set<Id>();
+        Set<Id> sectnsIds=new Set<Id>();
         for(Question__c qustn:(List<Question__c>)newMap.values()) {
             if(qustn.Section__c!=((Question__c)oldMap.get(qustn.Id)).Section__c && qustn.Section__c!=null) {
-                SectnsIds.add(qustn.Section__c);
-                SectnsIds.add(((Question__c)oldMap.get(qustn.Id)).Section__c);
+                sectnsIds.add(qustn.Section__c);
+                sectnsIds.add(((Question__c)oldMap.get(qustn.Id)).Section__c);
             }
         }
-        if(qustnlst.size()>0 || SectnsIds.size()>0) {
-            getQuestionsCount(qustnlst,SectnsIds);
+        if(qustnlst.size()>0 || sectnsIds.size()>0) {
+            getQuestionsCount(qustnlst,sectnsIds);
         }
     }
     /**
-    * To execute before delete logic
+    * @description To execute before delete logic
     * @param oldList This is the old list of records.
       @param oldMap This is the old map of records.
     */
@@ -75,7 +82,7 @@ public class QuestionTriggerHandler implements ITriggerHandler{
         recordSequenceNumber(oldList);
     }
     /**
-    * To execute after delete logic
+    * @description To execute after delete logic
     * @param oldList This is the old list of records.
       @param oldMap This is the old map of records.
     */
@@ -83,7 +90,7 @@ public class QuestionTriggerHandler implements ITriggerHandler{
         getQuestionsCount(oldList,new Set<Id>{});
     }
     /**
-    * To execute after undelete logic
+    * @description To execute after undelete logic
     * @param newList This is the new list of records.
       @param newMap This is the new map of records.
     */
@@ -92,7 +99,7 @@ public class QuestionTriggerHandler implements ITriggerHandler{
     }
     
     /**
-    * To calculate questions count
+    * @description To calculate questions count
     * @param qustlst This is the new list of question records.
     * @param sectionsIds This is the set of section id.
     */
@@ -145,7 +152,7 @@ public class QuestionTriggerHandler implements ITriggerHandler{
         }
     }
     /**
-    * To perform operations based on the status of template 
+    * @description To perform validation based on the status of template.
     * @param qusLst This is the new list of question records.
     */
     public void restrictRecordActions(List<Question__c> qusLst) {
@@ -179,7 +186,7 @@ public class QuestionTriggerHandler implements ITriggerHandler{
         }
     }
     /**
-    * To perform validations on assessment template
+    * @description To perform validations on assessment template
     * @param questionLst This is the new list of question records.
     */
     public void recordValidations(List<Question__c> questionLst) {
@@ -192,7 +199,7 @@ public class QuestionTriggerHandler implements ITriggerHandler{
         }
     }
     /**
-    * To add the sequence number.
+    * @description To add the sequence number.
     * @param qusLst This is the new list of question records.
     */
     public void recordAddSequenceNumber(List<Question__c> qusLst) {
@@ -229,7 +236,7 @@ public class QuestionTriggerHandler implements ITriggerHandler{
         }
     }
     /**
-    * To update sequence number for question object
+    * @description To update sequence number for question object
     * @param quesLst This is the new list of question records.
     */
     public void recordSequenceNumber(List<Question__c> quesLst) {
@@ -273,7 +280,7 @@ public class QuestionTriggerHandler implements ITriggerHandler{
         }
     }
 /**
-  * It is used to throw the exception.
+  * @description It is used to throw the exception.
 */
     public class SecurityControllerException extends Exception{
         
