@@ -1,4 +1,4 @@
-/* 
+/** 
 * Class Name        : AssessmentController
 * Developer         : Sai Koushik Nimmaturi and Reethika Velpula           
 * Created Date      : 
@@ -302,7 +302,7 @@ public with sharing class AssessmentController {
         }
     }
     
-    /* @description getUserName method is used to get the username
+    /** @description getUserName method is used to get the username
 	*@return
 	*/
     @AuraEnabled
@@ -982,35 +982,39 @@ public with sharing class AssessmentController {
             if(assRlnsList.isEmpty() == false){
                 if(string.isBlank(source)){
                     for(AccountAssessmentRelation__c assRelRec:assRlnsList){
-                        Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
-                        List<String> sendTo = new List<String>();
-                        sendTo.add(assRelRec.Account__r.Email__c);
-                        mail.setToAddresses(sendTo);
-                        mail.setSubject('Sample Survey');
-                        String body = '<html><body>'+
-                            '<br><br>'+'Dear '+assRelRec.Account__r.Name+
-                            '<br><br>'+'we’d like to complete a short survey.'+
-                            '<br><br><a href='+siteData.Site_URL__c+assRelRec.Id+'>Take the survey now.</a>'+
-                            '<br><br>'+'Kind regards,'+
-                            '<br>'+'Rhythm';
-                        mail.setHtmlBody(body);
-                        emailMessagesList.add(mail);
+                        if(string.isNotBlank(assRelRec.Account__r.Email__c) && siteData != null){
+                            Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
+                            List<String> sendTo = new List<String>();
+                            sendTo.add(assRelRec.Account__r.Email__c);
+                            mail.setToAddresses(sendTo);
+                            mail.setSubject('Sample Survey');
+                            String body = '<html><body>'+
+                                '<br><br>'+'Dear '+assRelRec.Account__r.Name+
+                                '<br><br>'+'we’d like to complete a short survey.'+
+                                '<br><br><a href='+System.Label.Supplier_Portal_URL+assRelRec.Id+'>Take the survey now.</a>'+
+                                '<br><br>'+'Kind regards,'+
+                                '<br>'+'Rhythm';
+                            mail.setHtmlBody(body);
+                            emailMessagesList.add(mail);
+                        }
                     }
                 }else{
                     for(AccountAssessmentRelation__c assRelRec:assRlnsList){
-                        Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
-                        List<String> sendTo = new List<String>();
-                        sendTo.add(assRelRec.Account__r.Email__c);
-                        mail.setToAddresses(sendTo);
-                        mail.setSubject('Updates on the Assessment');
-                        String body = '<html><body>'+
-                            '<br><br>'+'Dear '+assRelRec.Account__r.Name+
-                            '<br><br>'+'There are few comments on the responses submitted.'+
-                            '<br><br><a href='+siteData.Site_URL__c+assRelRec.Id+'>Click Here</a>'+
-                            '<br><br>'+'Kind regards,'+
-                            '<br>'+'Rhythm';
-                        mail.setHtmlBody(body);
-                        emailMessagesList.add(mail);
+                        if(string.isNotBlank(assRelRec.Account__r.Email__c) && siteData != null){
+                            Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
+                            List<String> sendTo = new List<String>();
+                            sendTo.add(assRelRec.Account__r.Email__c);
+                            mail.setToAddresses(sendTo);
+                            mail.setSubject('Updates on the Assessment');
+                            String body = '<html><body>'+
+                                '<br><br>'+'Dear '+assRelRec.Account__r.Name+
+                                '<br><br>'+'There are few comments on the responses submitted.'+
+                                '<br><br><a href='+System.Label.Supplier_Portal_URL+assRelRec.Id+'>Click Here</a>'+
+                                '<br><br>'+'Kind regards,'+
+                                '<br>'+'Rhythm';
+                            mail.setHtmlBody(body);
+                            emailMessagesList.add(mail);
+                        }
                     }
                 }
                 if(emailMessagesList.isEmpty() == false){
@@ -1357,68 +1361,43 @@ public with sharing class AssessmentController {
     * @description It is used to store the questiondata
     */
     public class QuestionWrapper{
-        @AuraEnabled
-        public Id questionId{get;set;}
-        @AuraEnabled
-        public String question{get;set;}
-        @AuraEnabled
-        public String name{get;set;}
-        @AuraEnabled
-        public String sectionId{get;set;}
-        @AuraEnabled
-        public String assessmentTemplateId{get;set;}
-        @AuraEnabled
-        public String parentQuestion{get;set;}
-        @AuraEnabled
-        public String type{get;set;}
-        @AuraEnabled
-        public String sectionName{get;set;}
-        @AuraEnabled
-        public String conditionalValue{get;set;}
-        @AuraEnabled
-        public String assessmentTemplate{get;set;}
-        @AuraEnabled
-        public String optionValueSet{get;set;}
-        @AuraEnabled
-        public datetime lastModifiedDate{get;set;}
-        @AuraEnabled
-        public String lastModifiedBy{get;set;}
-        @AuraEnabled
-        public List<SObject> childquestionList {get;set;}
-        @AuraEnabled
-        public List<childQuestionWrapper> childQuestions{get;set;}
+        @AuraEnabled public Id questionId{get;set;}
+        @AuraEnabled public String question{get;set;}
+        @AuraEnabled public String name{get;set;}
+        @AuraEnabled public String sectionId{get;set;}
+        @AuraEnabled public String assessmentTemplateId{get;set;}
+        @AuraEnabled public String parentQuestion{get;set;}
+        @AuraEnabled public String type{get;set;}
+        @AuraEnabled public String sectionName{get;set;}
+        @AuraEnabled public String conditionalValue{get;set;}
+        @AuraEnabled public String assessmentTemplate{get;set;}
+        @AuraEnabled public String optionValueSet{get;set;}
+        @AuraEnabled public datetime lastModifiedDate{get;set;}
+        @AuraEnabled public String lastModifiedBy{get;set;}
+        @AuraEnabled public List<SObject> childquestionList {get;set;}
+        @AuraEnabled public List<childQuestionWrapper> childQuestions{get;set;}
     }
 
     /**
     *@description  It is used to store the child questiondata
     */
     public class ChildQuestionWrapper{
-        @AuraEnabled
-        public String question{get;set;}
-        @AuraEnabled
-        public String name{get;set;}
-        @AuraEnabled
-        public String parentQuestion{get;set;}
-        @AuraEnabled
-        public String type{get;set;}
+        @AuraEnabled public String question{get;set;}
+        @AuraEnabled public String name{get;set;}
+        @AuraEnabled public String parentQuestion{get;set;}
+        @AuraEnabled public String type{get;set;}
     }
 
     /**
     * @description It is used to store the sectiondata.
     */
     public class SectionWrapper{
-        @AuraEnabled
-        public Id sectionId{get;set;}
-        @AuraEnabled
-        public Integer noofqustns{get;set;}
-        @AuraEnabled
-        public Id assessmenttemplateId{get;set;}
-        @AuraEnabled
-        public Decimal sequencenumber{get;set;}
-        @AuraEnabled
-        public String name{get;set;}
-        @AuraEnabled
-        public Boolean assessmentstatus{get;set;}
+        @AuraEnabled public Id sectionId{get;set;}
+        @AuraEnabled public Integer noofqustns{get;set;}
+        @AuraEnabled public Id assessmenttemplateId{get;set;}
+        @AuraEnabled public Decimal sequencenumber{get;set;}
+        @AuraEnabled public String name{get;set;}
+        @AuraEnabled public Boolean assessmentstatus{get;set;}
     }  
     
     /**

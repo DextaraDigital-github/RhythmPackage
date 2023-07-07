@@ -1,4 +1,3 @@
-
 /* 
 * Class Name        : AssessmentTriggerHandler
 * Developer         : Sai Koushik Nimmaturi and Reethika Velpula           
@@ -10,7 +9,8 @@
 public class SendAssessmentNotificationsBatch implements Database.Batchable<sObject> {
 
     /**
-    * Start method to query the required records.
+    * @description Start method to query the required records.
+    * @return
     */
     public Database.QueryLocator start(Database.BatchableContext bc){
         Date todayDate = Date.Today();
@@ -19,7 +19,7 @@ public class SendAssessmentNotificationsBatch implements Database.Batchable<sObj
     }
 
      /**
-    * execute method to process the records.
+    * @description execute method to process the records.
     */
     public void execute(Database.BatchableContext bc, List<Assessment_Supplier__c> scope){
         List<ErrorTransactionLog__c> errorList = new List<ErrorTransactionLog__c>();
@@ -46,11 +46,9 @@ public class SendAssessmentNotificationsBatch implements Database.Batchable<sObj
                 Database.SaveResult[] results = Database.insert(accountAssessRelnsList, false);
                 for(Database.SaveResult result : results) {
                     if(result.isSuccess()){
-                        system.debug('insertedAssessments------>' + result.getId());
                         successRecordsIdSet.add(result.getId());
                     } else {
                         for(Database.Error error : result.getErrors()) {
-                            system.debug('errorDetails----->'+ error.getStatusCode() + ' : ' + 'Error Fields : ' + error.getFields());
                         }
                     }
                 }
@@ -58,7 +56,7 @@ public class SendAssessmentNotificationsBatch implements Database.Batchable<sObj
             if(successRecordsIdSet.isEmpty() == false){
                
                 for(AccountAssessmentRelation__c assRelRec:[SELECT Id,Account__r.Name,Account__r.Email__c,Assessment__c FROM AccountAssessmentRelation__c WHERE ID IN:successRecordsIdSet]){
-                    if(String.isNotBlank(assRelRec.Account__r.Email__c)){
+                    if(String.isNotBlank(assRelRec.Account__r.Email__c) && siteData != null){
                         List<String> sendTo = new List<String>();
                         sendTo.add(assRelRec.Account__r.Email__c);
                         Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
@@ -83,8 +81,6 @@ public class SendAssessmentNotificationsBatch implements Database.Batchable<sObj
                         List<Messaging.SendEmailError> errors = result.getErrors();
                         if (errors.size() > 0){
                             Messaging.SendEmailError err = errors[0];
-                            system.debug('emailErrorMessage---->'+err.getMessage());
-                            system.debug('emailErrorMessage---->'+err.getFields());
                         }                	
                     }
                 }
@@ -103,7 +99,7 @@ public class SendAssessmentNotificationsBatch implements Database.Batchable<sObj
         }
     }
     /**
-    * execute any post-processing operations
+    * @description execute any post-processing operations.
     */
     public void finish(Database.BatchableContext bc){
         // execute any post-processing operations

@@ -26,7 +26,7 @@ public class AssessmentExpiryNotificationBatch implements Database.Batchable<sOb
         Configuration__mdt siteData = Configuration__mdt.getInstance('Site_URL');
         try{ 
             for(AccountAssessmentRelation__c assRelRec:scope){
-                if(String.isNotBlank(assRelRec.Account__r.Email__c)){
+                if(String.isNotBlank(assRelRec.Account__r.Email__c) && siteData != null){
                     List<String> sendTo = new List<String>();
                     sendTo.add(assRelRec.Account__r.Email__c);
                     Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
