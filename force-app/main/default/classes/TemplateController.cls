@@ -1,6 +1,19 @@
+/* 
+* Class Name        : TemplateController
+* Developer         : Sai Koushik Nimmaturi and Reethika Velpula           
+* Created Date      : 
+* Description       : It is used for template versioning logic.
+* Last Modified Date: 
+*/
 public with sharing class TemplateController {
     public static SecurityCheckController safe = new SecurityCheckController();//use singleton pattern
     private static Savepoint sp;//prudhvi to work
+
+
+    /**
+    * To create template version.
+    * @param assessmentId This is a record id of an Template.  
+    */
 
     @AuraEnabled
     public static ResultWrapper createTemplateVersion(string recordId){
@@ -124,11 +137,19 @@ public with sharing class TemplateController {
         }
         return resultWrap;
     }
+
+    /**
+    * It is used to store the response from server
+    */
     public class ResultWrapper{
         @AuraEnabled public boolean isSuccess;
         @AuraEnabled public string message;
         @AuraEnabled public string errorCode;
     }
+
+    /**
+    * It is used to throw the exception
+    */
     public class SecurityControllerException extends Exception{
         
     }

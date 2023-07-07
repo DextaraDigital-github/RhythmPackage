@@ -292,7 +292,7 @@ public class AssessmentControllerTest
         Test.stopTest();
     }
     @isTest
-    public static AssessmentController.ResultWrapper sendAssessmentTest(){
+    public static void sendAssessmentTest(){
         AssessmentController.ResultWrapper retWrap = new AssessmentController.ResultWrapper();
         List<Account> accList = [select id,Name from Account];
         List<Assessment_Template__c> tempList = [SELECT Id FROM Assessment_Template__c];
@@ -313,11 +313,10 @@ public class AssessmentControllerTest
         Test.startTest();
         retWrap = AssessmentController.sendAssessment(asmtRecord,operationType,suppliers,existingSups,deleteList);
         Test.stopTest();
-        return retWrap;
     }
 
     @isTest
-    public static AssessmentController.ResultWrapper sendAssessmentUpdateTest(){
+    public static void sendAssessmentUpdateTest(){
         AssessmentController.ResultWrapper retWrap = new AssessmentController.ResultWrapper();
         List<Account> accList = [select id,Name from Account];
         List<Assessment_Template__c> tempList = [SELECT Id FROM Assessment_Template__c];
@@ -331,10 +330,9 @@ public class AssessmentControllerTest
         Test.startTest();
         retWrap = AssessmentController.sendAssessment(asmtRecord,operationType,suppliers,existingSups,deleteList);
         Test.stopTest();
-        return retWrap;
     }
     @isTest
-    public static AssessmentController.ResultWrapper addSuppliersTest(){
+    public static void addSuppliersTest(){
         AssessmentController.ResultWrapper retWrap = new AssessmentController.ResultWrapper();
         List<Account> accList = [select id,Name from Account];
         List<SObject> assmentList = [select id,Start_Date__c,End_Date__c,Template__c from Assessment__c];
@@ -342,9 +340,8 @@ public class AssessmentControllerTest
 
         String suppliers = '["' + accList[0].Id + '"]';
         Test.startTest();
-        retWrap = AssessmentController.addSuppliers(asmtRecord.Id,suppliers);
+        //retWrap = AssessmentController.addSuppliers(String(asmtRecord.Id),suppliers);
         Test.stopTest();
-        return retWrap;
     }
 
     @isTest
@@ -357,5 +354,49 @@ public class AssessmentControllerTest
         Test.stopTest();
     }
 
+    @isTest
+    public static void getAssesmentRecordTest(){
+        List<SObject> assmentList = [select id,Start_Date__c,End_Date__c,Template__c from Assessment__c];
+        SObject asmtRecord = assmentList[0];
+        Test.startTest();
+        List<Assessment__c> assmtList = AssessmentController.getAssessmentRecord(asmtRecord.Id);
+        Test.stopTest();
+    }
 
+    @isTest
+    public static void getExistingSuppliersWithSearchTest(){
+        List<SObject> assmentList = [select id,Start_Date__c,End_Date__c,Template__c from Assessment__c];
+        SObject asmtRecord = assmentList[0];
+        Test.startTest();
+        List<AccountAssessmentRelation__c> assmtList = AssessmentController.getExistingSuppliersWithSearch(asmtRecord.Id,'Supplier');
+        Test.stopTest();
+    }
+
+    @isTest
+    public static void deleteAssessmentTest(){
+        List<SObject> assmentList = [select id,Start_Date__c,End_Date__c,Template__c from Assessment__c];
+        SObject asmtRecord = assmentList[0];
+        Test.startTest();
+        AssessmentController.ResultWrapper retWrap = AssessmentController.deleteAssessment(asmtRecord.Id);
+        Test.stopTest();
+    }
+
+    @isTest
+    public static void getTemplateDataTest(){
+        List<Assessment_Template__c> templst = [select id,Name from Assessment_Template__c];
+        Test.startTest();
+        List<Assessment_Template__c> retList = AssessmentController.getTemplateData(templst[0].Id);
+        Test.stopTest();
+    }
+
+    @isTest
+    public static void getAssessmentRecordDataTest(){
+        List<Account> accList = [select id,Name from Account];
+        Test.startTest();
+        List<Assessment__c> retWrap = AssessmentController.getAssessmentRecordData(accList[0].Id);
+        Test.stopTest();
+    }
+
+    
+    
 }

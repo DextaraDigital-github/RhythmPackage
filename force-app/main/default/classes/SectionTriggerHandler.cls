@@ -1,16 +1,37 @@
+/* 
+* Class Name        : SectionTriggerHandler
+* Developer         : Sai Koushik Nimmaturi and Reethika Velpula           
+* Created Date      : 
+* Description       : It is used to perform the trigger logic on Section__c object.
+* Last Modified Date: 
+*/
 public class SectionTriggerHandler implements ITriggerHandler {
     public static SecurityCheckController safe = new SecurityCheckController();//use singleton pattern
     private static Savepoint sp;//prudhvi to work
     
+     /**
+    * To execute before insert logic
+    * @param newList This is the new list of records.  
+    */
     public void beforeInsert(List<sObject> newList) {
         restrictRecordActions(newList);
         recordAddSequenceNumber(newList);
     }
-    
+    /**
+    * To execute after insert logic
+    * @param newList This is the new list of records.
+      @param newMap This is the new map of records.
+    */
     public void afterInsert(List<sObject> newList , Map<Id, sObject> newMap) {
         
     }
-    
+    /**
+    * To execute before update logic
+    * @param newList This is the new list of records.
+      @param newMap This is the new map of records.
+      @param oldList This is the old list of records.
+      @param oldMap This is the old map of records.
+    */
     public void beforeUpdate(List<sObject> newList, Map<Id, sObject> newMap, List<sObject> oldList, Map<Id, sObject> oldMap) {
         List<Section__c> newSeclst=new List<Section__c>();
         List<Section__c> sectionLst=new List<Section__c>();
@@ -26,23 +47,46 @@ public class SectionTriggerHandler implements ITriggerHandler {
         recordValidations(sectionLst);
         restrictRecordActions(newSeclst);
     }
+    /**
+    * To execute after update logic
+    * @param newList This is the new list of records.
+      @param newMap This is the new map of records.
+      @param oldList This is the old list of records.
+      @param oldMap This is the old map of records.
+    */
     
     public void afterUpdate(List<sObject> newList, Map<Id, sObject> newMap,  List<sObject> oldList, Map<Id, sObject> oldMap) {
         
     }
-    
+    /**
+    * To execute before delete logic
+    * @param oldList This is the old list of records.
+      @param oldMap This is the old map of records.
+    */
     public void beforeDelete(List<sObject> oldList , Map<Id, sObject> oldMap) {
         restrictRecordActions(oldList); 
         recordSequenceNumber(oldList);
     }
-    
+     /**
+    * To execute after delete logic
+    * @param oldList This is the old list of records.
+      @param oldMap This is the old map of records.
+    */
     public void afterDelete(List<sObject> oldList , Map<Id, sObject> oldMap) {
         
     }
-    
+     /**
+    * To execute after undelete logic
+    * @param newList This is the new list of records.
+      @param newMap This is the new map of records.
+    */
     public void afterUnDelete(List<sObject> newList, Map<Id, sObject> newMap) {
     }
     
+    /**
+    * To perform validation based on the status of template.
+    * @param secLst This is the new list of section records.
+    */
     
     public void restrictRecordActions(List<Section__c> secLst) {
         try {
@@ -73,6 +117,10 @@ public class SectionTriggerHandler implements ITriggerHandler {
             
         }
     }
+     /**
+    * To perform validations on assessment template
+    * @param secLst This is the new list of section records.
+    */
     public void recordValidations(List<Section__c> secLst) {
         try {
             for(Section__c sec:secLst) {
@@ -83,6 +131,10 @@ public class SectionTriggerHandler implements ITriggerHandler {
             
         }
     }
+     /**
+    * To add the sequence number.
+    * @param secLst This is the new list of section records.
+    */
     public void recordAddSequenceNumber(List<Section__c> secLst) {
         Set<Id> templateIds = new Set<Id>();
         try {
@@ -117,6 +169,10 @@ public class SectionTriggerHandler implements ITriggerHandler {
             
         }
     }
+     /**
+    * To update sequence number for section object
+    * @param secLst This is the new list of section records.
+    */
     public void recordSequenceNumber(List<Section__c> secLst) {
         Set<Id> templateIds = new Set<Id>();
         List<Section__c> updateSectionList=new List<Section__c>();
@@ -159,6 +215,9 @@ public class SectionTriggerHandler implements ITriggerHandler {
             
         }
     }
+/**
+  * It is used to throw the exception.
+*/
     public class SecurityControllerException extends Exception{
         
     }

@@ -182,4 +182,19 @@ public class TestDataFactory{
         }
         return createRecords(accountAssessmentlist,true,attributes);
     }
+
+    /**
+    * createResponse method is used to create Response records
+    * @param numToInsert This is a number of records to insert.  
+    * @param doInsert This is boolean value whether to insert record or not.
+    * @param attributes This is a map which contain record data to insert.
+    */
+    public static List<Assessment_Supplier__c> createSuppliers(Integer numToInsert, Boolean doInsert,Map<String, Object> attributes){
+        List<Assessment_Supplier__c> supplierList = new List<Assessment_Supplier__c>();
+        for(Integer i=0; i< numToInsert; i++){
+            Assessment_Supplier__c accSupplier = new Assessment_Supplier__c();
+            supplierList.add(accSupplier);
+        }
+        return createRecords(supplierList,true,attributes);
+    }
 }

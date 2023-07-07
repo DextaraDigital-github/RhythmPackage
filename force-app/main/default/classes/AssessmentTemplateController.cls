@@ -8,8 +8,12 @@
 public with sharing class AssessmentTemplateController {
     public static SecurityCheckController safe = new SecurityCheckController();//use singleton pattern
     private static Savepoint sp;//prudhvi to work
-    
-    //get Section Records for LookupField
+
+/**
+* get Section Records for LookupField.
+* @param sectionName This is a name of the section.
+* @param templateId This is a record id of an Template__c.  
+*/    
     @AuraEnabled(cacheable=true)
     public static List<Section__c> getSections(String sectionName, string templateId) {
         try{
@@ -34,8 +38,11 @@ public with sharing class AssessmentTemplateController {
             throw new AuraHandledException(ErrorMsg);
         }
     }
-    
-    //Get Template Details
+
+/**
+* Get the details of the Template.
+* @param templateId This is a record id of an Template__c.  
+*/    
     @AuraEnabled(Cacheable=true)
     public static Boolean getTemplateDetails(String templateId) {
         try {
@@ -64,8 +71,13 @@ public with sharing class AssessmentTemplateController {
             throw new AuraHandledException(ErrorMsg);
         }
     }
-    
-    /* getRecordsCount method is used to get the count of Records to particular Assessment Template */
+
+/**
+* getRecordsCount method is used to get the count of Records to particular Assessment Template.
+* @param objName This is a name of the object Section.
+* @param templateId This is a record id of an Template__c.  
+*/    
+
     @AuraEnabled
     public static Integer getRecordsCount(String templateId, String objName) {
         try {
@@ -96,8 +108,10 @@ public with sharing class AssessmentTemplateController {
         }
     }
     
-    
-    /* getTemplateSections method is used to get all the Sections related to particular Assessment Template */
+/**
+* getTemplateSections method is used to get all the Sections related to particular Assessment Template.
+* @param templateId This is a record id of an Template__c.  
+*/   
     @AuraEnabled
     public static List<Section__c> getTemplateSections(String templateId) {
         try {
@@ -122,8 +136,11 @@ public with sharing class AssessmentTemplateController {
         }
         return null;
     }
+/**
+* getQuestionsLists method is used to get all the questions.
+* @param templateId This is a record id of an Template__c.  
+*/   
     
-    /* getQuestionsLists method is used to get all the questions */
     @AuraEnabled
     public static List<Question__c> getQuestionsLists(String templateId) {
         try {
@@ -144,8 +161,12 @@ public with sharing class AssessmentTemplateController {
         return null;
     }
     
+/**
+* getTemplateQuestionList method is used to get all the questions related to template.
+* @param recslimit This is a count of record limit to query.
+* @param templateId This is a record id of an Template__c.  
+*/    
     
-    /* getTemplateQuestionList method is used to get all the questions related to template */
     @AuraEnabled
     public static List<Question__c> getTemplateQuestionList(String templateId, Integer recslimit) {
         try { 
@@ -169,8 +190,10 @@ public with sharing class AssessmentTemplateController {
         }
         return null;
     }
-    
-    /* updateQustnRecords method is used to update section list */
+/**
+* updateQustnRecords method is used to update section list.
+* @param qstnList This is a list of questions data to perform update operation.
+*/   
     @AuraEnabled 
     public static void updateQustnRecords(list<Question__c> qstnList) {
         try{
@@ -190,8 +213,11 @@ public with sharing class AssessmentTemplateController {
             throw new AuraHandledException(ErrorMsg);
         }
     }
-    
-    /* updateRecords method is used to update section list */
+/**
+* updateRecords method is used to update section list.
+* @param secList This is a list of sections data to perform update operation.
+*/    
+   
     @AuraEnabled
     public static void updateRecords(List<Section__c> secList) {
         try{
@@ -211,8 +237,12 @@ public with sharing class AssessmentTemplateController {
             throw new AuraHandledException(ErrorMsg);
         }
     }
-    
-    /* deleteRecords method is used to delete the records */
+
+/**
+*deleteRecords method is used to delete the records.
+* @param recIdList This is a list of the section Id.
+* @param delchildobjrecs This is a boolean value to delete the records or not.  
+*/
     @AuraEnabled
     public static String deleteRecords(List<Id> recIdList, Boolean delchildobjrecs) {
         String status = 'Success';
@@ -250,8 +280,11 @@ public with sharing class AssessmentTemplateController {
         }
         return status;
     }
-    
-    //Get Questions Count
+
+/**
+* Get Questions Count.
+* @param sectionId This is a record id of an Section__c.  
+*/    
     @AuraEnabled
     public static Object questionsCount(Id sectionId)
     {
@@ -260,15 +293,18 @@ public with sharing class AssessmentTemplateController {
                          + ' FROM Question__c'
                          + ' WHERE Section__c=\'' + String.escapeSingleQuotes(sectionId) + '\''
                          + ' WITH SECURITY_ENFORCED';
-            List<AggregateResult> s = safe.doQuery(query);
+            List<AggregateResult> s = database.query(query);
             return s[0].get('q');
         }catch(exception e){
             String errorMsg = e.getMessage();
             throw new AuraHandledException(ErrorMsg);
         }
     }
-    
-    //Get Sections Count
+ 
+/**
+* Get Sections Count.
+* @param templateId This is a record id of an Template__c.  
+*/
     @AuraEnabled
     public static Object sectionsCount(Id templateId)
     {
@@ -277,16 +313,16 @@ public with sharing class AssessmentTemplateController {
                          + ' FROM Section__c'
                          + ' WHERE Assessment_Template__c =\'' + String.escapeSingleQuotes(templateId) + '\''
                          + ' WITH SECURITY_ENFORCED';
-            List<AggregateResult> s = safe.doQuery(query);
+            List<AggregateResult> s = database.query(query);
             return s[0].get('s');
         }catch(exception e){
             String errorMsg = e.getMessage();
             throw new AuraHandledException(ErrorMsg);
         }
     }
-       /**
-    * It is used to throw the exception
-    */
+/**
+  * It is used to throw the exception.
+*/
     public class SecurityControllerException extends Exception{
             
     }

@@ -2,7 +2,7 @@
 * Class Name        : AssessmentController
 * Developer         : Sai Koushik Nimmaturi and Reethika Velpula           
 * Created Date      : 
-* Description       : AssessmentController class is used for SOQl on Question__c,Section__c,Assessment_Template__c and DML operations on the objects Assessment__c,Response__c.
+* @description       : AssessmentController class is used for SOQl on Question__c,Section__c,Assessment_Template__c and DML operations on the objects Assessment__c,Response__c.
 * Last Modified Date: 
 */
 public with sharing class AssessmentController {
@@ -11,9 +11,11 @@ public with sharing class AssessmentController {
     private static Savepoint sp;//prudhvi to work
     
     /**
-* Gets the assessment information.
-* @param assessmentId This is a record id of an Assessment__c.  
-*/
+    * @description Gets the assessment information.
+    * @param assessmentId This is a record id of an Assessment__c. 
+    * @return 
+    */
+
     @AuraEnabled
     public static List<SObject> getSupplierAssessmentList(String assessmentId){
         try{
@@ -31,9 +33,10 @@ public with sharing class AssessmentController {
     }
     
     /**
-* Gets the Question__c,Section__c information of a particular Assessment_Template__c.
-* @param templateId This is a record id of an Assessment_Template__c.  
-*/
+    * @description Gets the Question__c,Section__c information of a particular Assessment_Template__c.
+    * @param templateId This is a record id of an Assessment_Template__c.
+    * @return  
+    */
     @AuraEnabled
     public static List<SObject> getQuestionsList(String templateId){
         try{
@@ -55,14 +58,15 @@ public with sharing class AssessmentController {
     
     
     /**
-* Gets the Response__c information of an AccountAssessmentRelation__c.
-* @param assessmentId This is a record id of an AccountAssessmentRelation__c.  
-*/
+    * @description Gets the Response__c information of an AccountAssessmentRelation__c.
+    * @param assessmentId This is a record id of an AccountAssessmentRelation__c. 
+    * @return 
+    */
     @AuraEnabled
     public static List<SObject> getSupplierResponseList(String assessmentId){
         try{
             String query = 'SELECT Id, Question__c,Assessment__c,Question__r.Question_Type__c,'
-                         + 'Assessment__r.Name,Files__c, Response__c,CreatedBy.Name,'
+                         + 'Assessment__r.Name,Files__c, Response__c,'
                          + 'CreatedDate, Flag__c, Conversation_History__c,LastModifiedDate,LastModifiedById'
                          + ' FROM Response__c'
                          + ' WHERE AccountAssessmentRelation__c=\'' + String.escapeSingleQuotes(assessmentId) + '\''
@@ -74,14 +78,15 @@ public with sharing class AssessmentController {
             throw new AuraHandledException(errorMsg);
         }
     }
-    
+
     /**
-* Insert or update the Response__c of a supplier(Account) for an Assessment__c.
-* @param suppResponseList Response__c wrapper.
-* @param vendorId supplier Account Id.
-* @param assesmentId record id of an Assessment__c.
-* @param isSubmit true:save & submit(update the Assessment__c status to submitted), false: only save (update the Assessment__c status to Draft)
-*/
+    * @description Insert or update the Response__c of a supplier(Account) for an Assessment__c.
+    * @param suppResponseList Response__c wrapper.
+    * @param vendorId supplier Account Id.
+    * @param assesmentId record id of an Assessment__c.
+    * @param isSubmit true:save & submit(update the Assessment__c status to submitted), false: only save (update the Assessment__c status to Draft)
+    * @return
+    */
     @AuraEnabled
     public static void createSupplierResponse(List<SObject> suppResponseList,String paramMap){
         try{
@@ -89,12 +94,14 @@ public with sharing class AssessmentController {
             String accAssmtId =(string)queryMap.get('accountassessmentid');
             List<Id> questionIds = new List<Id>();
             Map<Id,SObject> suppResponseMap = new Map<Id,SObject>();
+            system.debug('suppResponseList---->'+suppResponseList);
             for(SObject response:suppResponseList){
                 questionIds.add((Id)response.get('Rhythm__Question__c'));
                 suppResponseMap.put((Id)response.get('Rhythm__Question__c'),response);
             }
             List<Response__c> existingResponses = new List<Response__c>();
             if(!questionIds.isEmpty()){
+                system.debug('questionIds---->'+questionIds);
                 string query = 'SELECT Id,Name,Question__c,Response__c,Files__c,Assessment__c,'
                         + 'Flag__c,Is_Latest_Response__c,AccountAssessmentRelation__c'
                         +' FROM Response__c'
@@ -107,27 +114,27 @@ public with sharing class AssessmentController {
             if (sp == null){
                 sp = Database.setSavepoint();
             }
-            if(existingResponses.isEmpty() == false){
-                for(Response__c resp :existingResponses){
-                    ((Response__c)suppResponseMap.get(resp.Question__c)).put('Files__c', resp.Files__c);
-                    resp.Is_Latest_Response__c = false;
-                }
-                if(!suppResponseMap.values().isEmpty()){
-                    Database.SaveResult[] results = safe.doInsert(suppResponseMap.values());
-                    List<String> errorsList = SecurityCheckController.safeClassExceptionHandlerInsert(results);
-                    if(errorsList.size()>0){
-                        Database.rollback(sp);
-                        throw new SecurityControllerException(String.join(errorsList, ', ' ));
-                    }
-                }
-                Database.SaveResult[] saveResult = safe.doUpdate(existingResponses);
-                List<String> errorList = SecurityCheckController.safeClassExceptionHandlerInsert(saveResult);
-                if(errorList.size()>0){
+            system.debug('existingResponses---->'+existingResponses);
+            for(Response__c resp :existingResponses){
+                ((Response__c)suppResponseMap.get(resp.Question__c)).put('Files__c', resp.Files__c);
+                resp.Is_Latest_Response__c = false;
+            }
+            system.debug('suppResponseMap---->'+suppResponseMap.values());
+            if(suppResponseMap.values().isEmpty() == false){
+                Database.SaveResult[] results = safe.doInsert(suppResponseMap.values());
+                List<String> errorsList = SecurityCheckController.safeClassExceptionHandlerInsert(results);
+                system.debug('errorsList---->'+errorsList);
+                if(errorsList.size()>0){
                     Database.rollback(sp);
-                    throw new SecurityControllerException(String.join( errorList, ', ' ));
+                    throw new SecurityControllerException(String.join(errorsList, ', ' ));
                 }
             }
-
+            Database.SaveResult[] saveResult = safe.doUpdate(existingResponses);
+            List<String> errorList = SecurityCheckController.safeClassExceptionHandlerInsert(saveResult);
+            if(errorList.size()>0){
+                Database.rollback(sp);
+                throw new SecurityControllerException(String.join( errorList, ', ' ));
+            }
             String assmtQuery =  'SELECT Id,Name,Follow_Up_Requests__c,Status__c,'
                                +'Assessment__c,Account__c,PdfConvertor__c'
                                +' FROM AccountAssessmentRelation__c'
@@ -141,11 +148,11 @@ public with sharing class AssessmentController {
                 if((String)queryMap.get('status')=='Submitted'){
                     assessment[0].Submission_Date__c = DateTime.now();
                 }
-                Database.SaveResult[] saveResult = safe.doUpdate(assessment);
-                List<String> errorList = SecurityCheckController.safeClassExceptionHandlerInsert(saveResult);
-                if(errorList.size()>0){
+                Database.SaveResult[] updResult = safe.doUpdate(assessment);
+                List<String> upderrorList = SecurityCheckController.safeClassExceptionHandlerInsert(updResult);
+                if(upderrorList.size()>0){
                     Database.rollback(sp);
-                    throw new SecurityControllerException(String.join( errorList, ', ' ));
+                    throw new SecurityControllerException(String.join( upderrorList, ', ' ));
                 }
             }
         }catch(exception e){
@@ -154,6 +161,11 @@ public with sharing class AssessmentController {
         }
     }
     
+    /**
+    *@description  Update the Assessment Status
+    * @param paramMap Map with the values to update
+    * @return
+    */
     @AuraEnabled
     public static List<SObject> updateAccountAssessmentStatus(String paramMap)
     {
@@ -185,10 +197,12 @@ public with sharing class AssessmentController {
             throw new AuraHandledException(errorMsg);
         }
     }
+
     /**
-* Gets the Assessment__History information of a Status__c field in Assessment__c.
-* @param assessmentId This is a record id of an Assessment__c.
-*/
+    * @description Gets the Assessment__History information of a Status__c field in Assessment__c.
+    * @param assessmentId This is a record id of an Assessment__c.
+    * @return
+    */
     @AuraEnabled
     public static List<SObject> getAssessmentStatus(String assessmentId, String objectName){
         try{
@@ -209,9 +223,11 @@ public with sharing class AssessmentController {
             throw new AuraHandledException(errorMsg);
         }
     }
-    /**
-* Gets the all Assessment__c records information of an Assessment__c.
-*/
+   
+     /**
+    * @description Gets the all Assessment__c records information of an Assessment__c.
+    * @return
+    */
     @AuraEnabled
     public static List<Object> getAssesmentRecords()
     {
@@ -230,6 +246,13 @@ public with sharing class AssessmentController {
         }
     }
 
+
+    /**
+    * @description Get the response record data for the supplier.
+    * @param accountId This is the account id.
+    * @param assessmentId This is the assessment id.
+    * @return
+    */
     @AuraEnabled
     public static List<Object> getAccountAssesmentRecords(String accountId, String assessmentId)
     {
@@ -248,14 +271,16 @@ public with sharing class AssessmentController {
             return accountAssessment;
         }catch(exception e){
             String errorMsg = e.getMessage();
+            System.debug('sample'+errorMsg);
             throw new AuraHandledException(errorMsg);
         }
     }
+
     /**
-* Gets the Response__c information of all fields in Response__c for a particular Question__c, Assessment__c.
-* @param assessmentId This is a record id of an Assessment__c.
-* @param questionId This is RecordId of Question__c.
-*/
+    * @description Gets the Response__c information of all fields in Response__c for a particular Question__c, Assessment__c.
+    * @param responseWrapper This is the wrapper with response data.
+    * @return
+    */
     @AuraEnabled
     public static List<Response__c> getResponseList(String responseWrapper)
     {
@@ -277,16 +302,20 @@ public with sharing class AssessmentController {
         }
     }
     
-    /* getUserName method is used to get the username */
+    /* @description getUserName method is used to get the username
+	*@return
+	*/
     @AuraEnabled
     public static String getUserName()
     {
         String userName=UserInfo.getName();
         return userName;
     }
+
     /**
-* Gets the AccountId information of a user who logged in to portal.
-*/ 
+    * @description Gets the AccountId information of a user who logged in to portal.
+    * @return
+    */ 
     @AuraEnabled
     public static String getAccountId()
     {
@@ -309,6 +338,10 @@ public with sharing class AssessmentController {
         }
     }
     
+    /**
+    * @description To get the community url.
+    * @return
+    */
     @AuraEnabled
     public static string getCommunityURL()
     {
@@ -324,9 +357,10 @@ public with sharing class AssessmentController {
     
     
     /**
-* Gets the AccountAssessmentRelation__c information of all fields in AccountAssessmentRelation__c for a particular Account__c.
-* @param accountId This is a record id of an Account__c.
-*/
+    * @description To get the response information of all fields in AccountAssessmentRelation__c for a particular Account__c.
+    * @param accountId This is a record id of an Account__c.
+    * @return
+    */
     @AuraEnabled
     public static List<SObject> getAssessmentJunctionRecords(String accountId)
     {
@@ -347,6 +381,13 @@ public with sharing class AssessmentController {
             throw auraEx;
         }
     }
+
+    /**
+    * @description To upload the pdf for the responses
+    * @param pdfdata Data to be displayed in the pdf.
+    * @param accountId This is the reponseId.
+    * @return
+    */
     @AuraEnabled
     public static List<AccountAssessmentRelation__c> uploadPdfContent(String pdfdata, String recordId)
     {
@@ -382,9 +423,10 @@ public with sharing class AssessmentController {
     }
     
     /**
-* Its used to update a flag in Response__c.
-* @param questionId record id of a Question__c.
-*/
+    * @description To get the response data
+    * @param assrecordId record id of a AccountAssessmentRelation__c.
+    * @return
+    */
     @AuraEnabled
     public static List<Sobject> getAccountAssessmentRecordData(String assrecordId)
     {
@@ -405,10 +447,13 @@ public with sharing class AssessmentController {
             throw new AuraHandledException(errorMsg);
         }
     }
+    
     /**
-* Its used to update a flag in Response__c.
-* @param questionId record id of a Question__c.
-*/
+    * @description Its used to update a flag in Response__c.
+    * @param questionId record id of a Question__c.
+    * @param accountAssessmentId record id of a AccountAssessmentRelation__c.
+    * @return
+    */
     @AuraEnabled
     public static List<SObject> getResponseFlag(String questionId, String accountAssessmentId)
     {
@@ -463,10 +508,10 @@ public with sharing class AssessmentController {
     }
     
     /**
-* Its used to delete a file reference in Response__c.
-* @param questionId record id of a Question__c.
-* @param name filename .
-*/
+    * @description Its used to delete a file reference in Response__c.
+    * @param deleteMap wrapper with question id, assessment id and file details.
+    * @return
+    */
     @AuraEnabled
     public static Object deleteFileAttachment(String deleteMap)
     {
@@ -514,18 +559,16 @@ public with sharing class AssessmentController {
     
     
     /**
-* Its used to save the communication log of a quesiton in Response__c.
-* @param responseList JSON format of a conversation log.
-* @param assessmentId record id of an Assessment__c .
-* @param questionId record id of a Question__c .
-*/
+    * @description Its used to save the communication log of a quesiton in Response__c.
+    * @param chatWrapperstring wrapper with question id, assessment id and chatter data.
+    */
     @AuraEnabled
     public static void saveChatterResponse(String chatWrapperstring)// responseList,string assessmentId,string questionId)
     {
         try{
             Map<String,Object> chatMap = (Map<String,Object>)JSON.deserializeUntyped(chatWrapperstring);
-            String quesId = (String)chatMap.get('accountassessmentId');
-            String accAssmtId = (String)chatMap.get('questionId');
+            String quesId = (String)chatMap.get('questionId');
+            String accAssmtId = (String)chatMap.get('accountassessmentId');
             String query = 'SELECT Conversation_History__c,createdDate'
                          + ' FROM Response__c'
                          + ' WHERE AccountAssessmentRelation__c=\'' + String.escapeSingleQuotes(accAssmtId) + '\''
@@ -565,13 +608,11 @@ public with sharing class AssessmentController {
             throw new AuraHandledException(errorMsg);
         }
     }
-    /**
-* Its used to capture the error information of any apex/js call.
-* @param componentName LWC component name.
-* @param methodName Apex method name.
-* @param className Apex class name.
-* @param errorData stack trace information.
-*/
+    
+     /**
+    * @description Its used to capture the error information of any apex/js call.
+    * @param errorLogWrapper wrapper with error details to insert the error log rcord.
+    */
     @AuraEnabled
     public static void errorLogRecord(String errorLogWrapper)
     {
@@ -601,6 +642,12 @@ public with sharing class AssessmentController {
             throw new AuraHandledException(errorMsg);
         }
     }
+
+    /**
+    * @description Its used to update the sequence of the sections.
+    * @param secList list of section records.
+    * @return
+    */
     @AuraEnabled
     public static Boolean updateSectionSequence(List<Section__c> secList){//Todo priyanka to work
         try{
@@ -625,13 +672,10 @@ public with sharing class AssessmentController {
     
     
     /**
-* Its used to save the file and save the reference link in Response__c in JSON format.
-* @param resId record id of a Response__c.
-* @param fileBlob file content.
-* @param name file name.
-* @param quesId record id of a Question__c.
-* @param assessmentId record id of an Assessment__c.
-*/
+    * @description Its used to save the file and save the reference link in Response__c in JSON format.
+    * @param fileResp wrapper with questionid, assessmentid and file data to upload.
+    * @return
+    */
     @AuraEnabled    
     public static List<SObject> uploadFile(String fileResp)
     {
@@ -715,9 +759,11 @@ public with sharing class AssessmentController {
     }
     
     /**
-* Its used to get the suppliers.
-* @param searchKey userinput for the search.
-*/
+    * @description Its used to get the suppliers.
+    * @param searchKey user input to search new suppliers.
+    * @param exSearchKey user input to search existing suppliers.
+    * @return
+    */
     @AuraEnabled(cacheable=true)
     public static List<Account> getAllSuppliers(String existingData, String searchKey, String exSearchKey){
         List<Account> supplierList = new List<Account>();
@@ -764,17 +810,15 @@ public with sharing class AssessmentController {
         return safe.doQueryWithBinds(query,bindVariables);
     }
     
-
-
-      
-    
-    /**
-* It is used to create assessment record with suppliers
-* @param assessmentRecord record data given by user for assessment creation.
-* @param suppliers strigified list of suppliers selected.
-* @param deleteList strigified list of suppliers removed.
-*/
-    
+   /**
+    * @description It is used to create assessment record with suppliers
+    * @param assessmentRecord record data given by user for assessment creation.
+    * @param operationType it is used to check creation or updation of the assessment.
+    * @param suppliers strigified list of suppliers selected.
+    * @param existingSups strigified list of existingSups.
+    * @param deleteList strigified list of suppliers removed.
+    * @return
+    */
     @AuraEnabled
     public static ResultWrapper sendAssessment(SObject assessmentRecord,String operationType, String suppliers,String existingSups, String deleteList){
         ResultWrapper resWrap = new ResultWrapper();
@@ -922,11 +966,13 @@ public with sharing class AssessmentController {
     }
     
     /**
-* It is used to send assessment email to the suppliers.
-* @param recordIdsSet AccountAssessmentRelation record ids to send emails.
-*/
+    * @description It is used to send assessment email to the suppliers.
+    * @param recordIdsSet AccountAssessmentRelation record ids to send emails.
+    * @param source To send new assessment email or send flagged email notification.
+    */
     public static void sendEmails(Set<Id> recordIdsSet, String source){
         try{
+            Configuration__mdt siteData = Configuration__mdt.getInstance('Site_URL');
             List<Messaging.SingleEmailMessage> emailMessagesList = new List<Messaging.SingleEmailMessage>();
             String assRelQuery = 'SELECT Id,Account__c,Account__r.Name,Account__r.Email__c,Assessment__c'
                                    +' FROM AccountAssessmentRelation__c'
@@ -944,7 +990,7 @@ public with sharing class AssessmentController {
                         String body = '<html><body>'+
                             '<br><br>'+'Dear '+assRelRec.Account__r.Name+
                             '<br><br>'+'we’d like to complete a short survey.'+
-                            '<br><br><a href='+System.Label.Supplier_Portal_URL+assRelRec.Id+'>Take the survey now.</a>'+
+                            '<br><br><a href='+siteData.Site_URL__c+assRelRec.Id+'>Take the survey now.</a>'+
                             '<br><br>'+'Kind regards,'+
                             '<br>'+'Rhythm';
                         mail.setHtmlBody(body);
@@ -960,7 +1006,7 @@ public with sharing class AssessmentController {
                         String body = '<html><body>'+
                             '<br><br>'+'Dear '+assRelRec.Account__r.Name+
                             '<br><br>'+'There are few comments on the responses submitted.'+
-                            '<br><br><a href='+System.Label.Supplier_Portal_URL+assRelRec.Id+'>Click Here</a>'+
+                            '<br><br><a href='+siteData.Site_URL__c+assRelRec.Id+'>Click Here</a>'+
                             '<br><br>'+'Kind regards,'+
                             '<br>'+'Rhythm';
                         mail.setHtmlBody(body);
@@ -979,54 +1025,12 @@ public with sharing class AssessmentController {
         }
     }
     
-    /**
-* It is used to create assessment supplier records for upcoming assessment schedules
-* @param assesmentId assessment record id
-* @param suppliers strigified list of suppliers selected.
-*/
-    @AuraEnabled
-    public static ResultWrapper addSuppliers(String assesmentId, String suppliers){
-        ResultWrapper resWrap = new ResultWrapper();
-        try{
-            List<Assessment_Supplier__c> assessSupList = new List<Assessment_Supplier__c>();
-            List<string> suppliersList = (List<string>) JSON.deserialize(suppliers, List<string>.class);
-            for(string supplierId:suppliersList){
-                Assessment_Supplier__c assessSup = new Assessment_Supplier__c();
-                assessSup.Account__c = supplierId;
-                assessSup.Assessment__c = assesmentId;
-                assessSup.Status__c = 'Inactive';
-                assessSupList.add(assessSup);
-            }
-            if(sp == null){
-                sp = Database.setSavepoint();
-            }
-            if(assessSupList.isEmpty() ==false){
-                Database.SaveResult[] results = safe.doInsert(assessSupList);
-                List<String> errorsList = SecurityCheckController.safeClassExceptionHandlerInsert(results);
-                if(errorsList.size()>0){
-                    Database.rollback(sp);
-                    throw new SecurityControllerException(String.join(errorsList, ', ' ));
-                }
-            }
-            resWrap.isSuccess = true;
-            resWrap.recordId = '';
-            resWrap.message = '';
-            resWrap.errorCode = '';
-        }catch(exception e){
-            resWrap.isSuccess = false;
-            resWrap.recordId = '';
-            resWrap.message = e.getMessage();
-            resWrap.errorCode = '';
-        }
-        return resWrap;
-    }
-    
     
     /**
-* It is used to update assessment supplier records to send assessment email for scheduled assessments.
-* @param assesmentId assessment record id
-*/
-    
+    * @description It is used to update assessment supplier records to send assessment email for scheduled assessments.
+    * @param assessmentId assessment record id
+    * @return
+    */
     @AuraEnabled
     public static ResultWrapper updateAssessmentSuppliers(string assessmentId){
         ResultWrapper resWrap = new ResultWrapper();
@@ -1068,10 +1072,10 @@ public with sharing class AssessmentController {
     }
     
     /**
-* It is used to get assessment record
-* @param assesmentId assessment record id
-*/
-    
+    * @description It is used to get assessment record
+    * @param assessmentId assessment record id
+    * @return
+    */
     @AuraEnabled(cacheable=true)
     public static List<Assessment__c> getAssessmentRecord(String assessmentId){
         try{
@@ -1088,10 +1092,11 @@ public with sharing class AssessmentController {
     }
     
     /**
-* It is used to search the existing suppliers for assessment.
-* @param assesmentId assessment record id
-* @param searchKey user input to search supplier
-*/
+    * @description It is used to search the existing suppliers for assessment.
+    * @param assesmentId assessment record id.
+    * @param searchKey user input to search existing supplier.
+    * @return
+    */
     @AuraEnabled
     public static List<AccountAssessmentRelation__c> getExistingSuppliersWithSearch(string assessmentId, string searchKey){
         try{
@@ -1112,6 +1117,11 @@ public with sharing class AssessmentController {
         }
     }
     
+    /**
+    * @description It is used to delete the assessment.
+    * @param assessmentId assessment record id.
+    * @return
+    */
     @AuraEnabled
     public static ResultWrapper deleteAssessment(string assessmentId){
         ResultWrapper resWrap = new ResultWrapper();
@@ -1148,6 +1158,11 @@ public with sharing class AssessmentController {
         return resWrap;
     }
     
+    /**
+    * @description It is used to get the template data.
+    * @param assessmentId template record id.
+    * @return
+    */
     @AuraEnabled(cacheable=true)
     public static List<Assessment_Template__c> getTemplateData(string templateId){
         try{
@@ -1163,6 +1178,11 @@ public with sharing class AssessmentController {
         }
     }
     
+     /**
+    * @description It is used to get the assessments for the supplier.
+    * @param accountId account record id.
+    * @return
+    */
     @AuraEnabled(cacheable=true)
     public static List<Assessment__c> getAssessmentRecordData(string accountId){
         try{
@@ -1177,7 +1197,11 @@ public with sharing class AssessmentController {
         }
     }
     
-    /* getSectionsRecCount method is used to get all the Sections count to particular Assessment Template */
+     /**
+    * @description It is used to get all the Sections count to particular Assessment Template.
+    * @param templateId template record id.
+    * @return
+    */
     @AuraEnabled
     public static Integer getSectionsRecCount(String templateId){
         Integer totalRecsCount=0;
@@ -1194,7 +1218,13 @@ public with sharing class AssessmentController {
             throw new AuraHandledException(ErrorMsg);
         }
     }
-    
+
+
+    /**
+    *@description It is used to get all the questions count to particular Assessment Template.
+    * @param templateId template record id.
+    * @return
+    */
     @AuraEnabled
     public static Integer getQuestionsRecCount(String templateId){
         Integer totalRecsCount=0;
@@ -1213,7 +1243,11 @@ public with sharing class AssessmentController {
     }
     
     
-    /* getTemplateSections method is used to get all the Sections related to particular Assessment Template */
+    /**
+    * @description It is used to get all the Sections related to particular Assessment Template.
+    * @param templateId template record id.
+    * @return
+    */
     @AuraEnabled
     public static List<SectionWrapper> getTemplateSections(String templateId,Integer recslimit){
         List<SectionWrapper> sectionwraplist=new List<SectionWrapper>();
@@ -1261,7 +1295,11 @@ public with sharing class AssessmentController {
         }
     }
 
-    /* insertSection method is used to insert the section records */
+    /**
+    * @description It is used to insert the section related to particular Assessment Template.
+    * @param assessmentTempalteId template record id.
+    * @param sectionName user input for the section name.
+    */
     @AuraEnabled
     public static void insertSection(Id assessmentTempalteId,String sectionName){
         try{
@@ -1289,7 +1327,10 @@ public with sharing class AssessmentController {
     }
 
 
-     /* This method is used to get the todays date */
+     /**
+    * @description It is used to get the current date.
+    * @return
+    */
     @AuraEnabled(cacheable=true)
     public static date getTodayDate(){
         try{
@@ -1301,8 +1342,8 @@ public with sharing class AssessmentController {
     }
     
     /**
-* It is used to store the response from server
-*/
+    * @description It is used to store the response from server
+    */
     
     public class ResultWrapper{
         @AuraEnabled public boolean isSuccess;
@@ -1312,7 +1353,9 @@ public with sharing class AssessmentController {
     }
     
     
-    
+    /**
+    * @description It is used to store the questiondata
+    */
     public class QuestionWrapper{
         @AuraEnabled
         public Id questionId{get;set;}
@@ -1345,6 +1388,10 @@ public with sharing class AssessmentController {
         @AuraEnabled
         public List<childQuestionWrapper> childQuestions{get;set;}
     }
+
+    /**
+    *@description  It is used to store the child questiondata
+    */
     public class ChildQuestionWrapper{
         @AuraEnabled
         public String question{get;set;}
@@ -1354,7 +1401,11 @@ public with sharing class AssessmentController {
         public String parentQuestion{get;set;}
         @AuraEnabled
         public String type{get;set;}
-    } 
+    }
+
+    /**
+    * @description It is used to store the sectiondata.
+    */
     public class SectionWrapper{
         @AuraEnabled
         public Id sectionId{get;set;}
@@ -1371,10 +1422,9 @@ public with sharing class AssessmentController {
     }  
     
     /**
-* It is used to throw the exception
-*/
+    * @description It is used to throw the exception
+    */
     public class SecurityControllerException extends Exception{
-        
     }
     
 }
