@@ -74,7 +74,6 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
     /*handleChange is used to dispatch an event to its parent component(Questionnaire) and change the response and send back to the parent component*/
     handleChange(event) {
         var changedvalue = event.target.value;
-        console.log('changedvalue',changedvalue);
         let questionId = event.currentTarget.dataset.key;
         if(this.responses && this.responses.length > 0){
             this.responses.forEach(res => {
@@ -99,7 +98,6 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
         this.responsemap.SectionId = this.sectionid;
         this.responsemap.option = changedvalue;
         this.responsemap.questionId = questionId;
-        console.log('this.responsemap',this.responsemap);
         /*This dispatch event is used to send the data to questionnaire on onchange to perform saving.*/
         const selectedEvent = new CustomEvent('valuechange', {
             bubbles: true,
@@ -264,7 +262,6 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
         });
         // Dispatches the event.
         this.dispatchEvent(selectedEvent);
-        console.log('sampledata');
        
     }
 
@@ -296,10 +293,8 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
     }
 
     @api
-    fileUploadHandler(status)
+    fileUploadHandler()
     {
-        console.log('status from fileUploadHandler', status);
         this.uploadingFile = true;
-        console.log('status from fileUploadHandler', this.uploadingFile);
     }
 }

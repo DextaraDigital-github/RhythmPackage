@@ -1,12 +1,30 @@
+
+/* 
+* Class Name        : AssessmentTriggerHandler
+* Developer         : Sai Koushik Nimmaturi and Reethika Velpula           
+* Created Date      : 
+* Description       : It is used to send the assessment notification to suppliers.
+* Last Modified Date: 
+*/
+
 public class SendAssessmentNotificationsBatch implements Database.Batchable<sObject> {
+
+    /**
+    * Start method to query the required records.
+    */
     public Database.QueryLocator start(Database.BatchableContext bc){
         Date todayDate = Date.Today();
         string query = 'SELECT Id,Name,Assessment__r.Start_Date__c,Assessment__r.End_Date__c,Account__r.Name,Account__c,Assessment__c FROM Assessment_Supplier__c WHERE Status__c= \'Active\' AND Assessment__r.Start_Date__c=:todayDate';
         return Database.getQueryLocator(query);
     }
+
+     /**
+    * execute method to process the records.
+    */
     public void execute(Database.BatchableContext bc, List<Assessment_Supplier__c> scope){
         List<ErrorTransactionLog__c> errorList = new List<ErrorTransactionLog__c>();
         try{
+            Configuration__mdt siteData = Configuration__mdt.getInstance('Site_URL');
             List<Messaging.SingleEmailMessage> emailMessagesList = new List<Messaging.SingleEmailMessage>();
             List<AccountAssessmentRelation__c> accountAssessRelnsList = new List<AccountAssessmentRelation__c>();
             for(Assessment_Supplier__c assSuppl:scope){
@@ -49,7 +67,7 @@ public class SendAssessmentNotificationsBatch implements Database.Batchable<sObj
                         String body = '<html><body>'+
                         '<br><br>'+'Dear '+assRelRec.Account__r.Name+
                         '<br><br>'+'we’d like to complete a short survey.'+
-                        '<br><br><a href='+System.Label.Supplier_Portal_URL+assRelRec.Id+'>Take the survey now.</a>'+
+                        '<br><br><a href='+siteData.Site_URL__c+assRelRec.Id+'>Take the survey now.</a>'+
                                         '<br><br>'+'Kind regards,'+
                                         '<br>'+'Rhythm';
                         mail.setHtmlBody(body);
@@ -84,6 +102,9 @@ public class SendAssessmentNotificationsBatch implements Database.Batchable<sObj
             Database.SaveResult[] results = Database.insert(errorList, false);
         }
     }
+    /**
+    * execute any post-processing operations
+    */
     public void finish(Database.BatchableContext bc){
         // execute any post-processing operations
     }

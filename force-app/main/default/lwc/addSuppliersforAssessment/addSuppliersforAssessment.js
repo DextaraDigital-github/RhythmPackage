@@ -19,7 +19,6 @@ export default class AddSuppliersforAssessment extends NavigationMixin(Lightning
     @wire(CurrentPageReference)
     getPageReferenceParameters(currentPageReference) {
        if (currentPageReference) {
-          console.log(currentPageReference);
           this.assessmentId = currentPageReference.state.recordId;
        }
     }
@@ -47,13 +46,12 @@ export default class AddSuppliersforAssessment extends NavigationMixin(Lightning
             this.startDate = result.data[0].Rhythm__Start_Date__c;
             this.endDate = result.data[0].Rhythm__End_Date__c;
         } else if (result.error) {
-            console.log('getAssessmentRecord error : ',result.error);
+            console.log(result.error);
         }
     }
 
     handleAdd(){
         try{
-            console.log('handleAdd - START : ');
             let deleteListStr = '';
             let exSupListStr = '';
             if(this.existingSuppList.length>0){
@@ -62,9 +60,6 @@ export default class AddSuppliersforAssessment extends NavigationMixin(Lightning
              if(this.delList.length>0){
                 deleteListStr = JSON.stringify(this.delList);
             }
-            console.log('todayDate----->',this.todayDate);
-            console.log('startDate----->',this.startDate);
-            console.log('endDate----->',this.endDate);
             let todayDate =  new Date(this.todayDate).toISOString().substring(0, 10);
             let save = false;
             if(this.endDate !== undefined){
