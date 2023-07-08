@@ -1,8 +1,8 @@
-/* 
+/** 
 * Class Name        : AssessmentTriggerHandler
 * Developer         : Sai Koushik Nimmaturi and Reethika Velpula           
 * Created Date      : 
-* Description       : It is used to perform the trigger logic.
+* @description        : It is used to perform the trigger logic.
 * Last Modified Date: 
 */
 
@@ -11,7 +11,7 @@ public with sharing class AssessmentTriggerHandler implements ITriggerHandler{
     public static TriggerFrameworkServiceController serviceController = new TriggerFrameworkServiceController();
     
     /**
-    * To execute before insert logic
+    * @description To execute before insert logic
     * @param newList This is the new list of records.  
     */
     public void beforeInsert(List<sObject> newList) {
@@ -19,7 +19,7 @@ public with sharing class AssessmentTriggerHandler implements ITriggerHandler{
     }
     
      /**
-    * To execute after insert logic
+    * @description To execute after insert logic
     * @param newList This is the new list of records.
       @param newMap This is the new map of records.
     */
@@ -28,7 +28,7 @@ public with sharing class AssessmentTriggerHandler implements ITriggerHandler{
     }
     
     /**
-    * To execute before update logic
+    * @description To execute before update logic
     * @param newList This is the new list of records.
       @param newMap This is the new map of records.
       @param oldList This is the old list of records.
@@ -47,7 +47,7 @@ public with sharing class AssessmentTriggerHandler implements ITriggerHandler{
     }
     
     /**
-    * To execute after update logic
+    * @description To execute after update logic
     * @param newList This is the new list of records.
       @param newMap This is the new map of records.
       @param oldList This is the old list of records.
@@ -58,7 +58,7 @@ public with sharing class AssessmentTriggerHandler implements ITriggerHandler{
     }
     
     /**
-    * To execute before delete logic
+    * @description To execute before delete logic
     * @param oldList This is the old list of records.
       @param oldMap This is the old map of records.
     */
@@ -67,7 +67,7 @@ public with sharing class AssessmentTriggerHandler implements ITriggerHandler{
     }
      
     /**
-    * To execute after delete logic
+    * @description To execute after delete logic
     * @param oldList This is the old list of records.
       @param oldMap This is the old map of records.
     */
@@ -76,16 +76,16 @@ public with sharing class AssessmentTriggerHandler implements ITriggerHandler{
     }
     
     /**
-    * To execute after undelete logic
-    * @param oldList This is the new list of records.
-      @param oldMap This is the new map of records.
+    * @description To execute after undelete logic
+    * @param newList This is the new list of records.
+      @param newMap This is the new map of records.
     */
     public void afterUnDelete(List<sObject> newList, Map<Id, sObject> newMap) {
         
     }
 
     /**
-    * To calculate questions count
+    * @description To calculate questions count
     * @param newList This is the new list of records.
     * @param newMap This is the new map of records.
     */

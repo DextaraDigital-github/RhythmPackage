@@ -1,4 +1,4 @@
-/* 
+/**
 * Class Name        : AccountAssessmentRelationHandler
 * Developer         : Sai Koushik Nimmaturi and Reethika Velpula           
 * Created Date      : 
@@ -13,14 +13,13 @@ public with sharing class AccountAssessmentRelationHandler implements ITriggerHa
 
      /**
     * @description To execute before insert logic
-    * @param newList This is the list of AccountAssessments.
-    * @return  
+    * @param newList This is the list of AccountAssessments.  
     */
 	public void beforeInsert(List<sObject> newList) {
     }
 
      /**
-    * To execute after insert logic
+    * @description To execute after insert logic
     * @param newList This is the list of AccountAssessments.
       @param newMap This is the map of AccountAssessments.
     */
@@ -28,7 +27,7 @@ public with sharing class AccountAssessmentRelationHandler implements ITriggerHa
     }
 
     /**
-    * To execute before update logic
+    * @description To execute before update logic
     * @param newList This is the list of AccountAssessments.
       @param newMap This is the map of AccountAssessments.
       @param oldList This is the old list of AccountAssessments.
@@ -38,7 +37,7 @@ public with sharing class AccountAssessmentRelationHandler implements ITriggerHa
     }
 
     /**
-    * To execute after update logic
+    * @description To execute after update logic
     * @param newList This is the list of AccountAssessments.
       @param newMap This is the map of AccountAssessments.
       @param oldList This is the old list of AccountAssessments.
@@ -59,7 +58,7 @@ public with sharing class AccountAssessmentRelationHandler implements ITriggerHa
     }
     
     /**
-    * To execute before delete logic
+    * @description To execute before delete logic
     * @param oldList This is the old list of AccountAssessments.
       @param oldMap This is the old map of AccountAssessments.
     */
@@ -67,7 +66,7 @@ public with sharing class AccountAssessmentRelationHandler implements ITriggerHa
     }
 
      /**
-    * To execute after delete logic
+    * @description To execute after delete logic
     * @param oldList This is the old list of AccountAssessments.
       @param oldMap This is the old map of AccountAssessments.
     */
@@ -75,16 +74,16 @@ public with sharing class AccountAssessmentRelationHandler implements ITriggerHa
     }
 
      /**
-    * To execute after undelete logic
-    * @param oldList This is the new list of AccountAssessments.
-      @param oldMap This is the new map of AccountAssessments.
+    * @description To execute after undelete logic
+    * @param newList This is the new list of AccountAssessments.
+      @param newMap This is the new map of AccountAssessments.
     */
     public void afterUnDelete(List<sObject> newList, Map<Id, sObject> newMap) {
     }
 
 
     /**
-    * To execute after update logic
+    * @description To execute after update logic
     * @param newList This is the list of AccountAssessments.
       @param newMap This is the map of AccountAssessments.
       @param oldList This is the old list of AccountAssessments.
@@ -93,7 +92,7 @@ public with sharing class AccountAssessmentRelationHandler implements ITriggerHa
 
     public void updateStatusData(List<SObject> newList , Map<Id, sObject> newMap,Map<Id, sObject> oldMap)
     {
-     	List<AccountAssessmentRelation__c> acs = (List<AccountAssessmentRelation__c>) newList;
+     	
         List<FieldHistoryTracking__c> fieldtrack = new List<FieldHistoryTracking__c>();
         for(Id assmntId: newMap.keySet()){
             if(newMap.get(assmntId).get('Rhythm__Status__c') != oldMap.get(assmntId).get('Rhythm__Status__c'))
@@ -121,9 +120,20 @@ public with sharing class AccountAssessmentRelationHandler implements ITriggerHa
     }
 
      /**
-    * To execute after delete logic
+    * @description To execute after delete logic
         custom exception class
     */
     public class SecurityControllerException extends Exception{
+    }
+
+    @testVisible 
+    public static List<Configuration__mdt> siteURLData{
+      get{ 
+          if(siteURLData == NULL){ 
+            siteURLData = [SELECT Site_URL__c,DeveloperName,MasterLabel FROM Configuration__mdt LIMIT 1]; 
+          } 
+          return siteURLData; 
+      } 
+      set; 
     }
 }

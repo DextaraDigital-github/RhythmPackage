@@ -150,7 +150,7 @@ public with sharing class CanTheUser {
     /**
      * @description convenience api for determining if the running user can
      * create the specified object
-     * @param String Object type to check create permissions on
+     * @param objName Object type to check create permissions on
      * @return Boolean
      * @example
      * System.debug(CanTheUser.create('Account'));
@@ -174,7 +174,7 @@ public with sharing class CanTheUser {
     /**
      * @description convenience api for determining if the running user can
      * read / access the specified objects
-     * @param obj object type to check read permissions on
+     * @param objs object type to check read permissions on
      * @return Boolean
      * @example
      **/
@@ -185,7 +185,7 @@ public with sharing class CanTheUser {
     /**
      * @description convenience api for determining if the running user can
      * read the specified object
-     * @param String Object type to check read permissions on
+     * @param objName Object type to check read permissions on
      * @return Boolean
      * @example
      * System.debug(CanTheUser.read('Account'));
@@ -209,7 +209,7 @@ public with sharing class CanTheUser {
     /**
      * @description convenience api for determining if the running user can
      * edit / update the specified objects
-     * @param obj object type to check edit permissions on
+     * @param objs object type to check edit permissions on
      * @return Boolean
      * @example
      **/
@@ -220,7 +220,7 @@ public with sharing class CanTheUser {
     /**
      * @description convenience api for determining if the running user can
      * edit the specified object
-     * @param String Object type to check edit permissions on
+     * @param objName Object type to check edit permissions on
      * @return Boolean
      * @example
      * System.debug(CanTheUser.edit('Account'));
@@ -244,7 +244,7 @@ public with sharing class CanTheUser {
     /**
      * @description convenience api for determining if the running user can
      * edit / update the specified objects
-     * @param obj object type to check upsert permissions on
+     * @param objs object type to check upsert permissions on
      * @return Boolean
      * @example
      **/
@@ -255,7 +255,7 @@ public with sharing class CanTheUser {
     /**
      * @description convenience api for determining if the running user can
      * upsert the specified object
-     * @param String Object type to check upsert permissions on
+     * @param objName Object type to check upsert permissions on
      * @return Boolean
      * @example
      * System.debug(CanTheUser.ups('Account'));
@@ -279,7 +279,7 @@ public with sharing class CanTheUser {
     /**
      * @description convenience api for determining if the running user can
      * delete the specified object
-     * @param String Object type to check delete permissions on
+     * @param objs Object type to check delete permissions on
      * @return Boolean
      **/
     public static Boolean destroy(List<SObject> objs) {
@@ -289,7 +289,7 @@ public with sharing class CanTheUser {
     /**
      * @description convenience api for determining if the running user can
      * delete the specified object
-     * @param String Object type to check create permissions on
+     * @param objName Object type to check create permissions on
      * @return Boolean
      * @example
      * System.debug(CanTheUser.destroy('Account'));

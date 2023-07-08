@@ -1,16 +1,16 @@
-/* 
+/**
 * Class Name        : SectionTriggerHandler
 * Developer         : Sai Koushik Nimmaturi and Reethika Velpula           
 * Created Date      : 
-* Description       : It is used to perform the trigger logic on Section__c object.
+* @description        : It is used to perform the trigger logic on Section__c object.
 * Last Modified Date: 
 */
-public class SectionTriggerHandler implements ITriggerHandler {
+public with sharing class SectionTriggerHandler implements ITriggerHandler {
     public static SecurityCheckController safe = new SecurityCheckController();//use singleton pattern
     private static Savepoint sp;//prudhvi to work
     
      /**
-    * To execute before insert logic
+    * @description To execute before insert logic
     * @param newList This is the new list of records.  
     */
     public void beforeInsert(List<sObject> newList) {
@@ -18,7 +18,7 @@ public class SectionTriggerHandler implements ITriggerHandler {
         recordAddSequenceNumber(newList);
     }
     /**
-    * To execute after insert logic
+    * @description To execute after insert logic
     * @param newList This is the new list of records.
       @param newMap This is the new map of records.
     */
@@ -26,7 +26,7 @@ public class SectionTriggerHandler implements ITriggerHandler {
         
     }
     /**
-    * To execute before update logic
+    * @description To execute before update logic
     * @param newList This is the new list of records.
       @param newMap This is the new map of records.
       @param oldList This is the old list of records.
@@ -48,7 +48,7 @@ public class SectionTriggerHandler implements ITriggerHandler {
         restrictRecordActions(newSeclst);
     }
     /**
-    * To execute after update logic
+    * @description To execute after update logic
     * @param newList This is the new list of records.
       @param newMap This is the new map of records.
       @param oldList This is the old list of records.
@@ -59,7 +59,7 @@ public class SectionTriggerHandler implements ITriggerHandler {
         
     }
     /**
-    * To execute before delete logic
+    * @description To execute before delete logic
     * @param oldList This is the old list of records.
       @param oldMap This is the old map of records.
     */
@@ -68,7 +68,7 @@ public class SectionTriggerHandler implements ITriggerHandler {
         recordSequenceNumber(oldList);
     }
      /**
-    * To execute after delete logic
+    * @description To execute after delete logic
     * @param oldList This is the old list of records.
       @param oldMap This is the old map of records.
     */
@@ -76,7 +76,7 @@ public class SectionTriggerHandler implements ITriggerHandler {
         
     }
      /**
-    * To execute after undelete logic
+    * @description To execute after undelete logic
     * @param newList This is the new list of records.
       @param newMap This is the new map of records.
     */
@@ -84,7 +84,7 @@ public class SectionTriggerHandler implements ITriggerHandler {
     }
     
     /**
-    * To perform validation based on the status of template.
+    * @description To perform validation based on the status of template.
     * @param secLst This is the new list of section records.
     */
     
@@ -118,7 +118,7 @@ public class SectionTriggerHandler implements ITriggerHandler {
         }
     }
      /**
-    * To perform validations on assessment template
+    * @description To perform validations on assessment template
     * @param secLst This is the new list of section records.
     */
     public void recordValidations(List<Section__c> secLst) {
@@ -132,7 +132,7 @@ public class SectionTriggerHandler implements ITriggerHandler {
         }
     }
      /**
-    * To add the sequence number.
+    * @description To add the sequence number.
     * @param secLst This is the new list of section records.
     */
     public void recordAddSequenceNumber(List<Section__c> secLst) {
@@ -170,7 +170,7 @@ public class SectionTriggerHandler implements ITriggerHandler {
         }
     }
      /**
-    * To update sequence number for section object
+    * @description To update sequence number for section object
     * @param secLst This is the new list of section records.
     */
     public void recordSequenceNumber(List<Section__c> secLst) {
@@ -216,7 +216,7 @@ public class SectionTriggerHandler implements ITriggerHandler {
         }
     }
 /**
-  * It is used to throw the exception.
+  * @description It is used to throw the exception.
 */
     public class SecurityControllerException extends Exception{
         

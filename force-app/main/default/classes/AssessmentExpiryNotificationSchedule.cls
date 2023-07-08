@@ -1,14 +1,15 @@
-/* 
+/**
 * Class Name        : AssessmentExpiryNotificationSchedule
 * Developer         : Prudhvi   
 * Created Date      : 
-* Description       : It is to schedule assessment notification batch class.
+* @description        : It is to schedule assessment notification batch class.
 * Last Modified Date: 
 */
-public class AssessmentExpiryNotificationSchedule implements Schedulable{
+public with sharing class AssessmentExpiryNotificationSchedule implements Schedulable{
     
     /**
-    *  Method to execute the batch.
+    * @description  Method to execute the batch.
+    * @param sc It is an instance of SchedulableContext.
     */
     public void execute(SchedulableContext sc){
         AssessmentExpiryNotificationBatch b = new AssessmentExpiryNotificationBatch(); // Your batch class

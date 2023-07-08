@@ -1,15 +1,15 @@
-/* 
+/** 
 * Class Name        : AssessmentTriggerHandler
 * Developer         : Sai Koushik Nimmaturi and Reethika Velpula           
 * Created Date      : 
-* Description       : It is used to send the assessment notification to suppliers.
+* @description       : It is used to send the assessment notification to suppliers.
 * Last Modified Date: 
 */
-
 public class SendAssessmentNotificationsBatch implements Database.Batchable<sObject> {
 
     /**
     * @description Start method to query the required records.
+    * @param bc It is an instance of BatchableContext.
     * @return
     */
     public Database.QueryLocator start(Database.BatchableContext bc){
@@ -20,6 +20,8 @@ public class SendAssessmentNotificationsBatch implements Database.Batchable<sObj
 
      /**
     * @description execute method to process the records.
+    * @param bc It is an instance of BatchableContext. 
+    * @param scope List of Assessment_Supplier__c object.
     */
     public void execute(Database.BatchableContext bc, List<Assessment_Supplier__c> scope){
         List<ErrorTransactionLog__c> errorList = new List<ErrorTransactionLog__c>();
@@ -100,6 +102,7 @@ public class SendAssessmentNotificationsBatch implements Database.Batchable<sObj
     }
     /**
     * @description execute any post-processing operations.
+    * @param bc It is an instance of BatchableContext.
     */
     public void finish(Database.BatchableContext bc){
         // execute any post-processing operations

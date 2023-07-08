@@ -82,26 +82,21 @@ public with sharing class AssessmentController {
     /**
     * @description Insert or update the Response__c of a supplier(Account) for an Assessment__c.
     * @param suppResponseList Response__c wrapper.
-    * @param vendorId supplier Account Id.
-    * @param assesmentId record id of an Assessment__c.
-    * @param isSubmit true:save & submit(update the Assessment__c status to submitted), false: only save (update the Assessment__c status to Draft)
-    * @return
+    * @param paramMap
     */
     @AuraEnabled
-    public static void createSupplierResponse(List<SObject> suppResponseList,String paramMap){
+    public static List<SObject> createSupplierResponse(List<SObject> suppResponseList,String paramMap){
         try{
             Map<String,object> queryMap = (Map<String,Object>)JSON.deserializeUntyped(paramMap);
             String accAssmtId =(string)queryMap.get('accountassessmentid');
             List<Id> questionIds = new List<Id>();
             Map<Id,SObject> suppResponseMap = new Map<Id,SObject>();
-            system.debug('suppResponseList---->'+suppResponseList);
             for(SObject response:suppResponseList){
                 questionIds.add((Id)response.get('Rhythm__Question__c'));
                 suppResponseMap.put((Id)response.get('Rhythm__Question__c'),response);
             }
             List<Response__c> existingResponses = new List<Response__c>();
             if(!questionIds.isEmpty()){
-                system.debug('questionIds---->'+questionIds);
                 string query = 'SELECT Id,Name,Question__c,Response__c,Files__c,Assessment__c,'
                         + 'Flag__c,Is_Latest_Response__c,AccountAssessmentRelation__c'
                         +' FROM Response__c'
@@ -114,16 +109,13 @@ public with sharing class AssessmentController {
             if (sp == null){
                 sp = Database.setSavepoint();
             }
-            system.debug('existingResponses---->'+existingResponses);
             for(Response__c resp :existingResponses){
                 ((Response__c)suppResponseMap.get(resp.Question__c)).put('Files__c', resp.Files__c);
                 resp.Is_Latest_Response__c = false;
             }
-            system.debug('suppResponseMap---->'+suppResponseMap.values());
             if(suppResponseMap.values().isEmpty() == false){
                 Database.SaveResult[] results = safe.doInsert(suppResponseMap.values());
                 List<String> errorsList = SecurityCheckController.safeClassExceptionHandlerInsert(results);
-                system.debug('errorsList---->'+errorsList);
                 if(errorsList.size()>0){
                     Database.rollback(sp);
                     throw new SecurityControllerException(String.join(errorsList, ', ' ));
@@ -155,6 +147,7 @@ public with sharing class AssessmentController {
                     throw new SecurityControllerException(String.join( upderrorList, ', ' ));
                 }
             }
+            return suppResponseList;
         }catch(exception e){
             string errorMsg = e.getMessage();
             throw new AuraHandledException(errorMsg);
@@ -162,7 +155,7 @@ public with sharing class AssessmentController {
     }
     
     /**
-    *@description  Update the Assessment Status
+    * @description  Update the Assessment Status
     * @param paramMap Map with the values to update
     * @return
     */
@@ -201,6 +194,7 @@ public with sharing class AssessmentController {
     /**
     * @description Gets the Assessment__History information of a Status__c field in Assessment__c.
     * @param assessmentId This is a record id of an Assessment__c.
+    * @param objectName Name of an object.
     * @return
     */
     @AuraEnabled
@@ -271,7 +265,6 @@ public with sharing class AssessmentController {
             return accountAssessment;
         }catch(exception e){
             String errorMsg = e.getMessage();
-            System.debug('sample'+errorMsg);
             throw new AuraHandledException(errorMsg);
         }
     }
@@ -297,13 +290,16 @@ public with sharing class AssessmentController {
             List<Response__c> responseRecords = safe.doQuery(query);
             return responseRecords;
         }catch(exception e){
+            
             string errorMsg = e.getMessage();
+            System.debug('response'+errorMsg);
             throw new AuraHandledException(errorMsg);
         }
     }
     
-    /** @description getUserName method is used to get the username
-	*@return
+    /** 
+    * @description getUserName method is used to get the username
+	* @return
 	*/
     @AuraEnabled
     public static String getUserName()
@@ -346,7 +342,6 @@ public with sharing class AssessmentController {
     public static string getCommunityURL()
     {
         try{
-            Id currentNetworkId = Network.getNetworkId();
             String relativeUrlBase = URL.getSalesforceBaseUrl().toExternalForm()+'/login';
             return relativeUrlBase;
         }catch(exception e){
@@ -382,45 +377,7 @@ public with sharing class AssessmentController {
         }
     }
 
-    /**
-    * @description To upload the pdf for the responses
-    * @param pdfdata Data to be displayed in the pdf.
-    * @param accountId This is the reponseId.
-    * @return
-    */
-    @AuraEnabled
-    public static List<AccountAssessmentRelation__c> uploadPdfContent(String pdfdata, String recordId)
-    {
-        try{
-            String query = 'SELECT Id,IsDeleted,Name,Account__c,Assessment__c,'
-                        + 'Assessment__r.name,Assessment__r.Status__c,Assessment__r.Customer_Review__c,'
-                        + 'Assessment__r.Number_of_Questions__c,Assessment__r.Additional_Requests__c,'
-                        + 'Number_of_Questions__c, Number_of_Responses__c,Assessment__r.CreatedBy.Name,'
-                        + 'Status__c,End_Date__c,Completed__c,Follow_Up_Requests__c,PdfConvertor__c'
-                        +' FROM AccountAssessmentRelation__c'
-                        +' WHERE Id=\'' + String.escapeSingleQuotes(recordId) + '\''
-                        +' WITH SECURITY_ENFORCED';
-            List<AccountAssessmentRelation__c> assessmentsdata = safe.doQuery(query);
-            if (sp == null){
-                sp = Database.setSavepoint();
-            }
-            if(assessmentsdata.isEmpty() == false){
-                for(AccountAssessmentRelation__c accassessment :assessmentsdata){
-                    accassessment.PdfConvertor__c = pdfdata;
-                }
-                Database.SaveResult[] saveResult = safe.doUpdate(assessmentsdata);
-                List<String> errorList = SecurityCheckController.safeClassExceptionHandlerInsert(saveResult);
-                if(errorList.size()>0){
-                    Database.rollback(sp);
-                    throw new SecurityControllerException(String.join( errorList, ', ' ));
-                }
-            }
-            return assessmentsdata;
-        }catch(exception e){
-            String errorMsg = e.getMessage();
-            throw new AuraHandledException(errorMsg);
-        }
-    }
+
     
     /**
     * @description To get the response data
@@ -530,7 +487,6 @@ public with sharing class AssessmentController {
                          + ' LIMIT 50000';
             List<Response__c> responseRecords = safe.doQuery(query);
             List<Object> responseFilesData= (List<Object>)JSON.deserializeUntyped(responseRecords[0].Files__c);
-            List<object>duplicate=new List<object>();
             if (sp == null){
                 sp = Database.setSavepoint();
             }
@@ -540,10 +496,10 @@ public with sharing class AssessmentController {
                 String responseurl = (String)mp.get('name');
                 if(responseurl==(String)filemap.get('name'))
                 {
-                    Object obj = responseFilesData.remove(i);
+                    responseFilesData.remove(i);
                 }
             }
-            responseRecords[0].put('Files__c',JSON.serialize(responseFilesData));
+            responseRecords[0].put('Rhythm__Files__c',JSON.serialize(responseFilesData));
             Database.SaveResult[] saveResult = safe.doUpdate(responseRecords);
             List<String> errorList = SecurityCheckController.safeClassExceptionHandlerInsert(saveResult);
             if(errorList.size()>0){
@@ -597,7 +553,6 @@ public with sharing class AssessmentController {
                 responseList.add(response);
                 Database.SaveResult[] results = safe.doInsert(responseList);
                 List<String> errorsList = SecurityCheckController.safeClassExceptionHandlerInsert(results);
-                system.debug(errorsList);
                 if(errorsList.size()>0){
                     Database.rollback(sp);
                     throw new SecurityControllerException(String.join(errorsList, ', ' ));
@@ -614,7 +569,7 @@ public with sharing class AssessmentController {
     * @param errorLogWrapper wrapper with error details to insert the error log rcord.
     */
     @AuraEnabled
-    public static void errorLogRecord(String errorLogWrapper)
+    public static ErrorTransactionLog__c errorLogRecord(String errorLogWrapper)
     {
         try{
             Map<String,Object> errorLogMap = (Map<String,Object>)JSON.deserializeUntyped(errorLogWrapper);
@@ -631,46 +586,20 @@ public with sharing class AssessmentController {
             if(errLogList.isEmpty() == false){
                 Database.SaveResult[] results = safe.doInsert(errLogList);
                 List<String> errorsList = SecurityCheckController.safeClassExceptionHandlerInsert(results);
-                system.debug(errorsList);
                 if(errorsList.size()>0){
                     Database.rollback(sp);
                     throw new SecurityControllerException(String.join(errorsList, ', ' ));
                 }
             }
+            return errorRecord;
         }catch(exception e){
             String errorMsg = e.getMessage();
             throw new AuraHandledException(errorMsg);
         }
+        
     }
 
-    /**
-    * @description Its used to update the sequence of the sections.
-    * @param secList list of section records.
-    * @return
-    */
-    @AuraEnabled
-    public static Boolean updateSectionSequence(List<Section__c> secList){//Todo priyanka to work
-        try{
-            if (sp == null){
-                sp = Database.setSavepoint();
-            }
-            if(secList.isEmpty() == false){
-                Database.SaveResult[] results = safe.doUpdate(secList);
-                List<String> errorsList = SecurityCheckController.safeClassExceptionHandlerInsert(results);
-                system.debug(errorsList);
-                if(errorsList.size()>0){
-                    Database.rollback(sp);
-                    throw new SecurityControllerException(String.join(errorsList, ', ' ));
-                }
-            }
-            return true;
-        }catch(exception e){
-            String errorMsg = e.getMessage();
-            throw new AuraHandledException(errorMsg);
-        }
-    }
-    
-    
+ 
     /**
     * @description Its used to save the file and save the reference link in Response__c in JSON format.
     * @param fileResp wrapper with questionid, assessmentid and file data to upload.
@@ -698,7 +627,6 @@ public with sharing class AssessmentController {
             if(cvList.isEmpty() == false){
                 Database.SaveResult[] results = safe.doInsert(cvList);
                 List<String> errorsList = SecurityCheckController.safeClassExceptionHandlerInsert(results);
-                system.debug(errorsList);
                 if(errorsList.size()>0){
                     Database.rollback(sp);
                     throw new SecurityControllerException(String.join(errorsList, ', ' ));
@@ -742,7 +670,7 @@ public with sharing class AssessmentController {
                     res.Files__c = fileJson;
                     res.Is_Latest_Response__c = true;
                     srList.add(res);
-                    Database.SaveResult[] saveResult = safe.doUpdate(srList);
+                    Database.SaveResult[] saveResult = safe.doInsert(srList);
                     List<String> errorList = SecurityCheckController.safeClassExceptionHandlerInsert(saveResult);
                     if(errorList.size()>0){
                         Database.rollback(sp);
@@ -760,13 +688,13 @@ public with sharing class AssessmentController {
     
     /**
     * @description Its used to get the suppliers.
+    * @param existingData user input to search new suppliers.
     * @param searchKey user input to search new suppliers.
     * @param exSearchKey user input to search existing suppliers.
     * @return
     */
     @AuraEnabled(cacheable=true)
     public static List<Account> getAllSuppliers(String existingData, String searchKey, String exSearchKey){
-        List<Account> supplierList = new List<Account>();
         Set<String> selSet = new Set<String>();
         Set<Id> existingSups = new Set<Id>();
         selSet.add(existingData);
@@ -1029,7 +957,6 @@ public with sharing class AssessmentController {
         }
     }
     
-    
     /**
     * @description It is used to update assessment supplier records to send assessment email for scheduled assessments.
     * @param assessmentId assessment record id
@@ -1097,7 +1024,7 @@ public with sharing class AssessmentController {
     
     /**
     * @description It is used to search the existing suppliers for assessment.
-    * @param assesmentId assessment record id.
+    * @param assessmentId assessment record id.
     * @param searchKey user input to search existing supplier.
     * @return
     */
@@ -1164,7 +1091,7 @@ public with sharing class AssessmentController {
     
     /**
     * @description It is used to get the template data.
-    * @param assessmentId template record id.
+    * @param templateId template record id.
     * @return
     */
     @AuraEnabled(cacheable=true)
@@ -1182,7 +1109,7 @@ public with sharing class AssessmentController {
         }
     }
     
-     /**
+    /**
     * @description It is used to get the assessments for the supplier.
     * @param accountId account record id.
     * @return
@@ -1201,137 +1128,7 @@ public with sharing class AssessmentController {
         }
     }
     
-     /**
-    * @description It is used to get all the Sections count to particular Assessment Template.
-    * @param templateId template record id.
-    * @return
-    */
-    @AuraEnabled
-    public static Integer getSectionsRecCount(String templateId){
-        Integer totalRecsCount=0;
-        try{
-            string query = 'SELECT Id'
-                         +' FROM Section__c'
-                         +' WHERE Assessment_Template__c =\'' + String.escapeSingleQuotes(templateId) + '\''
-                         +' WITH SECURITY_ENFORCED';
-            List<Section__c> sectionList=safe.doQuery(query);
-            totalRecsCount=sectionList.size();
-            return totalRecsCount;
-        } catch(exception e){
-            string errorMsg = e.getMessage();
-            throw new AuraHandledException(ErrorMsg);
-        }
-    }
-
-
     /**
-    *@description It is used to get all the questions count to particular Assessment Template.
-    * @param templateId template record id.
-    * @return
-    */
-    @AuraEnabled
-    public static Integer getQuestionsRecCount(String templateId){
-        Integer totalRecsCount=0;
-        try{
-            String query = 'SELECT Id'
-                         +' FROM Question__c'
-                         +' WHERE Assessment_Template__c = \'' + String.escapeSingleQuotes(templateId) + '\''
-                         +' WITH SECURITY_ENFORCED';
-            List<Section__c> sectionList = safe.doQuery(query);
-            totalRecsCount = sectionList.size();
-            return totalRecsCount;
-        } catch(exception e){
-            string errorMsg = e.getMessage();
-            throw new AuraHandledException(ErrorMsg);
-        }
-    }
-    
-    
-    /**
-    * @description It is used to get all the Sections related to particular Assessment Template.
-    * @param templateId template record id.
-    * @return
-    */
-    @AuraEnabled
-    public static List<SectionWrapper> getTemplateSections(String templateId,Integer recslimit){
-        List<SectionWrapper> sectionwraplist=new List<SectionWrapper>();
-        try{
-            String query = 'SELECT Status__c'
-                          +' FROM Assessment_Template__c'
-                          +' WHERE Id=\'' + String.escapeSingleQuotes(templateId) + '\''
-                          +' WITH SECURITY_ENFORCED'
-                          +' LIMIT 1';
-            List<Assessment_Template__c> assessmentList= safe.doQuery(query);
-
-            Assessment_Template__c assessmenttemp = (assessmentList.size()==1) ? assessmentList[0] : null;
-
-            String sectionQuery =  'SELECT Id,Name,Parent_Section__c, Root_Section__c,' 
-                                +  'Assessment_Template__c, Assessment_Template_Version__c,'
-                                +  'No_of_Questions__c, Section_Sequence_Number__c, Historical_Id__c,Cloned_Record_Id__c'
-                                + ' FROM Section__c'
-                                + ' WHERE Assessment_Template__c = \'' + String.escapeSingleQuotes(templateId) + '\''
-                                + ' WITH SECURITY_ENFORCED'
-                                + ' ORDER BY Section_Sequence_Number__c ASC'
-                                + ' LIMIT '+recslimit;
-
-            List<Section__c> sectionList = safe.doQuery(query);
-            if(sectionList.isEmpty() == false){
-                for(Section__c sec:sectionList){
-                    SectionWrapper sectionwrap=new SectionWrapper();
-                    sectionwrap.name=sec.name;
-                    sectionwrap.noofqustns=(Integer)sec.No_of_Questions__c;
-                    sectionwrap.sequencenumber=sec.Section_Sequence_Number__c;
-                    sectionwrap.assessmenttemplateId=sec.Assessment_Template__c;
-                    sectionwrap.sectionId=sec.Id;
-                    if(assessmenttemp!=null ){
-                        if(assessmenttemp.Status__c.equalsIgnoreCase('New')){
-                            sectionwrap.assessmentstatus = true;
-                        }
-                    }
-                    sectionwraplist.add(sectionwrap);
-                }
-            }
-            return sectionwraplist;
-        }
-        catch(exception e){
-            string errorMsg = e.getMessage();
-            throw new AuraHandledException(ErrorMsg);
-        }
-    }
-
-    /**
-    * @description It is used to insert the section related to particular Assessment Template.
-    * @param assessmentTempalteId template record id.
-    * @param sectionName user input for the section name.
-    */
-    @AuraEnabled
-    public static void insertSection(Id assessmentTempalteId,String sectionName){
-        try{
-            if(string.isNotBlank(assessmentTempalteId)){
-                Section__c sec = new Section__c();
-                sec.Assessment_Template__c=AssessmentTempalteId;
-                sec.Name=SectionName;
-                List<Section__c> secList = new List<Section__c>();
-                if (sp == null){
-                    sp = Database.setSavepoint();
-                }
-                if(secList.isEmpty() == false){
-                    Database.SaveResult[] saveResult = safe.doInsert(secList);
-                    List<String> errorList = SecurityCheckController.safeClassExceptionHandlerInsert(saveResult);
-                    if(errorList.size()>0){
-                        Database.rollback(sp);
-                        throw new SecurityControllerException(String.join( errorList, ', ' ));
-                    }
-                }
-            }
-        }catch(exception e){
-            string errorMsg = e.getMessage();
-            throw new AuraHandledException(ErrorMsg);
-        }
-    }
-
-
-     /**
     * @description It is used to get the current date.
     * @return
     */
@@ -1348,58 +1145,28 @@ public with sharing class AssessmentController {
     /**
     * @description It is used to store the response from server
     */
-    
     public class ResultWrapper{
+       
+    /**
+    * @description It is a variable isSuccess
+    */
         @AuraEnabled public boolean isSuccess;
+    /**
+    * @description It is a variable message
+    */
         @AuraEnabled public string message;
+    /**
+    * @description It is a variable errorCode
+    */
         @AuraEnabled public string errorCode;
-        @AuraEnabled public Id recordId;
+    /**
+    * @description It is a variable recordId
+    */
+        @AuraEnabled public string recordId;
     }
     
     
-    /**
-    * @description It is used to store the questiondata
-    */
-    public class QuestionWrapper{
-        @AuraEnabled public Id questionId{get;set;}
-        @AuraEnabled public String question{get;set;}
-        @AuraEnabled public String name{get;set;}
-        @AuraEnabled public String sectionId{get;set;}
-        @AuraEnabled public String assessmentTemplateId{get;set;}
-        @AuraEnabled public String parentQuestion{get;set;}
-        @AuraEnabled public String type{get;set;}
-        @AuraEnabled public String sectionName{get;set;}
-        @AuraEnabled public String conditionalValue{get;set;}
-        @AuraEnabled public String assessmentTemplate{get;set;}
-        @AuraEnabled public String optionValueSet{get;set;}
-        @AuraEnabled public datetime lastModifiedDate{get;set;}
-        @AuraEnabled public String lastModifiedBy{get;set;}
-        @AuraEnabled public List<SObject> childquestionList {get;set;}
-        @AuraEnabled public List<childQuestionWrapper> childQuestions{get;set;}
-    }
-
-    /**
-    *@description  It is used to store the child questiondata
-    */
-    public class ChildQuestionWrapper{
-        @AuraEnabled public String question{get;set;}
-        @AuraEnabled public String name{get;set;}
-        @AuraEnabled public String parentQuestion{get;set;}
-        @AuraEnabled public String type{get;set;}
-    }
-
-    /**
-    * @description It is used to store the sectiondata.
-    */
-    public class SectionWrapper{
-        @AuraEnabled public Id sectionId{get;set;}
-        @AuraEnabled public Integer noofqustns{get;set;}
-        @AuraEnabled public Id assessmenttemplateId{get;set;}
-        @AuraEnabled public Decimal sequencenumber{get;set;}
-        @AuraEnabled public String name{get;set;}
-        @AuraEnabled public Boolean assessmentstatus{get;set;}
-    }  
-    
+   
     /**
     * @description It is used to throw the exception
     */
