@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
-    <fullName>Check_for_Protected_Component</fullName>
-    <active>true</active>
-    <errorConditionFormula>IF(IsProtected == false,true,false)</errorConditionFormula>
-    <errorDisplayField>IsProtected</errorDisplayField>
-    <errorMessage>Protected Component should be Checked</errorMessage>
-</ValidationRule>
