@@ -43,6 +43,7 @@ public with sharing class TestDataFactory{
                 insert records;
             }
         } catch(Exception e){
+            throw new AuraHandledException(e.getMessage());
         }
         return records;
     }

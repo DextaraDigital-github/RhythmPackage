@@ -49,10 +49,11 @@ public class SendAssessmentNotificationsBatch implements Database.Batchable<sObj
                 for(Database.SaveResult result : results) {
                     if(result.isSuccess()){
                         successRecordsIdSet.add(result.getId());
-                    } else {
-                        for(Database.Error error : result.getErrors()) {
-                        }
-                    }
+                    } 
+                    // else {
+                    //     for(Database.Error error : result.getErrors()) {
+                    //     }
+                    // }
                 }
             }
             if(successRecordsIdSet.isEmpty() == false){
@@ -78,12 +79,10 @@ public class SendAssessmentNotificationsBatch implements Database.Batchable<sObj
             }
             if(emailMessagesList.isEmpty() == false){
                 List<Messaging.SendEmailResult> emailResults = Messaging.sendEmail(emailMessagesList);
-                for(Messaging.SendEmailResult result :emailResults) {                                    
-                    if(!result.IsSuccess()) {                    
-                        List<Messaging.SendEmailError> errors = result.getErrors();
-                        if (errors.size() > 0){
-                            Messaging.SendEmailError err = errors[0];
-                        }                	
+                for(Messaging.SendEmailResult result :emailResults) {   
+                    List<Messaging.SendEmailError> errors = result.getErrors();                                 
+                    if(!result.IsSuccess() && errors.size() > 0){
+                        Messaging.SendEmailError err = errors[0];
                     }
                 }
             }
@@ -97,7 +96,7 @@ public class SendAssessmentNotificationsBatch implements Database.Batchable<sObj
             errorList.add(errorRec);
         }
         if(errorList.isEmpty() == false){
-            Database.SaveResult[] results = Database.insert(errorList, false);
+            Database.insert(errorList, false);
         }
     }
     /**
@@ -106,5 +105,6 @@ public class SendAssessmentNotificationsBatch implements Database.Batchable<sObj
     */
     public void finish(Database.BatchableContext bc){
         // execute any post-processing operations
+        return;
     }
 }

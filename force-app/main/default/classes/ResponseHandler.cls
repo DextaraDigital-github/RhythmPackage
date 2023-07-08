@@ -15,7 +15,7 @@ public with sharing class ResponseHandler implements ITriggerHandler{
     * @param newList This is the new list of records.  
     */
     public void beforeInsert(List<sObject> newList) {
-       
+       return;
     }
 
     /**
@@ -35,7 +35,7 @@ public with sharing class ResponseHandler implements ITriggerHandler{
       @param oldMap This is the old map of records.
     */
     public void beforeUpdate(List<sObject> newList, Map<Id, sObject> newMap, List<sObject> oldList, Map<Id, sObject> oldMap) {
-        
+        return;
     }
     
     /**
@@ -55,7 +55,7 @@ public with sharing class ResponseHandler implements ITriggerHandler{
       @param oldMap This is the old map of records.
     */
     public void beforeDelete(List<sObject> oldList , Map<Id, sObject> oldMap) {
-        
+        return;
     }
     
     /**
@@ -64,7 +64,7 @@ public with sharing class ResponseHandler implements ITriggerHandler{
       @param oldMap This is the old map of records.
     */
     public void afterDelete(List<sObject> oldList , Map<Id, sObject> oldMap) {
-        
+        return;
     }
     
     /**
@@ -73,7 +73,7 @@ public with sharing class ResponseHandler implements ITriggerHandler{
       @param newMap This is the new map of records.
     */
     public void afterUnDelete(List<sObject> newList, Map<Id, sObject> newMap) {
-        
+        return;
     }
     
     /**
@@ -82,6 +82,7 @@ public with sharing class ResponseHandler implements ITriggerHandler{
     */
     public void getResponseCount(List<sObject> newList){
         Set<Id> accAssessmentSet = new Set<Id>();
+        List<String> errorList = new  List<String>();
         for(Response__c res : (List<Response__c>)newList){
             if(string.isNotBlank(res.AccountAssessmentRelation__c)){
                 accAssessmentSet.add(res.AccountAssessmentRelation__c);
@@ -97,25 +98,22 @@ public with sharing class ResponseHandler implements ITriggerHandler{
             if (sp == null){
                 sp = Database.setSavepoint();
             }
-            if(accountAssessmentList.isEmpty() == false){
-                for(AccountAssessmentRelation__c accAssRel :accountAssessmentList){
-                    accAssRel.Number_of_Responses__c = accAssRel.Supplier_Response__r.size();
-                    Integer flaggedResponse = 0;
-                        for(Response__c res:accAssRel.Supplier_Response__r){
-                            if(res.Flag__c){
-                                flaggedResponse++;
-                            }
+            for(AccountAssessmentRelation__c accAssRel :accountAssessmentList){
+                accAssRel.Number_of_Responses__c = accAssRel.Supplier_Response__r.size();
+                Integer flaggedResponse = 0;
+                    for(Response__c res:accAssRel.Supplier_Response__r){
+                        if(res.Flag__c){
+                            flaggedResponse++;
                         }
-                    accAssRel.Follow_Up_Requests__c = flaggedResponse;
-                }
-                
-                Database.SaveResult[] saveResult = safe.doUpdate(accountAssessmentList);
-                List<String> errorList = SecurityCheckController.safeClassExceptionHandlerInsert(saveResult);
-                if(errorList.size()>0){
-                    Database.rollback(sp);
-                    throw new SecurityControllerException(String.join( errorList, ', ' ));
-                }
+                    }
+                accAssRel.Follow_Up_Requests__c = flaggedResponse;
             }
+            Database.SaveResult[] saveResult = safe.doUpdate(accountAssessmentList);
+            errorList = SecurityCheckController.safeClassExceptionHandlerInsert(saveResult);
+        }
+        if(errorList.size()>0){
+            Database.rollback(sp);
+            throw new SecurityControllerException(String.join( errorList, ', ' ));
         }
     }
 

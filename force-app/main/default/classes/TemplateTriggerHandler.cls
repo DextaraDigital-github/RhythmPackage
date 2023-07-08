@@ -13,7 +13,7 @@ public with sharing class TemplateTriggerHandler implements ITriggerHandler{
     * @param newList This is the new list of records.  
     */
     public void beforeInsert(List<sObject> newList) {
-        
+        return;
     }
     
     /**
@@ -22,7 +22,7 @@ public with sharing class TemplateTriggerHandler implements ITriggerHandler{
     * @param newMap This is the new map of records.
     */
     public void afterInsert(List<sObject> newList , Map<Id, sObject> newMap) {
-        
+        return;
     }
     
      /**
@@ -60,7 +60,7 @@ public with sharing class TemplateTriggerHandler implements ITriggerHandler{
     */
 
     public void afterUpdate(List<sObject> newList, Map<Id, sObject> newMap,  List<sObject> oldList, Map<Id, sObject> oldMap) {
-        
+        return;
     }
 
     /**
@@ -85,7 +85,7 @@ public with sharing class TemplateTriggerHandler implements ITriggerHandler{
     * @param oldMap This is the old map of records.
     */
     public void afterDelete(List<sObject> oldList , Map<Id, sObject> oldMap) {
-        
+        return;
     }
     
      /**
@@ -94,7 +94,7 @@ public with sharing class TemplateTriggerHandler implements ITriggerHandler{
     * @param newMap This is the new map of records.
     */
     public void afterUnDelete(List<sObject> newList, Map<Id, sObject> newMap) {
-        
+       return; 
     }
     /**
     * @description

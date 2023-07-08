@@ -16,7 +16,7 @@ public with sharing class SendAssessmentNotificationsBatchTest {
         Map<String, Object> accAttributes = new Map<String, Object>{'RecordTypeId'=>clinicRecordTypeId,'Name'=>'Supplier','Rhythm__Email__c'=>'test@gmail.com'};
         List<Account> accts = TestDataFactory.createAccounts(1,true,accAttributes);
         Map<String,Object> contactAttributes  = new Map<String,Object>{'AccountId'=>accts[0].Id,'Email'=>'test123@gmail.com','LastName'=>'TestLName'};
-        List<Contact> contacts = TestDataFactory.createContacts(1,true,contactAttributes);
+        TestDataFactory.createContacts(1,true,contactAttributes);
         Map<String, Object> assementTemplateattributes = new Map<String, Object>{'Name'=>'2023 Assessment template','Rhythm__Name__c'=>'2023 Assessment template'};
         List<Assessment_Template__c> templist=TestDataFactory.createAssessmentTemp(1,true,assementTemplateattributes);
         Map<String, Object> sectionAttributes = new Map<String, Object>{'Rhythm__Assessment_Template__c'=>templist[0].Id,'Name'=>'Section1'};
@@ -24,19 +24,19 @@ public with sharing class SendAssessmentNotificationsBatchTest {
         Map<String, Object> questionAttributes = new Map<String, Object>{'Rhythm__Assessment_Template__c'=>templist[0].Id,
         'Rhythm__Question__c'=>'What is the feedback for service?','Rhythm__Question_Type__c'=>'Text','Rhythm__Required__c'=>True,
         'Rhythm__Section__c'=>seclist[0].Id};
-        List<Question__c> qstnlist=TestDataFactory.createQuestion(1,true,questionAttributes);
+        TestDataFactory.createQuestion(1,true,questionAttributes);
         Map<String, Object> assessmentattributes = new Map<String, Object>{'Rhythm__Account__c'=>accts[0].Id,'Template__c'=>templist[0].Id,
         'Name'=>'Assessment 2023','Rhythm__Status__c'=>'New','Rhythm__Number_of_Questions__c'=>10,'Rhythm__Start_Date__c'=>Date.Today(),'Rhythm__End_Date__c'=>Date.Today()+2,'Rhythm__Expiry_Reminder_Before_in_Days__c'=>2};
         List<Assessment__c> asslist=TestDataFactory.createAssessment(1,true,assessmentattributes);
 
         Map<String,Object> supplierData = new Map<String,Object>{'Rhythm__Account__c'=>accts[0].Id,'Rhythm__Assessment__c'=>asslist[0].Id,
         'Rhythm__Status__c'=>'Active'};
-        List<Assessment_Supplier__c> supplierList = TestDataFactory.createSuppliers(1,true,supplierData);
+        TestDataFactory.createSuppliers(1,true,supplierData);
         
-       Map<String,Object> accountassesments = new Map<String,Object>{'Rhythm__Account__c'=>accts[0].Id,'Rhythm__Assessment__c'=>asslist[0].Id,
+        Map<String,Object> accountassesments = new Map<String,Object>{'Rhythm__Account__c'=>accts[0].Id,'Rhythm__Assessment__c'=>asslist[0].Id,
         'Rhythm__Status__c'=>'New','Rhythm__End_Date__c'=>Date.newInstance(2030, 4, 26),'Rhythm__Number_of_Responses__c'=>10,
         'Rhythm__Start_Date__c'=>Date.newInstance(2030, 3, 26)};
-        List<AccountAssessmentRelation__c> accountasslist=TestDataFactory.createAccountAssessment(1,true,accountassesments);
+        TestDataFactory.createAccountAssessment(1,true,accountassesments);
        
     }
 
@@ -48,7 +48,7 @@ public with sharing class SendAssessmentNotificationsBatchTest {
         Database.executeBatch(b);
         Test.stopTest();
         List<AccountAssessmentRelation__c> assList= [SELECT Id from AccountAssessmentRelation__c];
-        system.debug('assList----->'+assList);
+        
         System.assert(assList.size()>0,true);
     }
 }

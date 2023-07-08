@@ -52,17 +52,12 @@ public with sharing class AssessmentTemplateController {
                 String query = 'SELECT Status__c'
                              + ' FROM Assessment_Template__c'
                              + ' WHERE Id= \'' + String.escapeSingleQuotes(templateId) + '\''
-                             + ' WITH SECURITY_ENFORCED'
-                             + ' LIMIT 1';
+                             + ' WITH SECURITY_ENFORCED';
 
                 List<Assessment_Template__c> assessmentList= safe.doQuery(query);
                 Assessment_Template__c assessmentTemp = (AssessmentList.size()==1)?AssessmentList[0]:null;
-                if(assessmentTemp  != null ) {
-                    if(assessmenttemp.Status__c.equalsIgnoreCase('New')){
-                        hasStatusNew = true;
-                    }else{
-                        hasStatusNew = false;
-                    }   
+                if(assessmentTemp  != null && assessmenttemp.Status__c.equalsIgnoreCase('New')){
+                    hasStatusNew = true;
                 }
             }
             return hasStatusNew;
@@ -255,17 +250,18 @@ public with sharing class AssessmentTemplateController {
         try {
             if(recIdList.size()>0) {
                 Database.DeleteResult[] drchildList;
+                List<Question__c> questionList = new List<Question__c>();
                 if(delchildobjrecs==true) {
                     string queQuery = 'SELECT Id'
                                     +' FROM Question__c'
                                     +' WHERE section__c IN:recIdList';
                     Map<String, Object> bindVariables = new Map<String, Object>{'recIdList' => recIdList};
-                    List<Question__c> questionList = safe.doQueryWithBinds(queQuery,bindVariables);
-                    if(questionList.isEmpty() == false) {
-                        drchildList=safe.doDelete(questionList);
-                    }
+                    questionList = safe.doQueryWithBinds(queQuery,bindVariables);
                 }
-                Database.DeleteResult[] drList=Database.delete(recIdList,true);
+                if(questionList.isEmpty() == false) {
+                    drchildList=safe.doDelete(questionList);
+                }
+                Database.delete(recIdList,true);
                 for(Database.DeleteResult dr:drchildList) {
                     if(!dr.isSuccess()) {
                         for(Database.Error de:dr.getErrors()) {
@@ -276,6 +272,7 @@ public with sharing class AssessmentTemplateController {
             }
         }
         catch(Exception e) {
+            status = e.getMessage();
         }
         return status;
     }

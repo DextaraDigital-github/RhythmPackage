@@ -16,6 +16,7 @@ public with sharing class AccountAssessmentRelationHandler implements ITriggerHa
     * @param newList This is the list of AccountAssessments.  
     */
 	public void beforeInsert(List<sObject> newList) {
+    return;
     }
 
      /**
@@ -24,6 +25,7 @@ public with sharing class AccountAssessmentRelationHandler implements ITriggerHa
       @param newMap This is the map of AccountAssessments.
     */
     public void afterInsert(List<sObject> newList , Map<Id, sObject> newMap) {
+      return;
     }
 
     /**
@@ -34,6 +36,7 @@ public with sharing class AccountAssessmentRelationHandler implements ITriggerHa
       @param oldMap This is the old map of AccountAssessments.
     */
     public void beforeUpdate(List<sObject> newList, Map<Id, sObject> newMap, List<sObject> oldList, Map<Id, sObject> oldMap) {
+      return;
     }
 
     /**
@@ -63,6 +66,7 @@ public with sharing class AccountAssessmentRelationHandler implements ITriggerHa
       @param oldMap This is the old map of AccountAssessments.
     */
     public void beforeDelete(List<sObject> oldList , Map<Id, sObject> oldMap) {
+      return;
     }
 
      /**
@@ -71,6 +75,7 @@ public with sharing class AccountAssessmentRelationHandler implements ITriggerHa
       @param oldMap This is the old map of AccountAssessments.
     */
     public void afterDelete(List<sObject> oldList , Map<Id, sObject> oldMap) {
+      return;
     }
 
      /**
@@ -79,6 +84,7 @@ public with sharing class AccountAssessmentRelationHandler implements ITriggerHa
       @param newMap This is the new map of AccountAssessments.
     */
     public void afterUnDelete(List<sObject> newList, Map<Id, sObject> newMap) {
+      return;
     }
 
 
@@ -86,7 +92,6 @@ public with sharing class AccountAssessmentRelationHandler implements ITriggerHa
     * @description To execute after update logic
     * @param newList This is the list of AccountAssessments.
       @param newMap This is the map of AccountAssessments.
-      @param oldList This is the old list of AccountAssessments.
       @param oldMap This is the old map of AccountAssessments.
     */
 

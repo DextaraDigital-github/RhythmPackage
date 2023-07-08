@@ -23,7 +23,7 @@ public with sharing class SectionTriggerHandler implements ITriggerHandler {
       @param newMap This is the new map of records.
     */
     public void afterInsert(List<sObject> newList , Map<Id, sObject> newMap) {
-        
+        return;
     }
     /**
     * @description To execute before update logic
@@ -56,7 +56,7 @@ public with sharing class SectionTriggerHandler implements ITriggerHandler {
     */
     
     public void afterUpdate(List<sObject> newList, Map<Id, sObject> newMap,  List<sObject> oldList, Map<Id, sObject> oldMap) {
-        
+        return;
     }
     /**
     * @description To execute before delete logic
@@ -73,7 +73,7 @@ public with sharing class SectionTriggerHandler implements ITriggerHandler {
       @param oldMap This is the old map of records.
     */
     public void afterDelete(List<sObject> oldList , Map<Id, sObject> oldMap) {
-        
+        return;
     }
      /**
     * @description To execute after undelete logic
@@ -81,6 +81,7 @@ public with sharing class SectionTriggerHandler implements ITriggerHandler {
       @param newMap This is the new map of records.
     */
     public void afterUnDelete(List<sObject> newList, Map<Id, sObject> newMap) {
+        return;
     }
     
     /**
@@ -101,7 +102,7 @@ public with sharing class SectionTriggerHandler implements ITriggerHandler {
                                  +' WHERE Id IN:templateIds';
                 Map<String, Object> bindVariables = new Map<String, Object>{'templateIds' => templateIds};
                 List<Assessment_template__c> templateList = safe.doQueryWithBinds(tempQuery,bindVariables);
-                if(templateList.isEmpty() == false){
+                //if(templateList.isEmpty() == false){
                     for(Assessment_template__c template:templateList) {
                         templateStatusMap.put(template.Id,template.Status__c);
                     }
@@ -110,11 +111,11 @@ public with sharing class SectionTriggerHandler implements ITriggerHandler {
                             sec.addError('You can not perform any operations on this record because of Template Status');
                         } 
                     }
-                }
+                //}
             }
         }
         catch(exception e) {
-            
+            throw new AuraHandledException(e.getMessage());
         }
     }
      /**
@@ -128,7 +129,7 @@ public with sharing class SectionTriggerHandler implements ITriggerHandler {
             }
         }
         catch(exception e) {
-            
+            throw new AuraHandledException(e.getMessage());
         }
     }
      /**
@@ -151,22 +152,21 @@ public with sharing class SectionTriggerHandler implements ITriggerHandler {
                 Map<String, Object> bindVariables = new Map<String, Object>{'templateIds' => templateIds};
                 List<Section__c> sectionList = safe.doQueryWithBinds(tempQuery,bindVariables);
                 integer sequenceNumber = 0;
-                if(sectionList.isEmpty() == false){
+                //if(sectionList.isEmpty() == false){
                     for(Section__c section: sectionList) {
-                        if(section.Section_Sequence_Number__c != null) {
-                            if(sequenceNumber < section.Section_Sequence_Number__c) {
+                        if(section.Section_Sequence_Number__c != null && 
+                            sequenceNumber < section.Section_Sequence_Number__c) {
                                 sequenceNumber = (Integer)section.Section_Sequence_Number__c;
-                            }
                         }
                     }
                     for(Section__c sec: secLst) {
                         sequenceNumber = sequenceNumber+1;
                         sec.Section_Sequence_Number__c = sequenceNumber;
                     }
-                }
+                //}
             }
         }catch(exception e) {
-            
+            throw new AuraHandledException(e.getMessage());
         }
     }
      /**
@@ -176,6 +176,7 @@ public with sharing class SectionTriggerHandler implements ITriggerHandler {
     public void recordSequenceNumber(List<Section__c> secLst) {
         Set<Id> templateIds = new Set<Id>();
         List<Section__c> updateSectionList=new List<Section__c>();
+        List<String> errorList = new List<String>();
         try {
             for(Section__c sec: secLst) {
                 if(string.isNotBlank(sec.Assessment_Template__c)){
@@ -191,7 +192,7 @@ public with sharing class SectionTriggerHandler implements ITriggerHandler {
                 Map<String, Object> bindVariables = new Map<String, Object>{'templateIds' => templateIds,'secLst' => secLst};
                 List<Section__c> sectionList = safe.doQueryWithBinds(secQuey,bindVariables);
                 Integer sequenceNumber = 0;
-                if(sectionList.isEmpty() == false){
+                //if(sectionList.isEmpty() == false){
                     for(Section__c section: sectionList) {
                         sequenceNumber = sequenceNumber+1;
                         section.Section_Sequence_Number__c = sequenceNumber;
@@ -203,16 +204,16 @@ public with sharing class SectionTriggerHandler implements ITriggerHandler {
                     }
                     if(updateSectionList.size() > 0) {
                         Database.SaveResult[] saveResult = safe.doUpdate(updateSectionList);
-                        List<String> errorList = SecurityCheckController.safeClassExceptionHandlerInsert(saveResult);
-                        if(errorList.size()>0){
-                            Database.rollback(sp);
-                            throw new SecurityControllerException(String.join( errorList, ', ' ));
-                        }
+                        errorList = SecurityCheckController.safeClassExceptionHandlerInsert(saveResult);
                     }
-                }
+                    if(errorList.size()>0){
+                        Database.rollback(sp);
+                        throw new SecurityControllerException(String.join( errorList, ', ' ));
+                    }
+                //}
             }
         }catch(exception e) {
-            
+            throw new AuraHandledException(e.getMessage());
         }
     }
 /**

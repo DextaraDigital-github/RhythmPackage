@@ -16,21 +16,17 @@ public with sharing class TriggerFrameworkServiceController {
     */
     public boolean checkEntryCriteria(sObject record, sObject oldRecord, string objectName){
         boolean isCriteriaMet = false;
-        string triggerObjId = Trigger_Configuration__mdt.getInstance(objectName).Id;
-        List<string> fieldsList = getUpdatableFields(triggerObjId);
-        if(fieldsList.isEmpty() == false){ 
-            for(string fName:fieldsList){
-                if(objectName.equalsIgnoreCase('Assessment_Template_c') && fName.equalsIgnoreCase('Status__c')){
-                    if(string.valueOf(record.get(fName)).equalsIgnoreCase('New') && string.valueOf(oldRecord.get(fName)).equalsIgnoreCase('Active')){
-                        isCriteriaMet = true;
-                    }else if(string.valueOf(oldRecord.get(fName)).equalsIgnoreCase('Inactive')){
-                        isCriteriaMet = true;
-                    }
-                }else{
-                    if(record.get(fName) != oldRecord.get(fName)){
-                        isCriteriaMet = true;
-                    }
-                }
+        String triggerObjId = Trigger_Configuration__mdt.getInstance(objectName).Id;
+        List<String> fieldsList = getUpdatableFields(triggerObjId);
+        for(String fName:fieldsList){
+            Boolean isAssessmentTemplate = objectName.equalsIgnoreCase('Assessment_Template_c') && fName.equalsIgnoreCase('Status__c');
+            if(isAssessmentTemplate && String.valueOf(record.get(fName)).equalsIgnoreCase('New') 
+                && String.valueOf(oldRecord.get(fName)).equalsIgnoreCase('Active')){
+                    isCriteriaMet = true;
+            }else if(isAssessmentTemplate && String.valueOf(oldRecord.get(fName)).equalsIgnoreCase('Inactive')){
+                    isCriteriaMet = true;
+            }else if(record.get(fName) != oldRecord.get(fName)){
+                    isCriteriaMet = true;
             }
         }
         return isCriteriaMet;

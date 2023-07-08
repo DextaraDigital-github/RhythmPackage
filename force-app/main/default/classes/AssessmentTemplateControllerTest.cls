@@ -23,10 +23,10 @@ public class AssessmentTemplateControllerTest {
         Map<String, Object> questionAttributes = new Map<String, Object>{'Rhythm__Assessment_Template__c'=>templist[0].Id,
             'Rhythm__Question__c'=>'What is the feedback for service?','Rhythm__Question_Type__c'=>'Text','Rhythm__Required__c'=>True,
             'Rhythm__Section__c'=>seclist[0].Id};
-                List<Question__c> qstnlist=TestDataFactory.createQuestion(1,true,questionAttributes);
+        TestDataFactory.createQuestion(1,true,questionAttributes);
         Map<String, Object> assessmentattributes = new Map<String, Object>{'Rhythm__Account__c'=>accts[0].Id,'Template__c'=>templist[0].Id,
             'Name'=>'Assessment 2023','Rhythm__Status__c'=>'New','Rhythm__Number_of_Questions__c'=>10};
-                List<Assessment__c> asslist=TestDataFactory.createAssessment(1,true,assessmentattributes);
+        TestDataFactory.createAssessment(1,true,assessmentattributes);
         
         
         
@@ -82,7 +82,7 @@ public class AssessmentTemplateControllerTest {
     public static void exceptioncoverage(){
        Test.startTest();
         try {
-            List<Section__c> sections = AssessmentTemplateController.getSections(null, null);
+            AssessmentTemplateController.getSections(null, null);
             
             System.assert(false, 'An exception should have been thrown');
         } catch (AuraHandledException e) {
@@ -90,14 +90,14 @@ public class AssessmentTemplateControllerTest {
            System.assert(e.getMessage()!=null,'Script-thrown exception');
         }
        try {
-            List<Section__c> sections = AssessmentTemplateController.getTemplateSections('invalidTemplateId');
+            AssessmentTemplateController.getTemplateSections('invalidTemplateId');
            
             System.assert(false, 'An exception should have been thrown');
         } catch (AuraHandledException e) {
             System.assert(e.getMessage()!=null,'invalid ID field: invalidTemplateId');
         }
         try {
-            List<Question__c> questions = AssessmentTemplateController.getQuestionsLists('invalidTemplateId');
+            AssessmentTemplateController.getQuestionsLists('invalidTemplateId');
             System.assert(false, 'An exception should have been thrown');
         } catch (AuraHandledException e) {
             System.assert(e.getMessage()!=null,'Script-thrown exception');

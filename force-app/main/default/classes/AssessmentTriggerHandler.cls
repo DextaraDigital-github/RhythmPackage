@@ -24,7 +24,7 @@ public with sharing class AssessmentTriggerHandler implements ITriggerHandler{
       @param newMap This is the new map of records.
     */
     public void afterInsert(List<sObject> newList , Map<Id, sObject> newMap) {
-        
+      return;
     }
     
     /**
@@ -54,7 +54,7 @@ public with sharing class AssessmentTriggerHandler implements ITriggerHandler{
       @param oldMap This is the old map of records.
     */
     public void afterUpdate(List<sObject> newList, Map<Id, sObject> newMap,  List<sObject> oldList, Map<Id, sObject> oldMap) {
-        
+      return;
     }
     
     /**
@@ -63,7 +63,7 @@ public with sharing class AssessmentTriggerHandler implements ITriggerHandler{
       @param oldMap This is the old map of records.
     */
     public void beforeDelete(List<sObject> oldList , Map<Id, sObject> oldMap) {
-        
+      return;
     }
      
     /**
@@ -72,7 +72,7 @@ public with sharing class AssessmentTriggerHandler implements ITriggerHandler{
       @param oldMap This is the old map of records.
     */
     public void afterDelete(List<sObject> oldList , Map<Id, sObject> oldMap) {
-       
+      return;
     }
     
     /**
@@ -81,7 +81,7 @@ public with sharing class AssessmentTriggerHandler implements ITriggerHandler{
       @param newMap This is the new map of records.
     */
     public void afterUnDelete(List<sObject> newList, Map<Id, sObject> newMap) {
-        
+      return;
     }
 
     /**
@@ -100,7 +100,7 @@ public with sharing class AssessmentTriggerHandler implements ITriggerHandler{
             }
         }
         set<Id> templateIds = templateMap.keySet();
-        Map<String, Object> bindVariables = new Map<String, Object>{'templateIds' => templateIds};
+        //Map<String, Object> bindVariables = new Map<String, Object>{'templateIds' => templateIds};
         string query = 'SELECT COUNT(id) quesCount, Assessment_Template__c'
                      +' FROM Question__c'
                      +' WITH SECURITY_ENFORCED'

@@ -9,7 +9,7 @@ public class AssessmentExpiryNotificationScheduleTest {
 		String jobId =system.schedule('TestSchduleExp', sch, expSche);
 		Test.stopTest();
         CronTrigger ct = [SELECT Id,TimesTriggered,CronExpression, CronJobDetail.Name FROM CronTrigger WHERE Id = :jobId];
-        System.assertEquals(sch, ct.CronExpression);
-		System.assertEquals(0, ct.TimesTriggered);
+        System.assertEquals(sch, ct.CronExpression,'scheduled cron job');
+		System.assertEquals(0, ct.TimesTriggered,'triggered');
 	}
 }

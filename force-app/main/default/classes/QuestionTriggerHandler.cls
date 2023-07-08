@@ -95,7 +95,7 @@ public with sharing class QuestionTriggerHandler implements ITriggerHandler{
       @param newMap This is the new map of records.
     */
     public void afterUnDelete(List<sObject> newList, Map<Id, sObject> newMap) {
-
+        return;
     }
     
     /**
@@ -108,7 +108,8 @@ public with sharing class QuestionTriggerHandler implements ITriggerHandler{
         try {
             Set<Id> secIds=new Set<Id>();
             List<Section__c> updateSectionslst = new List<Section__c>();
-            map<Id,Integer> sectionwithQuestionscountMap=new map<Id,Integer>();
+            Map<Id,Integer> sectionwithQuestionscountMap=new Map<Id,Integer>();
+            List<String> errorList =  new List<String>();
             if(qustlst.isEmpty() == false) {
                 for(Question__c qustn:qustlst){
                     secIds.add(qustn.section__c);
@@ -140,15 +141,15 @@ public with sharing class QuestionTriggerHandler implements ITriggerHandler{
                 }
                 if(updateSectionslst.isEmpty() == false) {
                     Database.SaveResult[] saveResult = safe.doUpdate(updateSectionslst);
-                    List<String> errorList = SecurityCheckController.safeClassExceptionHandlerInsert(saveResult);
-                    if(errorList.size()>0){
-                        Database.rollback(sp);
-                        throw new SecurityControllerException(String.join( errorList, ', ' ));
-                    }
+                    errorList = SecurityCheckController.safeClassExceptionHandlerInsert(saveResult);
+                }
+                if(errorList.size()>0){
+                    Database.rollback(sp);
+                    throw new SecurityControllerException(String.join( errorList, ', ' ));
                 }
             }
         }catch(exception e){
-            
+            throw new AuraHandledException(e.getMessage());
         }
     }
     /**
@@ -169,7 +170,7 @@ public with sharing class QuestionTriggerHandler implements ITriggerHandler{
                 
                 Map<String, Object> bindVariables = new Map<String, Object>{'templateIds' => templateIds};
                 List<Assessment_template__c> templateList = safe.doQueryWithBinds(tempQuery,bindVariables);
-                if(templateList.isEmpty() == false){
+                //if(templateList.isEmpty() == false){
                     for(Assessment_template__c template:templateList) {
                         templateStatusMap.put(template.Id,template.Status__c);
                     }
@@ -178,11 +179,11 @@ public with sharing class QuestionTriggerHandler implements ITriggerHandler{
                             qus.addError('You can not perform any operations on this record because of Template Status');
                         } 
                     }
-                }
+                //}
             }
         }
         catch(exception e){
-            
+            throw new AuraHandledException(e.getMessage());
         }
     }
     /**
@@ -195,7 +196,7 @@ public with sharing class QuestionTriggerHandler implements ITriggerHandler{
                 question.addError('You cannot change Assessment Template');
             }
         }catch(exception e) {
-            
+            throw new AuraHandledException(e.getMessage());
         }
     }
     /**
@@ -215,24 +216,23 @@ public with sharing class QuestionTriggerHandler implements ITriggerHandler{
                                 + ' ORDER BY Question_Sequence_Number__c ASC';
                 Map<String, Object> bindVariables = new Map<String, Object>{'templateIds' => templateIds};
                 List<Question__c> questionList = safe.doQueryWithBinds(queQuery,bindVariables);
-                if(questionList.isEmpty() == false){
+                //if(questionList.isEmpty() == false){
                     integer sequenceNumber = 0;
                     for(Question__c question: questionList) {
-                        if(question.Question_Sequence_Number__c != null) {
-                            if(sequenceNumber < question.Question_Sequence_Number__c) {
-                                sequenceNumber = (Integer)question.Question_Sequence_Number__c;
-                            }
+                        if(question.Question_Sequence_Number__c != null && 
+                            sequenceNumber < question.Question_Sequence_Number__c) {
+                            sequenceNumber = (Integer)question.Question_Sequence_Number__c;                            
                         }
                     }
                     for(Question__c ques: qusLst) {
                         sequenceNumber = sequenceNumber+1;
                         ques.Question_Sequence_Number__c = sequenceNumber;
                     }
-                }
+                //}
             }
         }
         catch(exception e) {
-            
+            throw new AuraHandledException(e.getMessage());
         }
     }
     /**
@@ -242,6 +242,7 @@ public with sharing class QuestionTriggerHandler implements ITriggerHandler{
     public void recordSequenceNumber(List<Question__c> quesLst) {
         Set<Id> templateIds = new Set<Id>();
         List<Question__c> updateQuestionList=new List<Question__c>();
+        List<String> errorList = new List<String>();
         try {
             for(Question__c question: quesLst) {
                 templateIds.add(question.Assessment_Template__c);
@@ -254,7 +255,7 @@ public with sharing class QuestionTriggerHandler implements ITriggerHandler{
                                 + ' ORDER BY Question_Sequence_Number__c ASC';
                 Map<String, Object> bindVariables = new Map<String, Object>{'templateIds' => templateIds,'quesLst' => quesLst};                               
                 List<Question__c> questionList = safe.doQueryWithBinds(queQuery,bindVariables);
-                if(questionList.isEmpty() == false){
+                //if(questionList.isEmpty() == false){
                     integer sequenceNumber = 0;
                     for(Question__c question: questionList) {
                         sequenceNumber = sequenceNumber+1;
@@ -266,17 +267,17 @@ public with sharing class QuestionTriggerHandler implements ITriggerHandler{
                     }
                     if(updateQuestionList.isEmpty() == false) {
                         Database.SaveResult[] saveResult = safe.doUpdate(updateQuestionList);
-                        List<String> errorList = SecurityCheckController.safeClassExceptionHandlerInsert(saveResult);
-                        if(errorList.size()>0){
-                            Database.rollback(sp);
-                            throw new SecurityControllerException(String.join( errorList, ', ' ));
-                        }
+                        errorList = SecurityCheckController.safeClassExceptionHandlerInsert(saveResult);
                     }
-                }
+                    if(errorList.size()>0){
+                        Database.rollback(sp);
+                        throw new SecurityControllerException(String.join( errorList, ', ' ));
+                    }
+                //}
             }
         }
         catch(exception e) {
-            
+            throw new AuraHandledException(e.getMessage());
         }
     }
 /**

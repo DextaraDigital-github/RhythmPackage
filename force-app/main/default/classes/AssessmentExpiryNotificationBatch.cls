@@ -59,7 +59,7 @@ public class AssessmentExpiryNotificationBatch implements Database.Batchable<sOb
             errorList.add(errorRec);
         }
         if(errorList.isEmpty() == false){
-            Database.SaveResult[] results = Database.insert(errorList, false);
+            Database.insert(errorList, false);
         }
     }
 
@@ -68,5 +68,6 @@ public class AssessmentExpiryNotificationBatch implements Database.Batchable<sOb
     * @param bc It is an instance of BatchableContext.
     */
     public void finish(Database.BatchableContext bc){
+        return;
     }
 }

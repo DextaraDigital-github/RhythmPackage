@@ -83,6 +83,7 @@ public with sharing class AssessmentController {
     * @description Insert or update the Response__c of a supplier(Account) for an Assessment__c.
     * @param suppResponseList Response__c wrapper.
     * @param paramMap
+    * @return 
     */
     @AuraEnabled
     public static List<SObject> createSupplierResponse(List<SObject> suppResponseList,String paramMap){
@@ -517,9 +518,10 @@ public with sharing class AssessmentController {
     /**
     * @description Its used to save the communication log of a quesiton in Response__c.
     * @param chatWrapperstring wrapper with question id, assessment id and chatter data.
+    * @return
     */
     @AuraEnabled
-    public static void saveChatterResponse(String chatWrapperstring)// responseList,string assessmentId,string questionId)
+    public static Boolean saveChatterResponse(String chatWrapperstring)// responseList,string assessmentId,string questionId)
     {
         try{
             Map<String,Object> chatMap = (Map<String,Object>)JSON.deserializeUntyped(chatWrapperstring);
@@ -562,11 +564,13 @@ public with sharing class AssessmentController {
             String errorMsg = e.getMessage();
             throw new AuraHandledException(errorMsg);
         }
+        return true;
     }
     
      /**
     * @description Its used to capture the error information of any apex/js call.
     * @param errorLogWrapper wrapper with error details to insert the error log rcord.
+    * @return 
     */
     @AuraEnabled
     public static ErrorTransactionLog__c errorLogRecord(String errorLogWrapper)
@@ -638,7 +642,7 @@ public with sharing class AssessmentController {
                             +' FROM ContentVersion'
                             +' WHERE Id=\'' + String.escapeSingleQuotes(cvId) + '\''
                             +' WITH SECURITY_ENFORCED';
-            List<ContentVersion> cversionList= safe.doQuery(query);
+            safe.doQuery(query);
             String ftype = ((String)filemap.get('name')).substringAfter('.');
 
             if(String.isNotBlank(quesId) && String.isNotBlank(accAssmtId)){
@@ -650,16 +654,14 @@ public with sharing class AssessmentController {
                                         +' WITH SECURITY_ENFORCED';
 
                 srList = safe.doQuery(questionQuery);
+                List<String> errorList = new List<String>();
                 if(srList.isEmpty() == false){
                     String fileUrl = baseUrl+'/sfc/servlet.shepherd/document/download/'+cvList[0].ContentDocumentId+'?operationContext=S1';
                     String fileJson = '{"name":"'+(String)filemap.get('name')+'","url":"'+fileUrl+'","type":"'+ftype+'"}';
                     srList[0].Files__c = (srList[0].Files__c == null || srList[0].Files__c.trim().length() == 0 || srList[0].Files__c=='[]') ? '['+fileJson+']' : '['+fileJson+','+srList[0].Files__c.substring(1,srList[0].Files__c.length());
                     Database.SaveResult[] saveResult = safe.doUpdate(srList);
-                    List<String> errorList = SecurityCheckController.safeClassExceptionHandlerInsert(saveResult);
-                    if(errorList.size()>0){
-                        Database.rollback(sp);
-                        throw new SecurityControllerException(String.join( errorList, ', ' ));
-                    }
+                    errorList = SecurityCheckController.safeClassExceptionHandlerInsert(saveResult);
+                    
                 }
                 else{
                     Response__c res=new Response__c();
@@ -671,11 +673,11 @@ public with sharing class AssessmentController {
                     res.Is_Latest_Response__c = true;
                     srList.add(res);
                     Database.SaveResult[] saveResult = safe.doInsert(srList);
-                    List<String> errorList = SecurityCheckController.safeClassExceptionHandlerInsert(saveResult);
-                    if(errorList.size()>0){
-                        Database.rollback(sp);
-                        throw new SecurityControllerException(String.join( errorList, ', ' ));
-                    }
+                    errorList = SecurityCheckController.safeClassExceptionHandlerInsert(saveResult);
+                }
+                if(errorList.size()>0){
+                    Database.rollback(sp);
+                    throw new SecurityControllerException(String.join( errorList, ', ' ));
                 }
             }
             return srList;
@@ -753,23 +755,22 @@ public with sharing class AssessmentController {
         try{
             String assessmentId = '';
             List<SObject> assmtList = new List<sObject>();
+            List<String> errorList =  new List<String>();
             if (sp == null){
                 sp = Database.setSavepoint();
             }
-            if(operationType.equalsIgnoreCase('new')){
+            if(operationType.equalsIgnoreCase('new') && assessmentRecord != null){
                 assmtList.add(assessmentRecord);
-                if(assmtList.isEmpty() == false){
                     Database.SaveResult[] saveResult = safe.doInsert(assmtList);
-                    List<String> errorList = SecurityCheckController.safeClassExceptionHandlerInsert(saveResult);
-                    if(errorList.size()>0){
-                        Database.rollback(sp);
-                        throw new SecurityControllerException(String.join( errorList, ', ' ));
-                    }else{
-                        assessmentId = assmtList[0].Id;
-                    }
-                }
+                    errorList = SecurityCheckController.safeClassExceptionHandlerInsert(saveResult);
             }else{
                 assessmentId = assessmentRecord.Id;
+            }
+            if(errorList.size()>0){
+                Database.rollback(sp);
+                throw new SecurityControllerException(String.join( errorList, ', ' ));
+            }else{
+                assessmentId = assmtList[0].Id;
             }
             Date asmtStartDate = (Date)assessmentRecord.get('Start_Date__c');
             Date asmtEndDate = (Date)assessmentRecord.get('End_Date__c') != null?(Date)assessmentRecord.get('End_Date__c'):null;
@@ -801,11 +802,11 @@ public with sharing class AssessmentController {
                 }
                 if(deleteAccAssRelns.isEmpty() == false){
                     List<Database.DeleteResult> deleteResult = safe.doDelete(deleteAccAssRelns);
-                    List<String> errorList = SecurityCheckController.safeClassExceptionHandlerDelete(deleteResult);
-                    if(errorList.size()>0){
-                        Database.rollback(sp);
-                        throw new SecurityControllerException(String.join( errorList, ', ' ));
-                    }
+                    errorList = SecurityCheckController.safeClassExceptionHandlerDelete(deleteResult);
+                }
+                if(errorList.size()>0){
+                    Database.rollback(sp);
+                    throw new SecurityControllerException(String.join( errorList, ', ' ));
                 }
             }
             List<AccountAssessmentRelation__c> accountAssessRelnsList = new List<AccountAssessmentRelation__c>();
@@ -825,26 +826,20 @@ public with sharing class AssessmentController {
                     assessSup.Status__c = 'Active';
                     assessSupList.add(assessSup);
                     boolean isSave = false;
-                    if(asmtEndDate != null){
-                        if(todayDate.daysBetween(asmtStartDate) <=0 && todayDate.daysBetween(asmtEndDate) >=0){
-                            isSave = true;
-                        }
-                    }else{
-                        if(todayDate.daysBetween(asmtStartDate) <=0){
-                            isSave = true;
-                        }
+                    if(asmtEndDate != null && todayDate.daysBetween(asmtStartDate) <=0 && todayDate.daysBetween(asmtEndDate) >=0){
+                        isSave = true;
+                    }else if(todayDate.daysBetween(asmtStartDate) <=0){
+                        isSave = true;
                     }
                     if(isSave){
                         AccountAssessmentRelation__c accAssessReln = new AccountAssessmentRelation__c();
                         accAssessReln.Name = acc.Name;
                         accAssessReln.Account__c = acc.Id;
                         accAssessReln.Assessment__c = assessmentId;
-                        if(asmtStartDate != null){
-                            accAssessReln.Start_Date__c = asmtStartDate;
-                        }
-                        if(asmtEndDate != null){
+                        accAssessReln.Start_Date__c = asmtStartDate;
+                        //if(asmtEndDate != null){
                             accAssessReln.End_Date__c = asmtEndDate;
-                        }
+                        //}
                         accAssessReln.Status__c = 'New';
                         accountAssessRelnsList.add(accAssessReln);
                     }
@@ -853,28 +848,29 @@ public with sharing class AssessmentController {
             if(sp == null){ 
                 sp = Database.setSavepoint();
             }
+            List<String> errorsList = new List<String>();
             if(assessSupList.isEmpty() == false){
                 Database.SaveResult[] results = safe.doInsert(assessSupList);
-                List<String> errorsList = SecurityCheckController.safeClassExceptionHandlerInsert(results);
-                if(errorsList.size()>0){
-                    Database.rollback(sp);
-                    throw new SecurityControllerException(String.join(errorsList, ', ' ));
-                }
+                errorsList = SecurityCheckController.safeClassExceptionHandlerInsert(results);
+            }
+            if(errorsList.size()>0){
+                Database.rollback(sp);
+                throw new SecurityControllerException(String.join(errorsList, ', ' ));
             }
 
             Set<Id> successRecordsIdSet = new Set<Id>();
             if(accountAssessRelnsList.isEmpty() == false){
                 Database.SaveResult[] results = safe.doInsert(accountAssessRelnsList);
-                List<String> errorsList = SecurityCheckController.safeClassExceptionHandlerInsert(results);
-                if(errorsList.size()>0){
-                    Database.rollback(sp);
-                    throw new SecurityControllerException(String.join(errorsList, ', ' ));
-                }
+                errorsList = SecurityCheckController.safeClassExceptionHandlerInsert(results);
                 for(Database.SaveResult result : results){
                     if(result.isSuccess()){
                         successRecordsIdSet.add(result.getId());
                     }
                 }
+            }
+            if(errorsList.size()>0){
+                Database.rollback(sp);
+                throw new SecurityControllerException(String.join(errorsList, ', ' ));
             }
             if(successRecordsIdSet.isEmpty() == false){
                 sendEmails(successRecordsIdSet,'');
@@ -907,47 +903,45 @@ public with sharing class AssessmentController {
                                    +' WHERE ID IN:recordIdsSet';
             Map<String, Object> bindVariables = new Map<String, Object>{'recordIdsSet' => recordIdsSet};
             List<AccountAssessmentRelation__c> assRlnsList = safe.doQueryWithBinds(assRelQuery,bindVariables);
-            if(assRlnsList.isEmpty() == false){
-                if(string.isBlank(source)){
-                    for(AccountAssessmentRelation__c assRelRec:assRlnsList){
-                        if(string.isNotBlank(assRelRec.Account__r.Email__c) && siteData != null){
-                            Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
-                            List<String> sendTo = new List<String>();
-                            sendTo.add(assRelRec.Account__r.Email__c);
-                            mail.setToAddresses(sendTo);
-                            mail.setSubject('Sample Survey');
-                            String body = '<html><body>'+
-                                '<br><br>'+'Dear '+assRelRec.Account__r.Name+
-                                '<br><br>'+'we’d like to complete a short survey.'+
-                                '<br><br><a href='+System.Label.Supplier_Portal_URL+assRelRec.Id+'>Take the survey now.</a>'+
-                                '<br><br>'+'Kind regards,'+
-                                '<br>'+'Rhythm';
-                            mail.setHtmlBody(body);
-                            emailMessagesList.add(mail);
-                        }
-                    }
-                }else{
-                    for(AccountAssessmentRelation__c assRelRec:assRlnsList){
-                        if(string.isNotBlank(assRelRec.Account__r.Email__c) && siteData != null){
-                            Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
-                            List<String> sendTo = new List<String>();
-                            sendTo.add(assRelRec.Account__r.Email__c);
-                            mail.setToAddresses(sendTo);
-                            mail.setSubject('Updates on the Assessment');
-                            String body = '<html><body>'+
-                                '<br><br>'+'Dear '+assRelRec.Account__r.Name+
-                                '<br><br>'+'There are few comments on the responses submitted.'+
-                                '<br><br><a href='+System.Label.Supplier_Portal_URL+assRelRec.Id+'>Click Here</a>'+
-                                '<br><br>'+'Kind regards,'+
-                                '<br>'+'Rhythm';
-                            mail.setHtmlBody(body);
-                            emailMessagesList.add(mail);
-                        }
+            if(assRlnsList.isEmpty() == false && string.isBlank(source)){
+                for(AccountAssessmentRelation__c assRelRec:assRlnsList){
+                    if(string.isNotBlank(assRelRec.Account__r.Email__c) && siteData != null){
+                        Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
+                        List<String> sendTo = new List<String>();
+                        sendTo.add(assRelRec.Account__r.Email__c);
+                        mail.setToAddresses(sendTo);
+                        mail.setSubject('Sample Survey');
+                        String body = '<html><body>'+
+                            '<br><br>'+'Dear '+assRelRec.Account__r.Name+
+                            '<br><br>'+'we’d like to complete a short survey.'+
+                            '<br><br><a href='+System.Label.Supplier_Portal_URL+assRelRec.Id+'>Take the survey now.</a>'+
+                            '<br><br>'+'Kind regards,'+
+                            '<br>'+'Rhythm';
+                        mail.setHtmlBody(body);
+                        emailMessagesList.add(mail);
                     }
                 }
-                if(emailMessagesList.isEmpty() == false){
-                    Messaging.sendEmail(emailMessagesList);
+            }else if(assRlnsList.isEmpty() == false){
+                for(AccountAssessmentRelation__c assRelRec:assRlnsList){
+                    if(string.isNotBlank(assRelRec.Account__r.Email__c) && siteData != null){
+                        Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
+                        List<String> sendTo = new List<String>();
+                        sendTo.add(assRelRec.Account__r.Email__c);
+                        mail.setToAddresses(sendTo);
+                        mail.setSubject('Updates on the Assessment');
+                        String body = '<html><body>'+
+                            '<br><br>'+'Dear '+assRelRec.Account__r.Name+
+                            '<br><br>'+'There are few comments on the responses submitted.'+
+                            '<br><br><a href='+System.Label.Supplier_Portal_URL+assRelRec.Id+'>Click Here</a>'+
+                            '<br><br>'+'Kind regards,'+
+                            '<br>'+'Rhythm';
+                        mail.setHtmlBody(body);
+                        emailMessagesList.add(mail);
+                    }
                 }
+            }
+            if(emailMessagesList.isEmpty() == false){
+                Messaging.sendEmail(emailMessagesList);
             }
         }catch(exception e){
             String errorMsg = e.getMessage();
@@ -978,16 +972,18 @@ public with sharing class AssessmentController {
             if (sp == null){
                 sp = Database.setSavepoint();
             }
+            List<String> errorList = new List<String>();
             if(assessSuppList.isEmpty() == false){
                 for(Assessment_Supplier__c assesSup:assessSuppList){
                     assesSup.Status__c = 'Active';
                 }
                 Database.SaveResult[] saveResult = safe.doUpdate(assessSuppList);
-                List<String> errorList = SecurityCheckController.safeClassExceptionHandlerInsert(saveResult);
-                if(errorList.size()>0){
-                    Database.rollback(sp);
-                    throw new SecurityControllerException(String.join( errorList, ', ' ));
-                }
+                errorList = SecurityCheckController.safeClassExceptionHandlerInsert(saveResult);
+                
+            }
+            if(errorList.size()>0){
+                Database.rollback(sp);
+                throw new SecurityControllerException(String.join( errorList, ', ' ));
             }
             resWrap.isSuccess = true;
             resWrap.recordId = '';
@@ -1062,19 +1058,20 @@ public with sharing class AssessmentController {
                         + ' WHERE Id= \'' + String.escapeSingleQuotes(assessmentId) + '\''
                         + ' WITH SECURITY_ENFORCED';
             List<Assessment__c> deleteAssmtsList = safe.doQuery(query);
+            List<String> errorList = new List<String>();
             if (sp == null){
                 sp = Database.setSavepoint();
             }
             if(deleteAssmtsList.isEmpty() == false){
                 List<Database.DeleteResult> deleteResult = safe.doDelete(deleteAssmtsList);
-                List<String> errorList = SecurityCheckController.safeClassExceptionHandlerDelete(deleteResult);
-                if(errorList.size()>0){
-                    resWrap.isSuccess = false;
-                    resWrap.message = '';
-                    resWrap.errorCode = '';
-                    Database.rollback(sp);
-                    throw new SecurityControllerException(String.join( errorList, ', ' ));
-                }
+                errorList = SecurityCheckController.safeClassExceptionHandlerDelete(deleteResult);
+            }
+            if(errorList.size()>0){
+                resWrap.isSuccess = false;
+                resWrap.message = '';
+                resWrap.errorCode = '';
+                Database.rollback(sp);
+                throw new SecurityControllerException(String.join( errorList, ', ' ));
             }
             resWrap.isSuccess = true;
             resWrap.message = '';

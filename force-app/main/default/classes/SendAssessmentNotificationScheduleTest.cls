@@ -8,7 +8,7 @@ public class SendAssessmentNotificationScheduleTest {
 		String jobId =system.schedule('TestSchduleNoti', sch, expSche);
 		Test.stopTest();
 		CronTrigger ct = [SELECT Id,TimesTriggered,CronExpression, CronJobDetail.Name FROM CronTrigger WHERE Id = :jobId];
-        System.assertEquals(sch, ct.CronExpression);
-		System.assertEquals(0, ct.TimesTriggered);
+        System.assertEquals(sch, ct.CronExpression,'');
+		System.assertEquals(0, ct.TimesTriggered,'');
 	}
 }
