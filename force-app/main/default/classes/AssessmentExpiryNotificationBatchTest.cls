@@ -16,7 +16,7 @@ public with sharing class AssessmentExpiryNotificationBatchTest {
         Map<String, Object> accAttributes = new Map<String, Object>{'RecordTypeId'=>clinicRecordTypeId,'Name'=>'Supplier','Rhythm__Email__c'=>'test@gmail.com'};
         List<Account> accts = TestDataFactory.createAccounts(1,true,accAttributes);
         //System.debug('accts==>'+accts[0].Id);
-        Map<String,Object> contactAttributes  = new Map<String,Object>{'AccountId'=>accts[0].Id,'Email'=>'test123@gmail.com'};
+        Map<String,Object> contactAttributes  = new Map<String,Object>{'AccountId'=>accts[0].Id,'Email'=>'test123@gmail.com','LastName'=>'TestLName'};
         List<Contact> contacts = TestDataFactory.createContacts(1,true,contactAttributes);
         Profile portalProfile = [SELECT Id FROM Profile WHERE Name='Customer Community User' Limit 1];
         Map<String,Object> userattributes = new Map<String,Object>{'UserName'=>accts[0].Name,'LastName'=>accts[0].Name,
@@ -24,7 +24,9 @@ public with sharing class AssessmentExpiryNotificationBatchTest {
         'CommunityNickname' => 'test12345',
         'TimeZoneSidKey' => 'America/Los_Angeles',
         'LocaleSidKey' => 'en_US',
-        'LanguageLocaleKey' => 'en_US'};
+        'LanguageLocaleKey' => 'en_US',
+        'Username' => 'User' + Math.random()*100 + '@test.com',
+        'Email'=>'test@gmail.com'};
         TestDataFactory.createUser(1,true,userattributes);
         Map<String, Object> assementTemplateattributes = new Map<String, Object>{'Name'=>'2023 Assessment template','Rhythm__Name__c'=>'2023 Assessment template'};
         List<Assessment_Template__c> templist=TestDataFactory.createAssessmentTemp(1,true,assementTemplateattributes);
