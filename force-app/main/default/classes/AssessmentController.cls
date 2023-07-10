@@ -763,15 +763,23 @@ public with sharing class AssessmentController {
                 assmtList.add(assessmentRecord);
                     Database.SaveResult[] saveResult = safe.doInsert(assmtList);
                     errorList = SecurityCheckController.safeClassExceptionHandlerInsert(saveResult);
+                  
+                
+                 
             }else{
+                
                 assessmentId = assessmentRecord.Id;
+                             
             }
             if(errorList.size()>0){
                 Database.rollback(sp);
                 throw new SecurityControllerException(String.join( errorList, ', ' ));
-            }else{
-                assessmentId = assmtList[0].Id;
             }
+            else if (assmtList.isEmpty() == false && assmtList[0].Id != null){
+                assessmentId = assmtList[0].Id;
+                     
+            }
+         
             Date asmtStartDate = (Date)assessmentRecord.get('Start_Date__c');
             Date asmtEndDate = (Date)assessmentRecord.get('End_Date__c') != null?(Date)assessmentRecord.get('End_Date__c'):null;
             Set<String> suppliersList = new Set<String>();
@@ -884,6 +892,7 @@ public with sharing class AssessmentController {
             resWrap.message = e.getMessage();
             resWrap.errorCode = '';
             String errorMsg = e.getMessage();
+           
             throw new AuraHandledException(ErrorMsg);
         }
         return resWrap;
