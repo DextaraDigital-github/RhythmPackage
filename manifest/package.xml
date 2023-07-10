@@ -7,7 +7,6 @@
 	<types>
 		<members>Account</members>
 		<members>Action__c</members>
-		<members>Assessment_Template_Junction__c</members>
 		<members>Assessment_Template__c</members>
 		<members>Assessment__c</members>
 		<members>Asset</members>
