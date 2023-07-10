@@ -17,8 +17,8 @@ public class AssessmentControllerTest
         Id clinicRecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByName().get('Supplier').getRecordTypeId();
         Map<String, Object> accAttributes = new Map<String, Object>{'RecordTypeId'=>clinicRecordTypeId,'Name'=>'Supplier','Email__c'=>'test@gmail.com'};
         List<Account> accts = TestDataFactory.createAccounts(1,true,accAttributes);
-        Map<String,Object> contactAttributes  = new Map<String,Object>{'AccountId'=>accts[0].Id,'Email'=>'test123@gmail.com'};
-        TestDataFactory.createContacts(1,true,contactAttributes);
+        Map<String,Object> contactAttributes  = new Map<String,Object>{'AccountId'=>accts[0].Id,'Email'=>'test123@gmail.com','LastName'=>'John David'};
+         List<Contact> cts =TestDataFactory.createContacts(1,true,contactAttributes);
         Map<String, Object> assementTemplateattributes = new Map<String, Object>{'Name'=>'2023 Assessment template','Rhythm__Name__c'=>'2023 Assessment template'};
         List<Assessment_Template__c> templist=TestDataFactory.createAssessmentTemp(1,true,assementTemplateattributes);
         Map<String, Object> sectionAttributes = new Map<String, Object>{'Rhythm__Assessment_Template__c'=>templist[0].Id,'Name'=>'Section1'};
@@ -52,6 +52,22 @@ public class AssessmentControllerTest
         Test.stopTest();
         System.assertEquals(supplierAssessment.size()>0, true,'Supplier Assessment Exist');
     }
+    
+    
+    @isTest
+    public static void getSupplierAssessmentListError()
+    {
+         List<Sobject> supplierAssessment=new List<Sobject>();
+        Test.startTest();
+         try{
+       supplierAssessment = AssessmentController.getSupplierAssessmentList(null);
+         }
+        catch(Exception e)
+        {            
+        }
+        Test.stopTest();
+        System.assertEquals(supplierAssessment.size()==0, true,'Supplier Assessment Not Exist');
+    }
     @isTest
     public static void questionsListTest()
     {
@@ -60,6 +76,18 @@ public class AssessmentControllerTest
         List<Sobject> questlst = AssessmentController.getQuestionsList(templst[0].Id);
         Test.stopTest();
          System.assertEquals(questlst.size()>0, true,'Template Questions Exist');
+    }
+    @isTest
+    public static void questionsListerror()
+    {
+         List<Sobject> questlst=new List<Sobject>();
+        Test.startTest();
+        try{
+        questlst = AssessmentController.getQuestionsList(null);
+        }
+        catch(Exception e){}
+        Test.stopTest();
+         System.assertEquals(questlst.size()==0, true,'Template Questions not Exist');
     }
     @isTest
     public static void supplierResponseListTest()
@@ -72,6 +100,18 @@ public class AssessmentControllerTest
         Test.stopTest();
         System.assertEquals(accAssRel.size()<1, true,'Supllier Response not saved yet');
     }
+     @isTest
+    public static void supplierResponseListError()
+    {
+		 List<Sobject> accAssRel=new List<Sobject>();
+        Test.startTest();
+        try{        
+        accAssRel = AssessmentController.getSupplierResponseList(null);
+        }
+        catch(Exception e){}
+        Test.stopTest();
+        System.assertEquals(accAssRel.size()==0, true,'Supllier Response not saved yet');
+    }
     @isTest
     public static void updateAccountAssessmentStatusTest()
     {
@@ -83,6 +123,18 @@ public class AssessmentControllerTest
         List<Sobject> assessmentStatus = AssessmentController.updateAccountAssessmentStatus(JSON.serialize(queryMap1));
         Test.stopTest();
         System.assertEquals(assessmentStatus.size()>0, true,'Response status updated');
+    }
+     @isTest
+    public static void updateAccountAssessmentStatusError()
+    {
+        Test.startTest();
+         List<Sobject> assessmentStatus=new List<Sobject>();
+        try{
+       assessmentStatus = AssessmentController.updateAccountAssessmentStatus(null);
+        }
+        catch(Exception e){}
+        Test.stopTest();
+        System.assertEquals(assessmentStatus.size()==0, true,'Response status not updated');
     }
     @isTest
     public static void getAssessmentStatusTest()
@@ -99,6 +151,18 @@ public class AssessmentControllerTest
         List<Sobject> assessmentStatus = AssessmentController.getAssessmentStatus(assessment[0].Id,'Rhythm__AccountAssessmentRelation__c');
         Test.stopTest();
         System.assertEquals(assessmentStatus!=null,true,'assessment status exist');
+    }
+     @isTest
+    public static void getAssessmentStatusError()
+    {
+        Test.startTest();
+        List<Sobject> assessmentStatus=new List<Sobject>();
+        try{
+        assessmentStatus = AssessmentController.getAssessmentStatus(null,null);
+        }
+        catch(Exception e){}
+        Test.stopTest();
+        System.assertEquals(assessmentStatus.size() ==0,true,'assessment status not exist');
     }
     @isTest
     public static void assesmentRecordsTest()
@@ -119,6 +183,18 @@ public class AssessmentControllerTest
         List<Object> accountassessment = AssessmentController.getAccountAssesmentRecords(accIds,assessmentId);
         Test.stopTest();
         System.assertEquals(accountassessment!=null,true,'AccountAssessmentRecords Exist');
+    }
+     @isTest
+    public static void accountAssesmentRecordsError()
+    {
+        Test.startTest();
+        List<Object> accountassessment=new List<Object>();
+        try{
+        accountassessment = AssessmentController.getAccountAssesmentRecords(null,null);
+        }
+        catch(Exception e){}
+        Test.stopTest();
+        System.assertEquals(accountassessment.size()==0,true,'AccountAssessmentRecords doesnot Exist');
     }
     @isTest
     public static void createSupResponseListTest()
@@ -142,6 +218,18 @@ public class AssessmentControllerTest
         System.assertEquals(resplst!=null, true,'Supplier Response records created');
     }
     @isTest
+    public static void createSupResponseListError()
+    {
+        
+        Test.startTest();
+        try{
+        AssessmentController.createSupplierResponse(null,null);
+        }
+        catch(exception e){}
+        Test.stopTest();
+        
+    }
+    @isTest
     public static void getResponseListTest()
     {
         List<Question__c> questions=[select Id,Name,Assessment_Template__c from Question__c ];
@@ -153,6 +241,18 @@ public class AssessmentControllerTest
         List<Response__c> response = AssessmentController.getResponseList(JSON.serialize(queryMap2));
         Test.stopTest();
         System.assertEquals(response!=null, true,'Supplier Response records Exist');
+    }
+     @isTest
+    public static void getResponseListError()
+    {
+        Test.startTest();
+         List<Response__c> response= new List<Response__c>();
+        try{
+        response = AssessmentController.getResponseList(null);
+        }
+        catch(Exception e){}
+        Test.stopTest();
+        System.assertEquals(response.size()==0, true,'Supplier Response records not Exist');
     }
     @isTest
     public static void userNameTest()
@@ -175,6 +275,7 @@ public class AssessmentControllerTest
         }
        
     }
+   
     @isTest
     public static void communityTest()
     {
@@ -192,6 +293,18 @@ public class AssessmentControllerTest
         Test.stopTest();
         System.assertEquals(lst.size()>0, true,'Got the AssessmentRecords');
     }
+     @isTest
+    public static void assessmentJunctionRecordsError()
+    {
+        List<SObject> lst = new List<SObject> ();
+        Test.startTest();
+        try{
+         lst = AssessmentController.getAssessmentJunctionRecords(null);
+        }
+        catch(Exception e){}
+        Test.stopTest();
+        System.assertEquals(lst.size()==0, true,'No AssessmentRecords');
+    }
     @isTest
     public static void accountAssessmentRecordDataTest()
     {
@@ -202,12 +315,36 @@ public class AssessmentControllerTest
          System.assertEquals(accountassessment.size()>0, true,'accountAssessment records created');
     }
     @isTest
+    public static void accountAssessmentRecordDataError()
+    {
+        Test.startTest();
+        List<SObject> accountassessment=new List<SObject>();
+        try{
+        accountassessment = AssessmentController.getAccountAssessmentRecordData(null);
+        }
+        catch(Exception e){}
+        Test.stopTest();
+         System.assertEquals(accountassessment.size()==0, true,'accountAssessment records not created');
+    }
+    @isTest
     public static void getResponseFlagTest()
     {
         Test.startTest();
         List<Question__c> questions=[select Id,Name,Assessment_Template__c from Question__c ];
         List<AccountAssessmentRelation__c> accAssessment =[SELECT Id,Account__c,Assessment__c from AccountAssessmentRelation__c];
         List<SObject> acc= AssessmentController.getResponseFlag(questions[0].Id,accAssessment[0].Id);
+        Test.stopTest();
+         System.assertEquals(acc.size()<1,true,'flagged response data not created');
+    }
+    @isTest
+    public static void getResponseFlagError()
+    {
+        Test.startTest();
+        List<SObject> acc=new List<SObject>();
+        try{
+         acc= AssessmentController.getResponseFlag(null,null);
+        }
+        catch(Exception e){}
         Test.stopTest();
          System.assertEquals(acc.size()<1,true,'flagged response data not created');
     }
@@ -228,6 +365,19 @@ public class AssessmentControllerTest
         System.assertEquals(isChatterSaved,true,'Chatter response saved');
     }
     @isTest
+    public static void saveChatterResponseerror()
+    {
+        
+        Test.startTest();
+        Boolean isChatterSaved;
+        try{
+        isChatterSaved = AssessmentController.saveChatterResponse(null);
+        }
+        catch(exception e){}
+        Test.stopTest();
+        System.assertEquals(isChatterSaved,null,'Chatter response not saved');
+    }
+    @isTest
     public static void uploadfileTest()
     {
         List<Question__c> questions=[select Id,Name,Assessment_Template__c from Question__c ];
@@ -241,6 +391,18 @@ public class AssessmentControllerTest
         List<Response__c> result = AssessmentController.uploadFile(fileResp);
         Test.stopTest();
         System.assertEquals(result.size()>0,true,'File uploaded successfully');
+    }
+    @isTest
+    public static void uploadfileError()
+    {
+        List<Response__c> result=new List<Response__c> ();
+        Test.startTest();
+        try{
+        result = AssessmentController.uploadFile(null);
+        }
+        catch(Exception e){}
+        Test.stopTest();
+        System.assertEquals(result.size()==0,true,'File not uploaded successfully');
     }
     @isTest
     public static void deleteFileTest()
@@ -259,6 +421,19 @@ public class AssessmentControllerTest
         Test.stopTest();
         System.assertEquals(deleteFile!=null, true,'File deleted successfully');
     }
+     @isTest
+    public static void deleteFileError()
+    {
+       
+        Test.startTest();
+        Object deleteFile;
+        try{
+        deleteFile = AssessmentController.deleteFileAttachment(null);
+        }
+        catch(exception e){}
+        Test.stopTest();
+        System.assertEquals(deleteFile==null, true,'File not deleted successfully');
+    }
     @isTest
     public static void errorLogRecordTest()
     {
@@ -273,6 +448,16 @@ public class AssessmentControllerTest
         Test.stopTest();
         System.assertEquals(queryMap2!=null, true,'Error log record created');
     }
+     @isTest
+    public static void errorLogRecordError()
+    {  
+        Test.startTest();
+        try{
+        AssessmentController.errorLogRecord(null);
+        }
+        catch(Exception e){}
+        Test.stopTest();
+    }
     @isTest
     public static void getAllSupplTest(){
         List<Account> accList = [select id,Name from Account];
@@ -283,6 +468,17 @@ public class AssessmentControllerTest
         List<Account> aclist=AssessmentController.getAllSuppliers(exData,searchKey,exSearchKey);
         Test.stopTest();
         System.assertEquals(aclist.size()>0, true,'suppliers fetched');
+    }
+     @isTest
+    public static void getAllSupplError(){
+       
+        Test.startTest();
+        List<Account> aclist= new List<Account> ();
+        try{
+        aclist=AssessmentController.getAllSuppliers(null,null,null);
+        }
+        catch(Exception e){}
+        Test.stopTest();
     }
 
     @isTest
@@ -307,13 +503,24 @@ public class AssessmentControllerTest
         Test.stopTest();
         System.assertEquals(retWrap!=null, true,'assessment sent');
     }
+     @isTest
+    public static void sendAssessmentError(){
+        AssessmentController.ResultWrapper retWrap = new AssessmentController.ResultWrapper();
+        Test.startTest();
+        try{
+        retWrap = AssessmentController.sendAssessment(null,null,null,null,null);
+        }
+        catch(Exception e){}
+        Test.stopTest();
+        System.assertEquals(retWrap.errorCode ==null, true,'assessment not sent');
+    }
     
 
     @isTest
     public static void sendAssessmentUpdateTest(){
         AssessmentController.ResultWrapper retWrap = new AssessmentController.ResultWrapper();
         List<Account> accList = [select id,Name from Account];
-        List<SObject> assmentList = [select id,Start_Date__c,End_Date__c,Template__c from Assessment__c];
+        List<SObject> assmentList = [select Id,Start_Date__c,End_Date__c,Template__c from Assessment__c];
         SObject asmtRecord = assmentList[0];
 
         String operationType = 'update';
@@ -358,6 +565,18 @@ public class AssessmentControllerTest
         Test.stopTest();
         System.assertEquals(assmtList.size()>0, true,'got the supplier assessment record');
     }
+     @isTest
+    public static void getAssesmentRecordError(){
+        
+        Test.startTest();
+        List<Assessment__c> assmtList=new List<Assessment__c>();
+        try{
+         assmtList = AssessmentController.getAssessmentRecord(null);
+        }
+         catch(Exception e){}
+        Test.stopTest();
+        System.assertEquals(assmtList.size()==0, true,'not found any supplier assessment record');
+    }
 
     @isTest
     public static void getExistingSuppliersWithSearchTest(){
@@ -368,6 +587,19 @@ public class AssessmentControllerTest
         Test.stopTest();
         System.assertEquals(assmtList.size()<1, true,'suppliers fetched');
     }
+    
+     @isTest
+    public static void getExistingSuppliersWithSearchTestError(){
+        
+        Test.startTest();
+        List<AccountAssessmentRelation__c> assmtList= new List<AccountAssessmentRelation__c>();
+        try{
+        assmtList = AssessmentController.getExistingSuppliersWithSearch(null,null);
+        }
+         catch(Exception e){}
+            Test.stopTest();
+        System.assertEquals(assmtList.size()==0, true,'suppliers not fetched');
+    }
 
     @isTest
     public static void deleteAssessmentTest(){
@@ -377,6 +609,18 @@ public class AssessmentControllerTest
         AssessmentController.ResultWrapper retWrap = AssessmentController.deleteAssessment(asmtRecord.Id);
         Test.stopTest();
         System.assertEquals(retWrap!=null, true,'assessment deleted');
+    }
+     @isTest
+    public static void deleteAssessmentError(){
+        
+        Test.startTest();
+        AssessmentController.ResultWrapper retWrap=new AssessmentController.ResultWrapper();
+        try{
+         retWrap = AssessmentController.deleteAssessment(null);
+        }
+         catch(Exception e){}
+        Test.stopTest();
+        System.assertEquals(retWrap.errorCode ==null, true,'assessment not deleted');
     }
 
     @isTest

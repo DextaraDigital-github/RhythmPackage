@@ -26,7 +26,7 @@ public class AssessmentTemplateControllerTest {
         TestDataFactory.createQuestion(1,true,questionAttributes);
         Map<String, Object> assessmentattributes = new Map<String, Object>{'Rhythm__Account__c'=>accts[0].Id,'Template__c'=>templist[0].Id,
             'Name'=>'Assessment 2023','Rhythm__Status__c'=>'New','Rhythm__Number_of_Questions__c'=>10};
-        TestDataFactory.createAssessment(1,true,assessmentattributes);
+       // TestDataFactory.createAssessment(1,true,assessmentattributes);
         
         
         

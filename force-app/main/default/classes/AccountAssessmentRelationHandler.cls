@@ -92,6 +92,7 @@ public with sharing class AccountAssessmentRelationHandler implements ITriggerHa
     * @description To execute after update logic
     * @param newList This is the list of AccountAssessments.
       @param newMap This is the map of AccountAssessments.
+      @param oldList This is the old list of AccountAssessments.
       @param oldMap This is the old map of AccountAssessments.
     */
 
