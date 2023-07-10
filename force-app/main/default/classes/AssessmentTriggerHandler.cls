@@ -1,17 +1,40 @@
-public class AssessmentTriggerHandler implements ITriggerHandler{
+/** 
+* Class Name        : AssessmentTriggerHandler
+* Developer         : Sai Koushik Nimmaturi and Reethika Velpula           
+* Created Date      : 
+* @description        : It is used to perform the trigger logic.
+* Last Modified Date: 
+*/
+
+public with sharing class AssessmentTriggerHandler implements ITriggerHandler{
     public static SecurityCheckController safe = new SecurityCheckController();
     public static TriggerFrameworkServiceController serviceController = new TriggerFrameworkServiceController();
+    
+    /**
+    * @description To execute before insert logic
+    * @param newList This is the new list of records.  
+    */
     public void beforeInsert(List<sObject> newList) {
-        system.debug('beforeInsert----->');
         getQuestionsCount(newList,null);
     }
-     
+    
+     /**
+    * @description To execute after insert logic
+    * @param newList This is the new list of records.
+      @param newMap This is the new map of records.
+    */
     public void afterInsert(List<sObject> newList , Map<Id, sObject> newMap) {
-        system.debug('afterInsert----->');
+      return;
     }
-     
+    
+    /**
+    * @description To execute before update logic
+    * @param newList This is the new list of records.
+      @param newMap This is the new map of records.
+      @param oldList This is the old list of records.
+      @param oldMap This is the old map of records.
+    */
     public void beforeUpdate(List<sObject> newList, Map<Id, sObject> newMap, List<sObject> oldList, Map<Id, sObject> oldMap) {
-       system.debug('inThebeforeUpdate-----');
        
         for(sObject assmt:newMap.values()){
             Decimal supplierCount = (Decimal)assmt.get('Number_of_Invited_Suppliers__c');
@@ -22,25 +45,52 @@ public class AssessmentTriggerHandler implements ITriggerHandler{
         }
         getQuestionsCount(newList, newMap);
     }
-     
+    
+    /**
+    * @description To execute after update logic
+    * @param newList This is the new list of records.
+      @param newMap This is the new map of records.
+      @param oldList This is the old list of records.
+      @param oldMap This is the old map of records.
+    */
     public void afterUpdate(List<sObject> newList, Map<Id, sObject> newMap,  List<sObject> oldList, Map<Id, sObject> oldMap) {
-        system.debug('afterUpdate----->');
+      return;
     }
-     
+    
+    /**
+    * @description To execute before delete logic
+    * @param oldList This is the old list of records.
+      @param oldMap This is the old map of records.
+    */
     public void beforeDelete(List<sObject> oldList , Map<Id, sObject> oldMap) {
-        system.debug('beforeDelete----->');
+      return;
     }
      
+    /**
+    * @description To execute after delete logic
+    * @param oldList This is the old list of records.
+      @param oldMap This is the old map of records.
+    */
     public void afterDelete(List<sObject> oldList , Map<Id, sObject> oldMap) {
-        system.debug('afterDelete----->');
+      return;
     }
-     
+    
+    /**
+    * @description To execute after undelete logic
+    * @param newList This is the new list of records.
+      @param newMap This is the new map of records.
+    */
     public void afterUnDelete(List<sObject> newList, Map<Id, sObject> newMap) {
-        system.debug('afterUnDelete----->');
+      return;
     }
+
+    /**
+    * @description To calculate questions count
+    * @param newList This is the new list of records.
+    * @param newMap This is the new map of records.
+    */
     public static void getQuestionsCount(List<sObject> newList,Map<Id, sObject> newMap)
     {
-        
         Map<Id,List<Assessment__c>> templateMap= new Map<Id,List<Assessment__c>>();
         for(Assessment__c assessment:(List<Assessment__c>)newList){
             if(templateMap.containsKey(assessment.Template__c)){
@@ -50,13 +100,15 @@ public class AssessmentTriggerHandler implements ITriggerHandler{
             }
         }
         set<Id> templateIds = templateMap.keySet();
-        Map<String, Object> bindVariables = new Map<String, Object>{'templateIds' => templateIds};
+        //Map<String, Object> bindVariables = new Map<String, Object>{'templateIds' => templateIds};
         string query = 'SELECT COUNT(id) quesCount, Assessment_Template__c'
                      +' FROM Question__c'
+                     +' WITH SECURITY_ENFORCED'
                      +' GROUP BY Assessment_Template__c'
                      +' HAVING Assessment_Template__c IN:templateIds';
 
-        AggregateResult[] templateGroup = safe.doQueryWithBinds(query,bindVariables);
+        //AggregateResult[] templateGroup = safe.doQueryWithBinds(query,bindVariables);
+        AggregateResult[] templateGroup = database.query(query);
         for (AggregateResult ar : templateGroup){
             String templateId = (Id)ar.get('Rhythm__Assessment_Template__c');
             for(Assessment__c assessment : templateMap.get(templateId) ){
@@ -66,6 +118,5 @@ public class AssessmentTriggerHandler implements ITriggerHandler{
                 }
             }
         }
-        System.debug('newMap==>'+newMap);
     }
 }

@@ -86,7 +86,7 @@ export default class CustomRecordForm extends LightningElement {
                 }),
               );
             }).catch(error => {
-              console.log('getRecsCount==>'+error);
+              //console.log('getRecsCount==>'+error);
             });
           }
         }
@@ -121,7 +121,7 @@ export default class CustomRecordForm extends LightningElement {
             this.handleCancel(event);
           }
         }).catch(error => {
-          console.log('Error in handle submit ' + error);
+          //console.log('Error in handle submit ' + error);
         });
       }
     }

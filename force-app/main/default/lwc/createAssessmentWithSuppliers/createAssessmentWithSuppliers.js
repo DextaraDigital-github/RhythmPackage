@@ -4,6 +4,7 @@ import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import addSuppliers from '@salesforce/apex/AssessmentController.sendAssessment';
 import getTemplateData from '@salesforce/apex/AssessmentController.getTemplateData';
 import getTodayDate from '@salesforce/apex/AssessmentController.getTodayDate';
+import errorLogRecord from '@salesforce/apex/AssessmentController.errorLogRecord';
 import TIME_ZONE from '@salesforce/i18n/timeZone';
 import LOCALE_DATA from '@salesforce/i18n/locale';
 
@@ -28,6 +29,7 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
 
     connectedCallback() {
         this.getTodayDate();
+        this.fetchTemplateData();
     }
 
     handleChange(event){
@@ -42,16 +44,16 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
             }
         })
         .catch(error => {
-            console.log(error);
+           //console.log(error);
         });
     }
 
-    @wire(getTemplateData,{templateId:'$templateId'})
-    templateRecord(result){
-        if (result.data) {
-            if(result.data.length>0){
-                this.templateStatus = result.data[0].Rhythm__Status__c;
-                if(result.data[0].Rhythm__Status__c === 'Inactive'){
+    fetchTemplateData(){
+        getTemplateData({templateId:this.templateId})
+        .then(result => {
+            if(result & result.length>0){
+                this.templateStatus = result[0].Rhythm__Status__c;
+                if(result[0].Rhythm__Status__c === 'Inactive'){
                     this.isTemplateInactive = true;
                     this.showNewAssessment = false;
                 }else{
@@ -60,12 +62,16 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
             }else{
                 this.showNewAssessment = true;
             }
-        }else if (result.error) {
-            console.log(result.error);
-            this.showNotification('Error',result.error.body.message,'error');
-        }else{
+        })
+        .catch(error => {
             this.showNewAssessment = true;
-        }
+            let errormap = {}; 
+            errormap.componentName = 'CreateAssessmentWithSuppliers'; 
+            errormap.methodName = 'fetchTemplateData'; 
+            errormap.className = 'AssessmentController';
+            errormap.errorData = error.message; 
+            errorLogRecord({ errorLogWrapper: JSON.stringify(errormap) }).then(() => { });
+        });
     }
 
     get startDate(){
@@ -95,7 +101,7 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
                 this.showNotification('Error',validatedData.message,'error');
             }
         }catch(e){
-            console.log('handleNextError----->',e)
+            //console.log('handleNextError----->',e)
         }
     }
 
@@ -146,7 +152,7 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
                 this.showNotification('Error','Please select atleast one supplier to proceed.','error');
             }
         }catch(e){
-            console.log('error----->',e);
+           // console.log('error----->',e);
         }
     }
 

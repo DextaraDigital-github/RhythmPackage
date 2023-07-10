@@ -42,7 +42,7 @@ export default class SearchComponentLwc extends  LightningElement{
             this.lookupValuesList=[];           
             this.showSearchedValues = false;
             this.messageResult=true;
-            console.log(error);
+            //console.log(error);
       });
         
    

@@ -1,24 +1,52 @@
-public class AccountAssessmentRelationHandler implements ITriggerHandler{
-    public static SecurityCheckController safe = new SecurityCheckController();//use singleton pattern
-    private static Savepoint sp;//prudhvi to work
+/**
+* Class Name        : AccountAssessmentRelationHandler
+* Developer         : Sai Koushik Nimmaturi and Reethika Velpula           
+* Created Date      : 
+* @description       : AccountAssessmentRelationHandler class is used to perform the trigger logic
+* Last Modified Date: 
+*/
 
+public with sharing class AccountAssessmentRelationHandler implements ITriggerHandler{
+    public static SecurityCheckController safe = new SecurityCheckController();
+    private static Savepoint sp;
+
+
+     /**
+    * @description To execute before insert logic
+    * @param newList This is the list of AccountAssessments.  
+    */
 	public void beforeInsert(List<sObject> newList) {
-        system.debug('beforeInsert----->');
-         
+    return;
     }
-    
+
+     /**
+    * @description To execute after insert logic
+    * @param newList This is the list of AccountAssessments.
+      @param newMap This is the map of AccountAssessments.
+    */
     public void afterInsert(List<sObject> newList , Map<Id, sObject> newMap) {
-        system.debug('afterInsert----->');
-        //getQuestionsCount( newList ,newMap);
-       
+      return;
     }
-    
+
+    /**
+    * @description To execute before update logic
+    * @param newList This is the list of AccountAssessments.
+      @param newMap This is the map of AccountAssessments.
+      @param oldList This is the old list of AccountAssessments.
+      @param oldMap This is the old map of AccountAssessments.
+    */
     public void beforeUpdate(List<sObject> newList, Map<Id, sObject> newMap, List<sObject> oldList, Map<Id, sObject> oldMap) {
-        system.debug('beforeUpdate----->');
+      return;
     }
-    
+
+    /**
+    * @description To execute after update logic
+    * @param newList This is the list of AccountAssessments.
+      @param newMap This is the map of AccountAssessments.
+      @param oldList This is the old list of AccountAssessments.
+      @param oldMap This is the old map of AccountAssessments.
+    */
     public void afterUpdate(List<sObject> newList, Map<Id, sObject> newMap,  List<sObject> oldList, Map<Id, sObject> oldMap) {
-        system.debug('afterUpdate----->');
         set<Id> acctAssmtSet = new set<Id>();
         Map<Id,AccountAssessmentRelation__c> oldRecordsMap = (Map<Id,AccountAssessmentRelation__c>)oldMap;
         for(AccountAssessmentRelation__c acctAsmt:(List<AccountAssessmentRelation__c>)newList){
@@ -32,24 +60,45 @@ public class AccountAssessmentRelationHandler implements ITriggerHandler{
        updateStatusData(newList,newMap,oldMap); 
     }
     
+    /**
+    * @description To execute before delete logic
+    * @param oldList This is the old list of AccountAssessments.
+      @param oldMap This is the old map of AccountAssessments.
+    */
     public void beforeDelete(List<sObject> oldList , Map<Id, sObject> oldMap) {
-        system.debug('beforeDelete----->');
-        
+      return;
     }
-    
+
+     /**
+    * @description To execute after delete logic
+    * @param oldList This is the old list of AccountAssessments.
+      @param oldMap This is the old map of AccountAssessments.
+    */
     public void afterDelete(List<sObject> oldList , Map<Id, sObject> oldMap) {
-        system.debug('afterDelete----->');
-        
+      return;
     }
-    
+
+     /**
+    * @description To execute after undelete logic
+    * @param newList This is the new list of AccountAssessments.
+      @param newMap This is the new map of AccountAssessments.
+    */
     public void afterUnDelete(List<sObject> newList, Map<Id, sObject> newMap) {
-        system.debug('afterUnDelete----->');
+      return;
     }
-    
-    
+
+
+    /**
+    * @description To execute after update logic
+    * @param newList This is the list of AccountAssessments.
+      @param newMap This is the map of AccountAssessments.
+      @param oldList This is the old list of AccountAssessments.
+      @param oldMap This is the old map of AccountAssessments.
+    */
+
     public void updateStatusData(List<SObject> newList , Map<Id, sObject> newMap,Map<Id, sObject> oldMap)
     {
-     	List<AccountAssessmentRelation__c> acs = (List<AccountAssessmentRelation__c>) newList;
+     	
         List<FieldHistoryTracking__c> fieldtrack = new List<FieldHistoryTracking__c>();
         for(Id assmntId: newMap.keySet()){
             if(newMap.get(assmntId).get('Rhythm__Status__c') != oldMap.get(assmntId).get('Rhythm__Status__c'))
@@ -63,7 +112,9 @@ public class AccountAssessmentRelationHandler implements ITriggerHandler{
               	fieldtrack.add(fieldTracker);
             }
         }
-        if (sp == null) sp = Database.setSavepoint();
+        if(sp == null){
+            sp = Database.setSavepoint();
+        }
         if(fieldtrack.isEmpty() == false){
             Database.SaveResult[] results = safe.doInsert(fieldtrack);
             List<String> errorsList = SecurityCheckController.safeClassExceptionHandlerInsert(results);
@@ -73,7 +124,22 @@ public class AccountAssessmentRelationHandler implements ITriggerHandler{
             }
         }
     }
+
+     /**
+    * @description To execute after delete logic
+        custom exception class
+    */
     public class SecurityControllerException extends Exception{
-        
+    }
+
+    @testVisible 
+    public static List<Configuration__mdt> siteURLData{
+      get{ 
+          if(siteURLData == NULL){ 
+            siteURLData = [SELECT Site_URL__c,DeveloperName,MasterLabel FROM Configuration__mdt LIMIT 1]; 
+          } 
+          return siteURLData; 
+      } 
+      set; 
     }
 }
