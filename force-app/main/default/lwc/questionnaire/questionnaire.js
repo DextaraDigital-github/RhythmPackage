@@ -1205,7 +1205,7 @@ export default class Questionnaire extends LightningElement {
             })
         })
         getResponseFlag({ questionId: this.showChat.questionId, accountAssessmentId: this.recordId }).then((result) => {
-            console.log('getResponseFlag ', result);
+           // console.log('getResponseFlag ', result);
         }).catch((error) => {
             let errormap = {}; 
             errormap.componentName = 'Questionnaire'; 

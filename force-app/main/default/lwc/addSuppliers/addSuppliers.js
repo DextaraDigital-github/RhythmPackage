@@ -108,7 +108,7 @@ export default class AddSuppliers extends LightningElement {
             this.dispatchEvent(custEvent);
             this.countRecords();
         } catch (error) {
-            console.log('handleChange error : ', error);
+            //console.log('handleChange error : ', error);
         }
     }
 
@@ -117,7 +117,7 @@ export default class AddSuppliers extends LightningElement {
         try {
             this.searchKey = event.target.value;
         } catch (error) {
-            console.log('handleSearch error : ', error);
+            //console.log('handleSearch error : ', error);
         }
     }
 
@@ -126,7 +126,7 @@ export default class AddSuppliers extends LightningElement {
         try {
             this.exSearchKey = event.target.value;
         } catch (error) {
-            console.log('handleExSearch error : ', error);
+            //console.log('handleExSearch error : ', error);
         }
     }
 

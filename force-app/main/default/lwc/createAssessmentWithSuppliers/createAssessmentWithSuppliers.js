@@ -42,7 +42,7 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
             }
         })
         .catch(error => {
-            console.log(error);
+           //console.log(error);
         });
     }
 
@@ -61,7 +61,7 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
                 this.showNewAssessment = true;
             }
         }else if (result.error) {
-            console.log(result.error);
+            //console.log(result.error);
             this.showNotification('Error',result.error.body.message,'error');
         }else{
             this.showNewAssessment = true;
@@ -95,7 +95,7 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
                 this.showNotification('Error',validatedData.message,'error');
             }
         }catch(e){
-            console.log('handleNextError----->',e)
+            //console.log('handleNextError----->',e)
         }
     }
 
@@ -146,7 +146,7 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
                 this.showNotification('Error','Please select atleast one supplier to proceed.','error');
             }
         }catch(e){
-            console.log('error----->',e);
+           // console.log('error----->',e);
         }
     }
 

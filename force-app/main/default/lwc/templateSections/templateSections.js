@@ -261,7 +261,7 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
             this.closeReorderSectionModal();
             this.handleRefresh();
         }).catch(error => {
-            console.log(error);
+            //console.log(error);
         });
     }
 
@@ -285,7 +285,7 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
             this.closeReorderSectionModal();
             this.handleRefresh();
         }).catch(error => {
-            console.log('Error' + error);
+            //console.log('Error' + error);
         });
     }
 
@@ -350,7 +350,7 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
                 this.handleRefresh();
             }
         }).catch(error => {
-            console.log(error);
+            //console.log(error);
         });
     }
     //Delete Functionality Ends
@@ -364,10 +364,10 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
                 this.totalRecsCount = secData;
                 this.handleSectionsData(JSON.parse(JSON.stringify(secData)));
             }).catch(error => {
-                console.log(error);
+                //console.log(error);
             });
         }).catch(error => {
-            console.log(error);
+            //console.log(error);
         });
     }
 
@@ -381,7 +381,7 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
             this.sectionList = JSON.parse(JSON.stringify(result));
             this.prepareSectionsQuestionaire();
         }).catch(error => {
-            console.log('Error' + error);
+            //console.log('Error' + error);
         });
     }
 

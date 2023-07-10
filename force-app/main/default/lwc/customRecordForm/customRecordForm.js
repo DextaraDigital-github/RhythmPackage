@@ -101,7 +101,7 @@ export default class CustomRecordForm extends LightningElement {
                 }),
               );
             }).catch(error => {
-              console.log(error);
+              //console.log(error);
             });
           }
         }
@@ -128,7 +128,8 @@ export default class CustomRecordForm extends LightningElement {
               variant: 'success',
             }),
           );
-        }).catch(error => { console.log(error);});
+        }).catch(error => { //console.log(error);
+        });
       }
     }
     else {
