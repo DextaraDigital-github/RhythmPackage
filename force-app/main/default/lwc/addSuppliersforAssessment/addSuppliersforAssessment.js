@@ -35,7 +35,7 @@ export default class AddSuppliersforAssessment extends NavigationMixin(Lightning
             }
         })
         .catch(error => {
-            console.log(error);
+            //console.log(error);
         });
     }
 
@@ -46,7 +46,7 @@ export default class AddSuppliersforAssessment extends NavigationMixin(Lightning
             this.startDate = result.data[0].Rhythm__Start_Date__c;
             this.endDate = result.data[0].Rhythm__End_Date__c;
         } else if (result.error) {
-            console.log(result.error);
+            //console.log(result.error);
         }
     }
 
@@ -83,7 +83,7 @@ export default class AddSuppliersforAssessment extends NavigationMixin(Lightning
                         }
                     })
                     .catch(error => {
-                        console.log('erroDetails----->',error);
+                        //console.log('erroDetails----->',error);
                         this.showNotification('Error',error.body.message,'error');
                     });
                 }else{
@@ -93,7 +93,7 @@ export default class AddSuppliersforAssessment extends NavigationMixin(Lightning
                 this.showNotification('Error','Suppliers cannot be modified for the past assessments','error');
             }
         }catch(e){
-            console.log(e);
+            //console.log(e);
         }
     }
 

@@ -100,11 +100,6 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>Assessment__c.Asset__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
         <field>Assessment__c.Category__c</field>
         <readable>true</readable>
     </fieldPermissions>
@@ -186,11 +181,6 @@
     <fieldPermissions>
         <editable>false</editable>
         <field>Assessment__c.Number_of_invited_Suppliers__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
-        <field>Assessment__c.Project_Assignment__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>

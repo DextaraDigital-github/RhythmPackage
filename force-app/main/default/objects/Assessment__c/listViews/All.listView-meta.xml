@@ -6,7 +6,6 @@
     <columns>Start_Date__c</columns>
     <columns>End_Date__c</columns>
     <columns>Frequency__c</columns>
-    <columns>Status__c</columns>
     <columns>Account__c</columns>
     <columns>Number_of_Invited_Suppliers__c</columns>
     <columns>Number_of_Responded_Suppliers__c</columns>
