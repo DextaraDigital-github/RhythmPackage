@@ -293,7 +293,6 @@ public with sharing class AssessmentController {
         }catch(exception e){
             
             string errorMsg = e.getMessage();
-            System.debug('response'+errorMsg);
             throw new AuraHandledException(errorMsg);
         }
     }
