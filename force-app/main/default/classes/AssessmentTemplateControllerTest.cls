@@ -106,4 +106,12 @@ public class AssessmentTemplateControllerTest {
         Test.stopTest();
     
     }
+    @isTest
+    public static void deleteTemplateTest(){
+        List<Assessment_Template__c> templist=[select id from Assessment_Template__c];
+        Test.startTest();
+        delete templist;
+        Test.stopTest();
+
+    }
 }

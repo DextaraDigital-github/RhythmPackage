@@ -19,7 +19,7 @@ public with sharing class CanTheUser {
      */
     public class CanTheUserException extends Exception {
     }
-
+    
     public enum CrudType {
         CREATE,
         READ,
@@ -33,50 +33,6 @@ public with sharing class CanTheUser {
         UPDATABLE
     }
 
-    /**
-     * @description this cachebuilder interface allows the CanTheUser class to
-     * cache per-object results for each object requested.This prevents the
-     * need to repeatedly calculate permission usage by calling
-     * Schema.Describe* calls
-     */
-    private class PermissionCache implements Cache.CacheBuilder {
-        /**
-         * @description   Required method for the CacheBuilder interface.Used
-         * here to either calculate an objects per-user FLS, OR to return it
-         * from Cache.
-         * The return datastructure for this is
-         * Map<String, Map<FLSType,Boolean>> and represents:
-         * FieldName -> FLStype -> True/False
-         * @param objType String object name used as the cache key
-         * @return       `Object`
-         */
-        public Object doLoad(String objType) {
-            return calculateFLS(objType);
-        }
-
-        /**
-         * @description   Calculates the FLS for a given object type
-         * @param objType String name of the object type
-         * @return        `Map<String, Map<FLSType, Boolean>>`
-         */
-        public Map<String, Map<FLSType, Boolean>> calculateFLS(string objType) {
-            Schema.DescribeSObjectResult[] descResult = Schema.describeSObjects(
-                new List<String>{ objType }
-            );
-
-            Map<String, Map<FLSType, Boolean>> results = new Map<String, Map<FLSType, Boolean>>();
-            for (SObjectField field : descResult[0].fields.getMap().values()) {
-                DescribeFieldResult fieldDetails = field.getDescribe();
-                String fieldKey = String.valueOf(field).toLowerCase();
-                results.put(fieldKey, new Map<FLSType, Boolean>());
-                results.get(fieldKey)
-                    .put(FLSType.ACCESSIBLE, fieldDetails.isAccessible());
-                results.get(fieldKey)
-                    .put(FLSType.UPDATABLE, fieldDetails.isUpdateable());
-            }
-            return results;
-        }
-    }
 
     /**
      * This class' name was chosen to facilitate easy-to-understand and read
@@ -423,20 +379,7 @@ public with sharing class CanTheUser {
         String field,
         FLSType checkType
     ) {
-        /*Cache.Partition defaultSession = PlatformCacheRecipes.getDefaultPartition(
-            PlatformCacheRecipes.PartitionType.SESSION
-        );
-
-        Map<String, Map<FLSType, Boolean>> objResults;
-
-        if (new OrgShape().isPlatformCacheEnabled()) {
-            objResults = (Map<String, Map<FLSType, Boolean>>) defaultSession
-                .get(PermissionCache.class, obj);
-        } else {
-            objResults = new PermissionCache().calculateFLS(obj);
-        }
-
-        Boolean results = objResults.get(field.toLowerCase())?.get(checkType);*/
-        return false;//(results != null && results) ? true : false;
+       
+        return false;
     }
 }
