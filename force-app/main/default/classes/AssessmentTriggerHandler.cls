@@ -1,8 +1,8 @@
-/* 
+/** 
 * Class Name        : AssessmentTriggerHandler
 * Developer         : Sai Koushik Nimmaturi and Reethika Velpula           
 * Created Date      : 
-* Description       : It is used to perform the trigger logic.
+* @description        : It is used to perform the trigger logic.
 * Last Modified Date: 
 */
 
@@ -11,7 +11,7 @@ public with sharing class AssessmentTriggerHandler implements ITriggerHandler{
     public static TriggerFrameworkServiceController serviceController = new TriggerFrameworkServiceController();
     
     /**
-    * To execute before insert logic
+    * @description To execute before insert logic
     * @param newList This is the new list of records.  
     */
     public void beforeInsert(List<sObject> newList) {
@@ -19,16 +19,16 @@ public with sharing class AssessmentTriggerHandler implements ITriggerHandler{
     }
     
      /**
-    * To execute after insert logic
+    * @description To execute after insert logic
     * @param newList This is the new list of records.
       @param newMap This is the new map of records.
     */
     public void afterInsert(List<sObject> newList , Map<Id, sObject> newMap) {
-        
+      return;
     }
     
     /**
-    * To execute before update logic
+    * @description To execute before update logic
     * @param newList This is the new list of records.
       @param newMap This is the new map of records.
       @param oldList This is the old list of records.
@@ -47,45 +47,50 @@ public with sharing class AssessmentTriggerHandler implements ITriggerHandler{
     }
     
     /**
-    * To execute after update logic
+    * @description To execute after update logic
     * @param newList This is the new list of records.
       @param newMap This is the new map of records.
       @param oldList This is the old list of records.
       @param oldMap This is the old map of records.
     */
     public void afterUpdate(List<sObject> newList, Map<Id, sObject> newMap,  List<sObject> oldList, Map<Id, sObject> oldMap) {
-        
+      return;
     }
     
     /**
-    * To execute before delete logic
+    * @description To execute before delete logic
     * @param oldList This is the old list of records.
       @param oldMap This is the old map of records.
     */
     public void beforeDelete(List<sObject> oldList , Map<Id, sObject> oldMap) {
-        
+      for(Assessment__c assmt:(List<Assessment__c>)oldMap.values()){
+        Decimal supplierCount = (Decimal)assmt.get('Number_of_Invited_Suppliers__c');
+        if(supplierCount > 0){
+          assmt.addError('Assessment program in use, cannot be deleted.');
+        }
+      }
     }
      
     /**
-    * To execute after delete logic
+    * @description To execute after delete logic
     * @param oldList This is the old list of records.
       @param oldMap This is the old map of records.
     */
     public void afterDelete(List<sObject> oldList , Map<Id, sObject> oldMap) {
-       
+      return;
     }
     
     /**
-    * To execute after undelete logic
-    * @param oldList This is the new list of records.
-      @param oldMap This is the new map of records.
+    * @description To execute after undelete logic
+    * @param newList This is the new list of records.
+      @param newMap This is the new map of records.
     */
     public void afterUnDelete(List<sObject> newList, Map<Id, sObject> newMap) {
-        
+      return;
     }
 
     /**
-    * To calculate questions count
+    * @description To calculate questions count
     * @param newList This is the new list of records.
     * @param newMap This is the new map of records.
     */
@@ -100,7 +105,7 @@ public with sharing class AssessmentTriggerHandler implements ITriggerHandler{
             }
         }
         set<Id> templateIds = templateMap.keySet();
-        Map<String, Object> bindVariables = new Map<String, Object>{'templateIds' => templateIds};
+        //Map<String, Object> bindVariables = new Map<String, Object>{'templateIds' => templateIds};
         string query = 'SELECT COUNT(id) quesCount, Assessment_Template__c'
                      +' FROM Question__c'
                      +' WITH SECURITY_ENFORCED'

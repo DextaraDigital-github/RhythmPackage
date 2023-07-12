@@ -162,7 +162,7 @@
     <label>Question</label>
     <nameField>
         <displayFormat>Q-{0000}</displayFormat>
-        <label>Question Name</label>
+        <label>Question Number</label>
         <trackHistory>false</trackHistory>
         <type>AutoNumber</type>
     </nameField>

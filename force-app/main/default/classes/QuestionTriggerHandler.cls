@@ -1,9 +1,16 @@
-public class QuestionTriggerHandler implements ITriggerHandler{
+/**
+* Class Name       : QuestionTriggerHandler
+* Developer         :       
+* Created Date      :
+* @description      : 
+* Last Modified Date:
+*/
+public with sharing class QuestionTriggerHandler implements ITriggerHandler{
     public static SecurityCheckController safe = new SecurityCheckController();//use singleton pattern
     private static Savepoint sp;//prudhvi to work
 
     /**
-    * To execute before insert logic
+    * @description To execute before insert logic
     * @param newList This is the new list of records.  
     */
     public void beforeInsert(List<sObject> newList) {
@@ -11,7 +18,7 @@ public class QuestionTriggerHandler implements ITriggerHandler{
         recordAddSequenceNumber(newList);
     }
      /**
-    * To execute after insert logic
+    * @description To execute after insert logic
     * @param newList This is the new list of records.
       @param newMap This is the new map of records.
     */
@@ -19,7 +26,7 @@ public class QuestionTriggerHandler implements ITriggerHandler{
         getQuestionsCount(newList,new Set<Id>{});
     }
      /**
-    * To execute before update logic
+    * @description To execute before update logic
     * @param newList This is the new list of records.
       @param newMap This is the new map of records.
       @param oldList This is the old list of records.
@@ -45,7 +52,7 @@ public class QuestionTriggerHandler implements ITriggerHandler{
         restrictRecordActions(newQustnlst);
     }
     /**
-    * To execute after update logic
+    * @description To execute after update logic
     * @param newList This is the new list of records.
       @param newMap This is the new map of records.
       @param oldList This is the old list of records.
@@ -53,19 +60,19 @@ public class QuestionTriggerHandler implements ITriggerHandler{
     */
     public void afterUpdate(List<sObject> newList, Map<Id, sObject> newMap,  List<sObject> oldList, Map<Id, sObject> oldMap) {
         List<Question__c> qustnlst=new List<Question__c>();
-        Set<Id> SectnsIds=new Set<Id>();
+        Set<Id> sectnsIds=new Set<Id>();
         for(Question__c qustn:(List<Question__c>)newMap.values()) {
             if(qustn.Section__c!=((Question__c)oldMap.get(qustn.Id)).Section__c && qustn.Section__c!=null) {
-                SectnsIds.add(qustn.Section__c);
-                SectnsIds.add(((Question__c)oldMap.get(qustn.Id)).Section__c);
+                sectnsIds.add(qustn.Section__c);
+                sectnsIds.add(((Question__c)oldMap.get(qustn.Id)).Section__c);
             }
         }
-        if(qustnlst.size()>0 || SectnsIds.size()>0) {
-            getQuestionsCount(qustnlst,SectnsIds);
+        if(qustnlst.size()>0 || sectnsIds.size()>0) {
+            getQuestionsCount(qustnlst,sectnsIds);
         }
     }
     /**
-    * To execute before delete logic
+    * @description To execute before delete logic
     * @param oldList This is the old list of records.
       @param oldMap This is the old map of records.
     */
@@ -75,7 +82,7 @@ public class QuestionTriggerHandler implements ITriggerHandler{
         recordSequenceNumber(oldList);
     }
     /**
-    * To execute after delete logic
+    * @description To execute after delete logic
     * @param oldList This is the old list of records.
       @param oldMap This is the old map of records.
     */
@@ -83,16 +90,16 @@ public class QuestionTriggerHandler implements ITriggerHandler{
         getQuestionsCount(oldList,new Set<Id>{});
     }
     /**
-    * To execute after undelete logic
+    * @description To execute after undelete logic
     * @param newList This is the new list of records.
       @param newMap This is the new map of records.
     */
     public void afterUnDelete(List<sObject> newList, Map<Id, sObject> newMap) {
-
+        return;
     }
     
     /**
-    * To calculate questions count
+    * @description To calculate questions count
     * @param qustlst This is the new list of question records.
     * @param sectionsIds This is the set of section id.
     */
@@ -101,7 +108,8 @@ public class QuestionTriggerHandler implements ITriggerHandler{
         try {
             Set<Id> secIds=new Set<Id>();
             List<Section__c> updateSectionslst = new List<Section__c>();
-            map<Id,Integer> sectionwithQuestionscountMap=new map<Id,Integer>();
+            Map<Id,Integer> sectionwithQuestionscountMap=new Map<Id,Integer>();
+            List<String> errorList =  new List<String>();
             if(qustlst.isEmpty() == false) {
                 for(Question__c qustn:qustlst){
                     secIds.add(qustn.section__c);
@@ -133,19 +141,19 @@ public class QuestionTriggerHandler implements ITriggerHandler{
                 }
                 if(updateSectionslst.isEmpty() == false) {
                     Database.SaveResult[] saveResult = safe.doUpdate(updateSectionslst);
-                    List<String> errorList = SecurityCheckController.safeClassExceptionHandlerInsert(saveResult);
-                    if(errorList.size()>0){
-                        Database.rollback(sp);
-                        throw new SecurityControllerException(String.join( errorList, ', ' ));
-                    }
+                    errorList = SecurityCheckController.safeClassExceptionHandlerInsert(saveResult);
+                }
+                if(errorList.size()>0){
+                    Database.rollback(sp);
+                    throw new SecurityControllerException(String.join( errorList, ', ' ));
                 }
             }
         }catch(exception e){
-            
+            throw new AuraHandledException(e.getMessage());
         }
     }
     /**
-    * To perform operations based on the status of template 
+    * @description To perform validation based on the status of template.
     * @param qusLst This is the new list of question records.
     */
     public void restrictRecordActions(List<Question__c> qusLst) {
@@ -162,7 +170,7 @@ public class QuestionTriggerHandler implements ITriggerHandler{
                 
                 Map<String, Object> bindVariables = new Map<String, Object>{'templateIds' => templateIds};
                 List<Assessment_template__c> templateList = safe.doQueryWithBinds(tempQuery,bindVariables);
-                if(templateList.isEmpty() == false){
+                //if(templateList.isEmpty() == false){
                     for(Assessment_template__c template:templateList) {
                         templateStatusMap.put(template.Id,template.Status__c);
                     }
@@ -171,15 +179,15 @@ public class QuestionTriggerHandler implements ITriggerHandler{
                             qus.addError('You can not perform any operations on this record because of Template Status');
                         } 
                     }
-                }
+                //}
             }
         }
         catch(exception e){
-            
+            throw new AuraHandledException(e.getMessage());
         }
     }
     /**
-    * To perform validations on assessment template
+    * @description To perform validations on assessment template
     * @param questionLst This is the new list of question records.
     */
     public void recordValidations(List<Question__c> questionLst) {
@@ -188,11 +196,11 @@ public class QuestionTriggerHandler implements ITriggerHandler{
                 question.addError('You cannot change Assessment Template');
             }
         }catch(exception e) {
-            
+            throw new AuraHandledException(e.getMessage());
         }
     }
     /**
-    * To add the sequence number.
+    * @description To add the sequence number.
     * @param qusLst This is the new list of question records.
     */
     public void recordAddSequenceNumber(List<Question__c> qusLst) {
@@ -208,33 +216,33 @@ public class QuestionTriggerHandler implements ITriggerHandler{
                                 + ' ORDER BY Question_Sequence_Number__c ASC';
                 Map<String, Object> bindVariables = new Map<String, Object>{'templateIds' => templateIds};
                 List<Question__c> questionList = safe.doQueryWithBinds(queQuery,bindVariables);
-                if(questionList.isEmpty() == false){
+                //if(questionList.isEmpty() == false){
                     integer sequenceNumber = 0;
                     for(Question__c question: questionList) {
-                        if(question.Question_Sequence_Number__c != null) {
-                            if(sequenceNumber < question.Question_Sequence_Number__c) {
-                                sequenceNumber = (Integer)question.Question_Sequence_Number__c;
-                            }
+                        if(question.Question_Sequence_Number__c != null && 
+                            sequenceNumber < question.Question_Sequence_Number__c) {
+                            sequenceNumber = (Integer)question.Question_Sequence_Number__c;                            
                         }
                     }
                     for(Question__c ques: qusLst) {
                         sequenceNumber = sequenceNumber+1;
                         ques.Question_Sequence_Number__c = sequenceNumber;
                     }
-                }
+                //}
             }
         }
         catch(exception e) {
-            
+            throw new AuraHandledException(e.getMessage());
         }
     }
     /**
-    * To update sequence number for question object
+    * @description To update sequence number for question object
     * @param quesLst This is the new list of question records.
     */
     public void recordSequenceNumber(List<Question__c> quesLst) {
         Set<Id> templateIds = new Set<Id>();
         List<Question__c> updateQuestionList=new List<Question__c>();
+        List<String> errorList = new List<String>();
         try {
             for(Question__c question: quesLst) {
                 templateIds.add(question.Assessment_Template__c);
@@ -247,7 +255,7 @@ public class QuestionTriggerHandler implements ITriggerHandler{
                                 + ' ORDER BY Question_Sequence_Number__c ASC';
                 Map<String, Object> bindVariables = new Map<String, Object>{'templateIds' => templateIds,'quesLst' => quesLst};                               
                 List<Question__c> questionList = safe.doQueryWithBinds(queQuery,bindVariables);
-                if(questionList.isEmpty() == false){
+                //if(questionList.isEmpty() == false){
                     integer sequenceNumber = 0;
                     for(Question__c question: questionList) {
                         sequenceNumber = sequenceNumber+1;
@@ -259,21 +267,21 @@ public class QuestionTriggerHandler implements ITriggerHandler{
                     }
                     if(updateQuestionList.isEmpty() == false) {
                         Database.SaveResult[] saveResult = safe.doUpdate(updateQuestionList);
-                        List<String> errorList = SecurityCheckController.safeClassExceptionHandlerInsert(saveResult);
-                        if(errorList.size()>0){
-                            Database.rollback(sp);
-                            throw new SecurityControllerException(String.join( errorList, ', ' ));
-                        }
+                        errorList = SecurityCheckController.safeClassExceptionHandlerInsert(saveResult);
                     }
-                }
+                    if(errorList.size()>0){
+                        Database.rollback(sp);
+                        throw new SecurityControllerException(String.join( errorList, ', ' ));
+                    }
+                //}
             }
         }
         catch(exception e) {
-            
+            throw new AuraHandledException(e.getMessage());
         }
     }
 /**
-  * It is used to throw the exception.
+  * @description It is used to throw the exception.
 */
     public class SecurityControllerException extends Exception{
         
