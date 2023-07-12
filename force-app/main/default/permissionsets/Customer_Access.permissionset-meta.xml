@@ -12,6 +12,10 @@
         <apexClass>AssessmentTemplateController</apexClass>
         <enabled>true</enabled>
     </classAccesses>
+    <classAccesses>
+        <apexClass>DisplayPDFController</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
     <fieldPermissions>
         <editable>false</editable>
         <field>AccountAssessmentRelation__c.Completed__c</field>

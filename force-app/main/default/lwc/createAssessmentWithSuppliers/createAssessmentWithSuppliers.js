@@ -34,6 +34,7 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
 
     handleChange(event){
         this.templateId = event.target.value;
+        this.fetchTemplateData();
     }
 
     getTodayDate(){
@@ -51,7 +52,7 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
     fetchTemplateData(){
         getTemplateData({templateId:this.templateId})
         .then(result => {
-            if(result & result.length>0){
+            if(result){
                 this.templateStatus = result[0].Rhythm__Status__c;
                 if(result[0].Rhythm__Status__c === 'Inactive'){
                     this.isTemplateInactive = true;
@@ -167,7 +168,7 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
         }else{
             this.navigateToObjectHome();
         }
-       // eval("$A.get('e.force:refreshView').fire();");//Todo Prudvi please check this
+        eval("$A.get('e.force:refreshView').fire();");//Todo Prudvi please check this
     }
     showNotification(title,message,variant) {
         const evt = new ShowToastEvent({

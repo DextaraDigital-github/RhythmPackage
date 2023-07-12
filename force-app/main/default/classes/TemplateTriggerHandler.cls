@@ -7,7 +7,7 @@
 */
 public with sharing class TemplateTriggerHandler implements ITriggerHandler{
     public static TriggerFrameworkServiceController serviceController = new TriggerFrameworkServiceController();
-    
+    public static SecurityCheckController safe = new SecurityCheckController();//use singleton pattern
     /**
     * @description To execute before insert logic
     * @param newList This is the new list of records.  
@@ -106,7 +106,11 @@ public with sharing class TemplateTriggerHandler implements ITriggerHandler{
         for(Assessment_Template__c template:templateList) {
             templateIds.add(template.Id);
         }
-        List<Assessment_Template__c> tmplList=[SELECT Id,(SELECT Id from Questions__r where Section__c != null) from Assessment_Template__c where Id IN: templateIds];
+        string query = 'SELECT Id,(SELECT Id from Questions__r where Section__c != null)'
+                     +' FROM Assessment_Template__c'
+                     +' WHERE Id IN: templateIds';
+        Map<String, Object> bindVariables = new Map<String, Object>{'templateIds' => templateIds};
+        List<Assessment_Template__c> tmplList = safe.doQueryWithBinds(query,bindVariables);
         for(Assessment_Template__c template:tmplList) {
             templateQuestionMap.put(template.Id,template.Questions__r.size());
         } 
@@ -115,8 +119,6 @@ public with sharing class TemplateTriggerHandler implements ITriggerHandler{
                 template.addError('Template should have atleast 1 question to change the status');
             }       
         }
-        
-        
     }
     
 }

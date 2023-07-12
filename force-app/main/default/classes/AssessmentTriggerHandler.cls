@@ -63,7 +63,12 @@ public with sharing class AssessmentTriggerHandler implements ITriggerHandler{
       @param oldMap This is the old map of records.
     */
     public void beforeDelete(List<sObject> oldList , Map<Id, sObject> oldMap) {
-      return;
+      for(Assessment__c assmt:(List<Assessment__c>)oldMap.values()){
+        Decimal supplierCount = (Decimal)assmt.get('Number_of_Invited_Suppliers__c');
+        if(supplierCount > 0){
+          assmt.addError('Assessment program in use, cannot be deleted.');
+        }
+      }
     }
      
     /**

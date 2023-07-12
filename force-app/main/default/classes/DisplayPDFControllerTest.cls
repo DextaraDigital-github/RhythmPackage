@@ -6,12 +6,12 @@
 * Last Modified Date: 
 */
 @isTest
-public class DisplayPDFControllerTest {
+private class DisplayPDFControllerTest {
     /**
     * @description method for testsetup data.
     */
 	@testSetup
-    public static void methodName() {
+    private static void methodName() {
         Id clinicRecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByName().get('Supplier').getRecordTypeId();
         Map<String, Object> accAttributes = new Map<String, Object>{'RecordTypeId'=>clinicRecordTypeId,'Name'=>'Supplier'};
         List<Account> accts = TestDataFactory.createAccounts(1,true,accAttributes);
@@ -38,7 +38,7 @@ public class DisplayPDFControllerTest {
     * @description
     */
     @isTest
-    public static void displayTest()
+    private static void displayTest()
     {
         Test.startTest();
         PageReference pageRef = Page.RenderAsPdf;

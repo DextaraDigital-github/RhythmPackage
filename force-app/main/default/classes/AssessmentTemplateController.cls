@@ -261,7 +261,7 @@ public with sharing class AssessmentTemplateController {
                 if(questionList.isEmpty() == false) {
                     drchildList=safe.doDelete(questionList);
                 }
-                Database.delete(recIdList,true);
+                Database.delete(recIdList,true);//need to check with priyanka
                 for(Database.DeleteResult dr:drchildList) {
                     if(!dr.isSuccess()) {
                         for(Database.Error de:dr.getErrors()) {

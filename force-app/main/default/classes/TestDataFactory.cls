@@ -8,6 +8,9 @@
 
 
 public with sharing class TestDataFactory{
+
+    public static SecurityCheckController safe = new SecurityCheckController();//use singleton pattern
+    private static Savepoint sp; // to rollback
     /**
     * @description createRecords methods is used to create the records for all objects.
     * @param records This is a list of records to insert.  
@@ -40,7 +43,13 @@ public with sharing class TestDataFactory{
                 }
             }
             if (doInsert) {
-                insert records;
+                Savepoint sp = Database.setSavepoint();
+                Database.SaveResult[] srList1 = safe.doinsert(records);
+                List<String> errorList = SecurityCheckController.safeClassExceptionHandlerInsert(srList1);
+                if(errorList.size()>0){
+                    Database.rollback(sp);
+                    throw new SecurityControllerException(String.join( errorList, ', ' ));
+                }
             }
         } catch(Exception e){
             throw new AuraHandledException(e.getMessage());
@@ -214,5 +223,12 @@ public with sharing class TestDataFactory{
             supplierList.add(accSupplier);
         }
         return createRecords(supplierList,true,attributes);
+    }
+
+    /**
+    * @description It is used to throw the exception.
+    */
+    public class SecurityControllerException extends Exception{
+            
     }
 }

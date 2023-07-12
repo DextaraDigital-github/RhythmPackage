@@ -1,8 +1,8 @@
 @isTest
-public class AssessmentExpiryNotificationScheduleTest {
+private class AssessmentExpiryNotificationScheduleTest {
 
     @istest
-    public static void testExpirySchedule() {
+    private static void testExpirySchedule() {
 		Test.StartTest();
 		AssessmentExpiryNotificationSchedule expSche = new AssessmentExpiryNotificationSchedule();
 		String sch = '0 0 23 * * ?';

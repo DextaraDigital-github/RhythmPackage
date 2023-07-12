@@ -6,12 +6,12 @@
 * Last Modified Date:
 */
 @isTest
-public class QuestionTriggerHandlerTest {
+private class QuestionTriggerHandlerTest {
     /**
     * @description method for testsetup data.
     */
     @testSetup
-    public static void methodName() {
+    private static void methodName() {
         Id clinicRecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByName().get('Supplier').getRecordTypeId();
         Map<String, Object> accAttributes = new Map<String, Object>{'RecordTypeId'=>clinicRecordTypeId,'Name'=>'Supplier'};
         TestDataFactory.createAccounts(1,true,accAttributes);
@@ -29,7 +29,7 @@ public class QuestionTriggerHandlerTest {
     * @description method for deleting questions scenerio.
     */
     @isTest
-    public static void questionDelete() {  
+    private static void questionDelete() {  
         Test.startTest();    
         List<Question__c> quesList = [Select id from Question__c LIMIT 1];
         delete quesList[0];
@@ -40,7 +40,7 @@ public class QuestionTriggerHandlerTest {
     * @description method for updating the questions scenerio.
     */
     @isTest
-    public static void questionUpdate() {
+    private static void questionUpdate() {
         Test.startTest();
         List<Question__c> quesList = [Select id from Question__c LIMIT 1];
         quesList[0].Question__c ='Test Question ?';

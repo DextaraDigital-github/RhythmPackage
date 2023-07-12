@@ -163,4 +163,108 @@ private inherited sharing class CanTheUserTest {
             'Expected that the two sets would be different'
         );
     }
+    @isTest
+    static void curdTestA() {
+        String testString;
+        Test.startTest();
+        SObject objRecord = new Account(Name='Test');
+        List<SObject> testList = new List<SObject>{objRecord};
+        CanTheUser.crud(testList,CanTheUser.CrudType.CREATE);
+        testString='Success';
+        System.assertEquals(testString=='Success', true,'fls check done');
+        Test.stopTest();
+    }
+
+    @isTest
+    static void curdTestB() {
+        String testString;
+        Test.startTest();
+        CanTheUser.crud('Account',CanTheUser.CrudType.CREATE);
+        testString='Success';
+        System.assertEquals(testString=='Success', true,'fls check done');
+        Test.stopTest();
+    }
+
+
+    @isTest
+    static void curdTestC() {
+        String testString;
+        Test.startTest();
+        SObject objRecord = new Account(Name='Test');
+        List<SObject> testList = new List<SObject>{objRecord};
+        CanTheUser.create(testList);
+        testString='Success';
+        System.assertEquals(testString=='Success', true,'fls check done');
+        Test.stopTest();
+    }
+
+    @isTest
+    static void curdTestD() {
+        String testString;
+        Test.startTest();
+        CanTheUser.create('Account');
+        testString='Success';
+        System.assertEquals(testString=='Success', true,'fls check done');
+        Test.stopTest();
+    }
+
+    @isTest
+    static void curdTestE() {
+        String testString;
+        Test.startTest();
+        SObject objRecord = new Account(Name='Test');
+        List<SObject> testList = new List<SObject>{objRecord};
+        CanTheUser.read(testList);
+        testString='Success';
+        System.assertEquals(testString=='Success', true,'fls check done');
+        Test.stopTest();
+    }
+
+    @isTest
+    static void curdTestF() {
+        String testString;
+        Test.startTest();
+        CanTheUser.read('Account');
+        testString='Success';
+        System.assertEquals(testString=='Success', true,'fls check done');
+        Test.stopTest();
+    }
+
+    @isTest
+    static void curdTestG() {
+        String testString;
+        Test.startTest();
+        SObject objRecord = new Account(Name='Test');
+        List<SObject> testList = new List<SObject>{objRecord};
+        CanTheUser.edit(testList);
+        testString='Success';
+        System.assertEquals(testString=='Success', true,'fls check done');
+        Test.stopTest();
+    }
+
+    @isTest
+    static void curdTestH() {
+        String testString;
+        Test.startTest();
+        SObject objRecord = new Account(Name='Test');
+        Set<String> fields = new Set<String>{'Name'};
+        CanTheUser.bulkFLSAccessible('Account',fields);
+        testString='Success';
+        System.assertEquals(testString=='Success', true,'fls check done');
+        Test.stopTest();
+    }
+
+    @isTest
+    static void curdTestI() {
+        String testString;
+        Test.startTest();
+        SObject objRecord = new Account(Name='Test');
+        Set<String> fields = new Set<String>{'Name'};
+        CanTheUser.bulkFLSUpdatable('Account',fields);
+        testString='Success';
+        System.assertEquals(testString=='Success', true,'fls check done');
+        Test.stopTest();
+    }
+
+    
 }

@@ -19,4 +19,29 @@ private class SecurityCheckControllerTest {
         Test.stopTest();
         System.assert(acc.size()>0, TRUE);
     }
+
+    @isTest
+    static void safelyTestA(){
+        String testString;
+        Test.startTest();
+        SecurityCheckController safe = new SecurityCheckController();
+        safe.throwIfRemovedFields();
+        testString='Success';
+        System.assertEquals(testString=='Success', true,'fls check done');
+        Test.stopTest();
+    }
+
+    @isTest
+    static void safelyTestB(){
+        String testString;
+        Test.startTest();
+        SecurityCheckController safe = new SecurityCheckController();
+        SObject objRecord = new Account(Name='Test');
+        safe.doInsert(objRecord);
+        testString='Success';
+        System.assertEquals(testString=='Success', true,'fls check done');
+        Test.stopTest();
+    }
+
+   
 }

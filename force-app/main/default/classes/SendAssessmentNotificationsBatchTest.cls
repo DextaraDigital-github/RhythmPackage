@@ -6,12 +6,12 @@
 * Last Modified Date: 
 */
 @isTest
-public with sharing class SendAssessmentNotificationsBatchTest {
+private with sharing class SendAssessmentNotificationsBatchTest {
     /**
     * @description method for testsetup data.
     */
     @testSetup
-    public static void methodName() {
+    private static void methodName() {
         Id clinicRecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByName().get('Supplier').getRecordTypeId();
         Map<String, Object> accAttributes = new Map<String, Object>{'RecordTypeId'=>clinicRecordTypeId,'Name'=>'Supplier','Rhythm__Email__c'=>'test@gmail.com'};
         List<Account> accts = TestDataFactory.createAccounts(1,true,accAttributes);
@@ -41,7 +41,7 @@ public with sharing class SendAssessmentNotificationsBatchTest {
     }
 
     @isTest
-    public static void notificationBatchTest()
+    private static void notificationBatchTest()
     {
         Test.startTest();
         SendAssessmentNotificationsBatch b = new SendAssessmentNotificationsBatch();
