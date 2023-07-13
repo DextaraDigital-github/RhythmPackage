@@ -707,7 +707,7 @@ public with sharing class AssessmentController {
             query = 'SELECT Id,Name FROM Account';
             String filter = '';
             if(string.isNotBlank(searchKey)){
-                string sKey = '\'%'+searchKey+'%\'';
+                String sKey ='\'%'+String.escapeSingleQuotes(searchKey)+'%\'';
                 filter += ' WHERE ((Name LIKE '+sKey+') ';
             }
             if(string.isNotBlank(existingData))
@@ -722,7 +722,7 @@ public with sharing class AssessmentController {
                 }
                 if(string.isNotBlank(exSearchKey))
                 {
-                    string sKey = '\'%'+exSearchKey+'%\'';
+                    string sKey = '\'%'+String.escapeSingleQuotes(exSearchKey)+'%\'';
                 	filter += ' AND (Name LIKE '+sKey+') ';
                 }
             }
@@ -1039,7 +1039,7 @@ public with sharing class AssessmentController {
                      +' FROM Assessment_Supplier__c'
                      +' WHERE Assessment__c = \'' + String.escapeSingleQuotes(assessmentId) + '\'';
             if(String.isNotBlank(searchKey)){
-                string sKey = '\'%'+searchKey+'%\'';
+                string sKey = '\'%'+String.escapeSingleQuotes(searchKey)+'%\'';
                 query = query+' AND Account__r.Name LIKE '+sKey;
                 query = query+' WITH SECURITY_ENFORCED';
             }else{
