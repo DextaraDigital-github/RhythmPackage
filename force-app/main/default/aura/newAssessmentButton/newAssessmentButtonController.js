@@ -7,8 +7,6 @@
             cmp.set("v.templateId",templateId);
         }
     },
-    refreshPage: function(){
-        $A.get('e.force:refreshView').fire();
-    }
+   
     
 })
