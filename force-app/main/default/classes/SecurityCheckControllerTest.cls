@@ -17,7 +17,7 @@ private class SecurityCheckControllerTest {
         safe.doDelete(new List<Account>());
         safe.doQuery('SELECT Id FROM Account');
         Test.stopTest();
-        System.assertEquals(acc.size()>0,true,' TRUE');
+        System.assert(acc.size()>0, TRUE);
     }
 
     @isTest

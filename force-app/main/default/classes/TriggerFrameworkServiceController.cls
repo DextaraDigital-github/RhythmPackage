@@ -38,10 +38,13 @@ public with sharing class TriggerFrameworkServiceController {
     * @return
     */
     public List<string> getUpdatableFields(string triggerObjId){
+        if ((!Schema.sObjectType.Trigger_Field_Change_Handler__mdt.isAccessible()) || (!Schema.sObjectType.Trigger_Field_Change_Handler__mdt.fields.Id.isAccessible()) || (!Schema.sObjectType.Trigger_Field_Change_Handler__mdt.fields.MasterLabel.isAccessible())) {
+            return new List<string>();
+        }
         List<string> fieldsList = new List<string>();
         for(Trigger_Field_Change_Handler__mdt tfh:[select id, MasterLabel from Trigger_Field_Change_Handler__mdt where Object_Name__c =:triggerObjId]){
             fieldsList.add(tfh.MasterLabel);
         }
         return fieldsList;
-    }
+     }
 }

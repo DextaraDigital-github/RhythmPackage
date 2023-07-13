@@ -134,12 +134,15 @@ public with sharing class AccountAssessmentRelationHandler implements ITriggerHa
 
     @testVisible 
     public static List<Configuration__mdt> siteURLData{
-      get{ 
-          if(siteURLData == NULL){ 
+      get{
+          if ((!Schema.sObjectType.Configuration__mdt.isAccessible()) || (!Schema.sObjectType.Configuration__mdt.fields.Site_URL__c.isAccessible())) {
+              return new List<Configuration__mdt>();
+          }
+          if(siteURLData == null){
             siteURLData = [SELECT Site_URL__c,DeveloperName,MasterLabel FROM Configuration__mdt LIMIT 1]; 
           } 
           return siteURLData; 
-      } 
-      set; 
+        }
+        set; 
     }
 }
