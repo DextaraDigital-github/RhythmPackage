@@ -116,7 +116,7 @@ jobs:
       - name: 'Promote package version'
         run: sfdx force:package:version:promote --package ${{ steps.createPackageVersion.outputs.packageVersionId }} -n
         
-      # Install Plugin to install sfdx scanner
+      # Install SFDX Scanner Plugin 
       - name: 'SFDX scanner Install'
         run: sfdx plugins:install @salesforce/sfdx-scanner
         
