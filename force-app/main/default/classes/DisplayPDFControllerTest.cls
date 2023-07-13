@@ -11,7 +11,7 @@ private class DisplayPDFControllerTest {
     * @description method for testsetup data.
     */
 	@testSetup
-    private static void methodName() {
+    static void methodName() {
         Id clinicRecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByName().get('Supplier').getRecordTypeId();
         Map<String, Object> accAttributes = new Map<String, Object>{'RecordTypeId'=>clinicRecordTypeId,'Name'=>'Supplier'};
         List<Account> accts = TestDataFactory.createAccounts(1,true,accAttributes);
@@ -38,7 +38,7 @@ private class DisplayPDFControllerTest {
     * @description
     */
     @isTest
-    private static void displayTest()
+    static void displayTest()
     {
         Test.startTest();
         PageReference pageRef = Page.RenderAsPdf;

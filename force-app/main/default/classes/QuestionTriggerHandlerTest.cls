@@ -11,7 +11,7 @@ private class QuestionTriggerHandlerTest {
     * @description method for testsetup data.
     */
     @testSetup
-    private static void methodName() {
+    static void methodName() {
         Id clinicRecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByName().get('Supplier').getRecordTypeId();
         Map<String, Object> accAttributes = new Map<String, Object>{'RecordTypeId'=>clinicRecordTypeId,'Name'=>'Supplier'};
         TestDataFactory.createAccounts(1,true,accAttributes);
@@ -29,7 +29,7 @@ private class QuestionTriggerHandlerTest {
     * @description method for deleting questions scenerio.
     */
     @isTest
-    private static void questionDelete() {  
+    static void questionDelete() {  
         Test.startTest();    
         List<Question__c> quesList = [Select id from Question__c LIMIT 1];
         delete quesList[0];
@@ -40,7 +40,7 @@ private class QuestionTriggerHandlerTest {
     * @description method for updating the questions scenerio.
     */
     @isTest
-    private static void questionUpdate() {
+    static void questionUpdate() {
         Test.startTest();
         List<Question__c> quesList = [Select id from Question__c LIMIT 1];
         quesList[0].Question__c ='Test Question ?';

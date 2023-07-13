@@ -11,7 +11,7 @@ private class SectionTriggerHandlerTest {
     * @description method for testsetup data.
     */
     @testSetup
-    private static void methodName() {
+    static void methodName() {
         Map<String, Object> assementTemplateattributes = new Map<String, Object>{'Name'=>'2023 Assessment template','Rhythm__Name__c'=>'2023 Assessment template'};
         List<Assessment_Template__c> templist=TestDataFactory.createAssessmentTemp(1,true,assementTemplateattributes);
         Map<String, Object> sectionAttributes = new Map<String, Object>{'Rhythm__Assessment_Template__c'=>templist[0].Id,'Name'=>'Section1'};
@@ -21,7 +21,7 @@ private class SectionTriggerHandlerTest {
     * @description method for update scenerio.
     */
     @istest
-    private static void testupdate() {
+    static void testupdate() {
         Test.startTest();
         List<Rhythm__Section__c> seclist=[select id,Rhythm__No_of_Questions__c from Rhythm__Section__c];
         seclist[0].Name = 'testSection';
@@ -34,7 +34,7 @@ private class SectionTriggerHandlerTest {
     * @description method for delete scenerio.
     */
     @isTest
-    private static void testdelete() {
+    static void testdelete() {
         Test.startTest();     
         List<Rhythm__Section__c> seclist=[select id,Rhythm__No_of_Questions__c from Rhythm__Section__c];
         delete secList[0];

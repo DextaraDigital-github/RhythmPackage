@@ -6,12 +6,14 @@
 * Last Modified Date: 23-06-2023
 */
 @IsTest
-public class AssessmentTemplateControllerTest {
+private class AssessmentTemplateControllerTest {
     /**
     * @description method for testsetup data.
     */
     @testSetup
-    public static void methodName() {
+    static void methodName() {
+        // Set<Id> userIds = new Set<Id>{(Id)UserInfo.getUserId()};
+        // TestDataFactory.AssignPermissionSetToUsers(userIds);
         Id clinicRecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByName().get('Supplier').getRecordTypeId();
         Map<String, Object> accAttributes = new Map<String, Object>{'RecordTypeId'=>clinicRecordTypeId,'Name'=>'Supplier'};
             List<Account> accts = TestDataFactory.createAccounts(1,true,accAttributes);
@@ -37,7 +39,7 @@ public class AssessmentTemplateControllerTest {
     * @description test method for AssessmentTemplateController.
     */
     @istest
-    public static void testgetQuestionsList() {	
+    static void testgetQuestionsList() {	
         Integer reccount=5;
         List<Rhythm__Assessment_Template__c> templist=[select id from Rhythm__Assessment_Template__c];
         List<Rhythm__Section__c> seclist=[select id,Rhythm__No_of_Questions__c from Rhythm__Section__c];
@@ -64,7 +66,7 @@ public class AssessmentTemplateControllerTest {
     * @description test method for getTemplateSections.
     */
     @istest
-    public static void testgetAssessmentRecord() {
+    static void testgetAssessmentRecord() {
        
         AssessmentTemplateController.getTemplateSections('');
         //List<Assessment__c> asslist=[select id from Assessment__c];
@@ -79,7 +81,7 @@ public class AssessmentTemplateControllerTest {
     * @description method for covering exception.
     */
     @istest
-    public static void exceptioncoverage(){
+    static void exceptioncoverage(){
        Test.startTest();
         try {
             AssessmentTemplateController.getSections(null, null);
@@ -107,7 +109,7 @@ public class AssessmentTemplateControllerTest {
     
     }
     @isTest
-    public static void deleteTemplateTest(){
+    static void deleteTemplateTest(){
         List<Assessment_Template__c> templist=[select id from Assessment_Template__c];
         Test.startTest();
         delete templist;
