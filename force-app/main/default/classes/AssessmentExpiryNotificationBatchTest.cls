@@ -11,7 +11,7 @@ private with sharing class AssessmentExpiryNotificationBatchTest {
     * @description method for testsetup data.
     */
     @testSetup
-    private static void methodName() {
+    static void methodName() {
         Id clinicRecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByName().get('Supplier').getRecordTypeId();
         Map<String, Object> accAttributes = new Map<String, Object>{'RecordTypeId'=>clinicRecordTypeId,'Name'=>'Supplier','Rhythm__Email__c'=>'test@gmail.com'};
         List<Account> accts = TestDataFactory.createAccounts(1,true,accAttributes);
@@ -57,7 +57,7 @@ private with sharing class AssessmentExpiryNotificationBatchTest {
     * @description method for coverage AssessmentExpiryNotificationBatch.
     */
     @isTest
-    private static void expiryBatchTest()
+    static void expiryBatchTest()
     {
         Test.startTest();
         AssessmentExpiryNotificationBatch b = new AssessmentExpiryNotificationBatch();

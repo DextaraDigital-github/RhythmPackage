@@ -27,7 +27,7 @@ private class SectionTriggerHandlerTest {
         seclist[0].Name = 'testSection';
         update seclist;
         Test.stopTest();
-        System.assert(seclist.size()>0, TRUE);
+        System.assertEquals(seclist.size()>0,true,' TRUE');
         
     }
     /**
@@ -39,7 +39,7 @@ private class SectionTriggerHandlerTest {
         List<Rhythm__Section__c> seclist=[select id,Rhythm__No_of_Questions__c from Rhythm__Section__c];
         delete secList[0];
         Test.stopTest();
-        System.assert(seclist.size()!=null, TRUE);
+        System.assertEquals(seclist.size()!=null,true,'TRUE');
         
     }
     

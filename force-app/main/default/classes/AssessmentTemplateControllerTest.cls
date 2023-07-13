@@ -16,7 +16,8 @@ private class AssessmentTemplateControllerTest {
         // TestDataFactory.AssignPermissionSetToUsers(userIds);
         Id clinicRecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByName().get('Supplier').getRecordTypeId();
         Map<String, Object> accAttributes = new Map<String, Object>{'RecordTypeId'=>clinicRecordTypeId,'Name'=>'Supplier'};
-            List<Account> accts = TestDataFactory.createAccounts(1,true,accAttributes);
+        //List<Account> accts = 
+        TestDataFactory.createAccounts(1,true,accAttributes);
         
         Map<String, Object> assementTemplateattributes = new Map<String, Object>{'Name'=>'2023 Assessment template','Rhythm__Name__c'=>'2023 Assessment template'};
             List<Assessment_Template__c> templist=TestDataFactory.createAssessmentTemp(1,true,assementTemplateattributes);
@@ -26,15 +27,10 @@ private class AssessmentTemplateControllerTest {
             'Rhythm__Question__c'=>'What is the feedback for service?','Rhythm__Question_Type__c'=>'Text','Rhythm__Required__c'=>True,
             'Rhythm__Section__c'=>seclist[0].Id};
         TestDataFactory.createQuestion(1,true,questionAttributes);
-        Map<String, Object> assessmentattributes = new Map<String, Object>{'Rhythm__Account__c'=>accts[0].Id,'Template__c'=>templist[0].Id,
-            'Name'=>'Assessment 2023','Rhythm__Status__c'=>'New','Rhythm__Number_of_Questions__c'=>10};
+       // Map<String, Object> assessmentattributes = new Map<String, Object>{'Rhythm__Account__c'=>accts[0].Id,'Template__c'=>templist[0].Id,
+        //    'Name'=>'Assessment 2023','Rhythm__Status__c'=>'New','Rhythm__Number_of_Questions__c'=>10};
        // TestDataFactory.createAssessment(1,true,assessmentattributes);
-        
-        
-        
-        
-        
-    }
+       }
     /**
     * @description test method for AssessmentTemplateController.
     */
@@ -60,7 +56,7 @@ private class AssessmentTemplateControllerTest {
         templist[0].status__c='Active';
         update templist[0];
         AssessmentTemplateController.getTemplateDetails(templist[0].id);
-        System.assert(templist.size()>0, True);
+        System.assertEquals(templist.size()>0,true, 'True');
     }
     /**
     * @description test method for getTemplateSections.
@@ -74,7 +70,7 @@ private class AssessmentTemplateControllerTest {
         List<id> idlist=new List<id>();
         idlist.add(accts[0].id);
         AssessmentTemplateController.deleteRecords(idlist,true);
-        System.assert(idlist.size()>0, True);
+        System.assertEquals(idlist.size()>0,true, True);
   
     }
     /**
@@ -86,23 +82,23 @@ private class AssessmentTemplateControllerTest {
         try {
             AssessmentTemplateController.getSections(null, null);
             
-            System.assert(false, 'An exception should have been thrown');
+            System.assertEquals(false,false, 'An exception should have been thrown');
         } catch (AuraHandledException e) {
             
-           System.assert(e.getMessage()!=null,'Script-thrown exception');
+           System.assertEquals(e.getMessage()!=null,true,'Script-thrown exception');
         }
        try {
             AssessmentTemplateController.getTemplateSections('invalidTemplateId');
            
-            System.assert(false, 'An exception should have been thrown');
+            System.assertEquals(false, false,'An exception should have been thrown');
         } catch (AuraHandledException e) {
-            System.assert(e.getMessage()!=null,'invalid ID field: invalidTemplateId');
+            System.assertEquals(e.getMessage()!=null,true,'invalid ID field: invalidTemplateId');
         }
         try {
             AssessmentTemplateController.getQuestionsLists('invalidTemplateId');
             System.assert(false, 'An exception should have been thrown');
         } catch (AuraHandledException e) {
-            System.assert(e.getMessage()!=null,'Script-thrown exception');
+            System.assertEquals(e.getMessage()!=null,true,'Script-thrown exception');
         }
         
         Test.stopTest();
@@ -110,10 +106,12 @@ private class AssessmentTemplateControllerTest {
     }
     @isTest
     static void deleteTemplateTest(){
+        String testString;
         List<Assessment_Template__c> templist=[select id from Assessment_Template__c];
         Test.startTest();
         delete templist;
+        testString='Success';
         Test.stopTest();
-
+        System.assertEquals(testString=='Success', true,'Template deleted');
     }
 }

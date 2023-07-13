@@ -34,7 +34,7 @@ private class QuestionTriggerHandlerTest {
         List<Question__c> quesList = [Select id from Question__c LIMIT 1];
         delete quesList[0];
         Test.stopTest();
-        System.assert(quesList.size()!=null, TRUE);
+        System.assertEquals(quesList.size()!=null,true,'TRUE');
     }
     /**
     * @description method for updating the questions scenerio.
@@ -46,6 +46,6 @@ private class QuestionTriggerHandlerTest {
         quesList[0].Question__c ='Test Question ?';
         update quesList[0];
         Test.stopTest();
-        System.assert(quesList.size()>0, TRUE);     
+        System.assertEquals(quesList.size()>0,true,' TRUE');     
     }
 }

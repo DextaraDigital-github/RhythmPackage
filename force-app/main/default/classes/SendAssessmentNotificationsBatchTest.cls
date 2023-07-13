@@ -49,6 +49,6 @@ private with sharing class SendAssessmentNotificationsBatchTest {
         Test.stopTest();
         List<AccountAssessmentRelation__c> assList= [SELECT Id from AccountAssessmentRelation__c];
         
-        System.assert(assList.size()>0,true);
+        System.assertEquals(assList.size()>0,true,'responses exists');
     }
 }

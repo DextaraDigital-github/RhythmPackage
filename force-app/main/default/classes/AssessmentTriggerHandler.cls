@@ -106,20 +106,22 @@ public with sharing class AssessmentTriggerHandler implements ITriggerHandler{
         }
         set<Id> templateIds = templateMap.keySet();
         //Map<String, Object> bindVariables = new Map<String, Object>{'templateIds' => templateIds};
-        string query = 'SELECT COUNT(id) quesCount, Assessment_Template__c'
+        if ((Schema.sObjectType.Question__c.fields.Id.isAccessible()) && (Schema.sObjectType.Question__c.fields.Assessment_Template__c.isAccessible())) {
+             string query = 'SELECT COUNT(Id) quesCount, Assessment_Template__c'
                      +' FROM Question__c'
                      +' WITH SECURITY_ENFORCED'
                      +' GROUP BY Assessment_Template__c'
                      +' HAVING Assessment_Template__c IN:templateIds';
 
-        //AggregateResult[] templateGroup = safe.doQueryWithBinds(query,bindVariables);
-        AggregateResult[] templateGroup = database.query(query);
-        for (AggregateResult ar : templateGroup){
-            String templateId = (Id)ar.get('Rhythm__Assessment_Template__c');
-            for(Assessment__c assessment : templateMap.get(templateId) ){
-                assessment.Number_of_Questions__c = (Integer)ar.get('quesCount');
-                if(newMap!=null){
-                    ((Assessment__c)newMap.get(assessment.Id)).Number_of_Questions__c = (Integer)ar.get('quesCount');
+            //AggregateResult[] templateGroup = safe.doQueryWithBinds(query,bindVariables);
+            AggregateResult[] templateGroup = database.query(query);
+            for (AggregateResult ar : templateGroup){
+                String templateId = (Id)ar.get('Rhythm__Assessment_Template__c');
+                for(Assessment__c assessment : templateMap.get(templateId) ){
+                    assessment.Number_of_Questions__c = (Integer)ar.get('quesCount');
+                    if(newMap!=null){
+                        ((Assessment__c)newMap.get(assessment.Id)).Number_of_Questions__c = (Integer)ar.get('quesCount');
+                    }
                 }
             }
         }

@@ -15,7 +15,7 @@ import errorLogRecord from '@salesforce/apex/AssessmentController.errorLogRecord
 import uploadFile from '@salesforce/apex/AssessmentController.uploadFile';
 import updateAccountAssessmentStatus from '@salesforce/apex/AssessmentController.updateAccountAssessmentStatus';
 import deleteFileAttachment from '@salesforce/apex/AssessmentController.deleteFileAttachment';
-import getResponseFlag from '@salesforce/apex/AssessmentController.getResponseFlag';
+//import getResponseFlag from '@salesforce/apex/AssessmentController.getResponseFlag';
 import getAccountAssessmentRecordData from '@salesforce/apex/AssessmentController.getAccountAssessmentRecordData';
 
 export default class Questionnaire extends LightningElement {
@@ -1204,7 +1204,7 @@ export default class Questionnaire extends LightningElement {
                 }
             })
         })
-        getResponseFlag({ questionId: this.showChat.questionId, accountAssessmentId: this.recordId }).then((result) => {
+        /*getResponseFlag({ questionId: this.showChat.questionId, accountAssessmentId: this.recordId }).then(() => {
            // console.log('getResponseFlag ', result);
         }).catch((error) => {
             let errormap = {}; 
@@ -1214,6 +1214,7 @@ export default class Questionnaire extends LightningElement {
             errormap.errorData = error.message; 
             errorLogRecord({ errorLogWrapper: JSON.stringify(errormap) }).then(() => { });
         });
+        */
         const selectedChat = new CustomEvent('selectconversation', {
             detail: this.showChat
         });

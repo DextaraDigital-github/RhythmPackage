@@ -1,4 +1,4 @@
-import { LightningElement,track,wire,api } from 'lwc';
+import { LightningElement,track,api } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import addSuppliers from '@salesforce/apex/AssessmentController.sendAssessment';
@@ -45,7 +45,7 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
             }
         })
         .catch(error => {
-           //console.log(error);
+           
         });
     }
 
@@ -102,7 +102,7 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
                 this.showNotification('Error',validatedData.message,'error');
             }
         }catch(e){
-            //console.log('handleNextError----->',e)
+           
         }
     }
 
@@ -153,7 +153,7 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
                 this.showNotification('Error','Please select atleast one supplier to proceed.','error');
             }
         }catch(e){
-           // console.log('error----->',e);
+           
         }
     }
 

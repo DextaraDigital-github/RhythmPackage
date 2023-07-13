@@ -246,7 +246,7 @@ private inherited sharing class CanTheUserTest {
     static void curdTestH() {
         String testString;
         Test.startTest();
-        SObject objRecord = new Account(Name='Test');
+        //SObject objRecord = new Account(Name='Test');
         Set<String> fields = new Set<String>{'Name'};
         CanTheUser.bulkFLSAccessible('Account',fields);
         testString='Success';
@@ -258,7 +258,7 @@ private inherited sharing class CanTheUserTest {
     static void curdTestI() {
         String testString;
         Test.startTest();
-        SObject objRecord = new Account(Name='Test');
+        //SObject objRecord = new Account(Name='Test');
         Set<String> fields = new Set<String>{'Name'};
         CanTheUser.bulkFLSUpdatable('Account',fields);
         testString='Success';

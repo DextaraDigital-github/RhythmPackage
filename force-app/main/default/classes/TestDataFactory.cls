@@ -231,17 +231,4 @@ public with sharing class TestDataFactory{
     public class SecurityControllerException extends Exception{
             
     }
-    public static void AssignPermissionSetToUsers (Set<Id> usersId) {
-        List<PermissionSetAssignment> permissionSetList = new List<PermissionSetAssignment>();
-        List<PermissionSet> permissionstobeassigned = [SELECT Id, Label FROM PermissionSet WHERE Name IN ('Customer_Access')];
-        for (User u : [Select Id, Name FROM User Where Id IN : usersId]){
-            for(PermissionSet ps : permissionstobeassigned){
-                PermissionSetAssignment psa = new PermissionSetAssignment ();
-                    psa.PermissionSetId = ps.Id; 
-                    psa.AssigneeId = u.Id;
-                permissionSetList.add(psa);
-            }
-        }
-        List<Database.upsertResult> uResults = Database.upsert(permissionSetList,false);
-      }
 }

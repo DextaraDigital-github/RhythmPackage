@@ -261,7 +261,9 @@ public with sharing class AssessmentTemplateController {
                 if(questionList.isEmpty() == false) {
                     drchildList=safe.doDelete(questionList);
                 }
-                Database.delete(recIdList,true);//need to check with priyanka
+                if (Schema.sObjectType.Section__c.isDeletable()) {
+                     Database.delete(recIdList,true);
+                }
                 for(Database.DeleteResult dr:drchildList) {
                     if(!dr.isSuccess()) {
                         for(Database.Error de:dr.getErrors()) {
@@ -283,13 +285,16 @@ public with sharing class AssessmentTemplateController {
 * @return
 */    
     @AuraEnabled
-    public static Object questionsCount(Id sectionId)
-    {
+    public static Object questionsCount(Id sectionId){
+        if ((!Schema.sObjectType.Question__c.fields.Id.isAccessible()) || (!Schema.sObjectType.Question__c.fields.Section__c.isAccessible())) {
+            return 0;
+        }
+        
         try{
             string query = 'SELECT COUNT(ID) q'
                          + ' FROM Question__c'
-                         + ' WHERE Section__c=\'' + String.escapeSingleQuotes(sectionId) + '\''
-                         + ' WITH SECURITY_ENFORCED';
+                         + ' WHERE Section__c=\'' + String.escapeSingleQuotes(sectionId) + '\'';
+            
             List<AggregateResult> s = database.query(query);
             return s[0].get('q');
         }catch(exception e){
@@ -304,13 +309,16 @@ public with sharing class AssessmentTemplateController {
 * @return
 */
     @AuraEnabled
-    public static Object sectionsCount(Id templateId)
-    {
+    public static Object sectionsCount(Id templateId) {
+        if ((!Schema.sObjectType.Section__c.fields.Id.isAccessible()) || (!Schema.sObjectType.Section__c.fields.Assessment_Template__c.isAccessible())) {
+            return 0;
+        }
+        
         try{
             String query = 'SELECT count(Id) s'
                          + ' FROM Section__c'
-                         + ' WHERE Assessment_Template__c =\'' + String.escapeSingleQuotes(templateId) + '\''
-                         + ' WITH SECURITY_ENFORCED';
+                         + ' WHERE Assessment_Template__c =\'' + String.escapeSingleQuotes(templateId) + '\'';
+                         
             List<AggregateResult> s = database.query(query);
             return s[0].get('s');
         }catch(exception e){
