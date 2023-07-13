@@ -51,7 +51,6 @@ private class AssessmentControllerTest
     {
         user u = [SELECT Id,UserName FROM User WHERE Email='standarduser@testorg.com' LIMIT 1];
         System.runAs(u){
-            List<Response__c> respList = [SELECT Id,Files__c,Question__c FROM Response__c WITH SECURITY_ENFORCED];
             Test.startTest();
             List<AccountAssessmentRelation__c> accAssessment=[select Id,Name,Status__c from AccountAssessmentRelation__c];
             List<Sobject> supplierAssessment = AssessmentController.getSupplierAssessmentList(accAssessment[0].Id);
@@ -775,12 +774,13 @@ private class AssessmentControllerTest
         System.runAs(u){
             List<SObject> assmentList = [select id,Start_Date__c,End_Date__c,Template__c from Assessment__c];
             SObject asmtRecord = assmentList[0];
+            AssessmentController.ResultWrapper retWrap = null;
             Test.startTest();
             try{
-                AssessmentController.ResultWrapper retWrap = AssessmentController.deleteAssessment(asmtRecord.Id);
+                retWrap = AssessmentController.deleteAssessment(asmtRecord.Id);
                 System.assertEquals(retWrap!=null, true,'assessment deleted');
             }catch(exception e){
-                //System.assertEquals(retWrap!=null, true,'assessment deleted');
+                System.assertEquals(retWrap==null, true,'assessment not deleted');
             }
             Test.stopTest();
         }

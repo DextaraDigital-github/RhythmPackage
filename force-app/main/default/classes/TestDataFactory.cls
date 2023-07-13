@@ -114,7 +114,7 @@ public with sharing class TestDataFactory{
     * @return
     */ 
     public static User createTestUser(){
-        Profile portalProfile = [SELECT Id FROM Profile WHERE Name='Standard Platform User' Limit 1];
+        Profile portalProfile = [SELECT Id FROM Profile WHERE Name='Standard Platform User' WITH SECURITY_ENFORCED Limit 1];
         List<user> lstuser = new List<User>();
         String uniqueUserName = 'rhytmtuser' + DateTime.now().getTime() + '@testorg.com';
         User u = new User(Alias = 'standt', Email='standarduser@testorg.com',
@@ -123,10 +123,10 @@ public with sharing class TestDataFactory{
         TimeZoneSidKey='America/Los_Angeles',
         UserName=uniqueUserName);
         lstuser.add(u);
-        set<Id> UserId = new set<Id>();
+        set<Id> userId = new set<Id>();
         List<user> retUser = createRecords(lstuser, true, new Map<String, Object>());
-        UserId.add(retUser[0].Id);
-        assignPermissionSetToUsers(UserId);
+        userId.add(retUser[0].Id);
+        assignPermissionSetToUsers(userId);
         return retUser[0];
     }
 
@@ -136,8 +136,8 @@ public with sharing class TestDataFactory{
     */ 
     public static void assignPermissionSetToUsers (Set<Id> usersId) {
         List<PermissionSetAssignment> permissionSetList = new List<PermissionSetAssignment>();
-        List<PermissionSet> permissionstobeassigned = [SELECT Id, Label FROM PermissionSet WHERE Name IN ('Customer_Access','Additional_Access')];
-        for (User u : [Select Id, Name FROM User Where Id IN : usersId]){
+        List<PermissionSet> permissionstobeassigned = [SELECT Id, Label FROM PermissionSet WHERE Name IN ('Customer_Access','Additional_Access') WITH SECURITY_ENFORCED];
+        for (User u : [Select Id, Name FROM User Where Id IN : usersId WITH SECURITY_ENFORCED]){
             for(PermissionSet ps : permissionstobeassigned){
                 PermissionSetAssignment psa = new PermissionSetAssignment ();
                     psa.PermissionSetId = ps.Id; 
@@ -145,7 +145,14 @@ public with sharing class TestDataFactory{
                 permissionSetList.add(psa);
             }
         }
-        List<Database.upsertResult> uResults = Database.upsert(permissionSetList,false);
+
+        Savepoint sp = Database.setSavepoint();
+        Database.UpsertResult[] srList1 = safe.doUpsert(permissionSetList);
+        List<String> errorList = SecurityCheckController.safeClassExceptionHandlerUpsert(srList1);
+        if(errorList.size()>0){
+            Database.rollback(sp);
+            throw new SecurityControllerException(String.join( errorList, ', ' ));
+        }
     }
 
     /**
