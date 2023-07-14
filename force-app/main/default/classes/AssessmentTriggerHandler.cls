@@ -8,6 +8,7 @@
 
 public with sharing class AssessmentTriggerHandler implements ITriggerHandler{
     public static SecurityCheckController safe = new SecurityCheckController();
+    private static Savepoint sp;//prudhvi to work
     public static TriggerFrameworkServiceController serviceController = new TriggerFrameworkServiceController();
     
     /**
@@ -24,7 +25,15 @@ public with sharing class AssessmentTriggerHandler implements ITriggerHandler{
       @param newMap This is the new map of records.
     */
     public void afterInsert(List<sObject> newList , Map<Id, sObject> newMap) {
-      return;
+      set<Id> templateIds = new set<Id>();
+      for(Assessment__c assessment:(List<Assessment__c>)newList){
+          if(String.isNotBlank(assessment.Template__c)){
+              templateIds.add(assessment.Template__c);
+          }
+      }
+      if(templateIds.isEmpty() == false){
+          calculateAssessmentsCount(templateIds);
+      }
     }
     
     /**
@@ -77,7 +86,15 @@ public with sharing class AssessmentTriggerHandler implements ITriggerHandler{
       @param oldMap This is the old map of records.
     */
     public void afterDelete(List<sObject> oldList , Map<Id, sObject> oldMap) {
-      return;
+      set<Id> templateIds = new set<Id>();
+      for(Assessment__c assessment:(List<Assessment__c>)oldList){
+          if(String.isNotBlank(assessment.Template__c)){
+              templateIds.add(assessment.Template__c);
+          }
+      }
+      if(templateIds.isEmpty() == false){
+          calculateAssessmentsCount(templateIds);
+      }
     }
     
     /**
@@ -86,7 +103,15 @@ public with sharing class AssessmentTriggerHandler implements ITriggerHandler{
       @param newMap This is the new map of records.
     */
     public void afterUnDelete(List<sObject> newList, Map<Id, sObject> newMap) {
-      return;
+      set<Id> templateIds = new set<Id>();
+      for(Assessment__c assessment:(List<Assessment__c>)newList){
+          if(String.isNotBlank(assessment.Template__c)){
+              templateIds.add(assessment.Template__c);
+          }
+      }
+      if(templateIds.isEmpty() == false){
+          calculateAssessmentsCount(templateIds);
+      }
     }
 
     /**
@@ -125,5 +150,34 @@ public with sharing class AssessmentTriggerHandler implements ITriggerHandler{
                 }
             }
         }
+    }
+
+    /**
+    * @description To calculate assessments count
+    * @param templateIds This is the set of ids.
+    */
+    public static void calculateAssessmentsCount(set<Id> templateIds){
+        List<Assessment_Template__c> templateList = new List<Assessment_Template__c>();
+        for(Assessment_Template__c tmp:[SELECT Id,(SELECT Id FROM Assessments__r) FROM Assessment_Template__c WHERE ID IN:templateIds WITH SECURITY_ENFORCED]){
+            tmp.Number_of_Assessments__c = tmp.Assessments__r.size();
+            templateList.add(tmp);
+        }
+        if (sp == null){
+            sp = Database.setSavepoint();
+        }
+        if(templateList.isEmpty() == false){
+            Database.SaveResult[] saveResult = safe.doUpdate(templateList);
+            List<String> errorList = SecurityCheckController.safeClassExceptionHandlerInsert(saveResult);
+            if(errorList.size()>0){
+                Database.rollback(sp);
+                throw new SecurityControllerException(String.join( errorList, ', ' ));
+            }
+        }
+    }
+
+     /**
+    * @description It is used to throw the exception
+    */
+    public class SecurityControllerException extends Exception{
     }
 }

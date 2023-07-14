@@ -855,4 +855,22 @@ private class AssessmentControllerTest
             System.assertEquals(testString=='Success', true,'accessed metadata');
         }
     }
+
+    @isTest
+    static void deleteAssessmentTestTwo(){
+        user u = [SELECT Id,UserName FROM User WHERE Email='standarduser@testorg.com' LIMIT 1];
+        System.runAs(u){
+            String testString;
+            List<SObject> assmentList = [select id,Start_Date__c,End_Date__c,Template__c from Assessment__c];
+            SObject asmtRecord = assmentList[0];
+            List<SObject> assmentRelList = [SELECT Id FROM AccountAssessmentRelation__c WHERE Assessment__c=:asmtRecord.Id];
+            Test.startTest();
+            delete assmentRelList;
+            delete asmtRecord;
+            undelete asmtRecord;
+            testString = 'Success';
+            System.assertEquals(testString =='Success', true,'assessment deleted');
+            Test.stopTest();
+        }
+    }
 }

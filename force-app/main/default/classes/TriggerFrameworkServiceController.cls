@@ -20,13 +20,16 @@ public with sharing class TriggerFrameworkServiceController {
         List<String> fieldsList = getUpdatableFields(triggerObjId);
         for(String fName:fieldsList){
             Boolean isAssessmentTemplate = objectName.equalsIgnoreCase('Assessment_Template_c') && fName.equalsIgnoreCase('Status__c');
-            if(isAssessmentTemplate && String.valueOf(record.get(fName)).equalsIgnoreCase('New') 
-                && String.valueOf(oldRecord.get(fName)).equalsIgnoreCase('Active')){
+            if(isAssessmentTemplate){
+                if(String.valueOf(record.get(fName)).equalsIgnoreCase('New') && String.valueOf(oldRecord.get(fName)).equalsIgnoreCase('Active')){
                     isCriteriaMet = true;
-            }else if(isAssessmentTemplate && String.valueOf(oldRecord.get(fName)).equalsIgnoreCase('Inactive')){
+                }else if(String.valueOf(oldRecord.get(fName)).equalsIgnoreCase('Inactive')){
+                        isCriteriaMet = true;
+                }
+            }else{
+                if(record.get(fName) != oldRecord.get(fName)){
                     isCriteriaMet = true;
-            }else if(record.get(fName) != oldRecord.get(fName)){
-                    isCriteriaMet = true;
+                }
             }
         }
         return isCriteriaMet;

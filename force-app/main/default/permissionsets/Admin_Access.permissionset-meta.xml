@@ -608,11 +608,6 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>Question__c.Assessment_Template__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
         <field>Question__c.Conditional_Response__c</field>
         <readable>true</readable>
     </fieldPermissions>
@@ -739,11 +734,6 @@
     <fieldPermissions>
         <editable>true</editable>
         <field>Section__c.Assessment_Template_Version__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
-        <field>Section__c.Assessment_Template__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>

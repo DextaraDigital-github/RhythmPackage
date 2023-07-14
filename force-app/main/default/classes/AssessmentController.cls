@@ -15,7 +15,6 @@ public with sharing class AssessmentController {
     * @param assessmentId This is a record id of an Assessment__c. 
     * @return 
     */
-
     @AuraEnabled
     public static List<SObject> getSupplierAssessmentList(String assessmentId){
         try{

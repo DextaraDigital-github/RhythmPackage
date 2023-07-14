@@ -906,7 +906,7 @@ export default class Questionnaire extends LightningElement {
                 errormap.className = 'AssessmentController';
                 errormap.errorData = error.message; 
                 errorLogRecord({ errorLogWrapper: JSON.stringify(errormap) }).then(() => { });
-                this.totastmessage = 'Error : ' + JSON.stringify(error);
+                this.totastmessage = 'Error : Something went wrong, Please contact admin.';
             });
         }
     }
