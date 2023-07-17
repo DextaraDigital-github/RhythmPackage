@@ -6,8 +6,8 @@
     <columns>Question__c</columns>
     <columns>Is_Latest_Response__c</columns>
     <columns>Flag__c</columns>
-    <columns>AccountAssessmentRelation__c</columns>
     <columns>Files__c</columns>
+    <columns>Assessment__c</columns>
     <filterScope>Everything</filterScope>
     <label>All</label>
 </ListView>

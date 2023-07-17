@@ -1,4 +1,4 @@
-import { LightningElement,track,wire,api } from 'lwc';
+import { LightningElement,track,api } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import addSuppliers from '@salesforce/apex/AssessmentController.sendAssessment';
@@ -45,7 +45,7 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
             }
         })
         .catch(error => {
-           //console.log(error);
+           
         });
     }
 
@@ -102,7 +102,7 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
                 this.showNotification('Error',validatedData.message,'error');
             }
         }catch(e){
-            //console.log('handleNextError----->',e)
+           
         }
     }
 
@@ -115,14 +115,14 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
         let todayDate =  new Date(this.todayDate).toISOString().substring(0, 10);
         if(this.templateStatus !== undefined && (this.templateStatus ==='New' || this.templateStatus ==='Inactive')){
             validatedDetails.isSave = false;
-            validatedDetails.message = 'Assessment can be created only for Active Template.';
+            validatedDetails.message = 'Assessment Program can be created only using an Active Template';
         }if(new Date(startDate) < new Date(todayDate)){
             validatedDetails.isSave = false;
-            validatedDetails.message = 'Start Date cannot be a past date.'
+            validatedDetails.message = 'Start Date of an Assessment Program cannot be a Past Date'
         }
         else if((typeof endDate !== 'undefined' && endDate !== null) && new Date(endDate) < new Date(startDate)){
             validatedDetails.isSave = false;
-            validatedDetails.message = 'End Date cannot be earlier than Start Date.'
+            validatedDetails.message = 'End Date of an Assessment Program cannot be before the Start Date'
         }
         return validatedDetails;
     }
@@ -153,7 +153,7 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
                 this.showNotification('Error','Please select atleast one supplier to proceed.','error');
             }
         }catch(e){
-           // console.log('error----->',e);
+           
         }
     }
 

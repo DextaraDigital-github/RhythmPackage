@@ -2,7 +2,7 @@
 private class AssessmentExpiryNotificationScheduleTest {
 
     @istest
-    private static void testExpirySchedule() {
+    static void testExpirySchedule() {
 		Test.StartTest();
 		AssessmentExpiryNotificationSchedule expSche = new AssessmentExpiryNotificationSchedule();
 		String sch = '0 0 23 * * ?';

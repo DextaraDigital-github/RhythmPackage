@@ -40,7 +40,7 @@ public with sharing class TemplateTriggerHandler implements ITriggerHandler{
             Decimal assessmentCount = (Decimal)templt.get('Number_of_Assessments__c');
             boolean isCriteriaMet = serviceController.checkEntryCriteria(templt,oldMap.get(templt.Id),'Assessment_Template_c');
             if(isCriteriaMet && assessmentCount > 0){
-                templt.addError('Template with Assessment Programs cannot be Modified.');
+                templt.addError('Details of the Active/Inactive Template cannot be modified');
             }
             Assessment_Template__c oldtemplate=((Assessment_Template__c)oldMap.get(templt.Id));
             Assessment_Template__c newtemplate=((Assessment_Template__c)templt);

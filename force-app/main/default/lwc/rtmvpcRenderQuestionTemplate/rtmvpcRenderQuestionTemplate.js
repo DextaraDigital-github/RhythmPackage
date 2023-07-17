@@ -164,6 +164,7 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
             case "doc": this.fileresponsemap.isDocx = true; break;
             default : console.log('default');
         }
+        x.readAsDataURL(event.target.files[0]);
         x.addEventListener("loadend", () => {
             this.fileresponsemap.filedata = x.result;
             this.fileresponsemap.showUploadProgress = this.showUploadProgress;

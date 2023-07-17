@@ -187,7 +187,7 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
             this.dispatchEvent(
                 new ShowToastEvent({
                     title: 'Error',
-                    message: 'Please Select Only one Section',
+                    message: 'Select only one Section to change the Question sequence',
                     variant: 'error'
                 })
             );
@@ -214,7 +214,7 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
                         this.dispatchEvent(
                             new ShowToastEvent({
                                 title: 'Error',
-                                message: 'Please Select the Section which have atleast 1 Question',
+                                message: 'Select a Section with more than 1 Question',
                                 variant: 'error'
                             })
                         );
@@ -318,7 +318,7 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
             if(this.sectionListData && typeof this.sectionListData !== 'undefined'){
                 this.sectionListData.forEach(rec => {
                     if (this.selectedRows[0] === rec.Id) {
-                        this.deletePopupMessage = 'Are you sure you want to delete this Section and Questions?';
+                        this.deletePopupMessage = 'Are you sure you want to delete the Section and Quetions in it?';
                     }
                 });
             }

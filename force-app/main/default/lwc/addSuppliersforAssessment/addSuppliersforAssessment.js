@@ -87,10 +87,10 @@ export default class AddSuppliersforAssessment extends NavigationMixin(Lightning
                         this.showNotification('Error',error.body.message,'error');
                     });
                 }else{
-                    this.showNotification('Error','Please select atleast one supplier to proceed.','error');
+                    this.showNotification('Error','Select at least one Supplier to create the Assessment Program','error');
                 }
             }else{
-                this.showNotification('Error','Suppliers cannot be modified for the past assessments','error');
+                this.showNotification('Error','Suppliers who received the Assessment cannot be removed from the Assessment Program.','error');
             }
         }catch(e){
             //console.log(e);
