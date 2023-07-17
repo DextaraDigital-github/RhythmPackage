@@ -187,7 +187,7 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
             this.dispatchEvent(
                 new ShowToastEvent({
                     title: 'Error',
-                    message: 'Please Select Only one Section',
+                    message: 'Select only one Section to change the Question sequence',
                     variant: 'error'
                 })
             );
@@ -214,7 +214,7 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
                         this.dispatchEvent(
                             new ShowToastEvent({
                                 title: 'Error',
-                                message: 'Please Select the Section which have atleast 1 Question',
+                                message: 'Select a Section with more than 1 Question',
                                 variant: 'error'
                             })
                         );
@@ -261,7 +261,7 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
             this.closeReorderSectionModal();
             this.handleRefresh();
         }).catch(error => {
-            console.log(error);
+            //console.log(error);
         });
     }
 
@@ -285,7 +285,7 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
             this.closeReorderSectionModal();
             this.handleRefresh();
         }).catch(error => {
-            console.log('Error' + error);
+            //console.log('Error' + error);
         });
     }
 
@@ -318,7 +318,7 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
             if(this.sectionListData && typeof this.sectionListData !== 'undefined'){
                 this.sectionListData.forEach(rec => {
                     if (this.selectedRows[0] === rec.Id) {
-                        this.deletePopupMessage = 'Are you sure you want to delete this Section and Questions?';
+                        this.deletePopupMessage = 'Are you sure you want to delete the Section and Quetions in it?';
                     }
                 });
             }
@@ -350,7 +350,7 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
                 this.handleRefresh();
             }
         }).catch(error => {
-            console.log(error);
+            //console.log(error);
         });
     }
     //Delete Functionality Ends
@@ -360,14 +360,14 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
         this.tempRecsLimit = this.recsLimit;
         getQuestionsList({ templateId: this.recordId }).then(data => {
             this.questionsList = JSON.parse(JSON.stringify(data));
-            getSectionRecsCount({ templateId: this.recordId, objName: this.tableLabel }).then(secData => {
+            getSectionRecsCount({ templateId: this.recordId, objName: this.objLabel }).then(secData => {
                 this.totalRecsCount = secData;
                 this.handleSectionsData(JSON.parse(JSON.stringify(secData)));
             }).catch(error => {
-                console.log(error);
+                //console.log(error);
             });
         }).catch(error => {
-            console.log(error);
+            //console.log(error);
         });
     }
 
@@ -381,7 +381,7 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
             this.sectionList = JSON.parse(JSON.stringify(result));
             this.prepareSectionsQuestionaire();
         }).catch(error => {
-            console.log('Error' + error);
+            //console.log('Error' + error);
         });
     }
 

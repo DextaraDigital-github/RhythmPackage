@@ -1,17 +1,22 @@
-/* Class Name   : AssessmentController
+/**
+* Class Name   : AssessmentController
 * Developer         :  Sai Koushik Nimmaturi and Reethika Velpula      
 * Created Date      :
-* Description       : TestDataFactory class is used to create test data.
+* @description       : TestDataFactory class is used to create test data.
 * Last Modified Date:
 */
 
 
-public class TestDataFactory{
+public with sharing class TestDataFactory{
+
+    public static SecurityCheckController safe = new SecurityCheckController();//use singleton pattern
+    private static Savepoint sp; // to rollback
     /**
-    * createRecords methods is used to create the records for all objects.
+    * @description createRecords methods is used to create the records for all objects.
     * @param records This is a list of records to insert.  
     * @param doInsert This is boolean value whether to insert record or not.
     * @param attributes This is a map which contain record data to insert.
+    * @return
     */
     public static List<SObject> createRecords(List<SObject> records, Boolean doInsert, Map<String, Object> attributes){
         try{
@@ -19,7 +24,6 @@ public class TestDataFactory{
             if(attributes != null){
                 for (Integer j =0; j < records.size(); j ++) {
                     SObject record = records[j];
-                    system.debug('attributes------->'+attributes);
                     for (String key : attributes.keySet()) {
                         Object value = attributes.get(key);
                         if (value instanceof List<Object>) {
@@ -39,35 +43,44 @@ public class TestDataFactory{
                 }
             }
             if (doInsert) {
-                insert records;
-                system.debug('records=====>'+records);
+                Savepoint sp = Database.setSavepoint();
+                Database.SaveResult[] srList1 = safe.doinsert(records);
+                List<String> errorList = SecurityCheckController.safeClassExceptionHandlerInsert(srList1);
+                if(errorList.size()>0){
+                    Database.rollback(sp);
+                    throw new SecurityControllerException(String.join( errorList, ', ' ));
+                }
             }
         } catch(Exception e){
-            system.debug('Exception while creating record: '+e.getMessage()+e.getLineNumber());
+            throw new AuraHandledException(e.getMessage());
         }
         return records;
     }
 
     /**
-    * createAccounts method is used to create account records.
+    * @description createAccounts method is used to create account records.
     * @param numToInsert This is a number of records to insert.  
     * @param doInsert This is boolean value whether to insert record or not.
     * @param attributes This is a map which contain record data to insert.
+    * @return
     */
 
     public static List<Account> createAccounts(Integer numToInsert, Boolean doInsert, Map<String, Object> attributes){
         List<Account> accountsToInsert = new List<Account>();
         for(Integer i=0; i< numToInsert; i++){
             Account acc = new Account();
+            acc.Name = 'TestAccount' + i;
+            acc.website = 'www.test.com';
             accountsToInsert.add(acc);
         }
         return createRecords(accountsToInsert, doInsert, attributes);
     }
     /**
-    * createContacts method is used to create Contacts records
+    * @description createContacts method is used to create Contacts records
     * @param numToInsert This is a number of records to insert.  
     * @param doInsert This is boolean value whether to insert record or not.
     * @param attributes This is a map which contain record data to insert.
+    * @return
     */  
      
     public static List<Contact> createContacts(Integer numToInsert, Boolean doInsert, Map<String, Object> attributes){
@@ -78,7 +91,13 @@ public class TestDataFactory{
         }
         return createRecords(contactsToInsert, doInsert, attributes);
     }
-
+    /**
+    * @description createUser method is used to create Users records
+    * @param numToInsert This is a number of records to insert.  
+    * @param doInsert This is boolean value whether to insert record or not.
+    * @param attributes This is a map which contain record data to insert.
+    * @return
+    */ 
     public static List<User> createUser(Integer numToInsert, Boolean doInsert, Map<String, Object> attributes){
         List<user> usersToInsert = new List<user>();
         for(Integer i=0; i< numToInsert; i++){
@@ -88,10 +107,60 @@ public class TestDataFactory{
         return createRecords(usersToInsert, doInsert, attributes);
     }
     /**
-    * createAssessmentTemp method is used to create AssessmentTemplate records
+    * @description createUser method is used to create Users records
     * @param numToInsert This is a number of records to insert.  
     * @param doInsert This is boolean value whether to insert record or not.
     * @param attributes This is a map which contain record data to insert.
+    * @return
+    */ 
+    public static User createTestUser(){
+        Profile portalProfile = [SELECT Id FROM Profile WHERE Name='Standard Platform User' WITH SECURITY_ENFORCED Limit 1];
+        List<user> lstuser = new List<User>();
+        String uniqueUserName = 'rhytmtuser' + DateTime.now().getTime() + '@testorg.com';
+        User u = new User(Alias = 'standt', Email='standarduser@testorg.com',
+        EmailEncodingKey='UTF-8', LastName='Testing', LanguageLocaleKey='en_US',
+        LocaleSidKey='en_US', ProfileId = portalProfile.Id,
+        TimeZoneSidKey='America/Los_Angeles',
+        UserName=uniqueUserName);
+        lstuser.add(u);
+        set<Id> userId = new set<Id>();
+        List<user> retUser = createRecords(lstuser, true, new Map<String, Object>());
+        userId.add(retUser[0].Id);
+        assignPermissionSetToUsers(userId);
+        return retUser[0];
+    }
+
+    /**
+    * @description AssignPermissionSetToUsers method is used to assign permission sets.
+    * @param usersId set of userids.
+    */ 
+    public static void assignPermissionSetToUsers (Set<Id> usersId) {
+        List<PermissionSetAssignment> permissionSetList = new List<PermissionSetAssignment>();
+        List<PermissionSet> permissionstobeassigned = [SELECT Id, Label FROM PermissionSet WHERE Name IN ('Customer_Access','Additional_Access') WITH SECURITY_ENFORCED];
+        for (User u : [Select Id, Name FROM User Where Id IN : usersId WITH SECURITY_ENFORCED]){
+            for(PermissionSet ps : permissionstobeassigned){
+                PermissionSetAssignment psa = new PermissionSetAssignment ();
+                    psa.PermissionSetId = ps.Id; 
+                    psa.AssigneeId = u.Id;
+                permissionSetList.add(psa);
+            }
+        }
+
+        Savepoint sp = Database.setSavepoint();
+        Database.UpsertResult[] srList1 = safe.doUpsert(permissionSetList);
+        List<String> errorList = SecurityCheckController.safeClassExceptionHandlerUpsert(srList1);
+        if(errorList.size()>0){
+            Database.rollback(sp);
+            throw new SecurityControllerException(String.join( errorList, ', ' ));
+        }
+    }
+
+    /**
+    * @description createAssessmentTemp method is used to create AssessmentTemplate records
+    * @param numToInsert This is a number of records to insert.  
+    * @param doInsert This is boolean value whether to insert record or not.
+    * @param attributes This is a map which contain record data to insert.
+    * @return
     */  
 
     public static List<Assessment_Template__c> createAssessmentTemp(Integer numToInsert, Boolean doInsert,Map<String, Object> attributes){
@@ -103,10 +172,11 @@ public class TestDataFactory{
        return createRecords(atemp, true, attributes);
     }
 /**
-* createSection method is used to create Section records.
+* @description createSection method is used to create Section records.
 * @param numToInsert This is a number of records to insert.  
 * @param doInsert This is boolean value whether to insert record or not.
 * @param attributes This is a map which contain record data to insert.
+* @return
 */
    
     public static List<Section__c> createSection(Integer numToInsert, Boolean doInsert,Map<String, Object> attributes){
@@ -119,10 +189,11 @@ public class TestDataFactory{
     }
 
     /**
-    * createQuestion method is used to create Question records
+    * @description createQuestion method is used to create Question records
     * @param numToInsert This is a number of records to insert.  
     * @param doInsert This is boolean value whether to insert record or not.
     * @param attributes This is a map which contain record data to insert.
+    * @return
     */
 
     public static List<Question__c> createQuestion(Integer numToInsert, Boolean doInsert,Map<String, Object> attributes){
@@ -135,26 +206,28 @@ public class TestDataFactory{
     }
  
     /**
-    * createAssessment method is used to create Assessment records
+    * @description createAssessment method is used to create Assessment records
     * @param numToInsert This is a number of records to insert.  
     * @param doInsert This is boolean value whether to insert record or not.
     * @param attributes This is a map which contain record data to insert.
+    * @return
     */  
     
     public static List<Assessment__c> createAssessment (Integer numToInsert, Boolean doInsert,Map<String, Object> attributes){
-    List<Assessment__c> AssesmentList=new List<Assessment__c> ();
+    List<Assessment__c> assesmentList=new List<Assessment__c> ();
         for(Integer i=0; i< numToInsert; i++){
             Assessment__c at=new Assessment__c();
-            AssesmentList.add(at);
+            assesmentList.add(at);
         }
-        return createRecords(AssesmentList,true,attributes);
+        return createRecords(assesmentList,true,attributes);
     }
 
     /**
-    * createResponse method is used to create Response records
+    * @description createResponse method is used to create Response records
     * @param numToInsert This is a number of records to insert.  
     * @param doInsert This is boolean value whether to insert record or not.
     * @param attributes This is a map which contain record data to insert.
+    *@return
     */
    
     public static List<Response__c> createResponse(Integer numToInsert, Boolean doInsert,Map<String, Object> attributes){
@@ -168,10 +241,12 @@ public class TestDataFactory{
     }
 
     /**
-    * createResponse method is used to create Response records
+    * @description createResponse method is used to create Response records
     * @param numToInsert This is a number of records to insert.  
     * @param doInsert This is boolean value whether to insert record or not.
     * @param attributes This is a map which contain record data to insert.
+    * @return
+
     */
     public static List<AccountAssessmentRelation__c> createAccountAssessment(Integer numToInsert, Boolean doInsert,Map<String, Object> attributes){
         List<AccountAssessmentRelation__c> accountAssessmentlist = new List<AccountAssessmentRelation__c>();
@@ -184,10 +259,11 @@ public class TestDataFactory{
     }
 
     /**
-    * createResponse method is used to create Response records
+    * @description createResponse method is used to create Response records
     * @param numToInsert This is a number of records to insert.  
     * @param doInsert This is boolean value whether to insert record or not.
     * @param attributes This is a map which contain record data to insert.
+    * @return
     */
     public static List<Assessment_Supplier__c> createSuppliers(Integer numToInsert, Boolean doInsert,Map<String, Object> attributes){
         List<Assessment_Supplier__c> supplierList = new List<Assessment_Supplier__c>();
@@ -196,5 +272,12 @@ public class TestDataFactory{
             supplierList.add(accSupplier);
         }
         return createRecords(supplierList,true,attributes);
+    }
+
+    /**
+    * @description It is used to throw the exception.
+    */
+    public class SecurityControllerException extends Exception{
+            
     }
 }

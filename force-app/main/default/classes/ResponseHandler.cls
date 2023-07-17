@@ -1,8 +1,8 @@
-/* 
+/** 
 * Class Name        : ResponseHandler
 * Developer         : Sai Koushik Nimmaturi and Reethika Velpula           
 * Created Date      : 
-* Description       : It is used to perform the trigger logic on Response__c object.
+* @description        : It is used to perform the trigger logic on Response__c object.
 * Last Modified Date: 
 */
 
@@ -11,15 +11,15 @@ public with sharing class ResponseHandler implements ITriggerHandler{
     private static Savepoint sp;//prudhvi to work
 
     /**
-    * To execute before insert logic
+    * @description To execute before insert logic
     * @param newList This is the new list of records.  
     */
     public void beforeInsert(List<sObject> newList) {
-       
+       return;
     }
 
     /**
-    * To execute after insert logic
+    * @description To execute after insert logic
     * @param newList This is the new list of records.
       @param newMap This is the new map of records.
     */
@@ -28,18 +28,18 @@ public with sharing class ResponseHandler implements ITriggerHandler{
     }
     
      /**
-    * To execute before update logic
+    * @description To execute before update logic
     * @param newList This is the new list of records.
       @param newMap This is the new map of records.
       @param oldList This is the old list of records.
       @param oldMap This is the old map of records.
     */
     public void beforeUpdate(List<sObject> newList, Map<Id, sObject> newMap, List<sObject> oldList, Map<Id, sObject> oldMap) {
-        
+        return;
     }
     
     /**
-    * To execute after update logic
+    * @description To execute after update logic
     * @param newList This is the new list of records.
       @param newMap This is the new map of records.
       @param oldList This is the old list of records.
@@ -50,38 +50,39 @@ public with sharing class ResponseHandler implements ITriggerHandler{
     }
     
     /**
-    * To execute before delete logic
+    * @description To execute before delete logic
     * @param oldList This is the old list of records.
       @param oldMap This is the old map of records.
     */
     public void beforeDelete(List<sObject> oldList , Map<Id, sObject> oldMap) {
-        
+        return;
     }
     
     /**
-    * To execute after delete logic
+    * @description To execute after delete logic
     * @param oldList This is the old list of records.
       @param oldMap This is the old map of records.
     */
     public void afterDelete(List<sObject> oldList , Map<Id, sObject> oldMap) {
-        
+        return;
     }
     
     /**
-    * To execute after undelete logic
-    * @param oldList This is the new list of records.
-      @param oldMap This is the new map of records.
+    * @description To execute after undelete logic
+    * @param newList This is the new list of records.
+      @param newMap This is the new map of records.
     */
     public void afterUnDelete(List<sObject> newList, Map<Id, sObject> newMap) {
-        
+        return;
     }
     
     /**
-    * To calculate response count.
+    * @description To calculate response count.
     * @param newList This is the new list of records.
     */
     public void getResponseCount(List<sObject> newList){
         Set<Id> accAssessmentSet = new Set<Id>();
+        List<String> errorList = new  List<String>();
         for(Response__c res : (List<Response__c>)newList){
             if(string.isNotBlank(res.AccountAssessmentRelation__c)){
                 accAssessmentSet.add(res.AccountAssessmentRelation__c);
@@ -97,30 +98,27 @@ public with sharing class ResponseHandler implements ITriggerHandler{
             if (sp == null){
                 sp = Database.setSavepoint();
             }
-            if(accountAssessmentList.isEmpty() == false){
-                for(AccountAssessmentRelation__c accAssRel :accountAssessmentList){
-                    accAssRel.Number_of_Responses__c = accAssRel.Supplier_Response__r.size();
-                    Integer flaggedResponse = 0;
-                        for(Response__c res:accAssRel.Supplier_Response__r){
-                            if(res.Flag__c){
-                                flaggedResponse++;
-                            }
+            for(AccountAssessmentRelation__c accAssRel :accountAssessmentList){
+                accAssRel.Number_of_Responses__c = accAssRel.Supplier_Response__r.size();
+                Integer flaggedResponse = 0;
+                    for(Response__c res:accAssRel.Supplier_Response__r){
+                        if(res.Flag__c){
+                            flaggedResponse++;
                         }
-                    accAssRel.Follow_Up_Requests__c = flaggedResponse;
-                }
-                
-                Database.SaveResult[] saveResult = safe.doUpdate(accountAssessmentList);
-                List<String> errorList = SecurityCheckController.safeClassExceptionHandlerInsert(saveResult);
-                if(errorList.size()>0){
-                    Database.rollback(sp);
-                    throw new SecurityControllerException(String.join( errorList, ', ' ));
-                }
+                    }
+                accAssRel.Follow_Up_Requests__c = flaggedResponse;
             }
+            Database.SaveResult[] saveResult = safe.doUpdate(accountAssessmentList);
+            errorList = SecurityCheckController.safeClassExceptionHandlerInsert(saveResult);
+        }
+        if(errorList.size()>0){
+            Database.rollback(sp);
+            throw new SecurityControllerException(String.join( errorList, ', ' ));
         }
     }
 
     /**
-    * It is used to throw the exception
+    * @description It is used to throw the exception
     */
     public class SecurityControllerException extends Exception{
         
