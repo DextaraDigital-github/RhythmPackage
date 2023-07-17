@@ -4,5 +4,5 @@
     <active>false</active>
     <errorConditionFormula>Start_Date__c &lt; TODAY()</errorConditionFormula>
     <errorDisplayField>Start_Date__c</errorDisplayField>
-    <errorMessage>Start date cannot be the past date</errorMessage> 
+    <errorMessage>Start Date of an Assessment Program cannot be a Past Date</errorMessage>
 </ValidationRule>

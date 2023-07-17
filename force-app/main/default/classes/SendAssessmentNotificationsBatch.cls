@@ -1,25 +1,27 @@
-
-/* 
+/** 
 * Class Name        : AssessmentTriggerHandler
 * Developer         : Sai Koushik Nimmaturi and Reethika Velpula           
 * Created Date      : 
-* Description       : It is used to send the assessment notification to suppliers.
+* @description       : It is used to send the assessment notification to suppliers.
 * Last Modified Date: 
 */
-
 public class SendAssessmentNotificationsBatch implements Database.Batchable<sObject> {
 
     /**
-    * Start method to query the required records.
+    * @description Start method to query the required records.
+    * @param bc It is an instance of BatchableContext.
+    * @return
     */
     public Database.QueryLocator start(Database.BatchableContext bc){
         Date todayDate = Date.Today();
-        string query = 'SELECT Id,Name,Assessment__r.Start_Date__c,Assessment__r.End_Date__c,Account__r.Name,Account__c,Assessment__c FROM Assessment_Supplier__c WHERE Status__c= \'Active\' AND Assessment__r.Start_Date__c=:todayDate';
+        string query = 'SELECT Id,Name,Assessment__r.Start_Date__c,Assessment__r.End_Date__c,Account__r.Name,Account__c,Assessment__c FROM Assessment_Supplier__c WHERE Status__c= \'Active\' AND Assessment__r.Start_Date__c=:todayDate WITH SECURITY_ENFORCED';
         return Database.getQueryLocator(query);
     }
 
      /**
-    * execute method to process the records.
+    * @description execute method to process the records.
+    * @param bc It is an instance of BatchableContext. 
+    * @param scope List of Assessment_Supplier__c object.
     */
     public void execute(Database.BatchableContext bc, List<Assessment_Supplier__c> scope){
         List<ErrorTransactionLog__c> errorList = new List<ErrorTransactionLog__c>();
@@ -46,19 +48,18 @@ public class SendAssessmentNotificationsBatch implements Database.Batchable<sObj
                 Database.SaveResult[] results = Database.insert(accountAssessRelnsList, false);
                 for(Database.SaveResult result : results) {
                     if(result.isSuccess()){
-                        system.debug('insertedAssessments------>' + result.getId());
                         successRecordsIdSet.add(result.getId());
-                    } else {
-                        for(Database.Error error : result.getErrors()) {
-                            system.debug('errorDetails----->'+ error.getStatusCode() + ' : ' + 'Error Fields : ' + error.getFields());
-                        }
-                    }
+                    } 
+                    // else {
+                    //     for(Database.Error error : result.getErrors()) {
+                    //     }
+                    // }
                 }
             }
             if(successRecordsIdSet.isEmpty() == false){
                
-                for(AccountAssessmentRelation__c assRelRec:[SELECT Id,Account__r.Name,Account__r.Email__c,Assessment__c FROM AccountAssessmentRelation__c WHERE ID IN:successRecordsIdSet]){
-                    if(String.isNotBlank(assRelRec.Account__r.Email__c)){
+                for(AccountAssessmentRelation__c assRelRec:[SELECT Id,Account__r.Name,Account__r.Email__c,Assessment__c FROM AccountAssessmentRelation__c WHERE ID IN:successRecordsIdSet WITH SECURITY_ENFORCED]){
+                    if(String.isNotBlank(assRelRec.Account__r.Email__c) && siteData != null){
                         List<String> sendTo = new List<String>();
                         sendTo.add(assRelRec.Account__r.Email__c);
                         Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
@@ -78,14 +79,17 @@ public class SendAssessmentNotificationsBatch implements Database.Batchable<sObj
             }
             if(emailMessagesList.isEmpty() == false){
                 List<Messaging.SendEmailResult> emailResults = Messaging.sendEmail(emailMessagesList);
-                for(Messaging.SendEmailResult result :emailResults) {                                    
-                    if(!result.IsSuccess()) {                    
-                        List<Messaging.SendEmailError> errors = result.getErrors();
-                        if (errors.size() > 0){
-                            Messaging.SendEmailError err = errors[0];
-                            system.debug('emailErrorMessage---->'+err.getMessage());
-                            system.debug('emailErrorMessage---->'+err.getFields());
-                        }                	
+                for(Messaging.SendEmailResult result :emailResults) {   
+                    List<Messaging.SendEmailError> errors = result.getErrors();                                 
+                    if(!result.IsSuccess() && errors.size() > 0){
+                        Messaging.SendEmailError err = errors[0];
+                        ErrorTransactionLog__c errorRec = new ErrorTransactionLog__c();
+                        errorRec.Class_Name__c = 'SendAssessmentNotificationsBatch';
+                        errorRec.Error_Stack_Trace__c = err.getMessage();
+                        errorRec.Name = 'Error Record';
+                        errorRec.LWC_Component_Name__c = '';
+                        errorRec.Method_Name__c = 'ExecuteMethod';
+                        errorList.add(errorRec);
                     }
                 }
             }
@@ -99,13 +103,15 @@ public class SendAssessmentNotificationsBatch implements Database.Batchable<sObj
             errorList.add(errorRec);
         }
         if(errorList.isEmpty() == false){
-            Database.SaveResult[] results = Database.insert(errorList, false);
+            Database.insert(errorList, false);
         }
     }
     /**
-    * execute any post-processing operations
+    * @description execute any post-processing operations.
+    * @param bc It is an instance of BatchableContext.
     */
     public void finish(Database.BatchableContext bc){
         // execute any post-processing operations
+        return;
     }
 }

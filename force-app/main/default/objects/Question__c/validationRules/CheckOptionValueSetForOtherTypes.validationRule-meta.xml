@@ -6,5 +6,5 @@
 NOT(OR((ISPICKVAL(Question_Type__c,&apos;Radio&apos;)),
 (ISPICKVAL(Question_Type__c, &apos;Picklist&apos;)),
 (ISPICKVAL(Question_Type__c, &apos;Picklist (Multi-Select)&apos;)))))</errorConditionFormula>
-    <errorMessage>OptionValueSet is not mandatory for the mentioned question type</errorMessage>
+    <errorMessage>Response Values are not required for the selected Question Type</errorMessage>
 </ValidationRule>

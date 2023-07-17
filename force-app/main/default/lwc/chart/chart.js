@@ -1,15 +1,15 @@
 import {LightningElement, api, track} from 'lwc';
-import chartjs2 from '@salesforce/resourceUrl/chartjs2';
+//import chartjs2 from '@salesforce/resourceUrl/chartjs2';
 //import {loadScript} from 'lightning/platformResourceLoader';
-import {ShowToastEvent} from 'lightning/platformShowToastEvent';
-import { loadScript } from 'c/resourceLoader';
+//import {ShowToastEvent} from 'lightning/platformShowToastEvent';
+//import { loadScript } from 'c/resourceLoader';
 
 export default class Chart extends LightningElement {
  @api loaderVariant = 'base';
  @api chartConfig;
 
  @track isChartJsInitialized;
- renderedCallback() {
+ /*renderedCallback() {
   if (this.isChartJsInitialized) {
    return;
   }
@@ -31,5 +31,7 @@ export default class Chart extends LightningElement {
      })
     );
    });
+
  }
+ */
 }

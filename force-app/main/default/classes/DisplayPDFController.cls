@@ -1,16 +1,19 @@
-/* 
+/**
 * Class Name        : DisplayPDFController
 * Developer         : Sai Koushik Nimmaturi and Reethika Velpula           
 * Created Date      : 
-* Description       : It is used to display the pdf.
+* @description        : It is used to display the pdf.
 * Last Modified Date: 
 */
 public with sharing class DisplayPDFController {
     public static SecurityCheckController safe = new SecurityCheckController();
+    /**
+    * @description It is variable.
+    */
 	public String displayText {get; set;}
 
     /**
-    * This is constructor where the record is fetched based on id.
+    * @description This is constructor where the record is fetched based on id.
     */
     public DisplayPDFController()
     {

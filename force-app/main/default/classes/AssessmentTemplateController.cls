@@ -1,8 +1,8 @@
-/* 
+/** 
 * Class Name        : AssessmentTemplateController
 * Developer         : Priyanka         
 * Created Date      : 
-* Description       : AssessmentTemplateController class is used for SOQl on Question__c,Section__c,Assessment_Template__c and DML operations on the objects Sections,Questions.
+* @description        : AssessmentTemplateController class is used for SOQl on Question__c,Section__c,Assessment_Template__c and DML operations on the objects Sections,Questions.
 * Last Modified Date: 23-06-2023
 */
 public with sharing class AssessmentTemplateController {
@@ -10,14 +10,14 @@ public with sharing class AssessmentTemplateController {
     private static Savepoint sp;//prudhvi to work
 
 /**
-* get Section Records for LookupField.
+* @description get Section Records for LookupField.
 * @param sectionName This is a name of the section.
-* @param templateId This is a record id of an Template__c.  
+* @param templateId This is a record id of an Template__c. 
+* @return
 */    
     @AuraEnabled(cacheable=true)
     public static List<Section__c> getSections(String sectionName, string templateId) {
         try{
-            List<Section__c> secList =new List<Section__c>();
             if(string.isNotBlank(sectionName)) {
                 String secName ='%'+ sectionName +'%';
                 String query = 'SELECT Id,Name'
@@ -40,8 +40,9 @@ public with sharing class AssessmentTemplateController {
     }
 
 /**
-* Get the details of the Template.
-* @param templateId This is a record id of an Template__c.  
+* @description Get the details of the Template.
+* @param templateId This is a record id of an Template__c.
+*@return
 */    
     @AuraEnabled(Cacheable=true)
     public static Boolean getTemplateDetails(String templateId) {
@@ -51,17 +52,12 @@ public with sharing class AssessmentTemplateController {
                 String query = 'SELECT Status__c'
                              + ' FROM Assessment_Template__c'
                              + ' WHERE Id= \'' + String.escapeSingleQuotes(templateId) + '\''
-                             + ' WITH SECURITY_ENFORCED'
-                             + ' LIMIT 1';
+                             + ' WITH SECURITY_ENFORCED';
 
                 List<Assessment_Template__c> assessmentList= safe.doQuery(query);
                 Assessment_Template__c assessmentTemp = (AssessmentList.size()==1)?AssessmentList[0]:null;
-                if(assessmentTemp  != null ) {
-                    if(assessmenttemp.Status__c.equalsIgnoreCase('New')){
-                        hasStatusNew = true;
-                    }else{
-                        hasStatusNew = false;
-                    }   
+                if(assessmentTemp  != null && assessmenttemp.Status__c.equalsIgnoreCase('New')){
+                    hasStatusNew = true;
                 }
             }
             return hasStatusNew;
@@ -73,9 +69,10 @@ public with sharing class AssessmentTemplateController {
     }
 
 /**
-* getRecordsCount method is used to get the count of Records to particular Assessment Template.
+* @description getRecordsCount method is used to get the count of Records to particular Assessment Template.
+* @param templateId This is a record id of an Template__c.
 * @param objName This is a name of the object Section.
-* @param templateId This is a record id of an Template__c.  
+*@return
 */    
 
     @AuraEnabled
@@ -109,8 +106,9 @@ public with sharing class AssessmentTemplateController {
     }
     
 /**
-* getTemplateSections method is used to get all the Sections related to particular Assessment Template.
-* @param templateId This is a record id of an Template__c.  
+* @description getTemplateSections method is used to get all the Sections related to particular Assessment Template.
+* @param templateId This is a record id of an Template__c.
+* @return
 */   
     @AuraEnabled
     public static List<Section__c> getTemplateSections(String templateId) {
@@ -137,8 +135,9 @@ public with sharing class AssessmentTemplateController {
         return null;
     }
 /**
-* getQuestionsLists method is used to get all the questions.
-* @param templateId This is a record id of an Template__c.  
+* @description getQuestionsLists method is used to get all the questions.
+* @param templateId This is a record id of an Template__c.
+* @return
 */   
     
     @AuraEnabled
@@ -162,9 +161,10 @@ public with sharing class AssessmentTemplateController {
     }
     
 /**
-* getTemplateQuestionList method is used to get all the questions related to template.
+* @description getTemplateQuestionList method is used to get all the questions related to template.
+* @param templateId This is a record id of an Template__c.
 * @param recslimit This is a count of record limit to query.
-* @param templateId This is a record id of an Template__c.  
+* @return
 */    
     
     @AuraEnabled
@@ -191,7 +191,7 @@ public with sharing class AssessmentTemplateController {
         return null;
     }
 /**
-* updateQustnRecords method is used to update section list.
+* @description updateQustnRecords method is used to update section list.
 * @param qstnList This is a list of questions data to perform update operation.
 */   
     @AuraEnabled 
@@ -214,7 +214,7 @@ public with sharing class AssessmentTemplateController {
         }
     }
 /**
-* updateRecords method is used to update section list.
+* @description updateRecords method is used to update section list.
 * @param secList This is a list of sections data to perform update operation.
 */    
    
@@ -239,9 +239,10 @@ public with sharing class AssessmentTemplateController {
     }
 
 /**
-*deleteRecords method is used to delete the records.
+* @description deleteRecords method is used to delete the records.
 * @param recIdList This is a list of the section Id.
 * @param delchildobjrecs This is a boolean value to delete the records or not.  
+* @return
 */
     @AuraEnabled
     public static String deleteRecords(List<Id> recIdList, Boolean delchildobjrecs) {
@@ -249,23 +250,20 @@ public with sharing class AssessmentTemplateController {
         try {
             if(recIdList.size()>0) {
                 Database.DeleteResult[] drchildList;
+                List<Question__c> questionList = new List<Question__c>();
                 if(delchildobjrecs==true) {
                     string queQuery = 'SELECT Id'
                                     +' FROM Question__c'
                                     +' WHERE section__c IN:recIdList';
                     Map<String, Object> bindVariables = new Map<String, Object>{'recIdList' => recIdList};
-                    List<Question__c> questionList = safe.doQueryWithBinds(queQuery,bindVariables);
-
-                    string queSubQuery = 'SELECT Id'
-                                    +' FROM Question__c'
-                                    +' WHERE Id IN:recIdList';
-                    
-                    List<Question__c> subquestionList = safe.doQueryWithBinds(queSubQuery,bindVariables);
-                    if(questionList.isEmpty() == false) {
-                        drchildList=safe.doDelete(questionList);
-                    }
+                    questionList = safe.doQueryWithBinds(queQuery,bindVariables);
                 }
-                Database.DeleteResult[] drList=Database.delete(recIdList,true);
+                if(questionList.isEmpty() == false) {
+                    drchildList=safe.doDelete(questionList);
+                }
+                if (Schema.sObjectType.Section__c.isDeletable()) {
+                     Database.delete(recIdList,true);
+                }
                 for(Database.DeleteResult dr:drchildList) {
                     if(!dr.isSuccess()) {
                         for(Database.Error de:dr.getErrors()) {
@@ -276,25 +274,25 @@ public with sharing class AssessmentTemplateController {
             }
         }
         catch(Exception e) {
-
+            status = e.getMessage();
         }
         return status;
     }
 
 /**
-* Get Questions Count.
-* @param sectionId This is a record id of an Section__c.  
+* @description Get Questions Count.
+* @param sectionId This is a record id of an Section__c. 
+* @return
 */    
     @AuraEnabled
-    public static Object questionsCount(Id sectionId)
-    {
+    public static Object questionsCount(Id sectionId){
+        if ((!Schema.sObjectType.Question__c.fields.Id.isAccessible()) || (!Schema.sObjectType.Question__c.fields.Section__c.isAccessible())) {
+            return 0;
+        }
+        
         try{
-            string query = 'SELECT COUNT(ID) q'
-                         + ' FROM Question__c'
-                         + ' WHERE Section__c=\'' + String.escapeSingleQuotes(sectionId) + '\''
-                         + ' WITH SECURITY_ENFORCED';
-            List<AggregateResult> s = database.query(query);
-            return s[0].get('q');
+            List<Question__c> queRecordsList = [SELECT Id FROM Question__c WHERE Section__c=:sectionId WITH SECURITY_ENFORCED];
+            return queRecordsList.size();
         }catch(exception e){
             String errorMsg = e.getMessage();
             throw new AuraHandledException(ErrorMsg);
@@ -302,26 +300,26 @@ public with sharing class AssessmentTemplateController {
     }
  
 /**
-* Get Sections Count.
-* @param templateId This is a record id of an Template__c.  
+* @description Get Sections Count.
+* @param templateId This is a record id of an Template__c.
+* @return
 */
     @AuraEnabled
-    public static Object sectionsCount(Id templateId)
-    {
+    public static Object sectionsCount(Id templateId) {
+        if ((!Schema.sObjectType.Section__c.fields.Id.isAccessible()) || (!Schema.sObjectType.Section__c.fields.Assessment_Template__c.isAccessible())) {
+            return 0;
+        }
+        
         try{
-            String query = 'SELECT count(Id) s'
-                         + ' FROM Section__c'
-                         + ' WHERE Assessment_Template__c =\'' + String.escapeSingleQuotes(templateId) + '\''
-                         + ' WITH SECURITY_ENFORCED';
-            List<AggregateResult> s = database.query(query);
-            return s[0].get('s');
+            List<Section__c> sectionList = [SELECT Id FROM Section__c WHERE Assessment_Template__c=:templateId WITH SECURITY_ENFORCED];
+            return sectionList.size();
         }catch(exception e){
             String errorMsg = e.getMessage();
             throw new AuraHandledException(ErrorMsg);
         }
     }
 /**
-  * It is used to throw the exception.
+  * @description It is used to throw the exception.
 */
     public class SecurityControllerException extends Exception{
             

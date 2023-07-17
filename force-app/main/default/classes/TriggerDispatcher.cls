@@ -1,4 +1,16 @@
+/**
+* Class Name        : TriggerDispatcher
+* Developer         :           
+* Created Date      : 
+* @description      : It is used to dispatch the trigger events
+* Last Modified Date:  
+*/
 public with sharing class TriggerDispatcher {
+
+    /**
+    * @description executes the methods based on events
+    * @param handler instance of a trigger handler
+    */
     public static void run(ITriggerHandler handler){
         
         switch on Trigger.operationType {
