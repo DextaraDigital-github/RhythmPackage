@@ -8,6 +8,9 @@
 
 
 public with sharing class TestDataFactory{
+
+    public static SecurityCheckController safe = new SecurityCheckController();//use singleton pattern
+    private static Savepoint sp; // to rollback
     /**
     * @description createRecords methods is used to create the records for all objects.
     * @param records This is a list of records to insert.  
@@ -40,7 +43,13 @@ public with sharing class TestDataFactory{
                 }
             }
             if (doInsert) {
-                insert records;
+                Savepoint sp = Database.setSavepoint();
+                Database.SaveResult[] srList1 = safe.doinsert(records);
+                List<String> errorList = SecurityCheckController.safeClassExceptionHandlerInsert(srList1);
+                if(errorList.size()>0){
+                    Database.rollback(sp);
+                    throw new SecurityControllerException(String.join( errorList, ', ' ));
+                }
             }
         } catch(Exception e){
             throw new AuraHandledException(e.getMessage());
@@ -97,6 +106,55 @@ public with sharing class TestDataFactory{
         }
         return createRecords(usersToInsert, doInsert, attributes);
     }
+    /**
+    * @description createUser method is used to create Users records
+    * @param numToInsert This is a number of records to insert.  
+    * @param doInsert This is boolean value whether to insert record or not.
+    * @param attributes This is a map which contain record data to insert.
+    * @return
+    */ 
+    public static User createTestUser(){
+        Profile portalProfile = [SELECT Id FROM Profile WHERE Name='Standard Platform User' WITH SECURITY_ENFORCED Limit 1];
+        List<user> lstuser = new List<User>();
+        String uniqueUserName = 'rhytmtuser' + DateTime.now().getTime() + '@testorg.com';
+        User u = new User(Alias = 'standt', Email='standarduser@testorg.com',
+        EmailEncodingKey='UTF-8', LastName='Testing', LanguageLocaleKey='en_US',
+        LocaleSidKey='en_US', ProfileId = portalProfile.Id,
+        TimeZoneSidKey='America/Los_Angeles',
+        UserName=uniqueUserName);
+        lstuser.add(u);
+        set<Id> userId = new set<Id>();
+        List<user> retUser = createRecords(lstuser, true, new Map<String, Object>());
+        userId.add(retUser[0].Id);
+        assignPermissionSetToUsers(userId);
+        return retUser[0];
+    }
+
+    /**
+    * @description AssignPermissionSetToUsers method is used to assign permission sets.
+    * @param usersId set of userids.
+    */ 
+    public static void assignPermissionSetToUsers (Set<Id> usersId) {
+        List<PermissionSetAssignment> permissionSetList = new List<PermissionSetAssignment>();
+        List<PermissionSet> permissionstobeassigned = [SELECT Id, Label FROM PermissionSet WHERE Name IN ('Customer_Access','Additional_Access') WITH SECURITY_ENFORCED];
+        for (User u : [Select Id, Name FROM User Where Id IN : usersId WITH SECURITY_ENFORCED]){
+            for(PermissionSet ps : permissionstobeassigned){
+                PermissionSetAssignment psa = new PermissionSetAssignment ();
+                    psa.PermissionSetId = ps.Id; 
+                    psa.AssigneeId = u.Id;
+                permissionSetList.add(psa);
+            }
+        }
+
+        Savepoint sp = Database.setSavepoint();
+        Database.UpsertResult[] srList1 = safe.doUpsert(permissionSetList);
+        List<String> errorList = SecurityCheckController.safeClassExceptionHandlerUpsert(srList1);
+        if(errorList.size()>0){
+            Database.rollback(sp);
+            throw new SecurityControllerException(String.join( errorList, ', ' ));
+        }
+    }
+
     /**
     * @description createAssessmentTemp method is used to create AssessmentTemplate records
     * @param numToInsert This is a number of records to insert.  
@@ -214,5 +272,12 @@ public with sharing class TestDataFactory{
             supplierList.add(accSupplier);
         }
         return createRecords(supplierList,true,attributes);
+    }
+
+    /**
+    * @description It is used to throw the exception.
+    */
+    public class SecurityControllerException extends Exception{
+            
     }
 }

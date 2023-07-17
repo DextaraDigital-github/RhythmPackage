@@ -15,7 +15,7 @@ public class AssessmentExpiryNotificationBatch implements Database.Batchable<sOb
     */
     public Database.QueryLocator start(Database.BatchableContext bc){
         Date todayDate = Date.Today();
-        string query = 'SELECT Id,Name,Account__r.Name,Account__r.Email__c FROM AccountAssessmentRelation__c WHERE Status__c != \'Submitted\' AND Assessment__r.Expiry_Reminder_Date__c != null AND Assessment__r.Expiry_Reminder_Date__c=:todayDate';
+        string query = 'SELECT Id,Name,Account__r.Name,Account__r.Email__c FROM AccountAssessmentRelation__c WHERE Status__c != \'Submitted\' AND Assessment__r.Expiry_Reminder_Date__c != null AND Assessment__r.Expiry_Reminder_Date__c=:todayDate WITH SECURITY_ENFORCED';
         return Database.getQueryLocator(query);
     }
 

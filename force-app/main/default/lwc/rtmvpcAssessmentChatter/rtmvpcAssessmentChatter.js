@@ -24,7 +24,7 @@ export default class RtmvpcAssessmentChatter extends LightningElement {
    @api recordid;
    @track responseWrapper = {};
    @track showData = false;
-   
+
    @api
    displayConversation(chatmap) {
       this.newChat = '';
@@ -33,7 +33,7 @@ export default class RtmvpcAssessmentChatter extends LightningElement {
       if (typeof chatmap !== 'undefined' && chatmap) {
          this.chattermap = chatmap;
       }
-      this.showData=false;
+      this.showData = false;
       this.questionId = this.chattermap.questionId;
       this.assessmentId = this.chattermap.assesmentId;
       this.accountType = this.chattermap.accountType;
@@ -84,8 +84,8 @@ export default class RtmvpcAssessmentChatter extends LightningElement {
 
    /* handleRightButtonClick is used to save the newly typed message to the response record */
    handleRightButtonClick() {
-      var chat=this.newChat.trim(' ');
-      if (typeof this.newChat !== 'undefined' && this.newChat !== '' && chat.length >0) {
+      var chat = this.newChat.trim(' ');
+      if (typeof this.newChat !== 'undefined' && this.newChat !== '' && chat.length > 0) {
          this.showData = false;
          this.responseWrapper.assessmentId = this.assessmentId;
          this.responseWrapper.questionId = this.questionId;
@@ -98,81 +98,87 @@ export default class RtmvpcAssessmentChatter extends LightningElement {
          this.newResponse = [];
          this.handleGetChatterResponse();
       }
-      else{
+      else {
          this.newChat = '';
       }
    }
 
-   handleGetChatterResponse(){
+   handleGetChatterResponse() {
       /*This method is used to get conversation history between vendor and customer after firing the event */
-         getChatterResponse({ responseWrapper: JSON.stringify(this.responseWrapper) }).then((result1) => {
-            if (result1.length !== 0) {
-               if (typeof result1[0].Rhythm__Conversation_History__c !== 'undefined') {
-                  this.newResponse = JSON.parse(result1[0].Rhythm__Conversation_History__c);
+      getChatterResponse({ responseWrapper: JSON.stringify(this.responseWrapper) }).then((result1) => {
+         if (result1.length !== 0) {
+            if (typeof result1[0].Rhythm__Conversation_History__c !== 'undefined') {
+               this.newResponse = JSON.parse(result1[0].Rhythm__Conversation_History__c);
+            }
+            if (typeof result1[0].CreatedDate !== 'undefined') {
+               let x = result1[0].CreatedDate.split('T')[0];
+               let time = result1[0].CreatedDate.split('T')[1].split('.')[0];
+               let months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+               result1[0].CreatedDate = months[Number(x.split('-')[1]) - 1] + '-' + x.split('-')[2] + '-' + x.split('-')[0];
+               let hours = time.split(':')[0];
+               let minutes = time.split(':')[1];               
+               this.responseMap.createdTime = result1[0].CreatedDate + ' ' + hours + ':' + minutes;
+            }
+         }
+
+         this.responseMap.Text = this.newChat;
+
+         this.responseMap.Name = this.userName;
+         let customerChatCSS = (typeof this.recordid !== 'undefined') ? 'cad-cd-customer' : 'cad-ad-customer';
+         let supplierChatCSS = (typeof this.recordid !== 'undefined') ? 'cad-cd-supplier' : 'cad-ad-supplier';
+         if (this.newResponse && this.newResponse.length > 0) {
+            this.newResponse.forEach(newresp => {
+               if (newresp.accountType === 'customer') {
+                  newresp.recipientType = customerChatCSS;
                }
-               if (typeof result1[0].CreatedDate !== 'undefined') {
-                  this.responseMap.createdTime = result1[0].CreatedDate;
+               else {
+                  newresp.recipientType = supplierChatCSS;
                }
-            }
-            
-            this.responseMap.Text = this.newChat;
+            })
+         }
 
-            this.responseMap.Name = this.userName;
-            let customerChatCSS = (typeof this.recordid !== 'undefined')?'cad-cd-customer':'cad-ad-customer';
-            let supplierChatCSS = (typeof this.recordid !== 'undefined')?'cad-cd-supplier':'cad-ad-supplier';
-            if( this.newResponse &&  this.newResponse.length > 0){
-               this.newResponse.forEach(newresp => {
-                  if (newresp.accountType === 'customer') {
-                     newresp.recipientType = customerChatCSS;
-                  }
-                  else {
-                     newresp.recipientType = supplierChatCSS;
-                  }
-               })
-            }
-            
-            if (this.recordid !== null && typeof this.recordid !== 'undefined') {
-               this.responseMap.accountType = 'customer';
-            }
-            else {
-               this.responseMap.accountType = 'supplier';
-            }
+         if (this.recordid !== null && typeof this.recordid !== 'undefined') {
+            this.responseMap.accountType = 'customer';
+         }
+         else {
+            this.responseMap.accountType = 'supplier';
+         }
 
-            if(this.accountType === 'vendor') {
-               this.responseMap.recipientType = customerChatCSS;
-            }
-            else if (this.accountType === 'supplier') {
-               this.responseMap.recipientType = supplierChatCSS;
-            }
+         if (this.accountType === 'vendor') {
+            this.responseMap.recipientType = customerChatCSS;
+         }
+         else if (this.accountType === 'supplier') {
+            this.responseMap.recipientType = supplierChatCSS;
+         }
 
-            if (typeof this.responseMap.Text != 'undefined' && this.responseMap.Text !== '') {
-                this.newResponse.push(this.responseMap);
-            }
-            if(this.newResponse.length >0){
+         if (typeof this.responseMap.Text != 'undefined' && this.responseMap.Text !== '') {
+            this.newResponse.push(this.responseMap);
+         }
+         if (this.newResponse.length > 0) {
             this.callChatterResponse(this.newResponse);
-            }
-            this.responseList = this.newResponse;
-            this.showData = true;
-            this.showResponse = true;
-            this.newChat = '';
-            this.chatDataMap.conversationHistory = JSON.stringify(this.responseList);
-            this.chatDataMap.questionId = this.questionId;
-            this.chatDataMap.accountassessmentId = this.accountassessmentId;
-            /* This dispatch event is used to assign the conversation data to the main wrapper (questionnaire) to update the data in the latest records. */
-            const selectedEvent = new CustomEvent('chatconversation', {
-               detail: this.chatDataMap
-            });
-            /* Dispatches the event.*/
-            this.dispatchEvent(selectedEvent);
-         }).catch((err) => {
-            var errormap = {};
-            errormap.componentName = 'RtmvpcAssessmentChatter';
-            errormap.methodName = 'getChatterResponse';
-            errormap.className = 'AssessmentController';
-            errormap.errorData = err.message;
-            errorLogRecord({ errorLogWrapper: JSON.stringify(errormap) }).then(() => {
-            });
+         }
+         this.responseList = this.newResponse;
+         this.showData = true;
+         this.showResponse = true;
+         this.newChat = '';
+         this.chatDataMap.conversationHistory = JSON.stringify(this.responseList);
+         this.chatDataMap.questionId = this.questionId;
+         this.chatDataMap.accountassessmentId = this.accountassessmentId;
+         /* This dispatch event is used to assign the conversation data to the main wrapper (questionnaire) to update the data in the latest records. */
+         const selectedEvent = new CustomEvent('chatconversation', {
+            detail: this.chatDataMap
          });
+         /* Dispatches the event.*/
+         this.dispatchEvent(selectedEvent);
+      }).catch((err) => {
+         var errormap = {};
+         errormap.componentName = 'RtmvpcAssessmentChatter';
+         errormap.methodName = 'getChatterResponse';
+         errormap.className = 'AssessmentController';
+         errormap.errorData = err.message;
+         errorLogRecord({ errorLogWrapper: JSON.stringify(errormap) }).then(() => {
+         });
+      });
    }
 
 }

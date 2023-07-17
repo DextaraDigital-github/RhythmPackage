@@ -158,7 +158,7 @@
     <enableSearch>true</enableSearch>
     <enableSharing>true</enableSharing>
     <enableStreamingApi>true</enableStreamingApi>
-    <externalSharingModel>Read</externalSharingModel>
+    <externalSharingModel>ControlledByParent</externalSharingModel>
     <label>Question</label>
     <nameField>
         <displayFormat>Q-{0000}</displayFormat>
@@ -168,6 +168,6 @@
     </nameField>
     <pluralLabel>Questions</pluralLabel>
     <searchLayouts></searchLayouts>
-    <sharingModel>ReadWrite</sharingModel>
+    <sharingModel>ControlledByParent</sharingModel>
     <visibility>Public</visibility>
 </CustomObject>

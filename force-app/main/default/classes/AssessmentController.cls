@@ -15,7 +15,6 @@ public with sharing class AssessmentController {
     * @param assessmentId This is a record id of an Assessment__c. 
     * @return 
     */
-
     @AuraEnabled
     public static List<SObject> getSupplierAssessmentList(String assessmentId){
         try{
@@ -707,7 +706,7 @@ public with sharing class AssessmentController {
             query = 'SELECT Id,Name FROM Account';
             String filter = '';
             if(string.isNotBlank(searchKey)){
-                string sKey = '\'%'+searchKey+'%\'';
+                String sKey ='\'%'+String.escapeSingleQuotes(searchKey)+'%\'';
                 filter += ' WHERE ((Name LIKE '+sKey+') ';
             }
             if(string.isNotBlank(existingData))
@@ -722,7 +721,7 @@ public with sharing class AssessmentController {
                 }
                 if(string.isNotBlank(exSearchKey))
                 {
-                    string sKey = '\'%'+exSearchKey+'%\'';
+                    string sKey = '\'%'+String.escapeSingleQuotes(exSearchKey)+'%\'';
                 	filter += ' AND (Name LIKE '+sKey+') ';
                 }
             }
@@ -922,7 +921,7 @@ public with sharing class AssessmentController {
                         String body = '<html><body>'+
                             '<br><br>'+'Dear '+assRelRec.Account__r.Name+
                             '<br><br>'+'we’d like to complete a short survey.'+
-                            '<br><br><a href='+System.Label.Supplier_Portal_URL+assRelRec.Id+'>Take the survey now.</a>'+
+                            '<br><br><a href='+siteData.Site_URL__c+assRelRec.Id+'>Take the survey now.</a>'+
                             '<br><br>'+'Kind regards,'+
                             '<br>'+'Rhythm';
                         mail.setHtmlBody(body);
@@ -940,7 +939,7 @@ public with sharing class AssessmentController {
                         String body = '<html><body>'+
                             '<br><br>'+'Dear '+assRelRec.Account__r.Name+
                             '<br><br>'+'There are few comments on the responses submitted.'+
-                            '<br><br><a href='+System.Label.Supplier_Portal_URL+assRelRec.Id+'>Click Here</a>'+
+                            '<br><br><a href='+siteData.Site_URL__c+assRelRec.Id+'>Click Here</a>'+
                             '<br><br>'+'Kind regards,'+
                             '<br>'+'Rhythm';
                         mail.setHtmlBody(body);
@@ -1039,7 +1038,7 @@ public with sharing class AssessmentController {
                      +' FROM Assessment_Supplier__c'
                      +' WHERE Assessment__c = \'' + String.escapeSingleQuotes(assessmentId) + '\'';
             if(String.isNotBlank(searchKey)){
-                string sKey = '\'%'+searchKey+'%\'';
+                string sKey = '\'%'+String.escapeSingleQuotes(searchKey)+'%\'';
                 query = query+' AND Account__r.Name LIKE '+sKey;
                 query = query+' WITH SECURITY_ENFORCED';
             }else{
@@ -1111,25 +1110,6 @@ public with sharing class AssessmentController {
                 templateList = safe.doQuery(query);
             }
             return templateList;
-        }catch(exception e){
-            String errorMsg = e.getMessage();
-            throw new AuraHandledException(ErrorMsg);
-        }
-    }
-    
-    /**
-    * @description It is used to get the assessments for the supplier.
-    * @param accountId account record id.
-    * @return
-    */
-    @AuraEnabled(cacheable=true)
-    public static List<Assessment__c> getAssessmentRecordData(string accountId){
-        try{
-            String query = 'SELECT Id,Start_Date__c,Name'
-                        + ' FROM Assessment__c'
-                        + ' WHERE Account__c= \'' + String.escapeSingleQuotes(accountId) + '\''
-                        + ' WITH SECURITY_ENFORCED';
-            return safe.doQuery(query);
         }catch(exception e){
             String errorMsg = e.getMessage();
             throw new AuraHandledException(ErrorMsg);
