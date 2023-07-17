@@ -140,6 +140,7 @@ public with sharing class AssessmentTriggerHandler implements ITriggerHandler{
 
             //AggregateResult[] templateGroup = safe.doQueryWithBinds(query,bindVariables);
             AggregateResult[] templateGroup = database.query(query);
+            //no need of aggregate query. plain query will resolve this issue.
             for (AggregateResult ar : templateGroup){
                 String templateId = (Id)ar.get('Rhythm__Assessment_Template__c');
                 for(Assessment__c assessment : templateMap.get(templateId) ){

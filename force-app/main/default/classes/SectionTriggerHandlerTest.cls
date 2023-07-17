@@ -17,7 +17,7 @@ private class SectionTriggerHandlerTest {
             custUser =  TestDataFactory.createTestUser();
         }
         System.runAs(custUser) {
-            Map<String, Object> assementTemplateattributes = new Map<String, Object>{'Name'=>'2023 Assessment template','Rhythm__Name__c'=>'2023 Assessment template'};
+            Map<String, Object> assementTemplateattributes = new Map<String, Object>{'Name'=>'2023 Assessment template'};
             List<Assessment_Template__c> templist=TestDataFactory.createAssessmentTemp(1,true,assementTemplateattributes);
             Map<String, Object> sectionAttributes = new Map<String, Object>{'Rhythm__Assessment_Template__c'=>templist[0].Id,'Name'=>'Section1'};
             TestDataFactory.createSection(1,true,sectionAttributes);

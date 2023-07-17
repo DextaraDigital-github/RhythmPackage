@@ -23,7 +23,7 @@ private with sharing class AssessmentExpiryNotificationBatchTest {
             //System.debug('accts==>'+accts[0].Id);
             Map<String,Object> contactAttributes  = new Map<String,Object>{'AccountId'=>accts[0].Id,'Email'=>'test123@gmail.com','LastName'=>'TestLName'};
             List<Contact> contacts = TestDataFactory.createContacts(1,true,contactAttributes);
-            Map<String, Object> assementTemplateattributes = new Map<String, Object>{'Name'=>'2023 Assessment template','Rhythm__Name__c'=>'2023 Assessment template'};
+            Map<String, Object> assementTemplateattributes = new Map<String, Object>{'Name'=>'2023 Assessment template'};
             List<Assessment_Template__c> templist=TestDataFactory.createAssessmentTemp(1,true,assementTemplateattributes);
             //System.debug('templist'+templist[0].Id);
             Map<String, Object> sectionAttributes = new Map<String, Object>{'Rhythm__Assessment_Template__c'=>templist[0].Id,'Name'=>'Section1'};
@@ -35,7 +35,7 @@ private with sharing class AssessmentExpiryNotificationBatchTest {
             'Rhythm__Section__c'=>seclist[0].Id};
             List<Question__c> qstnlist=TestDataFactory.createQuestion(1,true,questionAttributes);
             //System.debug('qstnlist'+qstnlist[0].Id);
-            Map<String, Object> assessmentattributes = new Map<String, Object>{'Rhythm__Account__c'=>accts[0].Id,'Template__c'=>templist[0].Id,
+            Map<String, Object> assessmentattributes = new Map<String, Object>{'Template__c'=>templist[0].Id,
             'Name'=>'Assessment 2023','Rhythm__Status__c'=>'New','Rhythm__Number_of_Questions__c'=>10,'Rhythm__Start_Date__c'=>Date.Today(),'Rhythm__End_Date__c'=>Date.Today()+2,'Rhythm__Expiry_Reminder_Before_in_Days__c'=>2};
             List<Assessment__c> asslist=TestDataFactory.createAssessment(1,true,assessmentattributes);
 

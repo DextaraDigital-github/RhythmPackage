@@ -291,12 +291,8 @@ public with sharing class AssessmentTemplateController {
         }
         
         try{
-            string query = 'SELECT COUNT(ID) q'
-                         + ' FROM Question__c'
-                         + ' WHERE Section__c=\'' + String.escapeSingleQuotes(sectionId) + '\'';
-            
-            List<AggregateResult> s = database.query(query);
-            return s[0].get('q');
+            List<Question__c> queRecordsList = [SELECT Id FROM Question__c WHERE Section__c=:sectionId WITH SECURITY_ENFORCED];
+            return queRecordsList.size();
         }catch(exception e){
             String errorMsg = e.getMessage();
             throw new AuraHandledException(ErrorMsg);
@@ -315,12 +311,8 @@ public with sharing class AssessmentTemplateController {
         }
         
         try{
-            String query = 'SELECT count(Id) s'
-                         + ' FROM Section__c'
-                         + ' WHERE Assessment_Template__c =\'' + String.escapeSingleQuotes(templateId) + '\'';
-                         
-            List<AggregateResult> s = database.query(query);
-            return s[0].get('s');
+            List<Section__c> sectionList = [SELECT Id FROM Section__c WHERE Assessment_Template__c=:templateId WITH SECURITY_ENFORCED];
+            return sectionList.size();
         }catch(exception e){
             String errorMsg = e.getMessage();
             throw new AuraHandledException(ErrorMsg);

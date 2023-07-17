@@ -36,7 +36,12 @@ public with sharing class AccountAssessmentRelationHandler implements ITriggerHa
       @param oldMap This is the old map of AccountAssessments.
     */
     public void beforeUpdate(List<sObject> newList, Map<Id, sObject> newMap, List<sObject> oldList, Map<Id, sObject> oldMap) {
-      return;
+      Map<Id,AccountAssessmentRelation__c> oldRecordsMap = (Map<Id,AccountAssessmentRelation__c>)oldMap;
+      for(AccountAssessmentRelation__c aar:(List<AccountAssessmentRelation__c>)newList) {
+            if(aar.Name != (String)oldRecordsMap.get(aar.Id).get('Name')) {
+                aar.addError('Name cannot be edited');
+            }
+        }
     }
 
     /**

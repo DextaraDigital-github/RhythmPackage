@@ -14,16 +14,16 @@ export default class AddSuppliers extends LightningElement {
     exSearchKey = '';
     @track latestSuppliers;
     existingSuppList = [];
+    existingSuppListtemp = [];
     @api est = [];
     hasRendered = true;
     @api recordId;
     newAccounts = [];
     delAccounts = [];
-    @track removingSuppList;
-
+    
     connectedCallback() {
         if (this.recordId !== undefined) {
-          this.fetchExistingSuppliers();
+            this.fetchExistingSuppliers();
         }
     }
     fetchExistingSuppliers() {
@@ -36,16 +36,13 @@ export default class AddSuppliers extends LightningElement {
                     }
                     if (tempList.length > 0) {
                         this.existingSuppList = JSON.parse(JSON.stringify(tempList));
-                        this.removingSuppList = JSON.parse(JSON.stringify(tempList));
-                   }
+                        this.existingSuppListtemp = JSON.parse(JSON.stringify(tempList));
+                    }
                 }
             })
             .catch(error => {
             });
     }
-
-
-
 
     // Updates existingData with the already selected Accounts Data
     get existingData() {
@@ -55,11 +52,6 @@ export default class AddSuppliers extends LightningElement {
         }
         return suppList;
     }
-
-
-
-
-
     // Fetches all the available accounts from Apex
 
     @wire(getAllSuppliers, { existingData: '$existingData', searchKey: '$searchKey', exSearchKey: '$exSearchKey' })
@@ -89,7 +81,6 @@ export default class AddSuppliers extends LightningElement {
     }
 
     handleChange(event) {
-      
         try {
             let selectedValues = event.detail.value;
             if (this.supplierData && this.supplierData.length > 0) {
@@ -102,20 +93,20 @@ export default class AddSuppliers extends LightningElement {
                         }
                     }
                     else if (selectedValues.indexOf(suppData.value) === -1 && this.existingSuppList.indexOf(suppData.value) !== -1) {
+                        if (this.existingSuppListtemp.includes(suppData.value)) {
+                            this.values = JSON.parse(JSON.stringify(this.existingSuppList));
+                            this.showNotification('Error', 'Suppliers who received the Assessment cannot be removed from the Assessment Program.', 'error');
+                            return;
+                        }
                         this.delAccounts.push(suppData.value);
                         this.existingSuppList.splice(this.existingSuppList.indexOf(suppData.value), 1);
                         if (this.newAccounts.indexOf(suppData.value) !== -1) {
                             this.newAccounts.splice(this.newAccounts.indexOf(suppData.value), 1);
-                        }
+                        }      
+                    }
+                    if (JSON.stringify(selectedValues[0]) === JSON.stringify(this.delAccounts[0])) {
                     }
                 })
-            }
-
-            if (this.delAccounts.filter(supplier => this.removingSuppList.some(remsupplier => remsupplier == supplier)).length > 0) {
-                this.showNotification('Error', 'You cannot remove existing suppliers.', 'error');
-                this.values = [...this.values];
-                event.preventDefault();
-                return;
             }
             const custEvent = new CustomEvent('updatedsupliers', {
                 detail: { newSuppliers: this.newAccounts, existingSupps: this.existingSuppList, delList: this.delAccounts }
@@ -133,21 +124,14 @@ export default class AddSuppliers extends LightningElement {
         }
     }
     // Updates the search value to search for account among the existing/already assigned accounts
-
     handleExSearch(event) {
         try {
             this.exSearchKey = event.target.value;
         } catch (error) {
         }
     }
-
-
-
-
     // Displays status/error as a toast message
-
     showNotification(title, message, variant) {
-
         const evt = new ShowToastEvent({
             title: title,
             message: message,
@@ -158,7 +142,7 @@ export default class AddSuppliers extends LightningElement {
     countRecords() {
         var selectedAccounts = 0;
         if (typeof this.supplierData !== 'undefined' && typeof this.existingSuppList !== 'undefined') {
-          this.supplierData.forEach(accountId => {
+            this.supplierData.forEach(accountId => {
                 if (this.existingSuppList.indexOf(accountId.value) !== -1) {
                     selectedAccounts++;
                 }

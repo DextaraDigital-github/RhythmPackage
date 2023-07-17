@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
-    <applicationVisibilities>
-        <application>Customer_Portal</application>
-        <visible>true</visible>
-    </applicationVisibilities>
+    
     <classAccesses>
         <apexClass>AssessmentController</apexClass>
         <enabled>true</enabled>
@@ -31,6 +28,11 @@
     <fieldPermissions>
         <editable>true</editable>
         <field>Account.Email__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>AccountAssessmentRelation__c.Account__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -124,11 +126,6 @@
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
-        <editable>true</editable>
-        <field>Assessment_Template__c.Name__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
         <editable>false</editable>
         <field>Assessment_Template__c.Number_of_Assessments__c</field>
         <readable>true</readable>
@@ -141,11 +138,6 @@
     <fieldPermissions>
         <editable>true</editable>
         <field>Assessment_Template__c.Version__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
-        <field>Assessment__c.Account__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -206,11 +198,6 @@
     <fieldPermissions>
         <editable>false</editable>
         <field>Assessment__c.Is_Past_Assessment__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
-        <field>Assessment__c.Name__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -315,11 +302,6 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>Question__c.Name__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
         <field>Question__c.OptionValueSet__c</field>
         <readable>true</readable>
     </fieldPermissions>
@@ -365,11 +347,6 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>Response__c.Account__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
         <field>Response__c.Assessment__c</field>
         <readable>true</readable>
     </fieldPermissions>
@@ -400,11 +377,6 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>Response__c.Name__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
         <field>Response__c.Question__c</field>
         <readable>true</readable>
     </fieldPermissions>
@@ -431,11 +403,6 @@
     <fieldPermissions>
         <editable>true</editable>
         <field>Section__c.Historical_Id__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
-        <field>Section__c.Name__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>

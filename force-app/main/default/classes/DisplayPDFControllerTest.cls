@@ -22,7 +22,7 @@ private class DisplayPDFControllerTest {
             List<Account> accts = TestDataFactory.createAccounts(1,true,accAttributes);
             Map<String,Object> contactAttributes  = new Map<String,Object>{'AccountId'=>accts[0].Id,'Email'=>'test123@gmail.com','LastName'=>'John David'};
             List<Contact> cts =TestDataFactory.createContacts(1,true,contactAttributes);
-            Map<String, Object> assementTemplateattributes = new Map<String, Object>{'Name'=>'2023 Assessment template','Rhythm__Name__c'=>'2023 Assessment template'};
+            Map<String, Object> assementTemplateattributes = new Map<String, Object>{'Name'=>'2023 Assessment template'};
             List<Assessment_Template__c> templist=TestDataFactory.createAssessmentTemp(1,true,assementTemplateattributes);
             Map<String, Object> sectionAttributes = new Map<String, Object>{'Rhythm__Assessment_Template__c'=>templist[0].Id,'Name'=>'Section1'};
             List<Section__c> seclist=TestDataFactory.createSection(1,true,sectionAttributes);
@@ -30,7 +30,7 @@ private class DisplayPDFControllerTest {
                 'Rhythm__Question__c'=>'What is the feedback for service?','Rhythm__Question_Type__c'=>'Text','Rhythm__Required__c'=>True,
                 'Rhythm__Section__c'=>seclist[0].Id};
             TestDataFactory.createQuestion(1,true,questionAttributes);
-            Map<String, Object> assessmentattributes = new Map<String, Object>{'Rhythm__Account__c'=>accts[0].Id,'Template__c'=>templist[0].Id,
+            Map<String, Object> assessmentattributes = new Map<String, Object>{'Template__c'=>templist[0].Id,
             'Name'=>'Assessment 2023','Rhythm__Status__c'=>'New','Rhythm__Number_of_Questions__c'=>10};
             List<Assessment__c> asslist=TestDataFactory.createAssessment(1,true,assessmentattributes);
             

@@ -108,7 +108,7 @@ public with sharing class SectionTriggerHandler implements ITriggerHandler {
                     }
                     for(Section__c sec:secLst) {
                         if(templateStatusMap.get(sec.Assessment_template__c) != 'New') {
-                            sec.addError('You can not perform any operations on this record because of Template Status');
+                            sec.addError('Modifications cannot be done to a Question linked to Active/Inactive Assessment Template');
                         } 
                     }
                 //}
@@ -125,7 +125,7 @@ public with sharing class SectionTriggerHandler implements ITriggerHandler {
     public void recordValidations(List<Section__c> secLst) {
         try {
             for(Section__c sec:secLst) {
-                sec.addError('You cannot change Assessment Template');
+                sec.addError('Assessment Template linked to the Section cannot be changed');
             }
         }
         catch(exception e) {
