@@ -51,7 +51,7 @@ jobs:
         run: sfdx update
         
     # Install Salesforce CLI Scanner
-      - name: 'Install Salesforce CLI Scanner'
+      - name: 'Install Salesforce SFDX Scanner'
         run: sfdx plugins:install @salesforce/sfdx-scanner
 
     # Checkout the source code
@@ -75,16 +75,6 @@ jobs:
       - name: 'List All ORGS'
         run: sfdx force:org:list
            
-     # Add namespace to project config
-      - name: 'Add namespace to project config'
-        run: |
-            sed -i 's,"namespace": "","namespace": "autocomp",' sfdx-project.json
-            
-     # Add namespace to CPEs
-      - name: 'Add namespace to Custom Property Editors'
-        run: |
-             find . -type f -name "*.js-meta.xml" -print0 | xargs -0 sed -i 's,configurationEditor="c-,configurationEditor="autocomp-,'
-         
      # Create package version and extract its id
       - name: 'Create package version'
         id: createPackageVersion
@@ -111,7 +101,11 @@ jobs:
       # Promote package version
       - name: 'Promote package version'
         run: sfdx force:package:version:promote --package ${{ steps.createPackageVersion.outputs.packageVersionId }} -n
-            
+       
+      # Generate Violation Report
+      - name: 'Scan for Violations and Generate report'
+        run: sfdx scanner:run:dfa --target "./**/*.cls" --projectdir "./"
+        
       # Create scratch org
       - name: 'Create scratch org'
         run: |
@@ -142,15 +136,6 @@ jobs:
                   packageLinkRegex="<a name=\"$packageName\" href=\"https:\/\/login\.salesforce\.com\/packaging\/installPackage\.apexp\?p0=[a-zA-ZA-ZA-Z0-9]{18}\">"
                   newPackageLink="<a name=\"${packageName}\" href=\"https://login.salesforce.com/packaging/installPackage.apexp?p0=${packageVersionId}\">"
                   sed -E -i "s,${packageLinkRegex},${newPackageLink}," README.md
-                  
-      # Revert namespace change in project config
-      - name: 'Revert namespace change in project config'
-        run: |
-                  sed -i 's,"namespace": "autocomp","namespace": "",' sfdx-project.json
-                  
-      # Revert namespace changes in CPEs
-      - name: 'Revert namespace changes in Custom Property Editors'
-        run: git checkout **/*.js-meta.xml
         
       # Create PR for new package version
       - name: 'Create PR for new package version'
