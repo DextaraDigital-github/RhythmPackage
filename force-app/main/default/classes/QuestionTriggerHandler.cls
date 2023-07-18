@@ -176,7 +176,7 @@ public with sharing class QuestionTriggerHandler implements ITriggerHandler{
                     }
                     for(Question__c qus:qusLst) {
                         if(templateStatusMap.get(qus.Assessment_template__c)!='New') {
-                            qus.addError('You can not perform any operations on this record because of Template Status');
+                            qus.addError('Modifications cannot be done to a Question linked to Active/Inactive Assessment Template');
                         } 
                     }
                 //}
@@ -193,7 +193,7 @@ public with sharing class QuestionTriggerHandler implements ITriggerHandler{
     public void recordValidations(List<Question__c> questionLst) {
         try{
             for(Question__c question:questionLst) {
-                question.addError('You cannot change Assessment Template');
+                question.addError('Assessment Template linked to the Section cannot be changed');
             }
         }catch(exception e) {
             throw new AuraHandledException(e.getMessage());

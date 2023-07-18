@@ -20,13 +20,16 @@ public with sharing class TriggerFrameworkServiceController {
         List<String> fieldsList = getUpdatableFields(triggerObjId);
         for(String fName:fieldsList){
             Boolean isAssessmentTemplate = objectName.equalsIgnoreCase('Assessment_Template_c') && fName.equalsIgnoreCase('Status__c');
-            if(isAssessmentTemplate && String.valueOf(record.get(fName)).equalsIgnoreCase('New') 
-                && String.valueOf(oldRecord.get(fName)).equalsIgnoreCase('Active')){
+            if(isAssessmentTemplate){
+                if(String.valueOf(record.get(fName)).equalsIgnoreCase('New') && String.valueOf(oldRecord.get(fName)).equalsIgnoreCase('Active')){
                     isCriteriaMet = true;
-            }else if(isAssessmentTemplate && String.valueOf(oldRecord.get(fName)).equalsIgnoreCase('Inactive')){
+                }else if(String.valueOf(oldRecord.get(fName)).equalsIgnoreCase('Inactive')){
+                        isCriteriaMet = true;
+                }
+            }else{
+                if(record.get(fName) != oldRecord.get(fName)){
                     isCriteriaMet = true;
-            }else if(record.get(fName) != oldRecord.get(fName)){
-                    isCriteriaMet = true;
+                }
             }
         }
         return isCriteriaMet;
@@ -38,10 +41,13 @@ public with sharing class TriggerFrameworkServiceController {
     * @return
     */
     public List<string> getUpdatableFields(string triggerObjId){
+        if ((!Schema.sObjectType.Trigger_Field_Change_Handler__mdt.isAccessible()) || (!Schema.sObjectType.Trigger_Field_Change_Handler__mdt.fields.Id.isAccessible()) || (!Schema.sObjectType.Trigger_Field_Change_Handler__mdt.fields.MasterLabel.isAccessible())) {
+            return new List<string>();
+        }
         List<string> fieldsList = new List<string>();
         for(Trigger_Field_Change_Handler__mdt tfh:[select id, MasterLabel from Trigger_Field_Change_Handler__mdt where Object_Name__c =:triggerObjId]){
             fieldsList.add(tfh.MasterLabel);
         }
         return fieldsList;
-    }
+     }
 }

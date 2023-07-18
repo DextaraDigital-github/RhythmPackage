@@ -14,7 +14,7 @@ public class SendAssessmentNotificationsBatch implements Database.Batchable<sObj
     */
     public Database.QueryLocator start(Database.BatchableContext bc){
         Date todayDate = Date.Today();
-        string query = 'SELECT Id,Name,Assessment__r.Start_Date__c,Assessment__r.End_Date__c,Account__r.Name,Account__c,Assessment__c FROM Assessment_Supplier__c WHERE Status__c= \'Active\' AND Assessment__r.Start_Date__c=:todayDate';
+        string query = 'SELECT Id,Name,Assessment__r.Start_Date__c,Assessment__r.End_Date__c,Account__r.Name,Account__c,Assessment__c FROM Assessment_Supplier__c WHERE Status__c= \'Active\' AND Assessment__r.Start_Date__c=:todayDate WITH SECURITY_ENFORCED';
         return Database.getQueryLocator(query);
     }
 
@@ -58,7 +58,7 @@ public class SendAssessmentNotificationsBatch implements Database.Batchable<sObj
             }
             if(successRecordsIdSet.isEmpty() == false){
                
-                for(AccountAssessmentRelation__c assRelRec:[SELECT Id,Account__r.Name,Account__r.Email__c,Assessment__c FROM AccountAssessmentRelation__c WHERE ID IN:successRecordsIdSet]){
+                for(AccountAssessmentRelation__c assRelRec:[SELECT Id,Account__r.Name,Account__r.Email__c,Assessment__c FROM AccountAssessmentRelation__c WHERE ID IN:successRecordsIdSet WITH SECURITY_ENFORCED]){
                     if(String.isNotBlank(assRelRec.Account__r.Email__c) && siteData != null){
                         List<String> sendTo = new List<String>();
                         sendTo.add(assRelRec.Account__r.Email__c);
@@ -83,6 +83,13 @@ public class SendAssessmentNotificationsBatch implements Database.Batchable<sObj
                     List<Messaging.SendEmailError> errors = result.getErrors();                                 
                     if(!result.IsSuccess() && errors.size() > 0){
                         Messaging.SendEmailError err = errors[0];
+                        ErrorTransactionLog__c errorRec = new ErrorTransactionLog__c();
+                        errorRec.Class_Name__c = 'SendAssessmentNotificationsBatch';
+                        errorRec.Error_Stack_Trace__c = err.getMessage();
+                        errorRec.Name = 'Error Record';
+                        errorRec.LWC_Component_Name__c = '';
+                        errorRec.Method_Name__c = 'ExecuteMethod';
+                        errorList.add(errorRec);
                     }
                 }
             }

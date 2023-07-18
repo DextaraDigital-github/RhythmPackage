@@ -7,7 +7,8 @@
             cmp.set("v.templateId",templateId);
         }
     },
-    refreshPage: function(){
+   	refreshPage: function(cmp, event, helper){
+        console.log('successeventValue----->',event.getParam('value'));
         $A.get('e.force:refreshView').fire();
     }
     

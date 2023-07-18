@@ -8,6 +8,13 @@
             "default": true,
             "versionDescription": "",
             "definitionFile": "config/project-scratch-def.json"
+        },
+        {
+            "path": "force-app",
+            "package": "RhythmLabs",
+            "versionName": "ver 0.1",
+            "versionNumber": "0.1.0.NEXT",
+            "default": false
         }
     ],
     "name": "RythmProject",
@@ -15,12 +22,13 @@
     "sfdcLoginUrl": "https://login.salesforce.com",
     "sourceApiVersion": "57.0",
     "packageAliases": {
-        "RhythmTest": "0Ho5w000000PBDQCA4",
-        "RhythmTest@0.1.0-0": "04t5w000004ckk0AAA",
         "RhythmDevTest": "0Ho5w000000PBDVCA4",
-        "RhythmDevTest@0.1.0-0": "04t5w000004ckpKAAQ",
-        "RhythmQATest": "0HoDp0000004CMJKA2",
+        "RhythmDevTest@0.1.0-0": "04t5w000004ckqSAAQ",
         "RhythmUnlocked": "0Ho5w000000PBDaCAO",
-        "RhythmUnlocked@0.1.0-0": "04t5w000004ckobAAA"
+        "RhythmUnlocked@0.1.0-0": "04t5w000004ckpZAAQ",
+        "RhythmLabs": "0HoDp0000004CMOKA2",
+        "RhythmLabs@0.1.0-1": "04tDp000000J2ImIAK",
+        "RhythmLabs@0.1.0-2": "04tDp000000J2N9IAK",
+        "RhythmLabs@0.1.0-3": "04tDp000000J2NEIA0"
     }
 }
