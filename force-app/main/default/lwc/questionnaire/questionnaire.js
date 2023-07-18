@@ -17,6 +17,10 @@ import updateAccountAssessmentStatus from '@salesforce/apex/AssessmentController
 import deleteFileAttachment from '@salesforce/apex/AssessmentController.deleteFileAttachment';
 import getResponseFlag from '@salesforce/apex/AssessmentController.getResponseFlag';
 import getAccountAssessmentRecordData from '@salesforce/apex/AssessmentController.getAccountAssessmentRecordData';
+import RTM_FONTS from '@salesforce/resourceUrl/rtmfonts';
+import CUS_STYLES from '@salesforce/resourceUrl/rtmcpcsldscustomstyles';
+import QUE_PLAT from '@salesforce/resourceUrl/rtmvpcquestionnaireplatform';
+import { loadStyle } from 'lightning/platformResourceLoader';
 
 export default class Questionnaire extends LightningElement {
 
@@ -144,6 +148,19 @@ export default class Questionnaire extends LightningElement {
             this.isTemplate = true;
         }
         this.handleOnload();
+        if(this.recordId !== undefined){
+            Promise.all([
+                loadStyle(this,RTM_FONTS + '/line-awesome/line-awesome.css'),
+                loadStyle(this,RTM_FONTS + '/SourceSansPro/SourceSansPro.css'),
+                loadStyle(this,CUS_STYLES),
+                loadStyle(this,QUE_PLAT )
+            ]).then(() => {
+                //console.log('Files loaded-------->');
+            }).catch(() => {
+               // console.error('ErrorMessage----------->',error);
+            });
+
+        }
 
     }
     /* handleOnload is used to get Sections data and corresponding Questions data and Responses data on onload */
