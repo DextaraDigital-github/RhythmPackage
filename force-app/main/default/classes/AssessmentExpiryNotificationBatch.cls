@@ -6,14 +6,14 @@
 * Last Modified Date: 
 */
 
-public class AssessmentExpiryNotificationBatch implements Database.Batchable<sObject> {
+global class AssessmentExpiryNotificationBatch implements Database.Batchable<sObject> {
 
     /**
     * @description Start method to query the required records.
     * @param bc It is an instance of BatchableContext.
     * @return
     */
-    public Database.QueryLocator start(Database.BatchableContext bc){
+    global Database.QueryLocator start(Database.BatchableContext bc){
         Date todayDate = Date.Today();
         string query = 'SELECT Id,Name,Account__r.Name,Account__r.Email__c FROM AccountAssessmentRelation__c WHERE Status__c != \'Submitted\' AND Assessment__r.Expiry_Reminder_Date__c != null AND Assessment__r.Expiry_Reminder_Date__c=:todayDate WITH SECURITY_ENFORCED';
         return Database.getQueryLocator(query);
@@ -24,7 +24,7 @@ public class AssessmentExpiryNotificationBatch implements Database.Batchable<sOb
     * @param bc It is an instance of BatchableContext.
     * @param scope It is a list of AccountAssessmentRelation__c object.
     */
-    public void execute(Database.BatchableContext bc, List<AccountAssessmentRelation__c> scope){
+    global void execute(Database.BatchableContext bc, List<AccountAssessmentRelation__c> scope){
         List<ErrorTransactionLog__c> errorList = new List<ErrorTransactionLog__c>();
         List<Messaging.SingleEmailMessage> emailMessagesList = new List<Messaging.SingleEmailMessage>();
         Configuration__mdt siteData = Configuration__mdt.getInstance('Site_URL');
@@ -67,7 +67,7 @@ public class AssessmentExpiryNotificationBatch implements Database.Batchable<sOb
     * @description execute any post-processing operations.
     * @param bc It is an instance of BatchableContext.
     */
-    public void finish(Database.BatchableContext bc){
+    global void finish(Database.BatchableContext bc){
         return;
     }
 }
