@@ -6,8 +6,9 @@
 * Last Modified Date: 
 */
 
-global class AssessmentExpiryNotificationBatch implements Database.Batchable<sObject> {
-
+global with sharing class AssessmentExpiryNotificationBatch implements Database.Batchable<sObject> {
+    public static SecurityCheckController safe = new SecurityCheckController();//use singleton pattern
+    private static Savepoint sp;
     /**
     * @description Start method to query the required records.
     * @param bc It is an instance of BatchableContext.
@@ -59,7 +60,12 @@ global class AssessmentExpiryNotificationBatch implements Database.Batchable<sOb
             errorList.add(errorRec);
         }
         if(errorList.isEmpty() == false){
-            Database.insert(errorList, false);
+            Database.SaveResult[] results = safe.doInsert(errorList);
+            List<String> errorsList = SecurityCheckController.safeClassExceptionHandlerInsert(results);
+            if(errorsList.size()>0){
+                Database.rollback(sp);
+                throw new SecurityControllerException(String.join(errorsList, ', ' ));
+            }
         }
     }
 
@@ -69,5 +75,7 @@ global class AssessmentExpiryNotificationBatch implements Database.Batchable<sOb
     */
     global void finish(Database.BatchableContext bc){
         return;
+    }
+    public class SecurityControllerException extends Exception{
     }
 }

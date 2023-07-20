@@ -5,8 +5,9 @@
 * @description       : It is used to send the assessment notification to suppliers.
 * Last Modified Date: 
 */
-global class SendAssessmentNotificationsBatch implements Database.Batchable<sObject> {
-
+global with sharing class SendAssessmentNotificationsBatch implements Database.Batchable<sObject> {
+    public static SecurityCheckController safe = new SecurityCheckController();//use singleton pattern
+    private static Savepoint sp;
     /**
     * @description Start method to query the required records.
     * @param bc It is an instance of BatchableContext.
@@ -44,16 +45,20 @@ global class SendAssessmentNotificationsBatch implements Database.Batchable<sObj
                 accountAssessRelnsList.add(accAssessReln);
             }
             set<Id> successRecordsIdSet = new set<Id>();
+            if (sp == null){
+                sp = Database.setSavepoint();
+            }
             if(accountAssessRelnsList.isEmpty() == false){
-                Database.SaveResult[] results = Database.insert(accountAssessRelnsList, false);
+                Database.SaveResult[] results = safe.doInsert(accountAssessRelnsList);
                 for(Database.SaveResult result : results) {
                     if(result.isSuccess()){
                         successRecordsIdSet.add(result.getId());
-                    } 
-                    // else {
-                    //     for(Database.Error error : result.getErrors()) {
-                    //     }
-                    // }
+                    }
+                }
+                List<String> errorsList = SecurityCheckController.safeClassExceptionHandlerInsert(results);
+                if(errorsList.size()>0){
+                    Database.rollback(sp);
+                    throw new SecurityControllerException(String.join(errorsList, ', ' ));
                 }
             }
             if(successRecordsIdSet.isEmpty() == false){
@@ -103,7 +108,12 @@ global class SendAssessmentNotificationsBatch implements Database.Batchable<sObj
             errorList.add(errorRec);
         }
         if(errorList.isEmpty() == false){
-            Database.insert(errorList, false);
+            Database.SaveResult[] results = safe.doInsert(errorList);
+            List<String> errorsList = SecurityCheckController.safeClassExceptionHandlerInsert(results);
+            if(errorsList.size()>0){
+                Database.rollback(sp);
+                throw new SecurityControllerException(String.join(errorsList, ', ' ));
+            }
         }
     }
     /**
@@ -113,5 +123,7 @@ global class SendAssessmentNotificationsBatch implements Database.Batchable<sObj
     global void finish(Database.BatchableContext bc){
         // execute any post-processing operations
         return;
+    }
+    public class SecurityControllerException extends Exception{
     }
 }

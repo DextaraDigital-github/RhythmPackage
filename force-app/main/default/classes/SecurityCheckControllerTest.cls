@@ -37,7 +37,7 @@ private class SecurityCheckControllerTest {
         Test.startTest();
         SecurityCheckController safe = new SecurityCheckController();
         SObject objRecord = new Account(Name='Test');
-        safe.doInsert(objRecord);
+        safe.doInsert(new List<SObject>{objRecord});
         testString='Success';
         System.assertEquals(testString=='Success', true,'fls check done');
         Test.stopTest();
