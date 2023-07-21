@@ -644,6 +644,18 @@ public with sharing class AssessmentController {
             String ftype = ((String)filemap.get('name')).substringAfter('.');
 
             if(String.isNotBlank(quesId) && String.isNotBlank(accAssmtId)){
+                List<String> errorList = new List<String>();
+                
+                List<ContentVersion> newcvList = [SELECT Id,ContentDocumentId FROM ContentVersion WHERE Id=:cvId WITH SECURITY_ENFORCED];
+                ContentDocumentLink cDocLink = new ContentDocumentLink();
+                cDocLink.ContentDocumentId = newcvList[0].ContentDocumentId;//Add ContentDocumentId
+                cDocLink.LinkedEntityId = accAssmtId;//Add attachment parentId
+                cDocLink.ShareType = 'V';//V - Viewer permission. C - Collaborator permission. I - Inferred permission.
+                cDocLink.Visibility = 'AllUsers';//AllUsers, InternalUsers, SharedUsers
+                List<ContentDocumentLink> cdlList = new List<ContentDocumentLink>{cDocLink};
+                Database.SaveResult[] cdlSResult = safe.doInsert(cdlList);
+                errorList = SecurityCheckController.safeClassExceptionHandlerInsert(cdlSResult);
+                
                 String questionQuery = 'SELECT Id,Files__c,Question__c'
                                         +' FROM Response__c'
                                         +' WHERE Question__c =\'' + String.escapeSingleQuotes(quesId) + '\''
@@ -652,20 +664,19 @@ public with sharing class AssessmentController {
                                         +' WITH SECURITY_ENFORCED';
 
                 srList = safe.doQuery(questionQuery);
-                List<String> errorList = new List<String>();
+                
                 if(srList.isEmpty() == false){
-                    String fileUrl = baseUrl+'/sfc/servlet.shepherd/document/download/'+cvList[0].ContentDocumentId+'?operationContext=S1';
+                    String fileUrl = baseUrl+'/sfc/servlet.shepherd/document/download/'+newcvList[0].ContentDocumentId+'?operationContext=S1';
                     String fileJson = '{"name":"'+(String)filemap.get('name')+'","url":"'+fileUrl+'","type":"'+ftype+'"}';
                     srList[0].Files__c = (srList[0].Files__c == null || srList[0].Files__c.trim().length() == 0 || srList[0].Files__c=='[]') ? '['+fileJson+']' : '['+fileJson+','+srList[0].Files__c.substring(1,srList[0].Files__c.length());
                     Database.SaveResult[] saveResult = safe.doUpdate(srList);
                     errorList = SecurityCheckController.safeClassExceptionHandlerInsert(saveResult);
-                    
                 }
                 else{
                     Response__c res=new Response__c();
                     res.Question__c= quesId;
                     res.AccountAssessmentRelation__c= accAssmtId;
-                    String fileUrl = baseUrl+'/sfc/servlet.shepherd/document/download/'+cvList[0].ContentDocumentId+'?operationContext=S1';
+                    String fileUrl = baseUrl+'/sfc/servlet.shepherd/document/download/'+newcvList[0].ContentDocumentId+'?operationContext=S1';
                     String fileJson = '[{"name":"'+(String)filemap.get('name')+'","url":"'+fileUrl+'","type":"'+ftype+'"}]';
                     res.Files__c = fileJson;
                     res.Is_Latest_Response__c = true;
@@ -697,6 +708,7 @@ public with sharing class AssessmentController {
     public static List<Account> getAllSuppliers(String existingData, String searchKey, String exSearchKey){
         Set<String> selSet = new Set<String>();
         Set<Id> existingSups = new Set<Id>();
+        String recordTypeId = String.valueOf(Schema.SObjectType.Account.getRecordTypeInfosByName().get('Supplier').getRecordTypeId());
         selSet.add(existingData);
         String query = '';
         try{
@@ -707,7 +719,7 @@ public with sharing class AssessmentController {
             String filter = '';
             if(string.isNotBlank(searchKey)){
                 String sKey ='\'%'+String.escapeSingleQuotes(searchKey)+'%\'';
-                filter += ' WHERE ((Name LIKE '+sKey+') ';
+                filter += ' WHERE RecordTypeId = \''+recordTypeId+'\' AND (((Name LIKE '+sKey+') ';
             }
             if(string.isNotBlank(existingData))
             {
@@ -717,7 +729,7 @@ public with sharing class AssessmentController {
                 }
                 else
                 {
-                    filter += ' WHERE (Id NOT IN :existingSups) OR ((Id IN :existingSups) ';
+                    filter += ' WHERE RecordTypeId = \''+recordTypeId+'\' AND ((Id NOT IN :existingSups) OR ((Id IN :existingSups) ';
                 }
                 if(string.isNotBlank(exSearchKey))
                 {
@@ -727,7 +739,7 @@ public with sharing class AssessmentController {
             }
             if(String.isNotBlank(filter))
             {
-                filter+=' )';
+                filter+=' ))';
             }
             query = query+filter+' ORDER BY CreatedDate DESC';
         }catch(exception e){

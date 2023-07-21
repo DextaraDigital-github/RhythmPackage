@@ -15,7 +15,7 @@ global with sharing class SendAssessmentNotificationsBatch implements Database.B
     */
     global Database.QueryLocator start(Database.BatchableContext bc){
         Date todayDate = Date.Today();
-        string query = 'SELECT Id,Name,Assessment__r.Start_Date__c,Assessment__r.End_Date__c,Account__r.Name,Account__c,Assessment__c FROM Assessment_Supplier__c WHERE Status__c= \'Active\' AND Assessment__r.Start_Date__c=:todayDate WITH SECURITY_ENFORCED';
+        string query = 'SELECT Id,Name,Assessment__r.Start_Date__c,Assessment__r.End_Date__c,Account__r.Name,Account__c,Assessment__c FROM Assessment_Supplier__c WHERE Status__c= \'Active\' AND Assessment__r.Start_Date__c=:todayDate AND Assessment__r.Number_of_invited_Suppliers__c= 0 WITH SECURITY_ENFORCED';
         return Database.getQueryLocator(query);
     }
 

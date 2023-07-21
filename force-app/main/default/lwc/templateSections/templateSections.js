@@ -58,6 +58,7 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
     @api fieldListforCreation = {
         "Rhythm__Section__c": [
             { label: 'Section Name', fieldName: 'Name', required: true, class: 'slds-col slds-large-size_1-of-1 slds-medium-size_1-of-1 slds-size_1-of-1 slds-p-left_medium slds-p-right_medium' }
+            //{label: 'Assessment', fieldName: 'Rhythm__Assessment_Template__c', required: false, class: 'slds-col slds-large-size_1-of-1 slds-medium-size_1-of-1 slds-size_1-of-1 slds-p-left_medium slds-p-right_medium'}
         ]
     };
     @track isReorderModalOpen = false;
@@ -176,7 +177,7 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
         let selRows = this.template.querySelector("lightning-tree-grid").getSelectedRows();
         let isreturn = false;
         if ((selRows === null || typeof selRows === 'undefined' || (selRows !== null && selRows.length === 0))
-            && !isreturn){
+            && !isreturn) {
             this.dispatchEvent(
                 new ShowToastEvent({
                     title: 'Error',
@@ -197,36 +198,36 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
             isreturn = true;
         }
         else if (selRows.length === 1 && !isreturn) {
-            if(this.sectionListData && typeof this.sectionListData !== 'undefined')
-             this.sectionListData.forEach(section => {
-                if (section.Id === selRows[0].Id) {
-                    if (section._children !== null && section._children.length > 0) {
-                        sectionQuestions = section._children;
-                        if(sectionQuestions && sectionQuestions !== 'undefined'){
-                           sectionQuestions.forEach(question => {
-                            tempOptions.push({ label: question.Name, value: question.Id });
-                            tempIds.push(question.Id);
-                            })
+            if (this.sectionListData && typeof this.sectionListData !== 'undefined')
+                this.sectionListData.forEach(section => {
+                    if (section.Id === selRows[0].Id) {
+                        if (section._children !== null && section._children.length > 0) {
+                            sectionQuestions = section._children;
+                            if (sectionQuestions && sectionQuestions !== 'undefined') {
+                                sectionQuestions.forEach(question => {
+                                    tempOptions.push({ label: question.Name, value: question.Id });
+                                    tempIds.push(question.Id);
+                                })
+                            }
+                            this.reorderOptions = tempOptions;
+                            this.selectedReorderOptions = tempIds;
+                            this.reorderType = 'Question';
+                            this.isReorderModalOpen = true;
                         }
-                        this.reorderOptions = tempOptions;
-                        this.selectedReorderOptions = tempIds;
-                        this.reorderType = 'Question';
-                        this.isReorderModalOpen = true;
+                        else {
+                            this.dispatchEvent(
+                                new ShowToastEvent({
+                                    title: 'Error',
+                                    message: 'Select a Section with more than 1 Question',
+                                    variant: 'error'
+                                })
+                            );
+                            isreturn = true;
+                        }
                     }
-                    else {
-                        this.dispatchEvent(
-                            new ShowToastEvent({
-                                title: 'Error',
-                                message: 'Select a Section with more than 1 Question',
-                                variant: 'error'
-                            })
-                        );
-                        isreturn = true;
-                    }
-                }
-            });
+                });
         }
-        return  isreturn ;
+        return isreturn;
     }
 
     // Open the modal with section reordering feature
@@ -255,12 +256,12 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
         }
         updateQuestionList({ qstnList: questionlist }).then(() => {
             this.dispatchEvent(
-                    new ShowToastEvent({
-                        title: 'Success',
-                        message: 'Reordered Questions Successfully',
-                        variant: 'success'
-                    })
-                );
+                new ShowToastEvent({
+                    title: 'Success',
+                    message: 'Reordered Questions Successfully',
+                    variant: 'success'
+                })
+            );
             this.closeReorderSectionModal();
             this.handleRefresh();
         }).catch(error => {
@@ -278,13 +279,13 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
             sectionList.push(response);
         }
         updateSectionList({ secList: sectionList }).then(() => {
-             this.dispatchEvent(
-                    new ShowToastEvent({
-                        title: 'Success',
-                        message: 'Reordered Sections Successfully',
-                        variant: 'success'
-                    })
-                );
+            this.dispatchEvent(
+                new ShowToastEvent({
+                    title: 'Success',
+                    message: 'Reordered Sections Successfully',
+                    variant: 'success'
+                })
+            );
             this.closeReorderSectionModal();
             this.handleRefresh();
         }).catch(error => {
@@ -318,7 +319,7 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
     handleDelete() {
         this.deletePopupMessage = 'Are you sure you want to delete this Questions?';
         if (this.selectedRows.length !== 0) {
-            if(this.sectionListData && typeof this.sectionListData !== 'undefined'){
+            if (this.sectionListData && typeof this.sectionListData !== 'undefined') {
                 this.sectionListData.forEach(rec => {
                     if (this.selectedRows[0] === rec.Id) {
                         this.deletePopupMessage = 'Are you sure you want to delete the Section and Quetions in it?';
@@ -352,6 +353,10 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
                 this.showModal.deleteModal = false;
                 this.handleRefresh();
             }
+            else {
+                this.showModal.deleteModal = false;
+                this.handleRefresh();
+            }
         }).catch(error => {
             //console.log(error);
         });
@@ -365,25 +370,26 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
             this.questionsList = JSON.parse(JSON.stringify(data));
             getSectionRecsCount({ templateId: this.recordId, objName: this.objLabel }).then(secData => {
                 this.totalRecsCount = secData;
+                this.recsCount = secData;
                 this.handleSectionsData(JSON.parse(JSON.stringify(secData)));
             }).catch(error => {
-                //console.log(error);
+                //console.error(error);
             });
         }).catch(error => {
-            //console.log(error);
+            //console.error(error);
         });
     }
 
     connectedCallback() {
         this.handleRefresh();
         Promise.all([
-            loadStyle(this,CUS_STYLES),
+            loadStyle(this, CUS_STYLES),
         ]).then(() => {
             //console.log('Files loaded-------->');
         })
-        .catch(() => {
-            //console.error('ErrorMessage----------->',error);
-        });
+            .catch(() => {
+                //console.error('ErrorMessage----------->',error);
+            });
     }
 
     //getting section records 
@@ -404,7 +410,7 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
         this.sectionListData = [];
         this.sectionList.forEach(section => {
             var tempqueslist = [];
-            if(this.questionsList && typeof this.questionsList !== 'undefined'){
+            if (this.questionsList && typeof this.questionsList !== 'undefined') {
                 this.questionsList.forEach(question => {
                     if (section.Id.toString() === question.Rhythm__Section__c.toString()) {
                         let questionJson = {};

@@ -264,12 +264,14 @@ public with sharing class AssessmentTemplateController {
                 if (Schema.sObjectType.Section__c.isDeletable()) {
                      Database.delete(recIdList,true);
                 }
+                if(drchildList != null) {
                 for(Database.DeleteResult dr:drchildList) {
                     if(!dr.isSuccess()) {
                         for(Database.Error de:dr.getErrors()) {
                             status='Error Status Code: '+de.getStatusCode()+' || '+de.getMessage()+' || Error Source:'+de.getFields();
                         }
                     }
+                }
                 }
             }
         }

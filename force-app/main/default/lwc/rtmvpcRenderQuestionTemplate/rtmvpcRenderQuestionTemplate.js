@@ -167,6 +167,7 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
         x.readAsDataURL(event.target.files[0]);
         x.addEventListener("loadend", () => {
             this.fileresponsemap.filedata = x.result;
+            this.fileresponsemap.url = x.result;
             this.fileresponsemap.showUploadProgress = this.showUploadProgress;
             /*To upload file and save the file in the record */
             const selectedEvent = new CustomEvent('fileupload', {
