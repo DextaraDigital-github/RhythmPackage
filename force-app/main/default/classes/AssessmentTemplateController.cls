@@ -261,9 +261,12 @@ public with sharing class AssessmentTemplateController {
                 if(questionList.isEmpty() == false) {
                     drchildList=safe.doDelete(questionList);
                 }
-                if (Schema.sObjectType.Section__c.isDeletable()) {
-                     Database.delete(recIdList,true);
+                
+                If(recIdList.isEmpty() == false){
+                    List<Section__c> deleteList = [SELECT Id FROM Section__c WHERE ID IN:recIdList];
+                    drchildList = safe.doDelete(deleteList);
                 }
+                
                 if(drchildList != null) {
                 for(Database.DeleteResult dr:drchildList) {
                     if(!dr.isSuccess()) {
