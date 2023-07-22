@@ -993,7 +993,7 @@ public with sharing class AssessmentController {
             String errorMsg = e.getMessage();
             AuraHandledException auraEx = new AuraHandledException(errorMsg);
             auraEx.setMessage(errorMsg);
-            throw auraEx;
+            //throw auraEx;
         }
     }
     

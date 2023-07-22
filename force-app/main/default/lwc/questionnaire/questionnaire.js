@@ -702,7 +702,11 @@ export default class Questionnaire extends LightningElement {
 
     /* handleSubmit method is used to save the responses for particular question and update the assessment status to submit */
     handleSubmit() {
-        this.constructResponse(true);
+        if(this.accountAssessmentStatus === 'New'||this.accountAssessmentStatus === 'In Progress'
+         || this.accountAssessmentStatus === 'Need More Information'){
+            this.constructResponse(true);
+         }
+        
     }
 
     /* constructResponse is used to call an apex class to store the response */
@@ -893,6 +897,7 @@ export default class Questionnaire extends LightningElement {
             if (this.assessmentStatus !== 'Need More Information') {
                 if (isSubmit) {
                     responseQueryMap.status = 'Submitted';
+                    this.showButtons.Save_Submit = false;
                 }
                 else {
                     responseQueryMap.status = 'In Progress';
@@ -936,6 +941,7 @@ export default class Questionnaire extends LightningElement {
                     detail: true
                 });
                 this.dispatchEvent(selectedEvent);
+                
 
             }).catch(error => {
                 let errormap = {};
