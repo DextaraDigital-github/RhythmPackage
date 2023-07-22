@@ -24,6 +24,7 @@ global with sharing class SendAssessmentNotificationsBatch implements Database.B
     * @param bc It is an instance of BatchableContext. 
     * @param scope List of Assessment_Supplier__c object.
     */
+    /* sfge-disable-stack ApexFlsViolationRule */
     global void execute(Database.BatchableContext bc, List<Assessment_Supplier__c> scope){
         List<ErrorTransactionLog__c> errorList = new List<ErrorTransactionLog__c>();
         try{

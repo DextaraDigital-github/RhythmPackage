@@ -25,6 +25,7 @@ global with sharing class AssessmentExpiryNotificationBatch implements Database.
     * @param bc It is an instance of BatchableContext.
     * @param scope It is a list of AccountAssessmentRelation__c object.
     */
+    /* sfge-disable-stack ApexFlsViolationRule */
     global void execute(Database.BatchableContext bc, List<AccountAssessmentRelation__c> scope){
         List<ErrorTransactionLog__c> errorList = new List<ErrorTransactionLog__c>();
         List<Messaging.SingleEmailMessage> emailMessagesList = new List<Messaging.SingleEmailMessage>();

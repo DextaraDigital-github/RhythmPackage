@@ -16,11 +16,13 @@ import uploadFile from '@salesforce/apex/AssessmentController.uploadFile';
 import updateAccountAssessmentStatus from '@salesforce/apex/AssessmentController.updateAccountAssessmentStatus';
 import deleteFileAttachment from '@salesforce/apex/AssessmentController.deleteFileAttachment';
 import getResponseFlag from '@salesforce/apex/AssessmentController.getResponseFlag';
+import getCommunityURL from '@salesforce/apex/AssessmentController.getCommunityURL'
 import getAccountAssessmentRecordData from '@salesforce/apex/AssessmentController.getAccountAssessmentRecordData';
 import RTM_FONTS from '@salesforce/resourceUrl/rtmfonts';
 import CUS_STYLES from '@salesforce/resourceUrl/rtmcpcsldscustomstyles';
 import QUE_PLAT from '@salesforce/resourceUrl/rtmvpcquestionnaireplatform';
 import { loadStyle } from 'lightning/platformResourceLoader';
+
 
 export default class Questionnaire extends LightningElement {
 
@@ -244,6 +246,21 @@ export default class Questionnaire extends LightningElement {
                                     })
                                     questionWrap.responsesPercentage = Math.floor((Number(questionWrap.numberOfResponses) / Number(questionWrap.numberOfQuestions)) * 100);
                                 });
+                                getCommunityURL({}).then(res => {
+                                    let baseurl = res.substring(0, res.length - 6);
+                                    this.questionsAndAnswerss.forEach(questionAnswer => {
+                                        questionAnswer.questions.forEach(question => {
+                                            if (typeof question.Files__c !== 'undefined') {
+                                                question.Files__c.forEach(file => {
+                                                    let fileurl = file.url.split('.com');
+                                                    file.url = baseurl + fileurl[1];
+                                                })
+                                            }
+                                        })
+                                    })
+                                })
+
+
                                 if (this.accountAssessmentStatus === 'Need More Information') {
                                     //this.handleFilterFlag(true);
                                 }
@@ -594,7 +611,7 @@ export default class Questionnaire extends LightningElement {
                             else {
                                 let fileresponsedatalst = JSON.parse(JSON.stringify(this.questionsAndAnswerss[i].questions[j].Files__c));
                                 fileresponsedatalst.push(x);
-                                this.questionsAndAnswerss[i].questions[j].Files__c =fileresponsedatalst;
+                                this.questionsAndAnswerss[i].questions[j].Files__c = fileresponsedatalst;
                             }
 
                         }
@@ -702,6 +719,7 @@ export default class Questionnaire extends LightningElement {
         for (const seckey of this.responseMap.keys()) {
             responseIdlist.push(seckey);
         }
+
         //This loop is to iterate over the sections in the wrapper.
         this.questionsAndAnswerss.forEach(questionAnswer => {
             let rowdata = '';
@@ -850,17 +868,20 @@ export default class Questionnaire extends LightningElement {
                             this.requiredQuestionList.splice(i, 1);
                         }
                     }
-                   
+
                 }
             }
             responseList.push(reponse);
         }
-        if (isSubmit && this.requiredQuestionList.length > 0) {
-            isAssessmentValidated = true;
-            this.showspinner = false;
-            this.showToast = true;
-            this.success = false;
-            this.totastmessage = 'Please fill Mandatory questions ';
+        
+        if (isSubmit) {
+            if (this.requiredQuestionList.length > 0) {
+                isAssessmentValidated = true;
+                this.showspinner = false;
+                this.showToast = true;
+                this.success = false;
+                this.totastmessage = 'Please fill Mandatory questions ';
+            }
         }
         if (isAssessmentValidated === false) {
             this.showToast = true;
@@ -915,7 +936,7 @@ export default class Questionnaire extends LightningElement {
                     detail: true
                 });
                 this.dispatchEvent(selectedEvent);
-                this.handleOnload();
+
             }).catch(error => {
                 let errormap = {};
                 errormap.componentName = 'Questionnaire';
@@ -1341,6 +1362,9 @@ export default class Questionnaire extends LightningElement {
             const selectedEvent = new CustomEvent('updatetimeline', {
                 detail: param
             });
+            this.showToast = true;
+            this.success = true;
+            this.totastmessage = 'The Assessment Status is updated to  ' + param.assessmentStatus + ' successfuly.';
             this.dispatchEvent(selectedEvent);
             this.handleOnload();
         }).catch(error => {
@@ -1351,9 +1375,7 @@ export default class Questionnaire extends LightningElement {
             errormap.errorData = error.message;
             errorLogRecord({ errorLogWrapper: JSON.stringify(errormap) }).then(() => { });
         });
-        this.showToast = true;
-        this.success = true;
-        this.totastmessage = 'The Assessment Status is updated to  ' + param.assessmentStatus + ' successfuly.';
+
     }
 
 }

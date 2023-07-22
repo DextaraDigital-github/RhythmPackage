@@ -292,7 +292,7 @@
 																style="width:0px" title="Click to Download">
 
 																<template if:true={file.isPng}>
-																	<a href={file.url} target="_blank" download={file.filedata}>
+																	<a href={file.url} download={file.filedata}>
 																		<lightning-icon icon-name="doctype:image"
 																			size="small">
 																		</lightning-icon>
@@ -307,7 +307,7 @@
 																	</template>
 																</template>
 																<template if:true={file.isPdf}>
-																	<a href={file.url} target="_blank" download={file.filedata}>
+																	<a href={file.url} download={file.filedata}>
 																		<lightning-icon icon-name="doctype:pdf"
 																			size="small">
 																		</lightning-icon>
@@ -322,7 +322,7 @@
 																	</template>
 																</template>
 																<template if:true={file.isDocx}>
-																	<a href={file.url} target="_blank" download={file.filedata}>
+																	<a href={file.url} download={file.filedata}>
 																		<lightning-icon icon-name="doctype:word"
 																			size="small">
 																		</lightning-icon>
@@ -337,7 +337,7 @@
 																	</template>
 																</template>
 																<template if:true={file.isCsv}>
-																	<a href={file.url} target="_blank" download={file.filedata}>
+																	<a href={file.url} download={file.filedata}>
 																		<lightning-icon icon-name="doctype:csv"
 																			size="small">
 																		</lightning-icon>
@@ -354,7 +354,7 @@
 
 															</div>
 															<div class="slds-col" style="overflow:hidden; width:100px;">
-																<a href={file.url} target="_blank" download={file.filedata}>
+																<a href={file.url} download={file.filedata}>
 																	<div class="slds-m-around_x-small"
 																		style="font-size:12px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;"
 																		title={file.name}>
