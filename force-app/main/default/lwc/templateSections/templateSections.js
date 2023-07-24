@@ -383,13 +383,11 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
     connectedCallback() {
         this.handleRefresh();
         Promise.all([
-            loadStyle(this, CUS_STYLES),
+            loadStyle(this,CUS_STYLES),
         ]).then(() => {
-            //console.log('Files loaded-------->');
         })
-            .catch(() => {
-                //console.error('ErrorMessage----------->',error);
-            });
+        .catch(error => {
+        });
     }
 
     //getting section records 

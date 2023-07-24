@@ -1,0 +1,68 @@
+<template>
+	<template if:true={showtable}>
+		<div class="cra-hw">
+			<table class="cra-table slds-table slds-table_bordered slds-table_fixed-layout">
+				<thead>
+					<tr class="slds-line-height_reset">
+						<template for:each={tableheaders} for:item="tablehead">
+							<th key={tablehead}>
+								<center>
+									<span class="slds-p-left_xx-small slds-p-right_xx-small slds-line-clamp">{tablehead}</span>
+								</center>
+							</th>
+						</template>
+						<template if:false={isCheckbox}>
+							<th style="width: 90px;"></th>
+						</template>
+					</tr>
+				</thead>
+				<tbody>
+					<template for:each={tablerowlst} for:item="tab">
+						<tr key={tab}>
+							<template for:each={tab.rowdata} for:item="row">
+								<template if:true={row.display}>
+									<td key={row.label}>
+										<div class="slds-p-left_xx-small slds-p-right_xx-small">
+											<template if:true={row.ispicklist}>
+												<lightning-combobox variant="label-hidden" value={row.rowlabel}
+													options={row.options} key={row.Label} data-id={row.key}
+													onchange={handleChange} required=true disabled={isdisable}>
+												</lightning-combobox>
+											</template>
+											<template if:false={row.ispicklist}>
+												<lightning-input class="input-box" variant="label-hidden" type="text"
+													key={row.Label} data-id={row.key} onchange={handleChange}
+													disabled={row.isEditable} value={row.rowlabel}
+													data-val={row.Label} onblur={handlefocus}>
+												</lightning-input>
+											</template>
+										</div>
+									</td>
+								</template>
+							</template>
+							<template if:false={isCheckbox}>
+								<template if:false={isdisable}>
+								<td key={tab} style="height: 100%">
+									<div class="slds-grid slds-grid_align-center slds-grid_vertical-align-center"
+										style="height: 100%;">
+										<div class="slds-col slds-p-around_x-small">
+											<lightning-icon class="cra-btnicon slds-p-around_xx-small"
+												icon-name="utility:add" size="x-small" alternative-text="Add new row"
+												onclick={handleNewRow}>
+											</lightning-icon>
+											<lightning-icon class="cra-btnicon slds-p-around_xx-small"
+												icon-name="utility:delete" size="x-small" data-id={tab.rownum}
+												alternative-text="Add new row" onclick={handleDeleteRow}>
+											</lightning-icon>
+										</div>
+									</div>
+								</td>
+							</template>
+							</template>
+						</tr>
+					</template>
+				</tbody>
+			</table>
+		</div>
+	</template>
+</template>

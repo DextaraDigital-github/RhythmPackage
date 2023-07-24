@@ -245,7 +245,9 @@ public with sharing class QuestionTriggerHandler implements ITriggerHandler{
         List<String> errorList = new List<String>();
         try {
             for(Question__c question: quesLst) {
-                templateIds.add(question.Assessment_Template__c);
+                if(string.isBlank(question.Assessment_Template__c)){
+                    templateIds.add(question.Assessment_Template__c);
+                }
             }
             if(templateIds.isEmpty() == false){
                 string queQuery = 'SELECT Id,Question_Sequence_Number__c'

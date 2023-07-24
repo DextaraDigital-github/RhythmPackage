@@ -1,0 +1,9 @@
+.sem-fh { height: 100%; }
+
+.modal-bd { height:500px; position: relative; }
+.sem-pp-menu { background-color: rgb(243,243,243); border-bottom:1.5px solid rgb(229, 229, 229); }
+.sem-inp-bb { border: 0px solid black; border-bottom:1px solid rgb(229, 229, 229); }
+.sem-spinner { background-color: grey; }
+
+.xyz:hover{border:0px solid black;}
+.xyz:active{border:0px solid black;}

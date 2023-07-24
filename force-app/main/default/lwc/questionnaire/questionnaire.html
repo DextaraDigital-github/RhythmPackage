@@ -38,8 +38,9 @@
 					</div>
 					<!-- Displays button and picklist for navigations --END-->
 					<div>
-					<template if:true={showRefreshbutton}>
-						<lightning-button variant="base" label="Refresh" title="Refresh" onclick={handleOnload}></lightning-button></template>
+						<template if:true={showRefreshbutton}>
+							<lightning-button variant="base" label="Refresh" title="Refresh" onclick={handleOnload}></lightning-button>
+						</template>
 					</div>
 					<div
 						style="position:absolute; display:inline-block; right:13px; margin-top:-47px; font-weight:bold;">
@@ -49,6 +50,36 @@
 								aria-controls="referenceId-21" aria-expanded="true">{buttonlabel}</a>
 						</template>
 					</div>
+
+
+					<div>
+						<template if:true={showFiles}>
+							<lightning-layout multiple-rows="true">
+								<template for:each={keyList} for:item="item" for:index="index">
+									<lightning-layout-item size="4" key={item.key}>
+										<table>
+											<tr hidden>
+												<td>
+												</td>
+												<td>
+												</td>
+											</tr>
+											<tr>
+												<td>
+													<lightning-icon icon-name="doctype:flash" alternative-text="File" class="slds-p-around_x-small">
+													</lightning-icon>
+												</td>
+												<td align="left">
+													{item.value}
+												</td>
+											</tr>
+										</table>
+									</lightning-layout-item>
+								</template>
+							</lightning-layout>
+						</template>
+					</div>
+					
 					<div>
 						<ul class="slds-accordion">
 							<li class="slds-accordion__list-item">
@@ -185,7 +216,8 @@
             </div> -->
 			<!-- Footer --END-->
 		</div>
-	</div> <template if:false={isTemplate}>
+	</div>
+	 <template if:false={isTemplate}>
 		<div class="slds-p-horizontal_medium slds-p-vertical_x-small slds-border-top"
 			style="position:absolute; width:100%; height:40px; bottom:0px; text-align:right; background:#e8eaed; border-top:1px solid #c9c9c9;">
 			<!-- Displays Save, Save & Submit buttons if the Assessment is not Submitted --START-->
@@ -201,6 +233,35 @@
 
 			<!-- Displays Save, Save & Submit buttons if the Assessment is not Submitted --END-->
 		</div>
+		 <template if:true={yesOrNoModalPopup}>
+        <!-- Modal/Popup Box LWC starts here -->
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <!-- Modal/Popup Box LWC header here -->
+                <!-- <header class="slds-modal__header"> -->
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeModal}>
+                        <lightning-icon icon-name="utility:close"
+                            alternative-text="close"
+                            variant="inverse"
+                            size="small" ></lightning-icon>
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <!-- <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Modal/PopUp Box header LWC</h2> -->
+                <!-- </header> -->
+                <!-- Modal/Popup Box LWC body starts here -->
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <p><b>Do you want to Submit the review?
+                    </b></p>
+                </div>
+                <!-- Modal/Popup Box LWC footer starts here -->
+                <footer class="slds-modal__footer">
+                    <button class="slds-button slds-button_neutral" onclick={closeModal} title="No">No</button>
+                    <button class="slds-button slds-button_brand" onclick={submitAssessment} title="Yes">Yes</button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
 	</template>
 	<template if:true={isTemplate}>
 		
@@ -227,5 +288,7 @@
 			</template>
 		</template>
 		
+		
 	</template>
+	
 </template>

@@ -1,0 +1,82 @@
+<template>
+	<section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="modal-heading-01"
+		class="slds-modal slds-fade-in-open slds-modal_medium">
+		<div class="slds-modal__container">
+			<div class="slds-modal__header">
+				<h1 id="modal-heading-01" class="slds-modal__title slds-hyphenate">Reorder Conditional Questions</h1>
+			</div>
+			<div class="cqr-mc slds-modal__content slds-scrollable_none" id="modal-content-id-1">
+				<template lwc:if={show.spinner}>
+					<lightning-spinner size="medium"></lightning-spinner>
+				</template>
+				<div class="cqr-fh">
+					<div class="cqr-head slds-p-around_small slds-grid">
+						<div>{question.posInSet}.&nbsp;</div>
+						<div>
+							<p class="slds-line-clamp" title={question.Rhythm__Question__c}>
+								{question.Rhythm__Question__c}</p>
+						</div>
+					</div>
+					<div class="cqr-body slds-grid">
+						<!-- <ul class="cqr-fh slds-size_3-of-1 slds-vertical-tabs__nav" role="tablist"
+							aria-orientation="vertical">
+							<template for:each={responseList} for:item="response">
+								<li class="slds-vertical-tabs__nav-item" key={response} data-name="response"
+									data-response={response} role="presentation" onclick={navItemClickHandler}>
+									<a class="slds-vertical-tabs__link" href="#" role="tab">
+										<span class="slds-truncate" title="Tab 1">{response}</span>
+									</a>
+								</li>
+							</template>
+						</ul> -->
+						<ul class="cqr-navbar cqr-fh slds-size_3-of-12 slds-grid slds-grid--vertical slds-navigation-list--vertical slds-scrollable"
+							role="tablist" aria-orientation="vertical">
+							<template for:each={responseList} for:item="response">
+								<li class="fileSource_item" key={response} data-name="response" data-response={response}
+									role="presentation" onclick={navItemClickHandler}>
+									<a class="slds-navigation-list--vertical__action slds-text-link--reset slds-line-clamp"
+										href="#" role="tab">
+										<span class="slds-line-clamp" title={response}>{response}</span>
+									</a>
+								</li>
+							</template>
+						</ul>
+						<div class="cqr-fh slds-size_9-of-12 slds-vertical-tabs__content slds-scrollable">
+							<template lwc:if={questionsData}>
+								<div class="slds-p-left_small">
+									<p>Conditional Questions
+										for&nbsp;<strong class="cqr-highlighttext">{activeResponse}</strong>&nbsp;response:
+									</p>
+								</div>
+								<div class="cqr-dualList slds-p-left_small">
+									<lightning-dual-listbox id="reorderQuestions" name="Reorder Questions"
+										options={questionsData.questionList} value={questionsData.questionValues}
+										onchange={questionReorderHandler}>
+									</lightning-dual-listbox>
+									<template lwc:if={questionsData.hideReorderBtns}>
+										<div class="cqr-hideReorderBtns"></div>
+									</template>
+								</div>
+							</template>
+							<template lwc:else>
+								<div
+									class="cqr-noQues cqr-fh slds-grid slds-grid_align-center slds-grid_vertical-align-center">
+									No Conditional Questions
+								</div>
+							</template>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="slds-modal__footer">
+				<lightning lwc:if={show.saveBtn}>
+					<lightning-button class="slds-p-around_xx-small" variant="brand" label="Save"
+						onclick={saveOrderHandler}></lightning-button>
+				</lightning>
+				<lightning-button class="slds-p-around_xx-small" variant="neutral" label="Close" onclick={closeModal}>
+				</lightning-button>
+			</div>
+		</div>
+	</section>
+	<div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
+</template>
