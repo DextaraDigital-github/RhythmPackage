@@ -8,6 +8,8 @@ import deleteRecords from '@salesforce/apex/AssessmentTemplateController.deleteR
 import getTemplateDetails from '@salesforce/apex/AssessmentTemplateController.getTemplateDetails';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { NavigationMixin } from 'lightning/navigation';
+import CUS_STYLES from '@salesforce/resourceUrl/rtmcpcsldscustomstyles';
+import { loadStyle } from 'lightning/platformResourceLoader';
 const actions = [
     { label: 'View', name: 'view' },
     { label: 'Edit', name: 'edit' },
@@ -373,6 +375,12 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
 
     connectedCallback() {
         this.handleRefresh();
+        Promise.all([
+            loadStyle(this,CUS_STYLES),
+        ]).then(() => {
+        })
+        .catch(error => {
+        });
     }
 
     //getting section records 

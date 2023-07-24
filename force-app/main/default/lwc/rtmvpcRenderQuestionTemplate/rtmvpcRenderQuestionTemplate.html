@@ -3,7 +3,6 @@
 	<template if:true={responses}>
 		<template for:each={responses} for:item="questionary">
 			<div key={questionary.Id} class="temp_question_border-bottom">
-
 				<div class="qactivelabelcont" data-id={questionary.Id} onclick={highlightQuestionHandler}>
 					<div
 						class="slds-grid slds-text-align_left slds-p-top_x-small slds-p-horizontal_medium slds-p-bottom_small">
@@ -192,7 +191,6 @@
 							</div>
 						</div>
 					</div>
-
 				</div>
 
 				<!-- File upload -->
@@ -375,17 +373,18 @@
 						</div>
 					</div>
 				</template>
-				<!-- <template if:true={questionary.Children}>
+
+				<template if:true={questionary.Children}>
 					<template for:each={questionary.Children} for:item="childquestion">
 						<template if:true={childquestion.isdisplay}>
-							<div key={childquestion.isdisplay} class="temp_dashed-border-top slds-m-left_large">
-								<c-rtmvpc-render-question-template selectquestion={selectquestionHandler}
-									responses={questionary.Children} key={childquestion.isdisplay}>
+							<div key={childquestion.isdisplay} class="temp_dashed-border-top slds-p-left_large">
+								<c-rtmvpc-render-question-template selectquestion={selectquestionHandler} onflagchange ={handlecustomerFlag} issupplier={issupplier}
+								onselectchange={handleConversationHistory}	responses={childquestion.questions} key={childquestion.isdisplay} onvaluechange={handlechildchange}>
 								</c-rtmvpc-render-question-template>
 							</div>
 						</template>
 					</template>
-				</template> -->
+				</template>
 			</div>
 		</template>
 	</template>

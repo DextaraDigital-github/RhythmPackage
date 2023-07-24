@@ -370,12 +370,15 @@ export default class CustomTable extends LightningElement {
                                 recDetails.progressBarValue = relatedListRecords[i].Rhythm__Completed__c;
                             }
                         }
+                        console.log('Rdata',relatedListRecords[i]);
+                        recDetails.templateId = relatedListRecords[i].Rhythm__Assessment__r.Rhythm__Template__c;
                         recDetails.id = relatedListRecords[i].Id;
                     }
                 }
             }
             recDetails.record = recArray;
             recDataList.push(recDetails);
+            console.log('cData---->',JSON.stringify(recDataList));
         }
         return recDataList;
     }
@@ -383,7 +386,7 @@ export default class CustomTable extends LightningElement {
     // Dispatches an event to the parent when a record is clicked so that the parent hides the table and opens the record detail of the record selected
     takeSurveyHandler(event) {
         const rowclick = new CustomEvent('rowclick', {
-            detail: { accountassessmentId: event.currentTarget.dataset.id }
+            detail: { accountassessmentId: event.currentTarget.dataset.id,templateId:event.currentTarget.dataset.tempid}
         });
         this.dispatchEvent(rowclick);
     }

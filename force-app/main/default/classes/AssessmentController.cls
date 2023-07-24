@@ -361,7 +361,7 @@ public with sharing class AssessmentController {
         try{
             String query = 'SELECT Id,IsDeleted,Name,Account__c,Assessment__c,Assessment__r.name,'
                         +'Assessment__r.Status__c,Assessment__r.Customer_Review__c,Assessment__r.Number_of_Questions__c,'
-                        +'Assessment__r.CreatedBy.Name,Status__c,End_Date__c,Completed__c,Follow_Up_Requests__c'
+                        +'Assessment__r.CreatedBy.Name,Status__c,End_Date__c,Completed__c,Follow_Up_Requests__c,Assessment__r.Template__c'
                         +' FROM AccountAssessmentRelation__c'
                         +' WHERE Account__c=\'' + String.escapeSingleQuotes(accountId) + '\''
                         +' WITH SECURITY_ENFORCED'

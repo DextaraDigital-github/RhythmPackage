@@ -178,7 +178,7 @@
 
 						<!-- Dynamically passing data to each column in a row by iterating through columns -->
 						<template  for:each={rec.record} for:item="col">
-							<div key={col.fieldName} class="td" data-id={rec.id} onclick={takeSurveyHandler}>
+							<div key={col.fieldName} class="td" data-id={rec.id} data-tempid={rec.templateId} onclick={takeSurveyHandler}>
 								<div class={col.classList}>
 									<label class="slds-form-element__label">{col.label}</label>
 									<div class="" data-id={col.fieldName} title={col.value}>

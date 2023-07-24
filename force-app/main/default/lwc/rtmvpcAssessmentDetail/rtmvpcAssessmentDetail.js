@@ -41,13 +41,22 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
     @track accountassessmentrelId;
     @track accountAssessmentStatus;
     @api accountassessmentid;
+    @api templateId;
     @track savedResponseMap = new Map();
     @track showdownloadIcon;
+    @track tempId;
+    @api detaileddata;
 
     connectedCallback() {
         this.customerId = this.recordId;
         this.showconverstion = false;
         this.assaccId = this.accountid;
+        if(this.templateId != undefined){
+            this.tempId = this.templateId;
+        }
+        console.log('detaileddata------>',this.detaileddata);
+        console.log('assaccId------>',this.assaccId);
+        console.log('TADId------>',this.tempId);
         /* To get the username */
         this.handleTimeLine();
     }

@@ -1,0 +1,13 @@
+.cqr-fh { height: 100%; }
+
+.cqr-mc { height:500px; position: relative; }
+.cqr-head { background-color: #ececec; color: #565656; }
+.cqr-body { height: calc(100% - 45px); border-top: 0.5px solid #c9c9c9; }
+.cqr-dualList { position: relative; }
+.cqr-navbar { overflow: auto; border-right: 1px solid rgb(227 227 227); }
+.cqr-highlighttext { color:rgb(1, 118, 211); }
+.cqr-hideReorderBtns { height: 84px; width: 40px; background-color: white; position: absolute; z-index: 2; right: 0px; top: 0px; }
+.cqr-noQues { color: rgb(186 186 186); font-weight: 500; font-size: 15px; }
+
+.slds-navigation-list-vertical__action, .slds-navigation-list--vertical__action { border-left: 2px solid white; }
+.slds-navigation-list--vertical .slds-is-active .slds-navigation-list--vertical__action { color: white; background-color: rgb(1, 118, 211); border-color: var(--slds-g-color-border-base-1, var(--lwc-colorBorder,rgb(229, 229, 229))); border-left: 2px solid #003466; }
