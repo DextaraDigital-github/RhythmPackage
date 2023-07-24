@@ -8,6 +8,9 @@ import deleteRecords from '@salesforce/apex/AssessmentTemplateController.deleteR
 import getTemplateDetails from '@salesforce/apex/AssessmentTemplateController.getTemplateDetails';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { NavigationMixin } from 'lightning/navigation';
+import CUS_STYLES from '@salesforce/resourceUrl/rtmcpcsldscustomstyles';
+import { loadStyle } from 'lightning/platformResourceLoader';
+
 const actions = [
     { label: 'View', name: 'view' },
     { label: 'Edit', name: 'edit' },
@@ -55,6 +58,7 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
     @api fieldListforCreation = {
         "Rhythm__Section__c": [
             { label: 'Section Name', fieldName: 'Name', required: true, class: 'slds-col slds-large-size_1-of-1 slds-medium-size_1-of-1 slds-size_1-of-1 slds-p-left_medium slds-p-right_medium' }
+            //{label: 'Assessment', fieldName: 'Rhythm__Assessment_Template__c', required: false, class: 'slds-col slds-large-size_1-of-1 slds-medium-size_1-of-1 slds-size_1-of-1 slds-p-left_medium slds-p-right_medium'}
         ]
     };
     @track isReorderModalOpen = false;
@@ -71,13 +75,13 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
     @wire(getTemplateDetails, { templateId: '$recordId' })
     getRecs(result) {
         this.disableButtons = result.data;
-        if (this.disableButtons == false) {
-            this.columns = [...this.sectionColumns].filter(col => col.type != 'action');
+        if (this.disableButtons === false) {
+            this.columns = [...this.sectionColumns].filter(col => col.type !== 'action');
         }
     }
 
     // Open Create Modal
-    handlenew(event) {
+    handlenew() {
         this.showModal.createModal = true;
     }
 
@@ -91,7 +95,7 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
     }
 
     //Save the record and Open new reocrd creation
-    handleSaveNew(event) {
+    handleSaveNew() {
         this.handlenew();
     }
 
@@ -163,15 +167,17 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
     }
 
     // Open the modal with section reordering feature
-    handleReorderQuestions(event) {
+    handleReorderQuestions() {
         this.selectedReorderValues = [];
         this.reorderType = '';
-        var tempOptions = [];
-        var tempIds = [];
-        var sectionQuestions = [];
+        let tempOptions = [];
+        let tempIds = [];
+        let sectionQuestions = [];
         this.reorderHeaderName = 'Reorder Questions';
-        var selRows = this.template.querySelector("lightning-tree-grid").getSelectedRows();
-        if (selRows == null || selRows === undefined || (selRows != null && selRows.length == 0)) {
+        let selRows = this.template.querySelector("lightning-tree-grid").getSelectedRows();
+        let isreturn = false;
+        if ((selRows === null || typeof selRows === 'undefined' || (selRows !== null && selRows.length === 0))
+            && !isreturn) {
             this.dispatchEvent(
                 new ShowToastEvent({
                     title: 'Error',
@@ -179,49 +185,53 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
                     variant: 'error'
                 })
             );
-            return;
+            isreturn = true;
         }
-        else if (selRows.length > 1) {
+        else if (selRows.length > 1 && !isreturn) {
             this.dispatchEvent(
                 new ShowToastEvent({
                     title: 'Error',
-                    message: 'Please Select Only one Section',
+                    message: 'Select only one Section to change the Question sequence',
                     variant: 'error'
                 })
             );
-            return;
+            isreturn = true;
         }
-        else if (selRows.length == 1) {
-            this.sectionListData && this.sectionListData.forEach(section => {
-                if (section.Id === selRows[0].Id) {
-                    if (section["_children"] != null && section["_children"].length > 0) {
-                        sectionQuestions = section._children;
-                        sectionQuestions && sectionQuestions.forEach(question => {
-                            tempOptions.push({ label: question.Name, value: question.Id });
-                            tempIds.push(question.Id);
-                        })
-                        this.reorderOptions = tempOptions;
-                        this.selectedReorderOptions = tempIds;
-                        this.reorderType = 'Question';
-                        this.isReorderModalOpen = true;
+        else if (selRows.length === 1 && !isreturn) {
+            if (this.sectionListData && typeof this.sectionListData !== 'undefined')
+                this.sectionListData.forEach(section => {
+                    if (section.Id === selRows[0].Id) {
+                        if (section._children !== null && section._children.length > 0) {
+                            sectionQuestions = section._children;
+                            if (sectionQuestions && sectionQuestions !== 'undefined') {
+                                sectionQuestions.forEach(question => {
+                                    tempOptions.push({ label: question.Name, value: question.Id });
+                                    tempIds.push(question.Id);
+                                })
+                            }
+                            this.reorderOptions = tempOptions;
+                            this.selectedReorderOptions = tempIds;
+                            this.reorderType = 'Question';
+                            this.isReorderModalOpen = true;
+                        }
+                        else {
+                            this.dispatchEvent(
+                                new ShowToastEvent({
+                                    title: 'Error',
+                                    message: 'Select a Section with more than 1 Question',
+                                    variant: 'error'
+                                })
+                            );
+                            isreturn = true;
+                        }
                     }
-                    else {
-                        this.dispatchEvent(
-                            new ShowToastEvent({
-                                title: 'Error',
-                                message: 'Please Select the Section which have atleast 1 Question',
-                                variant: 'error'
-                            })
-                        );
-                        return;
-                    }
-                }
-            });
+                });
         }
+        return isreturn;
     }
 
     // Open the modal with section reordering feature
-    handleReorderSections(event) {
+    handleReorderSections() {
         this.reorderHeaderName = 'Reorder Sections';
         this.reorderType = 'Section';
         this.prepareSectionReorderOptions();
@@ -238,50 +248,48 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
     //Update Question Sequence
     handleQuestionSequence(questionRecIds) {
         let questionlist = [];
-        for (var i = 0; i < questionRecIds.length; i++) {
-            var response = { 'sobjectType': 'Rhythm__Question__c' };
+        for (let i = 0; i < questionRecIds.length; i++) {
+            let response = { 'sobjectType': 'Rhythm__Question__c' };
             response.Id = questionRecIds[i];
             response.Rhythm__Question_Sequence_Number__c = i + 1;
             questionlist.push(response);
         }
-        updateQuestionList({ qstnList: questionlist }).then(result => {
-            console.log('sucessfully created Response result==>' + result);
+        updateQuestionList({ qstnList: questionlist }).then(() => {
             this.dispatchEvent(
-                    new ShowToastEvent({
-                        title: 'Success',
-                        message: 'Reordered Questions Successfully',
-                        variant: 'success'
-                    })
-                );
+                new ShowToastEvent({
+                    title: 'Success',
+                    message: 'Reordered Questions Successfully',
+                    variant: 'success'
+                })
+            );
             this.closeReorderSectionModal();
             this.handleRefresh();
         }).catch(error => {
-            console.log('Error' + error);
+            //console.log(error);
         });
     }
 
     //Update Section Sequence
     handleSequenceUpdate(sectionRecIds) {
         let sectionList = [];
-        for (var i = 0; i < sectionRecIds.length; i++) {
-            var response = { 'sobjectType': 'Rhythm__Section__c' };
+        for (let i = 0; i < sectionRecIds.length; i++) {
+            let response = { 'sobjectType': 'Rhythm__Section__c' };
             response.Id = sectionRecIds[i];
             response.Rhythm__Section_Sequence_Number__c = i + 1;
             sectionList.push(response);
         }
-        updateSectionList({ secList: sectionList }).then(result => {
-            console.log('sucessfully created Response result==>' + result);
-             this.dispatchEvent(
-                    new ShowToastEvent({
-                        title: 'Success',
-                        message: 'Reordered Sections Successfully',
-                        variant: 'success'
-                    })
-                );
+        updateSectionList({ secList: sectionList }).then(() => {
+            this.dispatchEvent(
+                new ShowToastEvent({
+                    title: 'Success',
+                    message: 'Reordered Sections Successfully',
+                    variant: 'success'
+                })
+            );
             this.closeReorderSectionModal();
             this.handleRefresh();
         }).catch(error => {
-            console.log('Error' + error);
+            //console.log('Error' + error);
         });
     }
 
@@ -308,27 +316,16 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
     }
 
     // checks if selected atleast one record to delete
-    handleDelete(event) {
-        this.deletePopupMessage = 'Are you sure you want to delete this Questions?'
-         /* var selRows = this.template.querySelector("lightning-tree-grid").getSelectedRows();
-         console.log('Selected rows ---' + JSON.parse(JSON.stringify(this.selectedRows)));
-         var selIds;
-         this.sectionListData && this.sectionListData.forEach(rec => {
-             selIds = selRows.find(row => row.id === rec.Id);
-         });
-         if (selIds == null || selIds == undefined(selIds != null && selIds.length > 0)) {
-             this.deletePopupMessage = 'Are you sure you want to delete this Questions?';
-         }
-         selRows && selRows.forEach(row => {
-             this.selectedRows.push(row.Id);
-         });*/
-        console.log(this.selectedRows);
-        if (this.selectedRows.length != 0) {
-            this.sectionListData && this.sectionListData.forEach(rec => {
-                if (this.selectedRows[0] === rec.Id) {
-                    this.deletePopupMessage = 'Are you sure you want to delete this Section and Questions?';
-                }
-            });
+    handleDelete() {
+        this.deletePopupMessage = 'Are you sure you want to delete this Questions?';
+        if (this.selectedRows.length !== 0) {
+            if (this.sectionListData && typeof this.sectionListData !== 'undefined') {
+                this.sectionListData.forEach(rec => {
+                    if (this.selectedRows[0] === rec.Id) {
+                        this.deletePopupMessage = 'Are you sure you want to delete the Section and Quetions in it?';
+                    }
+                });
+            }
             this.showModal.deleteModal = true;
         }
         else {
@@ -343,8 +340,7 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
     }
 
     // Delete selected Records
-    deleteRecordsHandler(event) {
-        console.log(this.selectedRows);
+    deleteRecordsHandler() {
         deleteRecords({ recIdList: this.selectedRows, delchildobjrecs: true }).then(result => {
             if (result.toString() === 'Success') {
                 this.dispatchEvent(
@@ -358,11 +354,11 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
                 this.handleRefresh();
             }
             else {
-                console.log('Deleted Unsuccessful');
+                this.showModal.deleteModal = false;
+                this.handleRefresh();
             }
         }).catch(error => {
-            console.log('Deleted Unsuccessful');
-            console.log('deleteRecords Error', JSON.stringify(error));
+            //console.log(error);
         });
     }
     //Delete Functionality Ends
@@ -372,19 +368,28 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
         this.tempRecsLimit = this.recsLimit;
         getQuestionsList({ templateId: this.recordId }).then(data => {
             this.questionsList = JSON.parse(JSON.stringify(data));
-            getSectionRecsCount({ templateId: this.recordId, objName: this.tableLabel }).then(data => {
-                this.totalRecsCount = data;
-                this.handleSectionsData(JSON.parse(JSON.stringify(data)));
+            getSectionRecsCount({ templateId: this.recordId, objName: this.objLabel }).then(secData => {
+                this.totalRecsCount = secData;
+                this.recsCount = secData;
+                this.handleSectionsData(JSON.parse(JSON.stringify(secData)));
             }).catch(error => {
-                console.log('Error' + error);
+                //console.error(error);
             });
         }).catch(error => {
-            console.log('Error' + error);
+            //console.error(error);
         });
     }
 
     connectedCallback() {
         this.handleRefresh();
+        Promise.all([
+            loadStyle(this, CUS_STYLES),
+        ]).then(() => {
+            //console.log('Files loaded-------->');
+        })
+            .catch(() => {
+                //console.error('ErrorMessage----------->',error);
+            });
     }
 
     //getting section records 
@@ -393,7 +398,7 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
             this.sectionList = JSON.parse(JSON.stringify(result));
             this.prepareSectionsQuestionaire();
         }).catch(error => {
-            console.log('Error' + error);
+            //console.log('Error' + error);
         });
     }
 
@@ -405,27 +410,28 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
         this.sectionListData = [];
         this.sectionList.forEach(section => {
             var tempqueslist = [];
-            this.questionsList && this.questionsList.forEach(question => {
-                if (section.Id.toString() === question.Rhythm__Section__c.toString()) {
-                    let questionJson = {};
-                    questionJson.Id = question.Id;
-                    questionJson.Name = question.Rhythm__Question__c;
-                    tempqueslist.push(questionJson);
-                }
-            });
+            if (this.questionsList && typeof this.questionsList !== 'undefined') {
+                this.questionsList.forEach(question => {
+                    if (section.Id.toString() === question.Rhythm__Section__c.toString()) {
+                        let questionJson = {};
+                        questionJson.Id = question.Id;
+                        questionJson.Name = question.Rhythm__Question__c;
+                        tempqueslist.push(questionJson);
+                    }
+                });
+            }
             if (tempqueslist && tempqueslist.length > 0) {
-                section["_children"] = tempqueslist;
+                section._children = tempqueslist;
             }
         });
         if (this.sectionList && this.sectionList.length > 0) {
             this.recsCount = this.sectionList.length;
         }
         this.sectionListData = JSON.parse(JSON.stringify(this.sectionList));
-        console.log('this.sectionListData -- ', this.sectionListData);
     }
 
     //record form onsuccess
-    handleSuccess(event) {
+    handleSuccess() {
         this.handleSectionsData();
     }
 }

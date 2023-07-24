@@ -1,4 +1,4 @@
-import { LightningElement, track, wire,api } from 'lwc';
+import { LightningElement, track, api } from 'lwc';
 import getRecordsList from '@salesforce/apex/AssessmentTemplateController.getSections';
 export default class SearchComponentLwc extends  LightningElement{
     @track lookupName='';
@@ -14,27 +14,24 @@ export default class SearchComponentLwc extends  LightningElement{
    
    hideValues()
    {
-     console.log('Yes');
      var _this = this;
-     const myTimeout = setTimeout(()=>{_this.showSearchedValues = false;}, 300);
+     setTimeout(()=>{_this.showSearchedValues = false;}, 300);
     }
-   handleClick(event){
-     console.log('Yeah');
+   handleClick(){
         getRecordsList({sectionName:this.lookupName,templateId:this.templateId})
         .then(data => {
         this.messageResult=false;
          if (data) {
            // TODO: Error handling 
-           console.log('data::'+data.length);
            if(data.length>0 && this.isShowResult){
                this.lookupValuesList = data;                
                this.showSearchedValues = true; 
                this.messageResult=false;
            }            
-           else if(data.length==0){
+           else if(data.length === 0){
                this.lookupValuesList = [];                
                this.showSearchedValues = false;
-               if(this.lookupName!='')
+               if(this.lookupName !== '')
                    this.messageResult=true;               
            } 
          } 
@@ -45,6 +42,7 @@ export default class SearchComponentLwc extends  LightningElement{
             this.lookupValuesList=[];           
             this.showSearchedValues = false;
             this.messageResult=true;
+            //console.log(error);
       });
         
    
@@ -67,8 +65,7 @@ export default class SearchComponentLwc extends  LightningElement{
     //Set the parent calendar id
     this.lookupId =  event.target.dataset.value;
     //Set the parent calendar label
-    this.lookupName =  event.target.dataset.label;      
-    console.log('lookupId::'+this.lookupId);    
+    this.lookupName =  event.target.dataset.label; 
     const selectedEvent = new CustomEvent('selectedvalue', { detail: this.lookupId });
         // Dispatches the event.
     this.dispatchEvent(selectedEvent);    

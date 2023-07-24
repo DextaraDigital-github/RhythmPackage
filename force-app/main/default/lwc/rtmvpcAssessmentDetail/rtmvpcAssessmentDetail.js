@@ -133,19 +133,14 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
                         // }
                         })
                     }
-                    console.log('accountAssessmentRecord',accountAssessmentRecord);
                     /* To get the assessment tracking history to update on timeline*/
                     getAssessmentStatus({ assessmentId: accountAssessmentRecord, objectName:'AccountAssessmentRelation__c' }).then(statusResult => {
                         var assessmentStatus = statusResult;
-                        console.log('statusResult',statusResult);
                         if (typeof statusResult !== 'undefined') {   
-                           
                             if(assessmentStatus  && assessmentStatus!==null){
                             assessmentStatus.forEach(assessStatus => {
-                                if(assessStatus.Rhythm__Object_Field_Name__c=='Rhythm__Status__c')
+                                if(assessStatus.Rhythm__Object_Field_Name__c === 'Rhythm__Status__c')
                                 {
-
-                                
                                 let statustrack = {};
                                 if (typeof assessStatus.Rhythm__Object_Field_Value__c !== 'undefined') {
                                     let date = assessStatus.CreatedDate.split('T');
@@ -188,17 +183,17 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
                             }
                         }
                     }).catch(error => {
-                        errorLogRecord({ componentName: 'RtmvpcAssessmentChatter', methodName: 'getChatterResponse', className: 'AssessmentController', errorData: error.message }).then((result) => {
+                        errorLogRecord({ componentName: 'RtmvpcAssessmentChatter', methodName: 'getChatterResponse', className: 'AssessmentController', errorData: error.message }).then(() => {
                         });
                     });
 
             }).catch(error => {
-                errorLogRecord({ componentName: 'RtmvpcAssessmentChatter', methodName: 'getChatterResponse', className: 'AssessmentController', errorData: error.message }).then((result) => {
+                errorLogRecord({ componentName: 'RtmvpcAssessmentChatter', methodName: 'getChatterResponse', className: 'AssessmentController', errorData: error.message }).then(() => {
                 });
             });
         });
 
-        console.log('Into assessment detail time line handler');
+        
     }
     /*To display only the flagged questions(flag colour- green) or all questions(flag colour- red) by clicking on flag */
     handleChange(event) {
@@ -237,7 +232,7 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
     }
     /* chatHistory is used to get the question id, assessment id and flag boolean from the child component (Questionnaire) and pass it to the child component(AssessmentChatter)*/
     chatHistory(event) {
-        this.showChat = JSON.parse(JSON.stringify(event.detail));
+        this.showChat = event.detail;
         this.showChat.accountassessmentId = this.accountassessmentid;
         this.showData = this.showChat.openChat;
         this.showconverstion = this.showChat.disableSendButton;
@@ -262,8 +257,8 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
             var assessmentTemplateId = resultData[0].Rhythm__Assessment__r.Rhythm__Template__c;
             getQuestionsList({ templateId: assessmentTemplateId }).then(result => {
                 var resultMap = result;
-                getSupplierResponseList({ assessmentId: this.accountassessmentid }).then(result => {
-                    result.forEach(qres => {
+                getSupplierResponseList({ assessmentId: this.accountassessmentid }).then(suppRespResult => {
+                    suppRespResult.forEach(qres => {
                         var savedResponseList = new Map();
                         savedResponseList.set('value', qres.Rhythm__Response__c);
                         if (('Rhythm__Conversation_History__c' in qres)) {
@@ -275,13 +270,13 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
                         this.savedResponseMap.set(qres.Rhythm__Question__c, savedResponseList);
                     });
                     this.finalSection = this.constructWrapper(resultMap, this.savedResponseMap);
-                    var str = 'Section,Question,Answer,ConversationHistory,NumberOfAttachments\n';
+                    let str = 'Section,Question,Answer,ConversationHistory,NumberOfAttachments\n';
                     for (const key of this.finalSection.keys()) {
-                        for (var i = 0; i < this.finalSection.get(key).length; i++) {
+                        for (let i = 0; i < this.finalSection.get(key).length; i++) {
                             if (typeof this.finalSection.get(key)[i].conversationHistory != "undefined" && this.isJsonString(this.finalSection.get(key)[i].conversationHistory)) {
                                 let tempstr = '';
                                 let convJSON = JSON.parse(this.finalSection.get(key)[i].conversationHistory);
-                                for (var j = 0; j < convJSON.length; j++) {
+                                for (let j = 0; j < convJSON.length; j++) {
                                     tempstr = tempstr + convJSON[j].Name + ':' + convJSON[j].Text + '\n';
                                 }
                                 this.finalSection.get(key)[i].conversationHistory = tempstr;
@@ -289,27 +284,27 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
                             if (typeof this.finalSection.get(key)[i].files != "undefined" && this.isJsonString(this.finalSection.get(key)[i].files)) {
                                 this.finalSection.get(key)[i].files = JSON.parse(this.finalSection.get(key)[i].files).length;
                             }
-                            str += '"' + key + '","' + (i + 1) + '.' + ' ' + this.finalSection.get(key)[i].question + '","' + this.finalSection.get(key)[i].value + '","' + this.finalSection.get(key)[i].conversationHistory + '","' + this.finalSection.get(key)[i].files + '"\n';
+                            str += '"' + key + '","' + (i + 1) + '. ' + this.finalSection.get(key)[i].question + '","' + this.finalSection.get(key)[i].value + '","' + this.finalSection.get(key)[i].conversationHistory + '","' + this.finalSection.get(key)[i].files + '"\n';
                         }
                         str += '\n';
                     }
                     str = str.replaceAll('undefined', '').replaceAll('null', '');
-                    var blob = new Blob([str], { type: 'text/plain' });
-                    var url = window.URL.createObjectURL(blob);
-                    var atag = document.createElement('a');
+                    let blob = new Blob([str], { type: 'text/plain' });
+                    let url = window.URL.createObjectURL(blob);
+                    let atag = document.createElement('a');
                     atag.setAttribute('href', url);
                     atag.setAttribute('download', resultData[0].Rhythm__Assessment__r.Name + '.csv');
                     atag.click();
                 }).catch(error => {
-                    errorLogRecord({ componentName: 'CustomTable', methodName: 'getSupplierResponseList', className: 'AssessmentController', errorData: error.message }).then((result) => {
+                    errorLogRecord({ componentName: 'CustomTable', methodName: 'getSupplierResponseList', className: 'AssessmentController', errorData: error.message }).then(() => {
                     });
                 })
             }).catch(error => {
-                errorLogRecord({ componentName: 'CustomTable', methodName: 'getQuestionsList', className: 'AssessmentController', errorData: error.message }).then((result) => {
+                errorLogRecord({ componentName: 'CustomTable', methodName: 'getQuestionsList', className: 'AssessmentController', errorData: error.message }).then(() => {
                 });
             })
         }).catch(error => {
-            errorLogRecord({ componentName: 'CustomTable', methodName: 'getSupplierAssessmentList', className: 'AssessmentController', errorData: error.message }).then((result) => {
+            errorLogRecord({ componentName: 'CustomTable', methodName: 'getSupplierAssessmentList', className: 'AssessmentController', errorData: error.message }).then(() => {
             });
         })
     }
@@ -364,13 +359,12 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
         }
        }
        else{
-           console.log('sample');
            getSupplierAssessmentList({ assessmentId:  this.accountassessmentid }).then(resultData => {
             var assessmentTemplateId = resultData[0].Rhythm__Assessment__r.Rhythm__Template__c;
             getQuestionsList({ templateId: assessmentTemplateId }).then(result => {
                 var resultMap = result;
-                getSupplierResponseList({ assessmentId:  this.accountassessmentid }).then(result => {
-                    result.forEach(qres => {
+                getSupplierResponseList({ assessmentId:  this.accountassessmentid }).then(suppRespresult => {
+                    suppRespresult.forEach(qres => {
                         var savedResponseList = new Map();
                         savedResponseList.set('value', qres.Rhythm__Response__c);
                         if (('Rhythm__Conversation_History__c' in qres)) {
@@ -382,10 +376,10 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
                         this.savedResponseMap.set(qres.Rhythm__Question__c, savedResponseList);
                     });
                     this.finalSection = this.constructWrapper(resultMap, this.savedResponseMap);
-                    var tableHtml = '<table><thead><tr>';
+                    let tableHtml = '<table><thead><tr>';
                     tableHtml += '<th>Section</th><th colspan="2">Question</th><th>Response</th><th>ConversationHistory</th><th>NumberOfAttachments</th>';
                     tableHtml += '</tr></thead><tbody>';
-                    var count = 0;
+                    let count = 0;
                     for (const key of this.finalSection.keys()) {
                         count += 1;
                         if (count % 2 === 0) {
@@ -394,10 +388,10 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
                         else {
                             tableHtml += '<tr><td class="oddLeftTd" rowspan=' + this.finalSection.get(key).length + '>' + key + '</td>';
                         }
-                        for (var i = 0; i < this.finalSection.get(key).length; i++) {
+                        for (let i = 0; i < this.finalSection.get(key).length; i++) {
                             if (typeof this.finalSection.get(key)[i].conversationHistory != "undefined" && this.isJsonString(this.finalSection.get(key)[i].conversationHistory)) {
-                                var str = '';
-                                for (var j = 0; j < JSON.parse(this.finalSection.get(key)[i].conversationHistory).length; j++) {
+                                let str = '';
+                                for (let j = 0; j < JSON.parse(this.finalSection.get(key)[i].conversationHistory).length; j++) {
                                     str = str + JSON.parse(this.finalSection.get(key)[i].conversationHistory)[j].Name + ':' + JSON.parse(this.finalSection.get(key)[i].conversationHistory)[j].Text + '\n';
                                 }
                                 this.finalSection.get(key)[i].conversationHistory = str;
@@ -405,13 +399,13 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
                             if (typeof this.finalSection.get(key)[i].files != "undefined" && this.isJsonString(this.finalSection.get(key)[i].files)) {
                                 this.finalSection.get(key)[i].files = JSON.parse(this.finalSection.get(key)[i].files).length;
                             }
-                            tableHtml += '<td class="align-to-top">' + (i + 1) + '.' + '</td><td>' + this.finalSection.get(key)[i].question + '</td><td>' + this.finalSection.get(key)[i].value + '</td><td> ' + this.finalSection.get(key)[i].conversationHistory + '</td><td> ' + this.finalSection.get(key)[i].files + '</td></tr>';
+                            tableHtml += '<td class="align-to-top">' + (i + 1) + '.</td><td>' + this.finalSection.get(key)[i].question + '</td><td>' + this.finalSection.get(key)[i].value + '</td><td> ' + this.finalSection.get(key)[i].conversationHistory + '</td><td> ' + this.finalSection.get(key)[i].files + '</td></tr>';
                         }
                         tableHtml += '<tr><td></td><td></td><td></td><td></td></tr>';
                     }
                     tableHtml += '</tbody></table>';
-                    var win = window.open('', '', 'width=' + (window.innerWidth * 0.9) + ',height=' + (window.innerHeight * 0.9) + ',location=no, top=' + (window.innerHeight * 0.1) + ', left=' + (window.innerWidth * 0.1));
-                    var style = '<style>@media print { * {-webkit-print-color-adjust:exact;}}} @page{ margin: 0px;} *{margin: 0px; padding: 0px; height: 0px; font-family: Source Sans Pro, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif !important;} .headerDiv{width: 100%; height: 56px; padding: 20px; background-color: #03314d;} .headerText{font-size: 40px; color: white; font-weight: bold} .tableDiv{padding: 20px;} table {border-collapse:collapse; font-size: 14px;} table td, th{ padding: 4px;} table tr:nth-child(odd) td {background-color: #F9F9F9;} .oddLeftTd{background-color: #E9E9E9 !important;} .evenLeftTd{background-color: #F1F1F1 !important;} table th{ border: 1px solid #E9E9E9; background-color:#B5BEC58F} table { page-break-inside:auto; } tr { page-break-inside:avoid; page-break-after:auto; } .align-to-top{ vertical-align: top; }</style>';
+                    let win = window.open('', '', 'width=' + (window.innerWidth * 0.9) + ',height=' + (window.innerHeight * 0.9) + ',location=no, top=' + (window.innerHeight * 0.1) + ', left=' + (window.innerWidth * 0.1));
+                    let style = '<style>@media print { * {-webkit-print-color-adjust:exact;}}} @page{ margin: 0px;} *{margin: 0px; padding: 0px; height: 0px; font-family: Source Sans Pro, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif !important;} .headerDiv{width: 100%; height: 56px; padding: 20px; background-color: #03314d;} .headerText{font-size: 40px; color: white; font-weight: bold} .tableDiv{padding: 20px;} table {border-collapse:collapse; font-size: 14px;} table td, th{ padding: 4px;} table tr:nth-child(odd) td {background-color: #F9F9F9;} .oddLeftTd{background-color: #E9E9E9 !important;} .evenLeftTd{background-color: #F1F1F1 !important;} table th{ border: 1px solid #E9E9E9; background-color:#B5BEC58F} table { page-break-inside:auto; } tr { page-break-inside:avoid; page-break-after:auto; } .align-to-top{ vertical-align: top; }</style>';
                     win.document.getElementsByTagName('head')[0].innerHTML += style;
                     win.document.getElementsByTagName('body')[0].innerHTML += '<div class="headerDiv slds-p-around_small"><span class="headerText">Rhythm</span></div><br/>';
                     tableHtml = tableHtml.replaceAll('undefined', '').replaceAll('null', '');
@@ -419,15 +413,15 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
                     win.print();
                     win.close();
                 }).catch(error => {
-                    errorLogRecord({ componentName: 'CustomTable', methodName: 'getSupplierResponseList', className: 'AssessmentController', errorData: error.message }).then((result) => {
+                    errorLogRecord({ componentName: 'CustomTable', methodName: 'getSupplierResponseList', className: 'AssessmentController', errorData: error.message }).then(() => {
                     });
                 })
             }).catch(error => {
-                errorLogRecord({ componentName: 'CustomTable', methodName: 'getQuestionsList', className: 'AssessmentController', errorData: error.message }).then((result) => {
+                errorLogRecord({ componentName: 'CustomTable', methodName: 'getQuestionsList', className: 'AssessmentController', errorData: error.message }).then(() => {
                 });
             })
         }).catch(error => {
-            errorLogRecord({ componentName: 'CustomTable', methodName: 'getSupplierAssessmentList', className: 'AssessmentController', errorData: error.message }).then((result) => {
+            errorLogRecord({ componentName: 'CustomTable', methodName: 'getSupplierAssessmentList', className: 'AssessmentController', errorData: error.message }).then(() => {
             });
         })
        }

@@ -37,12 +37,15 @@
 						</div>
 					</div>
 					<!-- Displays button and picklist for navigations --END-->
-
+					<div>
+					<template if:true={showRefreshbutton}>
+						<lightning-button variant="base" label="Refresh" title="Refresh" onclick={handleOnload}></lightning-button></template>
+					</div>
 					<div
 						style="position:absolute; display:inline-block; right:13px; margin-top:-47px; font-weight:bold;">
 						<template if:true={isTemplate}>
 							<a class="slds-button slds-button_reset slds-accordion__summary-action"
-								title="Expand All / Collapse All" onclick={closeAccordionSection}
+								title="Expand All / Collapse All" onclick={handleCollapseExpand}
 								aria-controls="referenceId-21" aria-expanded="true">{buttonlabel}</a>
 						</template>
 					</div>
@@ -79,9 +82,9 @@
 
 							<template for:each={questionsAndAnswerss} for:item="questionaryEntry">
 								<li class="slds-accordion__list-item" key={questionaryEntry.section}>
-									<section data-accordian={questionaryEntry.sectionId} key={questionaryEntry.section}>
+									<section data-accordian={questionaryEntry.sectionId} >
 
-										<div class="slds-accordion__summary" key={questionaryEntry.section}>
+										<div class="slds-accordion__summary" >
 											<h2 class="slds-accordion__summary-heading">
 												<button  class="slds-button slds-button_reset slds-accordion__summary-action" data-id={questionaryEntry.sectionId} onclick={handleAccordionQuestion} aria-controls="referenceId-22" aria-expanded="true">
                                                     <span class="slds-accordion__summary-action-icon slds-button__icon slds-button__icon_left" aria-hidden="true">
@@ -89,19 +92,19 @@
                                                     </span>
                                                     <span class="slds-accordion__summary-content" style="width:100%">
                                                         <div style="width:100%; display:flex; justify-content:space-between">
-                                                            <div key={questionaryEntry.section}>{questionaryEntry.section}</div>
-                                                            <div class="slds-accordion__summary-contentrht" key={questionaryEntry.section}>
+                                                            <div>{questionaryEntry.section}</div>
+                                                            <div class="slds-accordion__summary-contentrht">
                                                             <template if:false={isTemplate}>
-                                                                <div class="slds-grid slds-wrap" key={questionaryEntry.section}>
-                                                                    <div class="slds-col slds-text-align_left cad-mw60" title="Responses" key={questionaryEntry.section}>
+                                                                <div class="slds-grid slds-wrap">
+                                                                    <div class="slds-col slds-text-align_left cad-mw60" title="Responses">
                                                                         <lightning-icon icon-name="utility:number_input" alternative-text="Responses" size="x-small" title="Responses"></lightning-icon>
                                                                         &nbsp;<span>: {questionaryEntry.numberOfResponses}/{questionaryEntry.numberOfQuestions}</span>
                                                                     </div>
-                                                                    <div class="slds-col slds-text-align_left cad-mw65" title="% Completed" key={questionaryEntry.section}>
+                                                                    <div class="slds-col slds-text-align_left cad-mw65" title="% Completed">
                                                                         <lightning-icon icon-name="utility:success" alternative-text="% Completed" size="x-small" title="% Completed"></lightning-icon>
                                                                         &nbsp;<span>: {questionaryEntry.responsesPercentage}%</span>
                                                                     </div>
-                                                                    <div class="slds-col cib-flag slds-text-align_left cad-mw50" title="Additional Requests" key={questionaryEntry.section}>
+                                                                    <div class="slds-col cib-flag slds-text-align_left cad-mw50" title="Additional Requests">
                                                                         <lightning-icon icon-name="utility:priority" alternative-text="Additional Requests" size="x-small" title="Additional Requests"></lightning-icon>
                                                                         &nbsp;<span>: {questionaryEntry.displayFlag}</span>
                                                                     </div>
@@ -109,16 +112,16 @@
                                                             </template>
                                                             <template if:true={isTemplate}>
                                                             <template if:true={isAccountAssessment}>
-                                                                <div class="slds-grid slds-wrap" key={questionaryEntry.section}>
-                                                                    <div class="slds-col slds-text-align_left cad-mw60" title="Responses" key={questionaryEntry.section}>
+                                                                <div class="slds-grid slds-wrap">
+                                                                    <div class="slds-col slds-text-align_left cad-mw60" title="Responses">
                                                                         <lightning-icon icon-name="utility:number_input" alternative-text="Responses" size="x-small" title="Responses"></lightning-icon>
                                                                         &nbsp;<span>: {questionaryEntry.numberOfResponses}/{questionaryEntry.numberOfQuestions}</span>
                                                                     </div>
-                                                                    <div class="slds-col slds-text-align_left cad-mw65" title="% Completed" key={questionaryEntry.section}>
+                                                                    <div class="slds-col slds-text-align_left cad-mw65" title="% Completed">
                                                                         <lightning-icon icon-name="utility:success" alternative-text="% Completed" size="x-small" title="% Completed"></lightning-icon>
                                                                         &nbsp;<span>: {questionaryEntry.responsesPercentage}%</span>
                                                                     </div>
-                                                                    <div class="slds-col cib-flag slds-text-align_left cad-mw50" title="Additional Requests" key={questionaryEntry.section}>
+                                                                    <div class="slds-col cib-flag slds-text-align_left cad-mw50" title="Additional Requests">
                                                                         <lightning-icon icon-name="utility:priority" alternative-text="Additional Requests" size="x-small" title="Additional Requests"></lightning-icon>
                                                                         &nbsp;<span>: {questionaryEntry.displayFlag}</span>
                                                                     </div>
@@ -130,8 +133,7 @@
                                                 </button>
 											</h2>
 										</div>
-										<div class="slds-accordion__content" key={questionaryEntry.section}
-											id="referenceId-22">
+										<div class="slds-accordion__content">
 											<c-rtmvpc-render-question-template responses={questionaryEntry.questions}
 												issupplier={isSupplier} sectionid={questionaryEntry.sectionId}
 												assessmentid={assessment} onvaluechange={onResponseChange}

@@ -74,8 +74,7 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
     /*handleChange is used to dispatch an event to its parent component(Questionnaire) and change the response and send back to the parent component*/
     handleChange(event) {
         var changedvalue = event.target.value;
-        console.log('changedvalue',changedvalue);
-        var questionId = event.currentTarget.dataset.key;
+        let questionId = event.currentTarget.dataset.key;
         if(this.responses && this.responses.length > 0){
             this.responses.forEach(res => {
                 if((typeof changedvalue === 'undefined' || changedvalue === '' || changedvalue === '[]') && res.Id === questionId ) {
@@ -84,7 +83,7 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
                             changedvalue=res.defaultValue;
                         } 
                 }                      
-                if (res.Id == questionId && res.isCheckbox == true) {
+                if (res.Id === questionId && res.isCheckbox === true) {
                 if (event.target.checked) {
                     changedvalue = 'true';
                 }
@@ -99,7 +98,6 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
         this.responsemap.SectionId = this.sectionid;
         this.responsemap.option = changedvalue;
         this.responsemap.questionId = questionId;
-        console.log('this.responsemap',this.responsemap);
         /*This dispatch event is used to send the data to questionnaire on onchange to perform saving.*/
         const selectedEvent = new CustomEvent('valuechange', {
             bubbles: true,
@@ -133,7 +131,6 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
 
     /* uploadFilesHandler is used to dispatch the file blob value to parent component(Questionnaire) with the loading on uploading the attachment*/
     uploadFilesHandler(event) {
-        console.log('hello');
         var x = new FileReader();
         var questionId = (event.currentTarget.dataset.id);
         this.fileresponsemap.questionId = questionId;
@@ -152,10 +149,6 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
         }
         let type = (event.target.files[0].name).split('.');
         this.fileresponsemap.type = type[1];
-        //let blob = new Blob(event.target.files[0],type[1]);
-        //this.fileresponsemap.url = .URL.createObjectURL(event.target.files[0]);
-        //this.fileresponsemap.url= x.readAsDataURL(event.target.files[0]);
-        //let file = event.target.files[0].name;
         this.showUploadProgress = true;
         this.fileresponsemap.isPng = false;
         this.fileresponsemap.isPdf = false;
@@ -171,9 +164,10 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
             case "doc": this.fileresponsemap.isDocx = true; break;
             default : console.log('default');
         }
-        let s = x.readAsDataURL(event.target.files[0]);
-        x.addEventListener("loadend", (event) => {
+        x.readAsDataURL(event.target.files[0]);
+        x.addEventListener("loadend", () => {
             this.fileresponsemap.filedata = x.result;
+            this.fileresponsemap.url = x.result;
             this.fileresponsemap.showUploadProgress = this.showUploadProgress;
             /*To upload file and save the file in the record */
             const selectedEvent = new CustomEvent('fileupload', {
@@ -270,7 +264,6 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
         });
         // Dispatches the event.
         this.dispatchEvent(selectedEvent);
-        console.log('sampledata');
        
     }
 
@@ -302,10 +295,8 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
     }
 
     @api
-    fileUploadHandler(status)
+    fileUploadHandler()
     {
-        console.log('status from fileUploadHandler', status);
         this.uploadingFile = true;
-        console.log('status from fileUploadHandler', this.uploadingFile);
     }
 }

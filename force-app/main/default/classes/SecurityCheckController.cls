@@ -1,22 +1,44 @@
+/**
+* Class Name        : SecurityCheckController
+* Developer         :            
+* Created Date      : 
+* @description      : It is used to check permissions for objects and fields.
+* Last Modified Date: 
+*/
 public with sharing class SecurityCheckController {
     @testVisible
     private Boolean allOrNothing = false;
     @testVisible
     private Boolean throwIfRemovedFields = true;
+    /**
+    * @description It extends exceptions. 
+    */
     public class RemovedFieldsException extends Exception {
     }
-
+    
+    /**
+    * @description 
+    * @return  
+    */
     public SecurityCheckController allOrNothing() {
         this.allOrNothing = true;
         return this;
     }
 
+    /**
+    * @description To execute before insert logics.
+    * @return  
+    */
     public SecurityCheckController throwIfRemovedFields() {
         this.throwIfRemovedFields = true;
         return this;
     }
 
-    /// Insert
+    /**
+    * @description To insert the records.
+    * @param records List of records.
+    * @return 
+    */
     public List<Database.SaveResult> doInsert(List<SObject> records) {
         if (records.isEmpty()) {
             return new List<Database.SaveResult>();
@@ -26,12 +48,20 @@ public with sharing class SecurityCheckController {
         }
         return new List<Database.SaveResult>();
     }
+/**
+    * @description To insert records.
+    * @param record is Sobject record.
+    * @return  
+    */
+    // public List<Database.SaveResult> doInsert(SObject record) {
+    //     return doInsert(new List<Sobject>{ record });
+    // }
 
-    public List<Database.SaveResult> doInsert(SObject record) {
-        return doInsert(new List<Sobject>{ record });
-    }
-
-    /// Update
+   /**
+    * @description To update records.
+    * @param records of records.
+    * @return  
+    */
     public List<Database.SaveResult> doUpdate(List<SObject> records) {
         if (records.isEmpty()) {
             return new List<Database.SaveResult>();
@@ -41,12 +71,20 @@ public with sharing class SecurityCheckController {
         }
         return new List<Database.SaveResult>();
     }
+/**
+    * @description To update records.
+    * @param record is Sobject record.
+    * @return 
+    */
+    // public List<Database.SaveResult> doUpdate(SObject record) {
+    //     return doUpdate(new List<Sobject>{ record });
+    // }
 
-    public List<Database.SaveResult> doUpdate(SObject record) {
-        return doUpdate(new List<Sobject>{ record });
-    }
-
-    /// Upsert
+    /**
+    * @description 
+    * @param records List of records
+    * @return 
+    */
     public List<Database.UpsertResult> doUpsert(List<SObject> records) {
         if (records.isEmpty()) {
             return new List<Database.UpsertResult>();
@@ -65,7 +103,12 @@ public with sharing class SecurityCheckController {
         }
         return new List<Database.UpsertResult>();
     }
-
+/**
+    * @description 
+    * @param records
+    * @param uniqueField
+    * @return 
+    */
     public List<Database.UpsertResult> doUpsert(List<SObject> records, Schema.sObjectField uniqueField) {
         if (records.isEmpty()) {
             return new List<Database.UpsertResult>();
@@ -85,12 +128,20 @@ public with sharing class SecurityCheckController {
         }
         return new List<Database.UpsertResult>();
     }
-
+/**
+    * @description 
+    * @param record
+    * @return  
+    */
     public List<Database.UpsertResult> doUpsert(Sobject record) {
         return doUpsert(new List<Sobject>{ record });
     }
 
-    /// Delete
+   /**
+    * @description 
+    * @param records
+    * @return  
+    */
     public List<Database.DeleteResult> doDelete(List<SObject> records) {
         if (records.isEmpty()) {
             return new List<Database.DeleteResult>();
@@ -100,12 +151,20 @@ public with sharing class SecurityCheckController {
         }
         return new List<Database.DeleteResult>();
     }
-
+/**
+    * @description 
+    * @param record
+    * @return  
+    */
     public List<Database.DeleteResult> doDelete(SObject record) {
         return doDelete(new List<Sobject>{ record });
     }
 
-    /// Query - AKA Read
+   /**
+    * @description 
+    * @param query
+    * @return  
+    */
     public List<SObject> doQuery(String query) {
         List<SObject> records = Database.query(query);
         SObjectAccessDecision securityDecision = guardAgainstRemovedFields(
@@ -114,8 +173,27 @@ public with sharing class SecurityCheckController {
         );
         return securityDecision.getRecords();
     }
+/**
+    * @description 
+    * @param query
+    * @param bindVariables
+    * @return
+    */
+    public List<SObject> doQueryWithBinds(String query, Map<String, Object> bindVariables) {
+        List<SObject> records = Database.queryWithBinds(query, bindVariables,AccessLevel.USER_MODE);
+        SObjectAccessDecision securityDecision = guardAgainstRemovedFields(
+            AccessType.READABLE,
+            records
+        );
+        return securityDecision.getRecords();
+    }
 
-    /// Private Methods
+    /**
+    * @description 
+    * @param accessType
+    * @param records
+    * @return
+    */
     private List<Database.SaveResult> doDML(
         System.AccessType accessType,
         List<SObject> records
@@ -125,6 +203,7 @@ public with sharing class SecurityCheckController {
             records
         );
         */
+        
 
         switch on accessType {
             when CREATABLE {
@@ -147,7 +226,12 @@ public with sharing class SecurityCheckController {
             }
         }
     }
-
+/**
+    * @description 
+    * @param accessType
+    * @param records
+    * @return 
+    */
     private SObjectAccessDecision guardAgainstRemovedFields(
         System.AccessType accessType,
         List<SObject> records
@@ -166,7 +250,11 @@ public with sharing class SecurityCheckController {
         }
         return securityDecision;
     }
-
+/**
+    * @description 
+    * @param srList
+    * @return  
+    */
     public static List<String> safeClassExceptionHandlerInsert(Database.SaveResult[] srList){
         List<String> errorList = new List<String>();
         for (Database.SaveResult sr : srList) {
@@ -178,7 +266,11 @@ public with sharing class SecurityCheckController {
         } 
         return errorList;
     }
-
+/**
+    * @description 
+    * @param srList
+    * @return  
+    */
     public static List<String> safeClassExceptionHandlerUpsert(Database.UpsertResult[] srList){
             List<String> errorList = new List<String>();
             for (Database.UpsertResult sr : srList) {
@@ -190,7 +282,11 @@ public with sharing class SecurityCheckController {
             } 
             return errorList;
     }
-
+/**
+    * @description 
+    * @param srList
+    * @return 
+    */
     public static List<String> safeClassExceptionHandlerDelete(Database.DeleteResult[] srList){
             List<String> errorList = new List<String>();
             for (Database.DeleteResult sr : srList) {

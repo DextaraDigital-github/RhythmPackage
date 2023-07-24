@@ -125,6 +125,6 @@ jobs:
              body: 'Released new package version ${{ steps.createPackageVersion.outputs.packageVersionId }} for package ${{ secrets.MANAGED_PACKAGE1 }}'
              author: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>
              commit-message: 'Package: ${{ secrets.MANAGED_PACKAGE1 }} - New version: ${{ steps.createPackageVersion.outputs.packageVersionId }}'
-             branch: 'Version-Storage'
+             branch: 'auto/package-version-${{ steps.createPackageVersion.outputs.packageVersionId }}'
              token: ${{ secrets.BOT_ACCESS_TOKEN }}
            

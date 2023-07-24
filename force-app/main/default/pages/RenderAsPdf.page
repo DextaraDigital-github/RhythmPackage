@@ -4,7 +4,7 @@
             <span class="headerText">Rhythm</span>
         </div>
         <div class="tableDiv">
-            <apex:outputText value="{!displayText}" escape="false" />
+            <apex:outputText value="{!displayText}" />
         </div>
     </div> 
     <script>

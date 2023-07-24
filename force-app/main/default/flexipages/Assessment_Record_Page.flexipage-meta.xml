@@ -13,14 +13,21 @@
                             <value>Edit</value>
                             <visibilityRule>
                                 <criteria>
-                                    <leftValue>{!Record.Is_Past_Assessment__c}</leftValue>
+                                    <leftValue>{!Record.Number_of_invited_Suppliers__c}</leftValue>
                                     <operator>EQUAL</operator>
-                                    <rightValue>false</rightValue>
+                                    <rightValue>0</rightValue>
                                 </criteria>
                             </visibilityRule>
                         </valueListItems>
                         <valueListItems>
                             <value>Rhythm__Assessment__c.Delete</value>
+                            <visibilityRule>
+                                <criteria>
+                                    <leftValue>{!Record.Number_of_invited_Suppliers__c}</leftValue>
+                                    <operator>EQUAL</operator>
+                                    <rightValue>0</rightValue>
+                                </criteria>
+                            </visibilityRule>
                         </valueListItems>
                     </valueList>
                 </componentInstanceProperties>
@@ -62,10 +69,6 @@
         <type>Facet</type>
     </flexiPageRegions>
     <flexiPageRegions>
-        <name>Facet-8f170f8e-e56d-4568-869b-1a083e5e5779</name>
-        <type>Facet</type>
-    </flexiPageRegions>
-    <flexiPageRegions>
         <itemInstances>
             <componentInstance>
                 <componentInstanceProperties>
@@ -94,13 +97,16 @@
                             <value>NAME</value>
                         </valueListItems>
                         <valueListItems>
+                            <value>Completed__c</value>
+                        </valueListItems>
+                        <valueListItems>
+                            <value>Status__c</value>
+                        </valueListItems>
+                        <valueListItems>
                             <value>Submission_Date__c</value>
                         </valueListItems>
                         <valueListItems>
-                            <value>Start_Date__c</value>
-                        </valueListItems>
-                        <valueListItems>
-                            <value>End_Date__c</value>
+                            <value>Follow_Up_Requests__c</value>
                         </valueListItems>
                         <valueListItems>
                             <value>Customer_Review_Status__c</value>
@@ -147,20 +153,6 @@
                 </componentInstanceProperties>
                 <componentName>flexipage:tab</componentName>
                 <identifier>detailTab</identifier>
-            </componentInstance>
-        </itemInstances>
-        <itemInstances>
-            <componentInstance>
-                <componentInstanceProperties>
-                    <name>body</name>
-                    <value>Facet-8f170f8e-e56d-4568-869b-1a083e5e5779</value>
-                </componentInstanceProperties>
-                <componentInstanceProperties>
-                    <name>title</name>
-                    <value>Suppliers</value>
-                </componentInstanceProperties>
-                <componentName>flexipage:tab</componentName>
-                <identifier>flexipage_tab</identifier>
             </componentInstance>
         </itemInstances>
         <itemInstances>

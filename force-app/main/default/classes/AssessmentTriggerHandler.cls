@@ -1,16 +1,49 @@
-public class AssessmentTriggerHandler implements ITriggerHandler{
+/** 
+* Class Name        : AssessmentTriggerHandler
+* Developer         : Sai Koushik Nimmaturi and Reethika Velpula           
+* Created Date      : 
+* @description        : It is used to perform the trigger logic.
+* Last Modified Date: 
+*/
+
+public with sharing class AssessmentTriggerHandler implements ITriggerHandler{
+    public static SecurityCheckController safe = new SecurityCheckController();
+    private static Savepoint sp;//prudhvi to work
     public static TriggerFrameworkServiceController serviceController = new TriggerFrameworkServiceController();
+    
+    /**
+    * @description To execute before insert logic
+    * @param newList This is the new list of records.  
+    */
     public void beforeInsert(List<sObject> newList) {
-        system.debug('beforeInsert----->');
         getQuestionsCount(newList,null);
     }
-     
+    
+     /**
+    * @description To execute after insert logic
+    * @param newList This is the new list of records.
+      @param newMap This is the new map of records.
+    */
     public void afterInsert(List<sObject> newList , Map<Id, sObject> newMap) {
-        system.debug('afterInsert----->');
+      set<Id> templateIds = new set<Id>();
+      for(Assessment__c assessment:(List<Assessment__c>)newList){
+          if(String.isNotBlank(assessment.Template__c)){
+              templateIds.add(assessment.Template__c);
+          }
+      }
+      if(templateIds.isEmpty() == false){
+          calculateAssessmentsCount(templateIds);
+      }
     }
-     
+    
+    /**
+    * @description To execute before update logic
+    * @param newList This is the new list of records.
+      @param newMap This is the new map of records.
+      @param oldList This is the old list of records.
+      @param oldMap This is the old map of records.
+    */
     public void beforeUpdate(List<sObject> newList, Map<Id, sObject> newMap, List<sObject> oldList, Map<Id, sObject> oldMap) {
-       system.debug('inThebeforeUpdate-----');
        
         for(sObject assmt:newMap.values()){
             Decimal supplierCount = (Decimal)assmt.get('Number_of_Invited_Suppliers__c');
@@ -21,25 +54,73 @@ public class AssessmentTriggerHandler implements ITriggerHandler{
         }
         getQuestionsCount(newList, newMap);
     }
-     
+    
+    /**
+    * @description To execute after update logic
+    * @param newList This is the new list of records.
+      @param newMap This is the new map of records.
+      @param oldList This is the old list of records.
+      @param oldMap This is the old map of records.
+    */
     public void afterUpdate(List<sObject> newList, Map<Id, sObject> newMap,  List<sObject> oldList, Map<Id, sObject> oldMap) {
-        system.debug('afterUpdate----->');
+      return;
     }
-     
+    
+    /**
+    * @description To execute before delete logic
+    * @param oldList This is the old list of records.
+      @param oldMap This is the old map of records.
+    */
     public void beforeDelete(List<sObject> oldList , Map<Id, sObject> oldMap) {
-        system.debug('beforeDelete----->');
+      for(Assessment__c assmt:(List<Assessment__c>)oldMap.values()){
+        Decimal supplierCount = (Decimal)assmt.get('Number_of_Invited_Suppliers__c');
+        if(supplierCount > 0){
+          assmt.addError('Assessment program in use, cannot be deleted.');
+        }
+      }
     }
      
+    /**
+    * @description To execute after delete logic
+    * @param oldList This is the old list of records.
+      @param oldMap This is the old map of records.
+    */
     public void afterDelete(List<sObject> oldList , Map<Id, sObject> oldMap) {
-        system.debug('afterDelete----->');
+      set<Id> templateIds = new set<Id>();
+      for(Assessment__c assessment:(List<Assessment__c>)oldList){
+          if(String.isNotBlank(assessment.Template__c)){
+              templateIds.add(assessment.Template__c);
+          }
+      }
+      if(templateIds.isEmpty() == false){
+          calculateAssessmentsCount(templateIds);
+      }
     }
-     
+    
+    /**
+    * @description To execute after undelete logic
+    * @param newList This is the new list of records.
+      @param newMap This is the new map of records.
+    */
     public void afterUnDelete(List<sObject> newList, Map<Id, sObject> newMap) {
-        system.debug('afterUnDelete----->');
+      set<Id> templateIds = new set<Id>();
+      for(Assessment__c assessment:(List<Assessment__c>)newList){
+          if(String.isNotBlank(assessment.Template__c)){
+              templateIds.add(assessment.Template__c);
+          }
+      }
+      if(templateIds.isEmpty() == false){
+          calculateAssessmentsCount(templateIds);
+      }
     }
+
+    /**
+    * @description To calculate questions count
+    * @param newList This is the new list of records.
+    * @param newMap This is the new map of records.
+    */
     public static void getQuestionsCount(List<sObject> newList,Map<Id, sObject> newMap)
     {
-        
         Map<Id,List<Assessment__c>> templateMap= new Map<Id,List<Assessment__c>>();
         for(Assessment__c assessment:(List<Assessment__c>)newList){
             if(templateMap.containsKey(assessment.Template__c)){
@@ -48,17 +129,57 @@ public class AssessmentTriggerHandler implements ITriggerHandler{
             	templateMap.put(assessment.Template__c,new List<Assessment__c>{assessment});
             }
         }
-        AggregateResult[] templateGroup = [SELECT COUNT(id) quesCount, Assessment_Template__c FROM Question__c group by Assessment_Template__c having Assessment_Template__c
-                                      IN :templateMap.keySet()];
-        for (AggregateResult ar : templateGroup){
-            String templateId = (Id)ar.get('Rhythm__Assessment_Template__c');
-            for(Assessment__c assessment : templateMap.get(templateId) ){
-                assessment.Number_of_Questions__c = (Integer)ar.get('quesCount');
-                if(newMap!=null){
-                    ((Assessment__c)newMap.get(assessment.Id)).Number_of_Questions__c = (Integer)ar.get('quesCount');
+        set<Id> templateIds = templateMap.keySet();
+        //Map<String, Object> bindVariables = new Map<String, Object>{'templateIds' => templateIds};
+        if ((Schema.sObjectType.Question__c.fields.Id.isAccessible()) && (Schema.sObjectType.Question__c.fields.Assessment_Template__c.isAccessible())) {
+            
+            AggregateResult[] templateGroup = [SELECT COUNT(Id) quesCount, Assessment_Template__c
+                                              FROM Question__c
+                                              WITH SECURITY_ENFORCED
+                                              GROUP BY Assessment_Template__c
+                                              HAVING Assessment_Template__c IN:templateIds];
+
+            //AggregateResult[] templateGroup = safe.doQueryWithBinds(query,bindVariables);
+            //AggregateResult[] templateGroup = database.query(query);
+            //no need of aggregate query. plain query will resolve this issue.
+            for (AggregateResult ar : templateGroup){
+                String templateId = (Id)ar.get('Rhythm__Assessment_Template__c');
+                for(Assessment__c assessment : templateMap.get(templateId) ){
+                    assessment.Number_of_Questions__c = (Integer)ar.get('quesCount');
+                    if(newMap!=null){
+                        ((Assessment__c)newMap.get(assessment.Id)).Number_of_Questions__c = (Integer)ar.get('quesCount');
+                    }
                 }
             }
         }
-        System.debug('newMap==>'+newMap);
+    }
+
+    /**
+    * @description To calculate assessments count
+    * @param templateIds This is the set of ids.
+    */
+    public static void calculateAssessmentsCount(set<Id> templateIds){
+        List<Assessment_Template__c> templateList = new List<Assessment_Template__c>();
+        for(Assessment_Template__c tmp:[SELECT Id,(SELECT Id FROM Assessments__r) FROM Assessment_Template__c WHERE ID IN:templateIds WITH SECURITY_ENFORCED]){
+            tmp.Number_of_Assessments__c = tmp.Assessments__r.size();
+            templateList.add(tmp);
+        }
+        if (sp == null){
+            sp = Database.setSavepoint();
+        }
+        if(templateList.isEmpty() == false){
+            Database.SaveResult[] saveResult = safe.doUpdate(templateList);
+            List<String> errorList = SecurityCheckController.safeClassExceptionHandlerInsert(saveResult);
+            if(errorList.size()>0){
+                Database.rollback(sp);
+                throw new SecurityControllerException(String.join( errorList, ', ' ));
+            }
+        }
+    }
+
+     /**
+    * @description It is used to throw the exception
+    */
+    public class SecurityControllerException extends Exception{
     }
 }

@@ -2,13 +2,11 @@
 <Package xmlns="http://soap.sforce.com/2006/04/metadata">
 	<types>
 		<members>AssessmentController</members>
-		<members>rtmvpcRelatedListsController</members>
 		<name>ApexClass</name>
 	</types>
 	<types>
 		<members>Account</members>
 		<members>Action__c</members>
-		<members>Assessment_Template_Junction__c</members>
 		<members>Assessment_Template__c</members>
 		<members>Assessment__c</members>
 		<members>Asset</members>

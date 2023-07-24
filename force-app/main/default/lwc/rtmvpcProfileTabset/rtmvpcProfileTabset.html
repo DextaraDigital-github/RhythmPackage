@@ -1,28 +1,3 @@
 <template>
-	<div class="rtmvpc-tabset">
-		<lightning-tabset>
-			<lightning-tab label="Company Profile">
-				<c-rtmvpc-record-details-view record-id={parentId} object-name="Vendor__c"
-					record-type="012000000000000AAA"></c-rtmvpc-record-details-view>
-			</lightning-tab>
-			<!-- <lightning-tab label="Products &amp; Services">
-                Products &amp; Services
-            </lightning-tab> -->
-			<lightning-tab label="Certificates & Licenses">
-				<c-custom-table rec-id={parentId} obj-name="Lisence__c" rel-name="Licenses__r"
-					record-type="012000000000000AAA" col-list={fieldList.Lisence__c}
-					tabs-data={tabsData.Lisence__c}></c-custom-table>
-			</lightning-tab>
-            <lightning-tab label="Insurance">
-				<c-custom-table rec-id={parentId} obj-name="Insurance__c" rel-name="Insurances__r"
-					record-type={recordType} col-list={fieldList.Insurance__c}
-					tabs-data={tabsData.Insurance__c}></c-custom-table>
-			</lightning-tab>
-			<!-- <lightning-tab label="Assessments">
-                Assessments
-                <c-rtmvpc-related-lists rec-id='a0h5i000004oqZEAAY' obj-name='Assessment__c' rel-name='Assesments__r'  fieldvalue={fieldList.Assessment__c}></c-rtmvpc-related-lists>
-            </lightning-tab> -->
-
-		</lightning-tabset>
-	</div>
+	
 </template>

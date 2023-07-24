@@ -19,45 +19,39 @@ export default class AddSuppliersforAssessment extends NavigationMixin(Lightning
     @wire(CurrentPageReference)
     getPageReferenceParameters(currentPageReference) {
        if (currentPageReference) {
-          console.log(currentPageReference);
           this.assessmentId = currentPageReference.state.recordId;
        }
     }
 
     connectedCallback() {
-         console.log('PARNTRECORDID---->',this.assessmentId);
-         console.log('PARNTRECORDID---->',this.recordId);
         this.getTodayDate();
     }
 
     getTodayDate(){
         getTodayDate()
         .then(result => {
-            console.log(JSON.stringify(result));
             if(result){
                 this.todayDate = result;
             }
         })
         .catch(error => {
-            console.log(JSON.stringify(error));
+            //console.log(error);
         });
     }
 
     @wire(getAssessmentRecord, { assessmentId: '$recordId'})
     getAssessmentRecord_wiredData(result) {
         if (result.data) {
-            console.log('getAssessmentRecord : ',JSON.stringify(result.data));
             this.assessmentRecord = result.data[0];
             this.startDate = result.data[0].Rhythm__Start_Date__c;
             this.endDate = result.data[0].Rhythm__End_Date__c;
         } else if (result.error) {
-            console.log('getAssessmentRecord error : ',result.error);
+            //console.log(result.error);
         }
     }
 
     handleAdd(){
         try{
-            console.log('handleAdd - START : ');
             let deleteListStr = '';
             let exSupListStr = '';
             if(this.existingSuppList.length>0){
@@ -66,12 +60,9 @@ export default class AddSuppliersforAssessment extends NavigationMixin(Lightning
              if(this.delList.length>0){
                 deleteListStr = JSON.stringify(this.delList);
             }
-            console.log('todayDate----->',this.todayDate);
-            console.log('startDate----->',this.startDate);
-            console.log('endDate----->',this.endDate);
             let todayDate =  new Date(this.todayDate).toISOString().substring(0, 10);
             let save = false;
-            if(this.endDate != undefined){
+            if(this.endDate !== undefined){
                 if(new Date(todayDate)>=new Date(this.startDate) &&  new Date(todayDate) <=new Date(this.endDate)){
                     save = true;
                 }
@@ -79,12 +70,10 @@ export default class AddSuppliersforAssessment extends NavigationMixin(Lightning
                 save = true;
             }
             if(save){
-                console.log('AddSuppliersMethod------->',JSON.stringify(this.suppliersList));
                 if(this.suppliersList.length > 0 || this.delList.length>0){
                     addSuppliers({assessmentRecord:this.assessmentRecord,operationType:'update',suppliers:JSON.stringify(this.suppliersList),existingSups:exSupListStr,deleteList:deleteListStr})
                     .then(result => {
-                        console.log('addSuppliers Result------->'+JSON.stringify(result));
-                        if(result.isSuccess == true){
+                        if(result.isSuccess === true){
                             this.showModal = false;
                             this.showNotification('Success','Suppliers Added to Assessments Successfully.','success');
                             this.closeModal();
@@ -94,22 +83,21 @@ export default class AddSuppliersforAssessment extends NavigationMixin(Lightning
                         }
                     })
                     .catch(error => {
-                        console.log('erroDetails----->',error);
+                        //console.log('erroDetails----->',error);
                         this.showNotification('Error',error.body.message,'error');
                     });
                 }else{
-                    this.showNotification('Error','Please select atleast one supplier to proceed.','error');
+                    this.showNotification('Error','Select at least one Supplier to create the Assessment Program','error');
                 }
             }else{
-                this.showNotification('Error','Suppliers cannot be modified for the past assessments','error');
+                this.showNotification('Error','Suppliers who received the Assessment cannot be removed from the Assessment Program.','error');
             }
         }catch(e){
-            console.log(e);
+            //console.log(e);
         }
     }
 
     updateSupplierData(event){
-        console.log('addSuppliersAssessment------>'+JSON.stringify(event.detail));
         this.suppliersList = event.detail.newSuppliers;
         this.existingSuppList = event.detail.existingSupps;
         this.delList = event.detail.delList;

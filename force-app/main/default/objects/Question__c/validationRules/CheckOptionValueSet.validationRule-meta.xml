@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CheckOptionValueSet</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND( ISBLANK(OptionValueSet__c),
+OR(ISPICKVAL(Question_Type__c,&apos;Radio&apos;),
+ISPICKVAL(Question_Type__c, &apos;Picklist&apos;),
+ISPICKVAL(Question_Type__c, &apos;Picklist (Multi-Select)&apos;)))</errorConditionFormula>
+    <errorMessage>Response Values cannot be empty for the selected Question Type</errorMessage>
+</ValidationRule>

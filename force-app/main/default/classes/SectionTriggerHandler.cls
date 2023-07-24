@@ -1,18 +1,38 @@
-public class SectionTriggerHandler implements ITriggerHandler {
+/**
+* Class Name        : SectionTriggerHandler
+* Developer         : Sai Koushik Nimmaturi and Reethika Velpula           
+* Created Date      : 
+* @description        : It is used to perform the trigger logic on Section__c object.
+* Last Modified Date: 
+*/
+public with sharing class SectionTriggerHandler implements ITriggerHandler {
+    public static SecurityCheckController safe = new SecurityCheckController();//use singleton pattern
+    private static Savepoint sp;//prudhvi to work
     
+     /**
+    * @description To execute before insert logic
+    * @param newList This is the new list of records.  
+    */
     public void beforeInsert(List<sObject> newList) {
-        system.debug('beforeInsert----->');
         restrictRecordActions(newList);
         recordAddSequenceNumber(newList);
     }
-    
+    /**
+    * @description To execute after insert logic
+    * @param newList This is the new list of records.
+      @param newMap This is the new map of records.
+    */
     public void afterInsert(List<sObject> newList , Map<Id, sObject> newMap) {
-        system.debug('afterInsert----->');
-        
+        return;
     }
-    
+    /**
+    * @description To execute before update logic
+    * @param newList This is the new list of records.
+      @param newMap This is the new map of records.
+      @param oldList This is the old list of records.
+      @param oldMap This is the old map of records.
+    */
     public void beforeUpdate(List<sObject> newList, Map<Id, sObject> newMap, List<sObject> oldList, Map<Id, sObject> oldMap) {
-        system.debug('beforeUpdate----->');
         List<Section__c> newSeclst=new List<Section__c>();
         List<Section__c> sectionLst=new List<Section__c>();
         for(Section__c sect:(List<Section__c>)newList) {
@@ -27,25 +47,47 @@ public class SectionTriggerHandler implements ITriggerHandler {
         recordValidations(sectionLst);
         restrictRecordActions(newSeclst);
     }
+    /**
+    * @description To execute after update logic
+    * @param newList This is the new list of records.
+      @param newMap This is the new map of records.
+      @param oldList This is the old list of records.
+      @param oldMap This is the old map of records.
+    */
     
     public void afterUpdate(List<sObject> newList, Map<Id, sObject> newMap,  List<sObject> oldList, Map<Id, sObject> oldMap) {
-        system.debug('afterUpdate----->');
+        return;
     }
-    
+    /**
+    * @description To execute before delete logic
+    * @param oldList This is the old list of records.
+      @param oldMap This is the old map of records.
+    */
     public void beforeDelete(List<sObject> oldList , Map<Id, sObject> oldMap) {
-        system.debug('beforeDelete----->');
         restrictRecordActions(oldList); 
         recordSequenceNumber(oldList);
     }
-    
+     /**
+    * @description To execute after delete logic
+    * @param oldList This is the old list of records.
+      @param oldMap This is the old map of records.
+    */
     public void afterDelete(List<sObject> oldList , Map<Id, sObject> oldMap) {
-        system.debug('afterDelete----->');
+        return;
     }
-    
+     /**
+    * @description To execute after undelete logic
+    * @param newList This is the new list of records.
+      @param newMap This is the new map of records.
+    */
     public void afterUnDelete(List<sObject> newList, Map<Id, sObject> newMap) {
-        system.debug('afterUnDelete----->');
+        return;
     }
     
+    /**
+    * @description To perform validation based on the status of template.
+    * @param secLst This is the new list of section records.
+    */
     
     public void restrictRecordActions(List<Section__c> secLst) {
         try {
@@ -54,77 +96,130 @@ public class SectionTriggerHandler implements ITriggerHandler {
             for(Section__c sec:secLst) {
                 templateIds.add(sec.Assessment_template__c);
             }
-            if(templateIds.size() >0) {
-                List<Assessment_template__c> templateList=[Select Id,status__c from Assessment_template__c where Id IN:templateIds];
-                for(Assessment_template__c template:templateList) {
-                    templateStatusMap.put(template.Id,template.Status__c);
-                }
-                for(Section__c sec:secLst) {
-                    if(templateStatusMap.get(sec.Assessment_template__c)!='New') {
-                        sec.addError('You can not perform any operations on this record because of Template Status');
-                    } 
-                }
+            if(templateIds.isEmpty() == false) {
+                string tempQuery = 'SELECT Id,status__c'
+                                 +' FROM Assessment_template__c'
+                                 +' WHERE Id IN:templateIds';
+                Map<String, Object> bindVariables = new Map<String, Object>{'templateIds' => templateIds};
+                List<Assessment_template__c> templateList = safe.doQueryWithBinds(tempQuery,bindVariables);
+                //if(templateList.isEmpty() == false){
+                    for(Assessment_template__c template:templateList) {
+                        templateStatusMap.put(template.Id,template.Status__c);
+                    }
+                    for(Section__c sec:secLst) {
+                        if(templateStatusMap.get(sec.Assessment_template__c) != 'New') {
+                            sec.addError('Modifications cannot be done to a Question linked to Active/Inactive Assessment Template');
+                        } 
+                    }
+                //}
             }
         }
-        Catch(Exception e) {
-            system.debug('Exception e==='+e.getMessage());
+        catch(exception e) {
+            throw new AuraHandledException(e.getMessage());
         }
     }
+     /**
+    * @description To perform validations on assessment template
+    * @param secLst This is the new list of section records.
+    */
     public void recordValidations(List<Section__c> secLst) {
         try {
             for(Section__c sec:secLst) {
-                sec.addError('You cannot change Assessment Template');
+                sec.addError('Assessment Template linked to the Section cannot be changed');
             }
         }
-        Catch(Exception e) {
-            system.debug('Exception e==='+e.getMessage());
+        catch(exception e) {
+            throw new AuraHandledException(e.getMessage());
         }
     }
+     /**
+    * @description To add the sequence number.
+    * @param secLst This is the new list of section records.
+    */
     public void recordAddSequenceNumber(List<Section__c> secLst) {
         Set<Id> templateIds = new Set<Id>();
         try {
             for(Section__c sec: secLst) {
-                templateIds.add(sec.Assessment_Template__c);
-            }
-            List<Section__c> sectionList=[Select Id,Section_Sequence_Number__c from Section__c where Assessment_Template__c IN:templateIds order by Section_Sequence_Number__c ASC];
-            Integer sequenceNumber = 0;
-            for(Section__c section: sectionList) {
-                if(section.Section_Sequence_Number__c != null) {
-                    if(sequenceNumber < section.Section_Sequence_Number__c) {
-                        sequenceNumber = (Integer)section.Section_Sequence_Number__c;
-                    }
+                if(string.isNotBlank(sec.Assessment_Template__c)){
+                    templateIds.add(sec.Assessment_Template__c);
                 }
             }
-            for(Section__c sec: secLst) {
-                sequenceNumber = sequenceNumber+1;
-                sec.Section_Sequence_Number__c = sequenceNumber;
-            } 
-        }
-        Catch(Exception e) {
-            system.debug('Exception e==='+e.getMessage());
+            if(templateIds.isEmpty() == false){
+                string tempQuery = 'SELECT Id,Section_Sequence_Number__c'
+                                + ' FROM Section__c'
+                                + ' WHERE Assessment_Template__c IN:templateIds'
+                                + ' ORDER BY Section_Sequence_Number__c ASC';
+                Map<String, Object> bindVariables = new Map<String, Object>{'templateIds' => templateIds};
+                List<Section__c> sectionList = safe.doQueryWithBinds(tempQuery,bindVariables);
+                integer sequenceNumber = 0;
+                //if(sectionList.isEmpty() == false){
+                    for(Section__c section: sectionList) {
+                        if(section.Section_Sequence_Number__c != null && 
+                            sequenceNumber < section.Section_Sequence_Number__c) {
+                                sequenceNumber = (Integer)section.Section_Sequence_Number__c;
+                        }
+                    }
+                    for(Section__c sec: secLst) {
+                        sequenceNumber = sequenceNumber+1;
+                        sec.Section_Sequence_Number__c = sequenceNumber;
+                    }
+                //}
+            }
+        }catch(exception e) {
+            throw new AuraHandledException(e.getMessage());
         }
     }
+     /**
+    * @description To update sequence number for section object
+    * @param secLst This is the new list of section records.
+    */
     public void recordSequenceNumber(List<Section__c> secLst) {
         Set<Id> templateIds = new Set<Id>();
         List<Section__c> updateSectionList=new List<Section__c>();
+        List<String> errorList = new List<String>();
         try {
             for(Section__c sec: secLst) {
-                templateIds.add(sec.Assessment_Template__c);
+                if(string.isNotBlank(sec.Assessment_Template__c)){
+                    templateIds.add(sec.Assessment_Template__c);
+                }
             }
-            List<Section__c> sectionList=[Select Id,Section_Sequence_Number__c from Section__c where Assessment_Template__c IN:templateIds and Id NOT IN :secLst order by Section_Sequence_Number__c ASC];
-            Integer sequenceNumber = 0;
-            for(Section__c section: sectionList) {
-                sequenceNumber = sequenceNumber+1;
-                section.Section_Sequence_Number__c = sequenceNumber;
-                updateSectionList.add(section);
-                
+            if(templateIds.isEmpty() == false){
+                string secQuey = 'SELECT Id,Section_Sequence_Number__c'
+                               + ' FROM Section__c'
+                               + ' WHERE Assessment_Template__c IN:templateIds'
+                               + ' AND Id NOT IN :secLst'
+                               + ' ORDER BY Section_Sequence_Number__c ASC';
+                Map<String, Object> bindVariables = new Map<String, Object>{'templateIds' => templateIds,'secLst' => secLst};
+                List<Section__c> sectionList = safe.doQueryWithBinds(secQuey,bindVariables);
+                Integer sequenceNumber = 0;
+                //if(sectionList.isEmpty() == false){
+                    for(Section__c section: sectionList) {
+                        sequenceNumber = sequenceNumber+1;
+                        section.Section_Sequence_Number__c = sequenceNumber;
+                        updateSectionList.add(section);
+                        
+                    }
+                    if (sp == null){
+                         sp = Database.setSavepoint();
+                    }
+                    if(updateSectionList.size() > 0) {
+                        Database.SaveResult[] saveResult = safe.doUpdate(updateSectionList);
+                        errorList = SecurityCheckController.safeClassExceptionHandlerInsert(saveResult);
+                    }
+                    if(errorList.size()>0){
+                        Database.rollback(sp);
+                        throw new SecurityControllerException(String.join( errorList, ', ' ));
+                    }
+                //}
             }
-            if(updateSectionList.size() > 0) {
-                update updateSectionList;
-            }
+        }catch(exception e) {
+            throw new AuraHandledException(e.getMessage());
         }
-        Catch(Exception e) {
-            system.debug('Exception e==='+e.getMessage());
-        }
+    }
+/**
+  * @description It is used to throw the exception.
+*/
+    public class SecurityControllerException extends Exception{
+        
     }
 }
