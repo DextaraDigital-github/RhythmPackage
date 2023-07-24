@@ -53,9 +53,9 @@ public with sharing class SecurityCheckController {
     * @param record is Sobject record.
     * @return  
     */
-    public List<Database.SaveResult> doInsert(SObject record) {
-        return doInsert(new List<Sobject>{ record });
-    }
+    // public List<Database.SaveResult> doInsert(SObject record) {
+    //     return doInsert(new List<Sobject>{ record });
+    // }
 
    /**
     * @description To update records.
@@ -76,9 +76,9 @@ public with sharing class SecurityCheckController {
     * @param record is Sobject record.
     * @return 
     */
-    public List<Database.SaveResult> doUpdate(SObject record) {
-        return doUpdate(new List<Sobject>{ record });
-    }
+    // public List<Database.SaveResult> doUpdate(SObject record) {
+    //     return doUpdate(new List<Sobject>{ record });
+    // }
 
     /**
     * @description 
@@ -203,6 +203,7 @@ public with sharing class SecurityCheckController {
             records
         );
         */
+        
 
         switch on accessType {
             when CREATABLE {

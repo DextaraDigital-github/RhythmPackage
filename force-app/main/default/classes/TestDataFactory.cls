@@ -116,7 +116,11 @@ public with sharing class TestDataFactory{
     public static User createTestUser(){
         Profile portalProfile = [SELECT Id FROM Profile WHERE Name='Standard Platform User' WITH SECURITY_ENFORCED Limit 1];
         List<user> lstuser = new List<User>();
-        String uniqueUserName = 'rhytmtuser' + DateTime.now().getTime() + '@testorg.com';
+         String orgId = UserInfo.getOrganizationId();
+        String dateString = String.valueof(Datetime.now()).replace(' ','').replace(':','').replace('-','');
+        Integer randomInt = Integer.valueOf(math.rint(math.random()*1000000));
+        String uniqueName = orgId + dateString + randomInt;
+        String uniqueUserName = uniqueName + '@test' + orgId + '.org';
         User u = new User(Alias = 'standt', Email='standarduser@testorg.com',
         EmailEncodingKey='UTF-8', LastName='Testing', LanguageLocaleKey='en_US',
         LocaleSidKey='en_US', ProfileId = portalProfile.Id,

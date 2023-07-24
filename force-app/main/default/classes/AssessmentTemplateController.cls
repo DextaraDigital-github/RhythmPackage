@@ -17,26 +17,27 @@ public with sharing class AssessmentTemplateController {
 */    
     @AuraEnabled(cacheable=true)
     public static List<Section__c> getSections(String sectionName, string templateId) {
+        List<Section__c> secList = new List<Section__c>();
         try{
+            templateId = String.escapeSingleQuotes(templateId);
             if(string.isNotBlank(sectionName)) {
                 String secName ='%'+ sectionName +'%';
-                String query = 'SELECT Id,Name'
-                                +' FROM Section__c'
-                                +' WHERE Assessment_Template__c=\'' + String.escapeSingleQuotes(templateId) + '\''
-                                +' AND Name LIKE \'' + String.escapeSingleQuotes(secName) + '\''
-                                +' WITH SECURITY_ENFORCED';
-                return safe.doQuery(query);
+                secList = [SELECT Id,Name
+                            FROM Section__c
+                            WHERE Assessment_Template__c = :templateId
+                            AND Name LIKE :secName
+                            WITH SECURITY_ENFORCED];
             }else {
-                String query = 'SELECT Id,Name'
-                             +' FROM Section__c'
-                             +' WHERE Assessment_Template__c=\'' + String.escapeSingleQuotes(templateId) + '\''
-                             +' WITH SECURITY_ENFORCED';
-                return safe.doQuery(query);
+                secList = [SELECT Id,Name
+                            FROM Section__c
+                            WHERE Assessment_Template__c = :templateId
+                            WITH SECURITY_ENFORCED];
             }
         }catch(exception e){
             String errorMsg = e.getMessage();
             throw new AuraHandledException(ErrorMsg);
         }
+        return secList;
     }
 
 /**
@@ -48,13 +49,12 @@ public with sharing class AssessmentTemplateController {
     public static Boolean getTemplateDetails(String templateId) {
         try {
             Boolean hasStatusNew = false;
+            templateId = String.escapeSingleQuotes(templateId);
             if(String.isNotBlank(templateId)) {
-                String query = 'SELECT Status__c'
-                             + ' FROM Assessment_Template__c'
-                             + ' WHERE Id= \'' + String.escapeSingleQuotes(templateId) + '\''
-                             + ' WITH SECURITY_ENFORCED';
-
-                List<Assessment_Template__c> assessmentList= safe.doQuery(query);
+                List<Assessment_Template__c> assessmentList=  [SELECT Status__c
+                                                                FROM Assessment_Template__c
+                                                                WHERE Id= :templateId
+                                                                WITH SECURITY_ENFORCED];
                 Assessment_Template__c assessmentTemp = (AssessmentList.size()==1)?AssessmentList[0]:null;
                 if(assessmentTemp  != null && assessmenttemp.Status__c.equalsIgnoreCase('New')){
                     hasStatusNew = true;
@@ -79,22 +79,22 @@ public with sharing class AssessmentTemplateController {
     public static Integer getRecordsCount(String templateId, String objName) {
         try {
             Integer totalRecsCount = 0;
+            templateId = String.escapeSingleQuotes(templateId);
             if(String.isNotBlank(templateId)) {
                 if(objName.equalsIgnoreCase('Sections')){
-                    String query = 'SELECT Id'
-                                +' FROM Section__c'
-                                +' WHERE Assessment_Template__c = \'' + String.escapeSingleQuotes(templateId) + '\''
-                                +' WITH SECURITY_ENFORCED';
-                    List<Section__c> sectionList = safe.doQuery(query);
+                    List<Section__c> sectionList = [SELECT Id
+                                                    FROM Section__c
+                                                    WHERE Assessment_Template__c = :templateId
+                                                    WITH SECURITY_ENFORCED];
+
                     totalRecsCount = sectionList.size();
                 }else if(objName.equalsIgnoreCase('Questions')){
-                    String query = 'SELECT Id'
-                                 + ' FROM Question__c'
-                                 + ' WHERE Assessment_Template__c=\'' + String.escapeSingleQuotes(templateId) + '\''
-                                 + ' AND Section__c != NULL'
-                                 + ' WITH SECURITY_ENFORCED';
-                    List<Question__c> sectionList = safe.doQuery(query);
-                    totalRecsCount = sectionList.size();
+                    List<Question__c> questionList = [SELECT Id
+                                                    FROM Question__c
+                                                    WHERE Assessment_Template__c = :templateId
+                                                    AND Section__c != NULL
+                                                    WITH SECURITY_ENFORCED];
+                    totalRecsCount = questionList.size();
                 }
             }
             return totalRecsCount;
@@ -113,17 +113,18 @@ public with sharing class AssessmentTemplateController {
     @AuraEnabled
     public static List<Section__c> getTemplateSections(String templateId) {
         try {
+            templateId = String.escapeSingleQuotes(templateId);
             if(String.isNotBlank(templateId)) {
-                string query = 'SELECT Id, Name,Section_Sequence_Number__c,'
-                             + 'Parent_Section__c, Root_Section__c, Assessment_Template__c,'
-                             + 'Assessment_Template_Version__c, No_of_Questions__c, Historical_Id__c,'
-                             + 'Cloned_Record_Id__c, Assessment_Template__r.Status__c,'
-                             + '(select Id, Rhythm__Question__c, Section__c from Questions__r)' 
-                             + ' FROM Section__c'
-                             + ' WHERE Assessment_Template__c = \'' + String.escapeSingleQuotes(templateId) + '\''
-                             + ' WITH SECURITY_ENFORCED'
-                             + ' ORDER BY Section_Sequence_Number__c ASC';
-                return safe.doQuery(query);
+                List<Section__c> sectionList = [SELECT Id, Name,Section_Sequence_Number__c,
+                                Parent_Section__c, Root_Section__c, Assessment_Template__c,
+                                Assessment_Template_Version__c, No_of_Questions__c, Historical_Id__c,
+                                Cloned_Record_Id__c, Assessment_Template__r.Status__c,
+                                (select Id, Rhythm__Question__c, Section__c from Questions__r)
+                                FROM Section__c
+                                WHERE Assessment_Template__c = :templateId
+                                WITH SECURITY_ENFORCED
+                                ORDER BY Section_Sequence_Number__c ASC];
+                return sectionList;
             }
         }
         catch(exception e) {
@@ -143,14 +144,15 @@ public with sharing class AssessmentTemplateController {
     @AuraEnabled
     public static List<Question__c> getQuestionsLists(String templateId) {
         try {
-            if(string.isNotBlank(templateId)) {
-                string query = 'SELECT Id,Rhythm__Question__c, Section__c'
-                             + ' FROM Question__c'
-                             + ' WHERE Assessment_Template__c=\'' + String.escapeSingleQuotes(templateId) + '\''
-                             + ' AND Section__c != NULL'
-                             + ' WITH SECURITY_ENFORCED'
-                             + ' ORDER BY Question_Sequence_Number__c ASC';
-                return safe.doQuery(query);
+            templateId = String.escapeSingleQuotes(templateId) ;
+            if(String.isNotBlank(templateId)) {
+                List<Question__c> questionList = [SELECT Id,Rhythm__Question__c, Section__c
+                                FROM Question__c
+                                WHERE Assessment_Template__c= :templateId
+                                AND Section__c != NULL
+                                WITH SECURITY_ENFORCED
+                                ORDER BY Question_Sequence_Number__c ASC];
+                return questionList;
             }
         }
         catch(exception e) {
@@ -170,18 +172,19 @@ public with sharing class AssessmentTemplateController {
     @AuraEnabled
     public static List<Question__c> getTemplateQuestionList(String templateId, Integer recslimit) {
         try { 
+            templateId = String.escapeSingleQuotes(templateId);
             if(string.isNotBlank(templateId)) {
-                String query =   'SELECT Id, Name, Section__c,Question_Sequence_Number__c,'
-                                +'OptionValueSet__c, Question_Type__c, Question__c,'
-                                +'Assessment_Template__c, Section__r.Name,'
-                                +'Rhythm__Assessment_Template__r.Rhythm__Status__c'
-                                +' FROM Question__c'
-                                +' WHERE Assessment_Template__c = \'' + String.escapeSingleQuotes(templateId) + '\''
-                                +' AND Section__c != NULL'
-                                +' WITH SECURITY_ENFORCED'
-                                +' ORDER BY Section__r.Section_Sequence_Number__c ASC, Question_Sequence_Number__c ASC'
-                                +' LIMIT '+recslimit;
-                return safe.doQuery(query);
+                List<Question__c> questionList =  [SELECT Id, Name, Section__c,Question_Sequence_Number__c,
+                                                    OptionValueSet__c, Question_Type__c, Question__c,
+                                                    Assessment_Template__c, Section__r.Name,
+                                                    Rhythm__Assessment_Template__r.Rhythm__Status__c
+                                                    FROM Question__c
+                                                    WHERE Assessment_Template__c = :templateId
+                                                    AND Section__c != NULL
+                                                    WITH SECURITY_ENFORCED
+                                                    ORDER BY Section__r.Section_Sequence_Number__c ASC, Question_Sequence_Number__c ASC
+                                                    LIMIT :recslimit];
+                return questionList;
             }
         }
         catch(exception e) {
@@ -195,6 +198,7 @@ public with sharing class AssessmentTemplateController {
 * @param qstnList This is a list of questions data to perform update operation.
 */   
     @AuraEnabled 
+    /* sfge-disable-stack ApexFlsViolationRule */
     public static void updateQustnRecords(list<Question__c> qstnList) {
         try{
             if (sp == null){
@@ -219,6 +223,7 @@ public with sharing class AssessmentTemplateController {
 */    
    
     @AuraEnabled
+    /* sfge-disable-stack ApexFlsViolationRule */
     public static void updateRecords(List<Section__c> secList) {
         try{
             if(sp == null){
@@ -245,6 +250,7 @@ public with sharing class AssessmentTemplateController {
 * @return
 */
     @AuraEnabled
+    /* sfge-disable-stack ApexFlsViolationRule */
     public static String deleteRecords(List<Id> recIdList, Boolean delchildobjrecs) {
         String status = 'Success';
         try {
@@ -252,24 +258,30 @@ public with sharing class AssessmentTemplateController {
                 Database.DeleteResult[] drchildList;
                 List<Question__c> questionList = new List<Question__c>();
                 if(delchildobjrecs==true) {
-                    string queQuery = 'SELECT Id'
-                                    +' FROM Question__c'
-                                    +' WHERE section__c IN:recIdList';
-                    Map<String, Object> bindVariables = new Map<String, Object>{'recIdList' => recIdList};
-                    questionList = safe.doQueryWithBinds(queQuery,bindVariables);
+                    questionList = [SELECT Id
+                                    FROM Question__c
+                                    WHERE section__c IN :recIdList
+                                    WITH SECURITY_ENFORCED];
+                    
                 }
                 if(questionList.isEmpty() == false) {
                     drchildList=safe.doDelete(questionList);
                 }
-                if (Schema.sObjectType.Section__c.isDeletable()) {
-                     Database.delete(recIdList,true);
+                
+                If(recIdList.isEmpty() == false){
+                    List<Section__c> deleteList = [SELECT Id FROM Section__c WHERE ID IN:recIdList 
+                                                    WITH SECURITY_ENFORCED];
+                    drchildList = safe.doDelete(deleteList);
                 }
+                
+                if(drchildList != null) {
                 for(Database.DeleteResult dr:drchildList) {
                     if(!dr.isSuccess()) {
                         for(Database.Error de:dr.getErrors()) {
                             status='Error Status Code: '+de.getStatusCode()+' || '+de.getMessage()+' || Error Source:'+de.getFields();
                         }
                     }
+                }
                 }
             }
         }

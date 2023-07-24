@@ -6,14 +6,15 @@
 * Last Modified Date: 
 */
 
-public class AssessmentExpiryNotificationBatch implements Database.Batchable<sObject> {
-
+global with sharing class AssessmentExpiryNotificationBatch implements Database.Batchable<sObject> {
+    public static SecurityCheckController safe = new SecurityCheckController();//use singleton pattern
+    private static Savepoint sp;
     /**
     * @description Start method to query the required records.
     * @param bc It is an instance of BatchableContext.
     * @return
     */
-    public Database.QueryLocator start(Database.BatchableContext bc){
+    global Database.QueryLocator start(Database.BatchableContext bc){
         Date todayDate = Date.Today();
         string query = 'SELECT Id,Name,Account__r.Name,Account__r.Email__c FROM AccountAssessmentRelation__c WHERE Status__c != \'Submitted\' AND Assessment__r.Expiry_Reminder_Date__c != null AND Assessment__r.Expiry_Reminder_Date__c=:todayDate WITH SECURITY_ENFORCED';
         return Database.getQueryLocator(query);
@@ -24,7 +25,8 @@ public class AssessmentExpiryNotificationBatch implements Database.Batchable<sOb
     * @param bc It is an instance of BatchableContext.
     * @param scope It is a list of AccountAssessmentRelation__c object.
     */
-    public void execute(Database.BatchableContext bc, List<AccountAssessmentRelation__c> scope){
+    /* sfge-disable-stack ApexFlsViolationRule */
+    global void execute(Database.BatchableContext bc, List<AccountAssessmentRelation__c> scope){
         List<ErrorTransactionLog__c> errorList = new List<ErrorTransactionLog__c>();
         List<Messaging.SingleEmailMessage> emailMessagesList = new List<Messaging.SingleEmailMessage>();
         Configuration__mdt siteData = Configuration__mdt.getInstance('Site_URL');
@@ -59,7 +61,12 @@ public class AssessmentExpiryNotificationBatch implements Database.Batchable<sOb
             errorList.add(errorRec);
         }
         if(errorList.isEmpty() == false){
-            Database.insert(errorList, false);
+            Database.SaveResult[] results = safe.doInsert(errorList);
+            List<String> errorsList = SecurityCheckController.safeClassExceptionHandlerInsert(results);
+            if(errorsList.size()>0){
+                Database.rollback(sp);
+                throw new SecurityControllerException(String.join(errorsList, ', ' ));
+            }
         }
     }
 
@@ -67,7 +74,9 @@ public class AssessmentExpiryNotificationBatch implements Database.Batchable<sOb
     * @description execute any post-processing operations.
     * @param bc It is an instance of BatchableContext.
     */
-    public void finish(Database.BatchableContext bc){
+    global void finish(Database.BatchableContext bc){
         return;
+    }
+    public class SecurityControllerException extends Exception{
     }
 }

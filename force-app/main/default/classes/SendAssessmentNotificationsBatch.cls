@@ -5,16 +5,17 @@
 * @description       : It is used to send the assessment notification to suppliers.
 * Last Modified Date: 
 */
-public class SendAssessmentNotificationsBatch implements Database.Batchable<sObject> {
-
+global with sharing class SendAssessmentNotificationsBatch implements Database.Batchable<sObject> {
+    public static SecurityCheckController safe = new SecurityCheckController();//use singleton pattern
+    private static Savepoint sp;
     /**
     * @description Start method to query the required records.
     * @param bc It is an instance of BatchableContext.
     * @return
     */
-    public Database.QueryLocator start(Database.BatchableContext bc){
+    global Database.QueryLocator start(Database.BatchableContext bc){
         Date todayDate = Date.Today();
-        string query = 'SELECT Id,Name,Assessment__r.Start_Date__c,Assessment__r.End_Date__c,Account__r.Name,Account__c,Assessment__c FROM Assessment_Supplier__c WHERE Status__c= \'Active\' AND Assessment__r.Start_Date__c=:todayDate WITH SECURITY_ENFORCED';
+        string query = 'SELECT Id,Name,Assessment__r.Start_Date__c,Assessment__r.End_Date__c,Account__r.Name,Account__c,Assessment__c FROM Assessment_Supplier__c WHERE Status__c= \'Active\' AND Assessment__r.Start_Date__c=:todayDate AND Assessment__r.Number_of_invited_Suppliers__c= 0 WITH SECURITY_ENFORCED';
         return Database.getQueryLocator(query);
     }
 
@@ -23,7 +24,8 @@ public class SendAssessmentNotificationsBatch implements Database.Batchable<sObj
     * @param bc It is an instance of BatchableContext. 
     * @param scope List of Assessment_Supplier__c object.
     */
-    public void execute(Database.BatchableContext bc, List<Assessment_Supplier__c> scope){
+    /* sfge-disable-stack ApexFlsViolationRule */
+    global void execute(Database.BatchableContext bc, List<Assessment_Supplier__c> scope){
         List<ErrorTransactionLog__c> errorList = new List<ErrorTransactionLog__c>();
         try{
             Configuration__mdt siteData = Configuration__mdt.getInstance('Site_URL');
@@ -44,16 +46,20 @@ public class SendAssessmentNotificationsBatch implements Database.Batchable<sObj
                 accountAssessRelnsList.add(accAssessReln);
             }
             set<Id> successRecordsIdSet = new set<Id>();
+            if (sp == null){
+                sp = Database.setSavepoint();
+            }
             if(accountAssessRelnsList.isEmpty() == false){
-                Database.SaveResult[] results = Database.insert(accountAssessRelnsList, false);
+                Database.SaveResult[] results = safe.doInsert(accountAssessRelnsList);
                 for(Database.SaveResult result : results) {
                     if(result.isSuccess()){
                         successRecordsIdSet.add(result.getId());
-                    } 
-                    // else {
-                    //     for(Database.Error error : result.getErrors()) {
-                    //     }
-                    // }
+                    }
+                }
+                List<String> errorsList = SecurityCheckController.safeClassExceptionHandlerInsert(results);
+                if(errorsList.size()>0){
+                    Database.rollback(sp);
+                    throw new SecurityControllerException(String.join(errorsList, ', ' ));
                 }
             }
             if(successRecordsIdSet.isEmpty() == false){
@@ -103,15 +109,22 @@ public class SendAssessmentNotificationsBatch implements Database.Batchable<sObj
             errorList.add(errorRec);
         }
         if(errorList.isEmpty() == false){
-            Database.insert(errorList, false);
+            Database.SaveResult[] results = safe.doInsert(errorList);
+            List<String> errorsList = SecurityCheckController.safeClassExceptionHandlerInsert(results);
+            if(errorsList.size()>0){
+                Database.rollback(sp);
+                throw new SecurityControllerException(String.join(errorsList, ', ' ));
+            }
         }
     }
     /**
     * @description execute any post-processing operations.
     * @param bc It is an instance of BatchableContext.
     */
-    public void finish(Database.BatchableContext bc){
+    global void finish(Database.BatchableContext bc){
         // execute any post-processing operations
         return;
+    }
+    public class SecurityControllerException extends Exception{
     }
 }

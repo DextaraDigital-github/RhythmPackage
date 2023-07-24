@@ -132,14 +132,15 @@ public with sharing class AssessmentTriggerHandler implements ITriggerHandler{
         set<Id> templateIds = templateMap.keySet();
         //Map<String, Object> bindVariables = new Map<String, Object>{'templateIds' => templateIds};
         if ((Schema.sObjectType.Question__c.fields.Id.isAccessible()) && (Schema.sObjectType.Question__c.fields.Assessment_Template__c.isAccessible())) {
-             string query = 'SELECT COUNT(Id) quesCount, Assessment_Template__c'
-                     +' FROM Question__c'
-                     +' WITH SECURITY_ENFORCED'
-                     +' GROUP BY Assessment_Template__c'
-                     +' HAVING Assessment_Template__c IN:templateIds';
+            
+            AggregateResult[] templateGroup = [SELECT COUNT(Id) quesCount, Assessment_Template__c
+                                              FROM Question__c
+                                              WITH SECURITY_ENFORCED
+                                              GROUP BY Assessment_Template__c
+                                              HAVING Assessment_Template__c IN:templateIds];
 
             //AggregateResult[] templateGroup = safe.doQueryWithBinds(query,bindVariables);
-            AggregateResult[] templateGroup = database.query(query);
+            //AggregateResult[] templateGroup = database.query(query);
             //no need of aggregate query. plain query will resolve this issue.
             for (AggregateResult ar : templateGroup){
                 String templateId = (Id)ar.get('Rhythm__Assessment_Template__c');

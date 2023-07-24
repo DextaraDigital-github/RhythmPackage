@@ -58,8 +58,8 @@ jobs:
       - name: 'Check for SFDX Update'
         run: sfdx update
         
-    # Install Salesforce CLI Scanner
-      - name: 'Install Salesforce CLI Scanner'
+    # Install Salesforce SFDX Scanner
+      - name: 'Install Salesforce SFDX Scanner'
         run: sfdx plugins:install @salesforce/sfdx-scanner
 
     # Checkout the source code
@@ -70,7 +70,12 @@ jobs:
       - name: 'Connect with Salesforce ORG'
         working-directory: .github/jwt/
         run: sfdx auth:jwt:grant --clientid ${{github.event.inputs.scratch-org_consumerkey}} --jwtkeyfile server.key --username ${{github.event.inputs.scratch-org_username}} -d --instanceurl ${{github.event.inputs.scratch-org_loginurl}}
-        
-      # Code Push to Scratch org
+
+    # Code Push to Scratch org
       - name: 'code push'
         run: sfdx force:source:push --targetusername=${{github.event.inputs.scratch-org_username}} --wait 20 -f --loglevel debug
+
+    # Generate Violation Report
+      - name: 'Scan for Violations and Generate report'
+        run: sfdx scanner:run:dfa --target "./**/*.cls" --projectdir "./"
+

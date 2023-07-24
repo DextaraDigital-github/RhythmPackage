@@ -37,15 +37,9 @@ private with sharing class SendAssessmentNotificationsBatchTest {
             Map<String,Object> supplierData = new Map<String,Object>{'Rhythm__Account__c'=>accts[0].Id,'Rhythm__Assessment__c'=>asslist[0].Id,
             'Rhythm__Status__c'=>'Active'};
             TestDataFactory.createSuppliers(1,true,supplierData);
-            
-            Map<String,Object> accountassesments = new Map<String,Object>{'Rhythm__Account__c'=>accts[0].Id,'Rhythm__Assessment__c'=>asslist[0].Id,
-            'Rhythm__Status__c'=>'New','Rhythm__End_Date__c'=>Date.newInstance(2030, 4, 26),'Rhythm__Number_of_Responses__c'=>10,
-            'Rhythm__Start_Date__c'=>Date.newInstance(2030, 3, 26)};
-            TestDataFactory.createAccountAssessment(1,true,accountassesments);
         }
        
     }
-
     @isTest
     static void notificationBatchTest()
     {

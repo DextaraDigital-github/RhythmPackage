@@ -2,19 +2,12 @@
     "packageDirectories": [
         {
             "path": "force-app",
-            "package": "RhythmDevTest",
-            "versionName": "ver 0.1",
-            "versionNumber": "0.1.0.0",
-            "default": true,
-            "versionDescription": "",
-            "definitionFile": "config/project-scratch-def.json"
-        },
-        {
-            "path": "force-app",
             "package": "RhythmLabs",
             "versionName": "ver 0.1",
-            "versionNumber": "0.1.0.NEXT",
-            "default": false
+            "versionNumber": "0.3.0.NEXT",
+            "ancestorVersion": "HIGHEST",
+            "default": true,
+            "definitionFile": "config/project-scratch-def.json"
         }
     ],
     "name": "RythmProject",
@@ -29,6 +22,12 @@
         "RhythmLabs": "0HoDp0000004CMOKA2",
         "RhythmLabs@0.1.0-1": "04tDp000000J2ImIAK",
         "RhythmLabs@0.1.0-2": "04tDp000000J2N9IAK",
-        "RhythmLabs@0.1.0-3": "04tDp000000J2NEIA0"
+        "RhythmLabs@0.1.0-3": "04tDp000000J2NEIA0",
+        "RhythmLabs@0.2.0-1": "04tDp000000J2NTIA0",
+        "RhythmLabs@0.3.0-1": "04tDp000000J2S0IAK",
+        "RhythmLabs@0.3.0-2": "04tDp000000J2S5IAK",
+        "RhythmLabs@0.3.0-3": "04tDp000000J2SAIA0",
+        "RhythmLabs@0.3.0-4": "04tDp000000J2SPIA0",
+        "RhythmLabs@0.3.0-5": "04tDp000000J2SUIA0"
     }
 }
