@@ -6,7 +6,7 @@
 * Last Modified Date : 
 */
 public with sharing class QuestionAttributeResponseService {
-    public static SecurityCheckController safe = new SecurityCheckController();   //use singleton pattern
+    public static SecurityCheckController safe = new SecurityCheckController();//use singleton pattern
     private static Savepoint sp;
     @AuraEnabled	
 	public static List<String> getQuestionTypeValues()
@@ -120,14 +120,15 @@ public with sharing class QuestionAttributeResponseService {
     }
     
     /**
-    * @description Fetches the Question__c records based on search string and other parameters
-    * @param parameterMap It is a stringified JSON of parameters required to fetch Question__c records
+    * @description Updates the Child Questions with updated Sequence
+    * @param parameterMap It is a stringified JSON of parameters required to update and fetch updated Question__c records
     * @return List of Question__c records
     */
-    public static List<sObject> fetchQuestions(String parameterMap) {
+    public static List<sObject> fetchQuestions(String parameterMap)
+    {
         Map<String,Object> newParameterMap = (Map<String,Object>)JSON.deserializeUntyped(parameterMap);
         String assessmentId = (String)newParameterMap.get('assessmentId');
-        String filter = ' WHERE Parent_Question__c = \'' + String.escapeSingleQuotes(assessmentId) + '\' ORDER BY Question_Sequence_Number__c ASC ';
+        String filter = ' WHERE Parent_Question__c = \''+String.escapeSingleQuotes(assessmentId)+'\' ORDER BY Question_Sequence_Number__c ASC';
         
         List<String> fields = new List<String>{'Id', 'Question__c', 'Conditional_Response__c', 'Question_Sequence_Number__c'};
         Map<String,Object> quesParameterMap = new Map<String,Object>{ 'fields'=>fields, 'filter'=>filter };
@@ -135,30 +136,37 @@ public with sharing class QuestionAttributeResponseService {
     }
     
     /**
-    * @description Updates the Child Questions with updated Sequence
-    * @param parameterMap It is a stringified JSON of parameters required to update and fetch updated Question__c records
+    * @description Fetches the Question__c records based on search string and other parameters
+    * @param parameterMap It is a stringified JSON of parameters required to fetch Question__c records
     * @return List of Question__c records
     */
-    public static List<sObject> updateQuestionsSequence(String parameterMap) {
+    public static List<sObject> updateQuestionsSequence(String parameterMap)
+    {
         Map<String,Object> newParameterMap = (Map<String,Object>)JSON.deserializeUntyped(parameterMap);
         return QuestionSelector.updateQuestionsSequence(newParameterMap);
     }
-    
     @AuraEnabled
     public static List<SObject> deleteQuestion(String questionId,String templateId)
     {
         List<SObject> delQues = QuestionAttributeResponseSelector.getQuestionsData(questionId,templateId);
         //List<SObject> delRespAtr = QuestionAttributeResponseSelector.getResponseAttributes(questionId);
         List<SObject> delChildQues = QuestionAttributeResponseSelector.getChildQuestions(questionId,templateId);
+        List<Database.DeleteResult> deleteResult = safe.doDelete(delChildQues);
+                    List<String> errorList = SecurityCheckController.safeClassExceptionHandlerDelete(deleteResult);
+                    if(errorList.size()>0){
+                        Database.rollback(sp);
+                        throw new SecurityControllerException(String.join( errorList, ', ' ));
+                    }
         DELETE delQues;
         if(!delChildQues.isEmpty())
         {
-            DELETE delChildQues;
+           List<Database.DeleteResult> deletechildResult = safe.doDelete(delChildQues);
+                    List<String> errorchildList = SecurityCheckController.safeClassExceptionHandlerDelete(deletechildResult);
+                    if(errorchildList.size()>0){
+                        Database.rollback(sp);
+                        throw new SecurityControllerException(String.join( errorList, ', ' ));
+                    }
         }
-        /*if(!delRespAtr.isEmpty())
-        {
-            DELETE delRespAtr;
-        }*/
         return delQues;
     }
     @AuraEnabled
@@ -167,7 +175,12 @@ public with sharing class QuestionAttributeResponseService {
         List<SObject> delrespAtr = QuestionAttributeResponseSelector.getResponseAttributes(questionId);
         if(!delrespAtr.isEmpty())
         {
-            DELETE delrespAtr;
+             List<Database.DeleteResult> delRespAttr = safe.doDelete(delrespAtr);
+                    List<String> errorRespAttr = SecurityCheckController.safeClassExceptionHandlerDelete(delRespAttr);
+                    if(errorRespAttr.size()>0){
+                        Database.rollback(sp);
+                        throw new SecurityControllerException(String.join( errorRespAttr, ', ' ));
+                    }
         }
         return delrespAtr;
     }

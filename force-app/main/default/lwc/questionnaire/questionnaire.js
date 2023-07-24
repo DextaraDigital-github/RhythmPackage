@@ -373,10 +373,11 @@ export default class Questionnaire extends LightningElement {
                                     this.questionsList.forEach(questionWrap => {
                                         let sequence = 0;
                                         questionWrap.questions.forEach(question => {
-                                            let childsequence = 0;
+                                            
                                             question.snumber = ++sequence;
                                             //This loop is to give all the number for all children Questions.
                                             question.Children.forEach(childQuestion => {
+                                                let childsequence = 0;
                                                 childQuestion.questions.forEach(ques => {
                                                     ques.snumber = sequence + '.' + (++childsequence);
                                                 });
@@ -499,10 +500,11 @@ export default class Questionnaire extends LightningElement {
                     this.questionsList.forEach(questionWrap => {
                         let sequence = 0;
                         questionWrap.questions.forEach(question => {
-                            let childsequence = 0;
+                            
                             question.snumber = ++sequence;
                             //This loop is to give all the number for all children Questions.
                             question.Children.forEach(childQuestion => {
+                                let childsequence = 0;
                                 childQuestion.questions.forEach(ques => {
                                     ques.snumber = sequence + '.' + (++childsequence);
                                 });
@@ -604,10 +606,11 @@ export default class Questionnaire extends LightningElement {
                             this.questionsList.forEach(questionWrap => {
                                 let sequence = 0;
                                 questionWrap.questions.forEach(question => {
-                                    let childsequence = 0;
+                                    
                                     question.snumber = ++sequence;
                                     //This loop is to give all the number for all children Questions.
                                     question.Children.forEach(childQuestion => {
+                                        let childsequence = 0;
                                         childQuestion.questions.forEach(ques => {
                                             ques.snumber = sequence + '.' + (++childsequence);
                                         });

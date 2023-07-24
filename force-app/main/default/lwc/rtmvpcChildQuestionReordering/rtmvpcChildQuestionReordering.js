@@ -1,7 +1,7 @@
 import { LightningElement, api, track } from 'lwc';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { loadStyle } from 'lightning/platformResourceLoader';
-import rtmvpcChildQuestionReorderingStylesheet from '@salesforce/resourceUrl/rtmvpcChildQuestionReorderingStyleSheet';
+import componentStylesheet from '@salesforce/resourceUrl/ComponentStylesheet';
 import fetchQuestions from '@salesforce/apex/QuestionAttributeResponseController.fetchQuestions';
 import updateQuestionsSequence from '@salesforce/apex/QuestionAttributeResponseController.updateQuestionsSequence';
 
@@ -19,7 +19,7 @@ export default class RtmvpcChildQuestionReordering extends LightningElement {
     }
     renderedCallback() {
         Promise.all([
-            loadStyle(this, rtmvpcChildQuestionReorderingStylesheet)
+            loadStyle(this, componentStylesheet)
         ]);
         this.renderNavBar();
     }

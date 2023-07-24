@@ -5,8 +5,8 @@
 			<div key={questionary.Id} class="temp_question_border-bottom">
 				<div class="qactivelabelcont" data-id={questionary.Id} onclick={highlightQuestionHandler}>
 					<div
-						class="slds-grid slds-text-align_left slds-p-top_x-small slds-p-horizontal_medium slds-p-bottom_small">
-						<div class="slds-col">
+						class="slds-grid slds-text-align_left slds-p-top_x-small slds-p-horizontal_small slds-p-bottom_small">
+						<div class="slds-col" style="min-width:22px">
 							<!-- Question Number Starts here -->
 							<span class="slds-form-element__labelttnor no-wordbreak">
 								{questionary.snumber}
@@ -229,7 +229,7 @@
 						<!-- <span class="slds-form-element__label" id={questionary.spanId} ></span> -->
 
 						<div class="slds-grid slds-text-align_left slds-p-left_x-small slds-p-bottom_small">
-							<div class="slds-col">
+							<div class="slds-col" style="min-width:22px">
 								<!-- Question Number Starts here -->
 								<span class="slds-form-element__labelttnor no-wordbreak">
 														&nbsp;
@@ -290,7 +290,7 @@
 																style="width:0px" title="Click to Download">
 
 																<template if:true={file.isPng}>
-																	<a href={file.url} download={file.filedata}>
+																	<a href={file.url}>
 																		<lightning-icon icon-name="doctype:image"
 																			size="small">
 																		</lightning-icon>
@@ -305,7 +305,7 @@
 																	</template>
 																</template>
 																<template if:true={file.isPdf}>
-																	<a href={file.url} download={file.filedata}>
+																	<a href={file.url}>
 																		<lightning-icon icon-name="doctype:pdf"
 																			size="small">
 																		</lightning-icon>
@@ -320,7 +320,7 @@
 																	</template>
 																</template>
 																<template if:true={file.isDocx}>
-																	<a href={file.url} download={file.filedata}>
+																	<a href={file.url}>
 																		<lightning-icon icon-name="doctype:word"
 																			size="small">
 																		</lightning-icon>
@@ -335,7 +335,7 @@
 																	</template>
 																</template>
 																<template if:true={file.isCsv}>
-																	<a href={file.url} download={file.filedata}>
+																	<a href={file.url}>
 																		<lightning-icon icon-name="doctype:csv"
 																			size="small">
 																		</lightning-icon>
@@ -348,11 +348,11 @@
 																			class="closericon">
 																		</lightning-button-icon>
 																	</template>
-							on									</template>
+																</template>
 
 															</div>
 															<div class="slds-col" style="overflow:hidden; width:100px;">
-																<a href={file.url} download={file.filedata}>
+																<a href={file.url}>
 																	<div class="slds-m-around_x-small"
 																		style="font-size:12px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;"
 																		title={file.name}>
@@ -377,7 +377,7 @@
 				<template if:true={questionary.Children}>
 					<template for:each={questionary.Children} for:item="childquestion">
 						<template if:true={childquestion.isdisplay}>
-							<div key={childquestion.isdisplay} class="temp_dashed-border-top slds-p-left_large">
+							<div key={childquestion.isdisplay} class="temp_dashed-border-top"> <!--temp_dashed-border-top-->
 								<c-rtmvpc-render-question-template selectquestion={selectquestionHandler} onflagchange ={handlecustomerFlag} issupplier={issupplier}
 								onselectchange={handleConversationHistory}	responses={childquestion.questions} key={childquestion.isdisplay} onvaluechange={handlechildchange}>
 								</c-rtmvpc-render-question-template>
