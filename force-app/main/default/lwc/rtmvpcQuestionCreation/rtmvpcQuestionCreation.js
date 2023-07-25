@@ -1,4 +1,6 @@
 import { LightningElement, track, api } from 'lwc';
+import { loadStyle } from 'lightning/platformResourceLoader';
+import ComponentStylesheet from '@salesforce/resourceUrl/ComponentStyleSheet';
 import getQuestionTypeValues from '@salesforce/apex/QuestionAttributeResponseService.getQuestionTypeValues';
 import createQuestions from '@salesforce/apex/QuestionAttributeResponseService.createQuestions';
 import createResponseAttributes from '@salesforce/apex/QuestionAttributeResponseService.createResponseAttributes';
@@ -71,6 +73,11 @@ export default class RtmvpcQuestionCreation extends LightningElement {
 
         });
 
+    }
+    renderedCallback() {
+        Promise.all([
+            loadStyle(this, this._ComponentStylesheet)
+        ]);
     }
     handleOnLoad() {
         console.log('this.assessmentTemplate', this.assessmentTemplate);

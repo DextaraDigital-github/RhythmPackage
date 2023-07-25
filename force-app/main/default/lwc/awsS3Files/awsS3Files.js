@@ -124,7 +124,7 @@ export default class AWSS3FileOperations extends LightningElement {
         })
             .then(result => {
                 if (result) {
-                    this.previewUrl = result;
+                    //this.previewUrl = result;
                     window.open(result);
                 }
             });
@@ -166,7 +166,7 @@ export default class AWSS3FileOperations extends LightningElement {
     //Upload files to AWS after uploaded successfully to salesforce
     handleUploadFinished() {
         filesUpload({
-            recId: this.recordId, objectName: this.objectApiName
+            recId: this.recordId, objectName: this.objectApiName, pathRecId:null
         }).then(result => {
             if (result) {
                 this.renderFlag = true;
@@ -193,7 +193,7 @@ export default class AWSS3FileOperations extends LightningElement {
         this.renderFlag = true;
         this.configAWS();
         eval("$A.get('e.force:refreshView').fire();");
-        this.retrieveFilesFromS3();
+        //this.retrieveFilesFromS3();
     }
 
     //Preivew File

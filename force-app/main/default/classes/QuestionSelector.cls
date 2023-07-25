@@ -22,7 +22,8 @@ public with sharing class QuestionSelector {
                     +  'Requires_File_Upload__c,Section__c'
                     + ' FROM Question__c'
                     + ' WHERE Parent_Question__c != null'
-                    + ' AND Parent_Question__c IN:mqIds';
+                    + ' AND Parent_Question__c IN:mqIds'
+                    + ' ORDER BY CreatedDate ASC';
         Map<String, Object> bindVariables = new Map<String, Object>{'mqIds' => mqIds};
         List<Question__c>  questionList = safe.doQueryWithBinds(query,bindVariables);
         return questionList;

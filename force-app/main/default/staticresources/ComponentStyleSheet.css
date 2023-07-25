@@ -27,3 +27,10 @@ lightning-tree-grid.rdq-tree-grid lightning-datatable .dt-outer-container table 
 lightning-tree-grid.rdq-tree-grid lightning-datatable .dt-outer-container table tr td:nth-child(5) span::after { content: ""; position: absolute; right: 0; width: 8.5px; height: 39px; background: white; }
 lightning-tree-grid.rdq-tree-grid lightning-datatable .dt-outer-container table tr td:nth-child(5) span div { width: calc(100% - 8.5px); } */
 /* RtmvpcDisplayQuestions --> END */
+        
+/* rtmvpcCreateResponseAttributes --> START */
+.cra-hw lightning-input { --slds-c-input-color-border: rgb(201, 201, 201); }
+.cra-hw table tbody tr td:nth-child(2) lightning-combobox .slds-combobox_container .slds-combobox div:nth-child(2){ width: 40px !important; overflow:hidden; }
+.cra-hw .slds-table_bordered:not(.slds-no-row-hover) tbody tr:hover>td:not(.slds-has-focus), .cra-hw .slds-table_bordered:not(.slds-no-row-hover) tbody tr:focus>td:not(.slds-has-focus) { box-shadow: none; }
+.cra-hw .slds-table_bordered:not(.slds-no-row-hover) tbody tr:hover>td:not(.slds-has-focus), .cra-hw .slds-table_bordered:not(.slds-no-row-hover) tbody tr:focus>td:not(.slds-has-focus) { background-color: #ffffff00; }
+/* rtmvpcCreateResponseAttributes --> END */

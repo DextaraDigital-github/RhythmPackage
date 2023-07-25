@@ -6,9 +6,7 @@
 					<tr class="slds-line-height_reset">
 						<template for:each={tableheaders} for:item="tablehead">
 							<th key={tablehead}>
-								<center>
-									<span class="slds-p-left_xx-small slds-p-right_xx-small slds-line-clamp">{tablehead}</span>
-								</center>
+								<span class="slds-p-left_small slds-p-right_xx-small slds-line-clamp">{tablehead}</span>
 							</th>
 						</template>
 						<template if:false={isCheckbox}>

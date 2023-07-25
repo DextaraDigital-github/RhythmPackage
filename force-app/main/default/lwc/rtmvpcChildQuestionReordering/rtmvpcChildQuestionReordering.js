@@ -1,7 +1,7 @@
 import { LightningElement, api, track } from 'lwc';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { loadStyle } from 'lightning/platformResourceLoader';
-import componentStylesheet from '@salesforce/resourceUrl/ComponentStylesheet';
+import componentStylesheet from '@salesforce/resourceUrl/ComponentStyleSheet';
 import fetchQuestions from '@salesforce/apex/QuestionAttributeResponseController.fetchQuestions';
 import updateQuestionsSequence from '@salesforce/apex/QuestionAttributeResponseController.updateQuestionsSequence';
 

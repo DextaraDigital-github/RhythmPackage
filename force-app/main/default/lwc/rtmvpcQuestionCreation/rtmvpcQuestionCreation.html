@@ -63,23 +63,9 @@
 										</div>
 									</div>
 								</lightning-layout-item>
-								<template if:false={showResponseAttributes}>
-									<lightning-layout-item size="12"
-										class="slds-p-left_medium slds-p-right_medium slds-p-bottom_x-small"
-										small-device-size="6" medium-device-size="12" large-device-size="6">
-										<div class="slds-grid slds-grid_vertical-align-center">
-											<lightning-input variant="label-hidden" type="Checkbox"
-												data-id="Rhythm__Requires_File_Upload__c"
-												checked={questionWrapper.Rhythm__Requires_File_Upload__c}
-												disabled={isdisabled} onchange={handleChange}>
-											</lightning-input>
-											<span class="slds-form-element__label slds-no-flex">Requires File Upload</span>
-										</div>
-									</lightning-layout-item>
-								</template>
 								<lightning-layout-item size="12"
-									class="slds-p-left_medium slds-p-right_medium slds-p-bottom_x-small"
-									small-device-size="12" medium-device-size="12" large-device-size="12">
+									class="slds-p-left_medium slds-p-right_medium slds-p-bottom_small"
+									small-device-size="12" medium-device-size="12" large-device-size="6">
 									<lightning-combobox style="--slds-c-input-color-border: rgb(201, 201, 201);"
 										name="Question Type" label="Question Type"
 										value={questionWrapper.Rhythm__Question_Type__c} options={options}
@@ -87,6 +73,23 @@
 										disabled={isdisabled}>
 									</lightning-combobox>
 								</lightning-layout-item>
+								<template if:false={showResponseAttributes}>
+									<lightning-layout-item size="12"
+										class="slds-p-left_medium slds-p-right_medium slds-p-bottom_x-small"
+										small-device-size="6" medium-device-size="12" large-device-size="6">
+										<div class="slds-grid slds-grid_vertical-align-center"
+											style="min-height: 56px;">
+											<div class="slds-col slds-grid">
+												<lightning-input variant="label-hidden" type="Checkbox"
+													data-id="Rhythm__Requires_File_Upload__c"
+													checked={questionWrapper.Rhythm__Requires_File_Upload__c}
+													disabled={isdisabled} onchange={handleChange}>
+												</lightning-input>
+												<span class="slds-form-element__label slds-no-flex">Requires File Upload</span>
+											</div>
+										</div>
+									</lightning-layout-item>
+								</template>
 								<template if:true={showResponseAttributes}>
 									<lightning-layout-item size="12"
 										class="slds-p-left_medium slds-p-right_medium slds-p-bottom_x-small"
@@ -171,19 +174,6 @@
 						<span class="slds-form-element__label slds-no-flex">Required</span>
 					</div>
 				</lightning-layout-item>
-				<template if:false={showResponseAttributes}>
-					<lightning-layout-item size="12"
-						class="slds-p-left_medium slds-p-right_medium slds-p-bottom_x-small" small-device-size="6"
-						medium-device-size="12" large-device-size="6">
-						<div class="slds-grid slds-grid_vertical-align-center">
-							<lightning-input variant="label-hidden" type="Checkbox"
-								data-id="Rhythm__Requires_File_Upload__c"
-								checked={questionWrapper.Rhythm__Requires_File_Upload__c} onchange={handleChange}>
-							</lightning-input>
-							<span class="slds-form-element__label slds-no-flex">Requires File Upload</span>
-						</div>
-					</lightning-layout-item>
-				</template>
 				<lightning-layout-item size="12" class="slds-p-left_medium slds-p-right_medium slds-p-bottom_x-small"
 					small-device-size="12" medium-device-size="12" large-device-size="12">
 					<!-- <div class="slds-grid slds-grid_vertical-align-center">
@@ -197,10 +187,25 @@
 							options={options} data-id="Rhythm__Question_Type__c" onchange={handleChange} required=true>
 						</lightning-combobox> -->
 					<lightning-combobox style="--slds-c-input-color-border: rgb(201, 201, 201);" name="Question Type"
-						label="Question Type" options={options}
-						data-id="Rhythm__Question_Type__c" onchange={handleChange} required=true>
+						label="Question Type" options={options} data-id="Rhythm__Question_Type__c"
+						onchange={handleChange} required=true>
 					</lightning-combobox>
 				</lightning-layout-item>
+				<template if:false={showResponseAttributes}>
+					<lightning-layout-item size="12"
+						class="slds-p-left_medium slds-p-right_medium slds-p-bottom_x-small" small-device-size="6"
+						medium-device-size="12" large-device-size="6">
+						<div class="slds-grid slds-grid_vertical-align-center" style="min-height: 56px;">
+							<div class="slds-col slds-grid">
+								<lightning-input variant="label-hidden" type="Checkbox"
+									data-id="Rhythm__Requires_File_Upload__c"
+									checked={questionWrapper.Rhythm__Requires_File_Upload__c} onchange={handleChange}>
+								</lightning-input>
+								<span class="slds-form-element__label slds-no-flex">Requires File Upload</span>
+							</div>
+						</div>
+					</lightning-layout-item>
+				</template>
 				<template if:true={showResponseAttributes}>
 					<lightning-layout-item size="12"
 						class="slds-p-left_medium slds-p-right_medium slds-p-bottom_x-small" small-device-size="12"
@@ -214,7 +219,7 @@
 				</template>
 			</lightning-layout>
 		</div>
-		<div style="height: 100px; width: 100%;">
+		<div style="height: 150px; width: 100%;">
 
 		</div>
 		<div class="slds-modal__footer" style="position: absolute; width: 100%; bottom: 0px; z-index: 2;">
