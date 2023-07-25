@@ -843,20 +843,29 @@ export default class Questionnaire extends LightningElement {
             reponse.Rhythm__AccountAssessmentRelation__c = this.accountassessmentid;
             reponse.Rhythm__Question__c = seckey;
             reponse.Rhythm__Account__c = this.vendor;
+            
             if (Array.isArray(this.responseMap.get(seckey))) {
+
                 reponse.Rhythm__Response__c = JSON.stringify(this.responseMap.get(seckey));
             }
             else if (this.responseMap.get(seckey) === true || this.responseMap.get(seckey) === false) {
                 reponse.Rhythm__Response__c = JSON.stringify(this.responseMap.get(seckey));
             }
             else {
-                reponse.Rhythm__Response__c = (this.responseMap.get(seckey));
+                console.log('this.responseMap.get(seckey)',this.responseMap.get(seckey));
+                if(typeof this.responseMap.get(seckey).Id ==='undefined'){
+                    reponse.Rhythm__Response__c = (this.responseMap.get(seckey));
+                }
+                
             }
             if (typeof flagmap[seckey] !== 'undefined') {
                 reponse.Rhythm__Flag__c = flagmap[seckey];
             }
             if (typeof conversationhistory[seckey] !== 'undefined' && conversationhistory[seckey].length > 0) {
                 reponse.Rhythm__Conversation_History__c = conversationhistory[seckey];
+            }
+            if(typeof filesmap[seckey] !=='undefined' && filesmap[seckey].length>0){
+                reponse.Rhythm__Files__c = filesmap[seckey];    
             }
             reponse.Rhythm__Is_Latest_Response__c = true;
             if (this.requiredQuestionList.includes(reponse.Rhythm__Question__c)) {
