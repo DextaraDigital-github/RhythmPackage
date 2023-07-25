@@ -150,7 +150,9 @@ public with sharing class SendEmailBatch implements Database.batchable<sObject>,
         }
         
         em.toAddress = String.join(toAddressMap.values(),'; ');
-        safe.doInsert(em);
+        List<EmailMessage> emList = new List<EmailMessage>();
+        emList.add(em);
+        safe.doInsert(emList);
         for(EmailMessageRelation emr: emrMap.values()) {
             emr.EmailMessageId = em.Id;
         }
