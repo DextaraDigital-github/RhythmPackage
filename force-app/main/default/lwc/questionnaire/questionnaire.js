@@ -172,20 +172,8 @@ export default class Questionnaire extends LightningElement {
                 this.isTemplate = true;
             }else{
                 console.log('SUPACCASSID----->',this.accountassessmentid);
-                getAccountAssessmentRecordData({ assrecordId: this.accountassessmentid }).then(result => {
-                    if (typeof result[0].Rhythm__Assessment__r !== 'undefined' && typeof result[0].Rhythm__Assessment__r.Rhythm__Template__c !== 'undefined'){
-                        this.documentParentId = result[0].Rhythm__Assessment__r.Rhythm__Template__c;
-                        console.log('documentParentId----->',this.documentParentId);
-                    }
-                }).catch(error => {
-                    let errormap = {};
-                                errormap.componentName = 'Questionnaire';
-                                errormap.methodName = 'configAWS';
-                                errormap.className = 'AssessmentController';
-                                errormap.errorData = error.message;
-                                errorLogRecord({ errorLogWrapper: JSON.stringify(errormap) }).then(() => { });
-                });
-            }
+                this.documentParentId = 'a0352000005gYLpAAM';
+            }   
             if(this.documentParentId != undefined){
                 Promise.all([
                     loadStyle(this,RTM_FONTS + '/line-awesome/line-awesome.css'),
@@ -194,36 +182,32 @@ export default class Questionnaire extends LightningElement {
                     loadStyle(this,QUE_PLAT ),
                     loadScript(this, awsjssdk)
                 ]).then(() => {
-                    this.configAWS();
+                    //this.configAWS();
                 })
-                .catch(error => {
-                    let errormap = {};
-                                errormap.componentName = 'Questionnaire';
-                                errormap.methodName = 'configAWS';
-                                errormap.className = 'AssessmentController';
-                                errormap.errorData = error.message;
-                                errorLogRecord({ errorLogWrapper: JSON.stringify(errormap) }).then(() => { });
-                });
+                .catch(error => console.log('ThenCatch---->',error));
             }
             this.handleOnload();
         }catch(e){
             console.log('CatchError----->',e);
         }
     }
+    /*
     renderedCallback() {
         Promise.all([
-            loadScript(this, awsjssdk),
+            loadScript(this, awsjssdk)
         ])
         .then(() => {
             setTimeout(() => {
-                this.configAWS();
+                //this.configAWS();
             }, 100);
         });
     }
-
+    */
     //AWS configuration
     configAWS() {
+        console.log('conFigAWSInsid---->');
         if (this.renderFlag == true) {
+            console.log('conFigAWSInsid22---->');
             getAuthentication({})
                 .then(result => {
                     if (result) {
