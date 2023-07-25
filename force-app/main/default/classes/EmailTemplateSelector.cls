@@ -6,7 +6,9 @@
 * Last Modified Date : 
 */
 public with sharing class EmailTemplateSelector {
-    public static SecurityCheckController safe = new SecurityCheckController();  //implementing singleton pattern
+    public static SecurityCheckController safe = new SecurityCheckController();  //Implementing singleton pattern
+    public static List<ErrorTransactionLog__c> errorList;   //Stores list of ErrorTransactionLog__c records to store errors
+    public static ErrorTransactionLog__c errorRec;   //Used for creating an instance for ErrorTransactionLog__c to log/store an error
     
     /**
     * @description Fetches the EmailTemplate records w.r.t fields, filter, child queries, etc.
@@ -18,11 +20,11 @@ public with sharing class EmailTemplateSelector {
         List<String> fields = (List<String>)JSON.deserialize(JSON.serialize(parameterMap.get('fields')), List<String>.class);
         String filter = (String)parameterMap.get('filter');
         List<String> childQuery = (List<String>)JSON.deserialize(JSON.serialize(parameterMap.get('childQuery')), List<String>.class);
-        if(fields!=null && fields.size()>0)
+        if(fields != null && !fields.isEmpty())
         {
-            filter = (filter==null)?'':filter;
-            String childQry = (childQuery!=null && childQuery.size()>0)?(' , '+String.join(childQuery,',')+' '):'';
-            String query = 'Select '+String.join(fields,',')+childQry+' from EmailTemplate '+filter; // USE FROM
+            filter = (filter == null)?'':filter;
+            String childQry = (childQuery !=  null && !childQuery.isEmpty())?(' , '+String.join(childQuery,', ')):'';
+            String query = 'SELECT ' + String.join(fields,',') + childQry + ' FROM EmailTemplate ' + filter;
             try
             {
                 List<EmailTemplate> emailTempList = safe.doQuery(query);
@@ -30,8 +32,16 @@ public with sharing class EmailTemplateSelector {
             }
             catch(Exception e)
             {
-                String errorMsg = e.getMessage();  // INSERT ERROR LOGS. REF: AssessmentExpiryNotificationBatch
-            	throw new AuraHandledException(errorMsg);
+                errorList = new List<ErrorTransactionLog__c>();
+            	errorRec = new ErrorTransactionLog__c();
+                errorRec.Class_Name__c = 'EmailTemplateSelector';
+                errorRec.Error_Stack_Trace__c = e.getStackTraceString();
+                errorRec.Name = 'Error while fetching EmailTemplate records';
+                errorRec.LWC_Component_Name__c = '';
+                errorRec.Method_Name__c = 'fetchEmailTemplates';
+                errorList.add(errorRec);
+                safe.doInsert(errorList);
+                throw new AuraHandledException(e.getMessage());   //Throws an exception
             }
         }
         return null;

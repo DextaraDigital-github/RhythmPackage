@@ -6,7 +6,9 @@
 * Last Modified Date : 
 */
 public with sharing class ContentVersionSelector {
-    public static SecurityCheckController safe = new SecurityCheckController();  //implementing singleton pattern
+    public static SecurityCheckController safe = new SecurityCheckController();  //Implementing singleton pattern
+    public static List<ErrorTransactionLog__c> errorList;   //Stores list of ErrorTransactionLog__c records to store errors
+    public static ErrorTransactionLog__c errorRec;   //Used for creating an instance for ErrorTransactionLog__c to log/store an error
     
     /**
     * @description Fetches the ContentVersion records w.r.t fields, filter, child queries, etc.
@@ -17,10 +19,10 @@ public with sharing class ContentVersionSelector {
     {
         List<String> fields = (List<String>)JSON.deserialize(JSON.serialize(parameterMap.get('fields')), List<String>.class);
         String filter = (String)parameterMap.get('filter');
-        if(fields!=null && fields.size()>0)
+        if(fields != null && !fields.isEmpty())
         {
-            filter = (filter==null)?'':filter;
-            String query = 'Select '+String.join(fields,',')+' from ContentVersion '+filter;
+            filter = (filter == null)?'':filter;
+            String query = 'SELECT ' + String.join(fields,',')+' FROM ContentVersion '+filter;
             try
             {
                 List<ContentVersion> contentVersionList = safe.doQuery(query);
@@ -28,8 +30,16 @@ public with sharing class ContentVersionSelector {
             }
             catch(Exception e)
             {
-                String errorMsg = e.getMessage();
-            	throw new AuraHandledException(errorMsg);
+                errorList = new List<ErrorTransactionLog__c>();
+            	errorRec = new ErrorTransactionLog__c();
+                errorRec.Class_Name__c = 'ContentVersionSelector';
+                errorRec.Error_Stack_Trace__c = e.getStackTraceString();
+                errorRec.Name = 'Error while fetching ContentVersion records';
+                errorRec.LWC_Component_Name__c = '';
+                errorRec.Method_Name__c = 'fetchContentVersions';
+                errorList.add(errorRec);
+                safe.doInsert(errorList);
+                throw new AuraHandledException(e.getMessage());   //Throws an exception
             }
         }
         return null;
