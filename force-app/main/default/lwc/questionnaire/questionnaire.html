@@ -169,9 +169,11 @@
 												issupplier={isSupplier} sectionid={questionaryEntry.sectionId}
 												assessmentid={assessment} onvaluechange={onResponseChange}
 												onfileupload={handleFileUpload} onselectchange={handlechatHistory}
-												ondeleteattachment={handledeletefile}
+												ondeleteattachment={handledeletefile} onremoveicon={removeCloseIcon}
 												onselectquestion={selectquestionHandler} recid={recordId}
-												onflagchange={handleFlagResponseMethod} uploading-file={uploadingFile}>
+												onflagchange={handleFlagResponseMethod} uploading-file={uploadingFile}
+												onactionchange={handleActionResponse} onrejectchange={handleReject}
+												timeline={timeline} is-preview-component={isPreviewComponent}>
 											</c-rtmvpc-render-question-template>
 										</div>
 
@@ -277,9 +279,17 @@
 			<template if:true={showSaveAndSubmit}>
 				<div class="slds-p-horizontal_medium slds-p-top_xx-small slds-border-top"
 			style="position:absolute; width:100%; height:40px; bottom:0px; text-align:right; background:#e8eaed; border-top:1px solid #c9c9c9;">
-				<lightning-button variant="Brand" label="Save & Submit" title="Save Response"
-					onclick={handleSubmitCustomer} flexibility="auto" class="slds-float--right slds-button_neutral">
+			   <lightning-button-group>
+				<lightning-button variant="Brand" label="Save" title="Save Response"
+					onclick={handleSaveCustomer} flexibility="auto" class=" slds-m-around_xxx-small">
 				</lightning-button>
+				<lightning-button variant="Brand" label="Submit & Follow-Up" title="Save Response" disabled={showFollowButton}
+					onclick={handleSubmitCustomer} flexibility="auto" class="slds-m-around_xxx-small">
+				</lightning-button>
+				<lightning-button variant="Brand" label="Submit & Close Review" title="Save Response"
+					onclick={handleSubmitReviewCustomer} flexibility="auto" class="slds-m-around_xxx-small">
+				</lightning-button>
+				 </lightning-button-group>
 				</div>
 				<!-- &nbsp;&nbsp;
                 <lightning-button variant="Brand" label="Save" title="Save Response" onclick={handleSaveCustomer}

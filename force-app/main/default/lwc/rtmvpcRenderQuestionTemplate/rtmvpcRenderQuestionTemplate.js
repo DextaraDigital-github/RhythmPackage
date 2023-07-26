@@ -9,6 +9,8 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
     @api responses; /*questions related to particular section will be stored in this JSON wrapper */
     @track chatterMap = {};
     @api upload;
+    @api isPreviewComponent;
+    @api conditionaval;
     @api accountassessmentid;
     @track responsemap = {};
     @track fileresponsemap = {};
@@ -24,6 +26,8 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
     @api recid;
     @track acceptedFormats = ['.pdf', '.png', '.pdf', '.csv', '.docx'];
     @api uploadingFile = false;
+     @api showicon;
+      @api timeline;
     connectedCallback() {
         console.log('isSupplier',this.issupplier);
         console.log('Responses',this.responses);
@@ -40,6 +44,98 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
                 }
             });
         }
+
+    }
+    /* deleteForm is used to delete the CAPA form for a question by dispatching the questionId to its parent Component
+       Questionnaire */
+    deleteForm(event){
+         let questionData=event.currentTarget.dataset.id;
+         const selectedAction = new CustomEvent('removeicon', {
+         detail: questionData
+    });
+    this.dispatchEvent(selectedAction);
+    }
+    handleRemove(event){
+         const selectedAction = new CustomEvent('removeicon', {
+         detail: event.detail
+    });
+    this.dispatchEvent(selectedAction);
+
+    }
+      /* handleReject is used to change the status of a question to reject,rejected or approved by onClick and dispatch the
+       data to its parent component (Questionnaire) */
+    handleReject(event){
+        console.log('koushik',this.responses);
+        var quesId = event.currentTarget.dataset.id;
+        var label= event.target.label;
+        var rejectMap={};
+        rejectMap.questionId=quesId;
+        if(!this.issupplier){
+            if(this.responses && this.responses.length > 0){
+                this.responses.forEach(res => {
+                    if(res.Id === quesId){
+                        if(label === 'Reject' || label ==='Rejected'){
+                         
+                        rejectMap.rejectResponse = !(res.rejectButton);
+                           console.log('label', rejectMap.rejectResponse);
+                        this.timeline.forEach(res=>{
+                              if(res.status === 'Need More Information'){                             
+                                  rejectMap.needData = !(res.needData);
+                              }
+                          })                   
+                        }
+                        else{
+                            rejectMap.needData = !(res.needData);
+                        }
+                    }
+                    
+                })
+            }
+             const selectedEvent = new CustomEvent('rejectchange', {
+                 bubbles:true,
+                detail:rejectMap
+            });
+             this.dispatchEvent(selectedEvent);
+           
+        }
+    }
+
+    handleRejectButton(event){
+        console.log('koushik123');
+         const selectedEvent = new CustomEvent('rejectchange', {
+                bubbles : true,
+                detail:event.detail
+            });
+            // Dispatches the event.
+            this.dispatchEvent(selectedEvent);
+           
+            
+        }
+
+ 
+
+     /* openActionForm is used to open the CAPA form and dispatch the questionId to its parent component(Questionnaire) */
+    openActionForm(event)
+    {
+        console.log('openaction',event.currentTarget.dataset.id);
+        let actionMap={};
+        actionMap.quesId=event.currentTarget.dataset.id;
+        actionMap.showCapaForm=false;
+ 
+         const selectedEvent = new CustomEvent('actionchange', {
+                detail: actionMap
+            });
+            // Dispatches the event.
+            this.dispatchEvent(selectedEvent);
+
+    }
+    handleActionChange(event){
+        const selectedEvent = new CustomEvent('actionchange', {
+                detail: event.detail
+            });
+            // Dispatches the event.
+            this.dispatchEvent(selectedEvent);
+
 
     }
 
@@ -65,10 +161,10 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
                 this.chatterMap.openChat = false;
                 this.chatterMap.disableSendButton = true;
             }
+            console.log('this.chatterMap',this.chatterMap);
             const selectedEvent = new CustomEvent('flagchange', {
                 detail: this.chatterMap
             });
-            // Dispatches the event.
             this.dispatchEvent(selectedEvent);
         }
     }
@@ -224,12 +320,23 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
         this.dispatchEvent(selectedEvent);
     }
 
+    handleQuestionHighlight(event)
+    {
+        let child = this.template.querySelectorAll('c-rtmvpc-render-question-template');
+        if(typeof child != 'undefined' && child.length > 0)
+        {
+            child[0].removehighlightHandler('id');
+        }
+        const removequeshighlight = new CustomEvent('removequeshighlight',{detail:'id'});
+        this.dispatchEvent(removequeshighlight);
+        this.highlightQuestionHandler(event);
+    }
     /* highlightQuestionHandler method is used to highlight the selected question and remove highligh for other questions in same section. It also sends an event to parent component to remove highlight for questions in other sections, if any.*/
     highlightQuestionHandler(event) {
         var labelsList = this.template.querySelectorAll('.qactivelabelcont');
         if (labelsList && labelsList.length > 0) {
             labelsList.forEach(label => {
-                if (label.dataset.id.toString() === event.currentTarget.dataset.id.toString()) {
+                if (typeof event != 'undefined' && label.dataset.id.toString() === event.currentTarget.dataset.id.toString()) {
                     label.style.color = "#2D67C5";
                     label.style.backgroundColor = "#f4f6f9";
                     label.style.fontWeight = "500";
@@ -272,6 +379,7 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
             }
         }
         this.chatterMap.questionId = quesId;
+         this.chatterMap.showCapaForm=true;
         const selectedEvent = new CustomEvent('selectchange', {
             detail: this.chatterMap
         });

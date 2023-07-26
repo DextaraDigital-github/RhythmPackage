@@ -46,6 +46,11 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
     @track showdownloadIcon;
     @track tempId;
     @api detaileddata;
+    @track showrejectquestions = true;
+    @track showResponseForm;
+    @track showCapaForm=false;
+    @track showResponseForm;
+    @track showCapaForm=false;
 
     connectedCallback() {
         this.customerId = this.recordId;
@@ -59,6 +64,10 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
         console.log('TADId------>',this.tempId);
         /* To get the username */
         this.handleTimeLine();
+    }
+      handleDeleteIcon(event)
+    {
+        this.template.querySelectorAll('c-Questionnaire')[0].removeDeleteButton(event.detail);
     }
 
     handleAccordian(event) {
@@ -97,9 +106,9 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
                                     if (typeof accAssessment.Rhythm__Status__c !== 'undefined') {
                                         this.statusassessment = accAssessment.Rhythm__Status__c;
                                         this.accountAssessmentStatus = this.statusassessment;
-                                        if (this.statusassessment === 'Need More Information' || this.statusassessment === 'Review Completed') {
-                                            this.showstatus = true;
-                                        }
+                                        // if (this.statusassessment === 'Need More Information' || this.statusassessment === 'Review Completed') {
+                                        //     this.showstatus = true;
+                                        // }
                                         this.assessmentName = accAssessment.Rhythm__Assessment__r.Name;
                                         if (typeof accAssessment.Rhythm__Start_Date__c !== 'undefined') {
                                             let statustrack = {};
@@ -171,6 +180,7 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
                                     }
                                     if (typeof assessStatus.Rhythm__Activity_User__c !== 'undefined') {
                                         statustrack.name = assessStatus.Rhythm__Activity_User__c;
+                                        statustrack.id= assessStatus.Rhythm__ActivityUserId__c;
                                     }
                                        this.assessmentTimeline.push(statustrack);
                                 }
@@ -189,6 +199,7 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
                             this.assessmentTimeline.push(relocate[0]);
                         }
                         this.showSections = true;
+                         this.handleFilter();
                             }
                         }
                     }).catch(error => {
@@ -204,6 +215,23 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
 
         
     }
+     handleFilter()
+    {
+          if (this.objectApiName === 'Rhythm__AccountAssessmentRelation__c'){
+            this.assessmentTimeline.forEach(res=>{
+                if(res.status === 'In Review' ){
+                    this.showstatus = true;
+                }
+            })
+        }
+        else{
+             this.assessmentTimeline.forEach(res=>{
+                if(res.status === 'Need More Information'){
+                    this.showstatus = true;
+                }
+            })
+        }
+    }
     /*To display only the flagged questions(flag colour- green) or all questions(flag colour- red) by clicking on flag */
     handleChange(event) {
         var dataId = event.currentTarget.dataset.id;
@@ -212,11 +240,45 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
         if (dataId === 'showlowerflag') {
             isLowerFlag = true;
         }
-        if (dataId === 'showpriorityflag') {
+        if (dataId === 'All') {
             isLowerFlag = false;
         }
         this.template.querySelector('c-Questionnaire').handleFilterFlag(isLowerFlag);
 
+    }
+     handleRejectChange(){
+         
+        this.template.querySelector('c-Questionnaire').handleFilterRejected();
+
+    }
+    handleAction(event)
+    {
+        console.log('hhh',this.assessmentTimeline);
+        this.showResponseForm=event.detail;
+        this.showCapaForm=this.showResponseForm[0].showCapaForm;
+        this.assessmentTimeline.forEach(res=>{
+            if(res.status === 'In Review'){
+               this.showResponseForm[0].ownershipId=res.id;
+               this.showResponseForm[0].ownershipName=res.name;
+            }
+            else if(res.status ==='Submitted'){
+                this.showResponseForm[0].assignedToId=res.id;
+                this.showResponseForm[0].assignedToName=res.name;
+            }
+        })
+         setTimeout(()=>{
+             this.template.querySelectorAll('c-action')[0].displayForm(this.showResponseForm);
+        },500);
+       
+    }
+    emptyFormData(event){
+        
+        this.template.querySelectorAll('c-action')[0].emptyForm(event.detail);
+    }
+    closeForm(event)
+    {
+         let deletedataform=event.detail;
+          this.template.querySelectorAll('c-questionnaire')[0].displayCloseIcon(deletedataform);
     }
 
     /*handleLeftButtonClick used to display records on page1*/
@@ -242,10 +304,15 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
     /* chatHistory is used to get the question id, assessment id and flag boolean from the child component (Questionnaire) and pass it to the child component(AssessmentChatter)*/
     chatHistory(event) {
         this.showChat = event.detail;
+         this.showCapaForm=event.detail.showCapaForm;
+        console.log('chatter',this.showChat);
         this.showChat.accountassessmentId = this.accountassessmentid;
         this.showData = this.showChat.openChat;
         this.showconverstion = this.showChat.disableSendButton;
-        this.template.querySelector('c-rtmvpc-assessment-chatter').displayConversation(this.showChat);
+         setTimeout(()=>{
+            console.log('chatter===>',this.template.querySelectorAll('c-rtmvpc-assessment-chatter'));
+            this.template.querySelectorAll('c-rtmvpc-assessment-chatter')[0].displayConversation(this.showChat);
+        },500);
     }
 
     showsummaryHandler() {

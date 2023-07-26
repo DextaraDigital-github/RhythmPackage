@@ -1,0 +1,169 @@
+.Vendor{
+	text-align: right;
+	
+	border-bottom: 1px solid black;
+	background-color:#D1F7C4;
+}
+.Customer
+{
+text-align: left;
+ border-bottom: 1px solid black;
+ background-color: lightblue;
+}
+
+.cad-cardbase {position:relative; width:100%; height:calc(100vh - 120px); border-radius:0px; overflow:hidden;}
+
+.cad-tbl { display:table; width:100%; height:100%;}
+.cad-row { display:table-row; }
+.cad-cel { display:table-cell; vertical-align:top; }
+.cad-w230 {width:230px}
+.cad-w300 {width:300px}
+.cad-wauto {width:auto}
+
+.cad-pl16 { padding-left:16px;}
+.cad-pl8 { padding-left:5px;}
+.cad-pr8 { padding-right:5px;}
+
+.cad-sec_container { width:100%; height:100%; border-radius:0px; border:1px solid var(--cibcadcdg-bdr-color); background:var(--bg-primary-color1); display:flex; flex-direction:column;}
+.cad-sec_container_nobdr { width:100%; height:100%; border-radius:0px; border:0px solid rgba(0,0,0,0.2); background:transparent; display:flex; flex-direction:column;}
+.cad-sec_header { position:relative; width:100%; padding:3px 3px 0px; border-bottom:1px solid var(--cibcadcdg-bdr-color); background:var(--bg-primary-color1); }
+.cad-sec_header:before { content:''; position:absolute; background:var(--bg-secheader); z-index:0; width:100%; height:100%; left:0px; top:0px;}
+.cad-sec_header span { display:inline-block; line-height:31px;}
+.cad-sec_header select { width:90px; height:18px; }
+.cad-sec_bodyfull1 { overflow-y:auto; overflow-x:hidden; height:calc(100% - 36px); position:relative; }
+.cad-sec_bodyfull2 { overflow-y:auto; overflow-x:hidden; height:calc(100% - 65px); position:relative; }
+.cad-listul, .cad-listul li {margin:0; padding:0; }
+.cad-listul li {border-bottom:1px solid var(--cibcadcdg-bdr-color1);}
+
+.cad-mtype { position:relative; background:rgba(248,249,250,1); border-left:2px solid rgba(248,249,250,1); padding:0.5rem; }
+.cad-mtype.active { position:relative; background:var(--cibcadcdg-bgh-color);border-left:2px solid var(--cibcadcdg-bdrh-color); padding:0.5rem; }
+.cad-mtype h4 { font-size:var(--fs-14); padding:5px 15px}
+.cad-mtype .cad-badge { position:absolute; right:13px;top:7px;right:10px; background:#bebebe; border-radius:3px; padding:0px 6px; font-size:var(--fs-12); font-weight:var(--fw-400); display:inline-block; color:rgba(0,0,0,0.8)}
+
+.cad-serch { border-bottom:1px solid var(--cibcadcdg-bdr-color1);}
+.cad-serch-input, .cad-serch-input:focus, .cad-serch-input:hover { border:0px solid transparent; padding:3px 10px; background:transparent; width:100%; }
+.cad-read, .cad-unread { position:relative; }
+.cad-read h4,.cad-unread h4 { font-size:var(--fs-16);}
+.cad-read a, .cad-unread a{ display:block;}
+.cad-read h4 {  font-weight:var(--fw-400); }
+.cad-unread h4 { color:#2d67c5; font-weight:var(--fw-700);}
+.cad-read {background:rgba(248,249,250,1);}
+.cad-unread {background:var(--cibcadcdg-bgh-color); cursor:pointer;}
+
+.cad-datentime {position:absolute; top:10px; right:10px; font-size:var(--fs-12); color:#999999; }
+.cad-status { text-align:right;float:right;}
+.cad-approved,.cad-rejected,.cad-pending,.cad-inprogress,.cad-needmoreinfo {border-radius:3px; padding:0px 6px; font-size:var(--fs-13); text-align:center; display:inline-block; background:#d1f7c4; min-width:98px; color:rgba(0,0,0,0.8)}
+
+.cad-tophead-details { padding:0px 15px; width:100%; height:63px;  background:var(--bg-primary-color1); border:1px solid var(--cibcadcdg-bdr-color); margin-bottom:5px; }
+.cad-tophead-details .slds-form-element__label { padding-right:0; padding-top:0; margin-bottom:0;}
+.cad-tophead-details h4 { color:#2d67c5; font-weight:var(--fw-600); }
+
+.cad-sec_container1 { height:100%; overflow-y:auto; }
+.cad-sec_container2 { height:154px; max-height:154px; }
+.cad-sec_container2 textarea.slds-textarea { height:100px; }
+
+.cad-sec_vcontainer { display:block; position:relative; height:100%;}
+.cad-sec_vcontainer1 { display:block; position:absolute; top:0px; height:63px;}
+.cad-sec_vcontainer1a { display:block; position:absolute; top:62px; height:37px; background:var(--bg-primary-color1);}
+.cad-sec_vcontainer1a:before { content:''; position:absolute; background:var(--bg-secheader); z-index:0; width:100%; height:100%; left:0px; top:0px;}
+.cad-sec_vcontainer2 { display:block; width:100%; position:absolute; height:calc(100% - 114px); margin:35px 0px 114px; overflow-y:auto; }
+.cad-sec_vcontainer2bdr { display:block; width:100%; position:absolute; height:calc(100% - 150px); margin:35px 0px 114px; overflow-y:auto; background:var(--bg-primary-color1); border:1px solid var(--cibcadcdg-bdr-color); border-bottom:0px; }
+.cad-sec_vcontainer2_1 { display:block; width:100%; position:absolute; height:calc(100% - 1px); margin:0px 0px 0px; overflow-y:auto; }
+.cad-sec_vcontainer2_2 { display:block; width:100%; position:absolute; height:calc(100% - 0px); margin:0px 0px 0px; overflow-y:auto; }
+.cad-sec_vcontainer3 { display:block; width:100%; position:absolute; bottom:0px; height:114px; background:rgba(0,0,0,0.05); border:1px solid var(--cibcadcdg-bdr-color);}
+.cad-top_menu_container{display:none; height:30px; background:#b5bec5;}
+.cad-top_back_container {display:none; background:#b5bec5;}
+.cad-type .cad-sec_header .cad_actions { display:inline-block; }
+.cad-type{ display:block; position:absolute; left:-300px; height:100%; }
+.cad-type.cadshowleft{ display:table-cell; position:relative; left:0px; z-index:9; height:100%; }
+
+.cad-timeline_line { position:absolute; border:1px solid var(--pbtn-bdr); background:var(--pbtn-bgh); width:0px; height:100%; margin-left:10px; }
+.cad-timeline_slidebase { position:relative; margin-left:22px; width:87%; padding:12px 0px 0px 0px; line-height:normal; }
+.cad-timeline_dot { position:absolute; top:18px; left:-16px; height:10px; width:10px; border-radius:5px; background:var(--bg-primary-color1); border:4px solid #999999; }
+.cad-timeline_datetime { font-size:var(--fs-12); color:#999999;padding-left:3px; }
+.cad-timeline_content { padding:1px 10px; background:#e5e4e4; color:#707070; border-radius:4px; border:1px solid var(--cibcadcdg-bdr-color); }
+.cad-timeline_title { font-size:var(--fs-14); font-weight:var(--fw-600); }
+.cad-timeline_content span{font-size:var(--fs-12); }
+
+.cad-approved, .cad-timeline_approved .cad-timeline_content {background:#d1f7c4; border:1px solid #a6cf98;}
+.cad-rejected, .cad-timeline_rejected .cad-timeline_content {background:#ffbdc7; border:1px solid #e0a2ab;}
+.cad-inprogress, .cad-timeline_submited .cad-timeline_content {background:#b6ddeb; border:1px solid #97bfce;}
+.cad-default, .cad-timeline_default .cad-timeline_content {background:#e5e4e4; border:1px solid #b9b9b9;}
+.cad-pending, .cad-timeline_pending .cad-timeline_content {background:#ffebb3; border:1px solid #dbc790;}
+.cad-needmoreinfo, .cad-timeline_needmoreinfo .cad-timeline_content {background:#d3b0e4; border:1px solid #b18ec2;}
+
+.cad-timeline_customer .cad-timeline_dot { border:4px solid #af0000; }
+.cad-timeline_vendor .cad-timeline_dot { border:4px solid #0072f5; }
+
+.cad-disc { display:none; position:unset; right:-300px; }
+.cadshowright {display:table-cell; position:relative; right:0px; height:100%; }
+
+
+.cad-ad-base { border-top:1px solid var(--cibcadcdg-bdr-color1); }
+.cad-ad-customer .cad-ad-base { border-width:1px 0px 0px 5px; border-style:solid; text-align:left; }
+.cad-ad-supplier .cad-ad-base { border-width:1px 5px 0px 0px; border-style:solid; text-align:right; }
+.cad-cd-supplier .cad-ad-base { border-width:1px 0px 0px 5px; border-style:solid; text-align:left; }
+.cad-cd-customer .cad-ad-base { border-width:1px 5px 0px 0px; border-style:solid; text-align:right; }
+
+.cad-ad-approved .cad-ad-base { border-color:#d1f7c4; }
+.cad-ad-rejected .cad-ad-base { border-color:#ffbdc7; }
+.cad-ad-submited .cad-ad-base { border-color:#b6ddeb; }
+.cad-ad-default .cad-ad-base { border-color:#e5e4e4; }
+
+.cad-ad-datentime { text-align:center; font-size:var(--fs-12); padding:5px 0px 0px; color:rgba(0,0,0,0.45); }
+.cad-ad-message { font-size:var(--fs-14); padding:5px 10px 5px 10px; line-height:normal; color:rgba(0,0,0,0.85); }
+.cad-ad-sender { font-size:var(--fs-12); font-style:italic; padding:0px 10px 5px; color:rgba(0,0,0,0.55); }
+
+.cad-sender {}
+.cad-tnailcard {width:100px ; height:90px ; border-radius:5px; box-shadow:rgb(57 100 255) 0px 0px 3px; display:flex; justify-content:center; align-items:center;}
+.cad-tnailcardinner {margin-left:30px; margin-right:30px; width:30px; height:30px; border:5px solid #f3f3f3; border-top:5px solid orange; border-radius:50%; animation:spin 2s linear infinite; background:transparent;}
+.cad-tnailcard2 {width:100px; height:90px; border-radius:5px;box-shadow:rgba(0, 0, 0, 0.1) 0px 0px 3px; background: #ebebeb;}
+.cad-tnailcard2inner { height:36px; display:flex; justify-content:center; align-items:center}
+
+@media screen and (max-width:992px) {    
+    .cad-row { display:block; height:100%; position:relative; } 
+	.cad-pl8 { padding-left:0px;}  
+    .cad-pr8 { padding-right:0px;} 
+	.cad-type{ display:block; position:absolute; left:-300px; height:100%; }
+    .cad-type.cadshowleft{ display:block; position:absolute; left:0px; z-index:9; height:100%; }
+    .cad-cel { display:inline-block;}
+    .cad-list{ display:block; position:relative; width:100%; height:100%; }
+    .cad-disc{ display:block; position:absolute; right:0px; top:0; width:300px; height:100%; z-index:10;}
+    .cad-disc.cadshowright {display:block; position:absolute; right:-320px; top:0; width:300px; height:100%; z-index:10; }
+    .cad-top_back_container {display:block; height:30px;}
+    .cad-tophead-details { border-bottom:0px solid rgba(0,0,0,0.2); margin-bottom:0px; }
+    .cad-sec_vcontainer1 { display:block; position:unset; top:0px; height:63px; }
+    .cad-sec_vcontainer1a { display:block; position:unset; top:0px; height:37px; }
+    .cad-sec_vcontainer2 { display:block; width:100%; position:absolute; height:calc(100% - 207px); margin:0px 0px 0px; overflow-y:auto; }
+    .cad-sec_vcontainer2_1 { display:block; width:100%; position:absolute; height:calc(100% - 1px); margin:0px 0px 0px; overflow-y:auto; }
+    .cad-sec_vcontainer2_2 { display:block; width:100%; position:absolute; height:calc(100% - 0px); margin:0px 0px 0px; overflow-y:auto; }
+    .cad-sec_vcontainer2bdr { margin:0px 0px 114px;}    
+}
+
+@media screen and (max-width:600px) {
+    .cad-type .cad-sec_header .cad_actions {display:inline-block;}
+    .cad-pl16 {padding-left:0px;}
+	.cad-pl8 { padding-left:0px;}
+    .cad-pr8 { padding-right:0px;} 
+    .cad-type{ display:block; position:absolute; left:-300px; height:100%; }
+    .cad-type.cadshowleft{ display:block; position:absolute; left:0px; z-index:9; height:100%; }
+    .cad-list{ display:block; position:relative; width:100%; height:100%; }
+    .cad-disc{ display:block; position:absolute; right:0px; top:0; width:100%; height:100%; z-index:10;}
+    .cad-disc.cadshowright {display:block; position:absolute; right:-115%; top:0; width:100%; height:100%; z-index:10; }
+    .cad-top_menu_container{display:block; height:30px;}
+    .cad-sec_bodyfull2 {height:calc(100% - 95px);}
+    .cad-tophead-details { border-bottom:0px solid rgba(0,0,0,0.2); margin-bottom:0px; }
+    .cad-sec_vcontainer1 { display:block; position:unset; top:0px; height:63px; }
+    .cad-sec_vcontainer1a { display:block; position:unset; top:0px; height:37px; }
+    .cad-sec_vcontainer2 { display:block; width:100%; position:absolute; height:calc(100% - 250px); margin:0px 0px 0px; overflow-y:auto; }
+    .cad-sec_vcontainer2_1 { display:block; width:100%; position:absolute; height:calc(100% - 1px); margin:0px 0px 0px; overflow-y:auto; }
+    .cad-sec_vcontainer2_2 { display:block; width:100%; position:absolute; height:calc(100% - 0px); margin:0px 0px 0px; overflow-y:auto; }
+    .cad-sec_vcontainer2bdr { margin:0px 0px 114px;}
+}
+
+.temp_flexbox_space-between
+{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}

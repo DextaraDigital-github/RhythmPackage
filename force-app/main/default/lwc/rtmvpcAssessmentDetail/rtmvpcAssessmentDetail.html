@@ -47,22 +47,17 @@
 
 							<div class="slds-float_right slds-is-relative">
 								<template if:true={showstatus}>
-									<template if:true={showflagquestions}>
-
-										<div class="cib-flag slds-is-absolute" style="left:-15px; top:4px;">
-											<lightning-icon data-id="showlowerflag"
-												icon-name="utility:lower_flag" size="x-small" onclick={handleChange}>
-											</lightning-icon>
-										</div>
-									</template>
-									<template if:false={showflagquestions}>
-										<div class="cib-archive:hover slds-is-absolute" style="left:-15px; top:4px;">
-											<lightning-icon data-id="showpriorityflag" icon-name="utility:priority"
-												 size="x-small"
-											     onclick={handleChange}></lightning-icon>
-										</div>
-										
-									</template>
+									<lightning-button-menu icon-name="utility:filter"
+									menu-alignment="right" menu-size="medium" alternative-text="Filtering"
+									variant="label-hidden" title="Filtering" style="top:-3px;">
+									<lightning-menu-item  data-id="showlowerflag" label="Flagged" title="Flagged"  onclick={handleChange}>
+									</lightning-menu-item>
+									<lightning-menu-item data-id="showrejected" label="Rejected" title="Rejected" onclick={handleRejectChange}>
+									</lightning-menu-item>
+									<lightning-menu-item data-id="All" label="All" title="All" onclick={handleChange}>
+									</lightning-menu-item>
+									<!-- <lightning-menu-item label="Excel" title="Excel" value="Excel"></lightning-menu-item> -->
+								</lightning-button-menu>
 								</template>
 								&nbsp; &nbsp;
 								
@@ -94,12 +89,12 @@
 								<div class="slds-scrollable_y" style="max-height:calc(100% - 40px);">
 									<div class="slds-text-align_center slds-text-heading_large">
 										<template if:true={showSections}>
-											<c-Questionnaire vendor={accountid} assessment={assessmentid}
+											<c-Questionnaire vendor={accountid} assessment={assessmentid} timeline={assessmentTimeline}
 												object-api-name={objectApiName} record-id={recordId} accid={assaccId}
 												onselectconversation={chatHistory} onshowsummary={showsummaryHandler}
 												account-assessment-status={accountAssessmentStatus} onupdatetimeline={handleupdatetimeline}
 												onexpandcollapse={handleExpandCollapse} accountassessmentid={accountassessmentid}
-												template-id={tempId}
+												template-id={tempId} onselectaction={handleAction} onemptyactionform={emptyFormData}
 												ontimelinehandle={handleTimeLine}>
 											</c-Questionnaire>
 										</template>
@@ -112,6 +107,7 @@
 
 				<div class="cad-cel cad-w300 cad-disc cad-pl8 cadshowright" data-id="caddisc">
 					<div class="cad-sec_container_nobdr cad-sec_vcontainer">
+						<template if:true={showCapaForm}>
 						<div class="cad-tophead-details cad-sec_vcontainer1a">
 							<div class="slds-text-align_center slds-p-vertical_x-small">
 								<button class="cad_actions slds-float_right slds-is-absolute" style="right:0px;top:3px;" data-id="buttoncaddisc" onclick={handleRightButtonClick} >
@@ -121,6 +117,7 @@
 								<h4> Review & Comments History</h4>
 							</div>
 						</div>
+						</template>
 						<template if:true={showconverstion}>
 							<div class="cad-sec_vcontainer2bdr">
 								<div class="slds-scrollable_y">
@@ -129,9 +126,15 @@
 								</div>
 							</div>
 						</template>
+						<template if:true={showCapaForm}>
 						<c-rtmvpc-assessment-chatter chattermap={showChat} onchatconversation={handleChat}
 							recordid={customerId}>
 						</c-rtmvpc-assessment-chatter>
+						</template>
+						<template if:false={showCapaForm}>							
+						<c-action showresponse={showResponseForm} oncloseform={closeForm} onremovedeleteicon={handleDeleteIcon}>
+						</c-action>
+				        </template>
 					</div>
 				</div>
 			</div>

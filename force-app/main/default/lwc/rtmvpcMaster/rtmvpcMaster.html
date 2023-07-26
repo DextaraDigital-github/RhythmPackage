@@ -42,6 +42,9 @@
 								<template if:true={isInbox}>
 									<c-rtmvpc-inbox onopentask = {openTaskHandler}></c-rtmvpc-inbox>
 								</template>
+								<template if:true={isAction}>
+									<c-action-item-grid ></c-action-item-grid>
+								</template>
 								<template if:true={isCalendar}>
 									<c-rtmvpc-calendar></c-rtmvpc-calendar>
 								</template>

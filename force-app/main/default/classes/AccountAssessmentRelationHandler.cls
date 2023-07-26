@@ -111,7 +111,9 @@ public with sharing class AccountAssessmentRelationHandler implements ITriggerHa
                 FieldHistoryTracking__c fieldTracker = new FieldHistoryTracking__c();
         		fieldTracker.Object_Name__c='AccountAssessmentRelation__c';
         		fieldTracker.Object_Field_Name__c='Rhythm__Status__c';
+           
         		fieldTracker.Rhythm__Activity_User__c =UserInfo.getName();
+             fieldTracker.Rhythm__ActivityUserId__c=UserInfo.getUserId();
         		fieldTracker.Object_Field_Value__c=(String)newMap.get(assmntId).get('Rhythm__Status__c');
         		fieldTracker.Rhythm__object_Record_Id__c=(String)assmntId;
               	fieldtrack.add(fieldTracker);
