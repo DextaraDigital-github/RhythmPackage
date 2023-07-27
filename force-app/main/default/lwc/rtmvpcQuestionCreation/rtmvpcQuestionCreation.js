@@ -239,9 +239,12 @@ export default class RtmvpcQuestionCreation extends LightningElement {
                     let preferredlst = this.responseAttributes.filter(res => res.Rhythm__preferred_Not_preferred__c === '');
                     let requiredupdatelst = this.responseAttributes.filter(res => res.Rhythm__Upload_Required__c === '');
                     console.log('set1',Array.from(set1).length);
-
+                    let scorelst = this.responseAttributes.filter(res => res.Rhythm__Score__c < 0);
+                    let weightlst = this.responseAttributes.filter(res => res.Rhythm__Weight__c < 0);
+                    console.log('scorelst',scorelst);
                     console.log('length',set1.length===this.responseAttributes.length);
-                    if (preferredlst.length === 0 && requiredupdatelst.length === 0 && (Array.from(set1).length)===this.responseAttributes.length) {
+                    if (preferredlst.length === 0 && requiredupdatelst.length === 0 
+                    && (Array.from(set1).length)===this.responseAttributes.length && scorelst.length===0 && weightlst.length===0) {
                         createQuestions({ questions: this.questionlst, isUpdate: isSubmit }).then(result => {
                             console.log('result', result[0].Id);
                             this.responseAttributes.forEach(resp => {
@@ -305,7 +308,14 @@ export default class RtmvpcQuestionCreation extends LightningElement {
                             this.configureToast('Some Error has occured', 'Enter unique response values', 'error');
                         }
                         else{
-                            this.configureToast('Some Error has occured', 'Preferred/Not Preferred and Upload Required fields are mandatory', 'error');
+                            if(scorelst.length>0 || weightlst.length>0)
+                            {
+                                this.configureToast('Some Error has occured', 'Scores and weight should be greater than 0', 'error');
+                            }
+                            else{
+                                this.configureToast('Some Error has occured', 'Preferred/Not Preferred and Upload Required fields are mandatory', 'error');
+                            }
+                            
                         }
                         
                     }

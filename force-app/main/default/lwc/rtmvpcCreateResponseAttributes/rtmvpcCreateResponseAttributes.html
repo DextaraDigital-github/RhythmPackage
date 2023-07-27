@@ -28,11 +28,19 @@
 												</lightning-combobox>
 											</template>
 											<template if:false={row.ispicklist}>
+												<template if:false={row.isNumber}>
 												<lightning-input class="input-box" variant="label-hidden" type="text"
 													key={row.Label} data-id={row.key} onchange={handleChange}
 													disabled={row.isEditable} value={row.rowlabel}
 													data-val={row.Label} onblur={handlefocus}>
+												</lightning-input></template>
+												<template if:true={row.isNumber}>
+													<lightning-input type="Number" class="input-box" variant="label-hidden"
+													key={row.Label} data-id={row.key} onchange={handleChange}
+													disabled={row.isEditable} value={row.rowlabel}
+													data-val={row.Label} onblur={handlefocus}>
 												</lightning-input>
+												</template>
 											</template>
 										</div>
 									</td>
