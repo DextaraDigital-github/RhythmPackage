@@ -113,6 +113,8 @@ public class CAPAService {
        
     }
     public static void notifyUsers(Map<string,object> actionData, String body, List<Id> userList){
+        Object targetId=CAPASelector.notifyUsers();
+        actionData.put('targetId',targetId);
         Set<string>userdata=new set<string>();
         for(Id userid:userList){
             userdata.add((String)userid);

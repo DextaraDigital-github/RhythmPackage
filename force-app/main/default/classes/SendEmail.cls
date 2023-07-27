@@ -52,9 +52,10 @@ public with sharing class SendEmail {
         Messaging.CustomNotification notification = new Messaging.CustomNotification();
          string subject=(String)actionData.get('Name');
          string recordid=(string)actionData.get('Id');
+         string targetId=(string)actionData.get('targetId');
         notification.setTitle(subject);
         notification.setBody(body);
-         notification.setNotificationTypeId('0ML7e000000L4wFGAS');
+         notification.setNotificationTypeId(targetId);
          notification.setTargetId(recordid);
         try {
             notification.send(recipientsIds);

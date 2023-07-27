@@ -79,6 +79,11 @@ public class CAPASelector {
                 Ownership__c,Ownership__r.Name,Assigned_To__c,Assigned_To__r.Name FROM Action__c WHERE Id=:actionid
                 WITH SECURITY_ENFORCED];
     }
+    public static Object notifyUsers(){
+        customNotificationType custom=[SELECT Id from customNotificationType WHERE DeveloperName = 'Action_Notification'];
+        return custom.Id;
+        
+    }
    @AuraEnabled
     public static Date getCurrentDate(){
         return System.today();

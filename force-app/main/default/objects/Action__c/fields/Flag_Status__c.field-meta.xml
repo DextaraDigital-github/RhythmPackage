@@ -6,9 +6,9 @@
 
   TEXT(Status__c) == &apos;Closed&apos;,
 
-  IMAGE(&apos;https://saas-customer-901-dev-ed--rhythm.scratch.vf.force.com/resource/1689524535000/Rhythm__GreenFlag&apos;,&apos;green&apos;,30,30),
+  IMAGE(&apos;/resource/Rhythm__GreenFlag&apos;,&apos;green&apos;,30,30),
 
-  IMAGE(&apos;https://saas-customer-901-dev-ed--rhythm.scratch.vf.force.com/resource/1689524888000/Rhythm__RedFlag&apos;, &apos;red&apos;,30,30)
+  IMAGE(&apos;/resource/Rhythm__RedFlag&apos;, &apos;red&apos;,30,30)
 
 )</formula>
     <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>

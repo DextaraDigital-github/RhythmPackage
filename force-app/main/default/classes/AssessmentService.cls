@@ -16,7 +16,7 @@ public class AssessmentService {
     */
     public static List<sObject> fetchAssessmentTemplates() {
         List<String> fields = new List<String>{'Id', 'Name'};
-        String filter = ' WHERE Status__c = \'Active\' ';
+        String filter = ' WHERE Status__c = \'Active\' ORDER BY Name ASC';
         Map<String,Object> newParameterMap = new Map<String,Object>{'fields'=>fields, 'filter'=>filter};
         List<Assessment_Template__c> recList = TemplateSelector.fetchAssessmentTemplates(newParameterMap).values();
         if(recList != null) {

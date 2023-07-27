@@ -28,10 +28,13 @@
 										</lightning-input-field>
 									</lightning-layout-item>
 									<lightning-layout-item size="6" padding="around-small">
-										<lightning-combobox name="Rhythm__Template__c" label="Template Name"
+										<!-- <lightning-combobox name="Rhythm__Template__c" label="Template Name"
 											value={templateId} options={templateOptions} data-id="template"
+											onchange={handleChange}></lightning-combobox> -->
+										<c-custom-combobox label="Template Name" value={templateId}
+											options={templateOptions} data-id="template" allow-search="true"
 											onchange={handleChange}>
-										</lightning-combobox>
+										</c-custom-combobox>
 										<!-- <lightning-input-field field-name="Rhythm__Template__c" data-id="template" onchange={handleChange} name="template" value={templateId} required></lightning-input-field> -->
 									</lightning-layout-item>
 									<lightning-layout-item size="6" padding="around-small">

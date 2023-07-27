@@ -27,8 +27,12 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
     @track acceptedFormats = ['.pdf', '.png', '.pdf', '.csv', '.docx'];
     @api uploadingFile = false;
      @api showicon;
-      @api timeline;
+    @api timeline;
+    @track conditionaldisplay= false;
     connectedCallback() {
+        if(typeof this.conditionaval!=='undefined'){
+            this.conditionaldisplay = true;
+        }
         console.log('isSupplier',this.issupplier);
         console.log('Responses',this.responses);
         this.chatterMap.openChat = false;
@@ -195,10 +199,10 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
                     }
                     if (res.isCheckbox === true) {
                         if (event.target.checked) {
-                            changedvalue = 'true';
+                            changedvalue = true;
                         }
                         else {
-                            changedvalue = 'false';
+                            changedvalue = false;
                         }
                     }
                 }

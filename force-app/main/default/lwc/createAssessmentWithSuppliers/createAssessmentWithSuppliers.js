@@ -47,7 +47,7 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
         this.templateOptions = [];
         typeof result != 'undefined' && result.forEach(template => {
             this.templateId = (typeof this.templateId != 'undefined' && template.Id.includes(this.templateId))?template.Id:this.templateId;
-            this.templateOptions.push({ label: template.Name, value: template.Id });
+            this.templateOptions.push({ label: template.Name, value: template.Id, icon: 'custom:custom13' });
         });
     }
 
@@ -62,7 +62,8 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
     }
 
     handleChange(event){
-        this.templateId = event.target.value;
+        console.log(event.detail.value);
+        this.templateId = event.detail.value;
         this.fetchTemplateData();
     }
 
