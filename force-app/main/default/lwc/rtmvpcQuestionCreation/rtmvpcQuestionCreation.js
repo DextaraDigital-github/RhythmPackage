@@ -277,10 +277,10 @@ export default class RtmvpcQuestionCreation extends LightningElement {
                                 })
                             }
                             if (isSubmit) {
-                                this.totastmessage = 'Updated Questions and Response Attributes Successfully';
+                                this.totastmessage = 'Updated Successfully';
                             }
                             else {
-                                this.totastmessage = 'Created Questions and Response Attributes Successfully';
+                                this.totastmessage = 'Created Successfully';
                             }
                             this.loading = false;
                             this.createQues = false;
@@ -302,10 +302,10 @@ export default class RtmvpcQuestionCreation extends LightningElement {
                     }
                     else {
                         if(Array.from(set1).length!==this.responseAttributes.length){
-                            this.configureToast('Some Error has occured', 'Response Attributes should not have same values, Please enter different Values', 'error');
+                            this.configureToast('Some Error has occured', 'Enter unique response values', 'error');
                         }
                         else{
-                            this.configureToast('Some Error has occured', 'Please fill mandatory fields : Preferred/Not Preferred and Upload Required ', 'error');
+                            this.configureToast('Some Error has occured', 'Preferred/Not Preferred and Upload Required fields are mandatory', 'error');
                         }
                         
                     }
@@ -318,7 +318,7 @@ export default class RtmvpcQuestionCreation extends LightningElement {
                         if (isSubmit) {
                             createQuestions({ questions: this.questionlst, isUpdate: isSubmit }).then(result => {
                                 console.log('result', result[0].Id);
-                                this.totastmessage = 'Question has been Updated Successfully.';
+                                this.totastmessage = 'Updated Successfully';
                                 this.createQues = false;
                                 this.loading = false;
                                 this.childQuesCreation = false;
@@ -329,7 +329,7 @@ export default class RtmvpcQuestionCreation extends LightningElement {
                             });
                         }
                         else {
-                            this.totastmessage = 'Please give Response Attributes';
+                            this.totastmessage = 'Selected Response Type needs at least one Response Value to create a Question';
                             this.success = false;
                             this.showToast = true;
                         }
@@ -338,7 +338,7 @@ export default class RtmvpcQuestionCreation extends LightningElement {
                         // this.totastmessage = 'mandatory fields Preferred/Not Preferred and Upload Required fields';
                         // this.success = false;
                         // this.showToast = true;
-                        this.configureToast('Some Error has occured', 'Please fill mandatory fields : Preferred/Not Preferred and Upload Required ', 'error');
+                        this.configureToast('Some Error has occured', 'Preferred/Not Preferred and Upload Required fields are mandatory', 'error');
                     }
                 }
             }
@@ -364,10 +364,10 @@ export default class RtmvpcQuestionCreation extends LightningElement {
                                 createQuestions({ questions: this.questionlst, isUpdate: isSubmit }).then(result => {
                                     console.log('createQuestions', result[0].Id);
                                     if (isSubmit) {
-                                        this.totastmessage = 'Question has been Updated Successfully.';
+                                        this.totastmessage = 'Updated Successfully.';
                                     }
                                     else {
-                                        this.totastmessage = 'Question has been created Successfully.';
+                                        this.totastmessage = 'Created Successfully.';
                                     }
                                     deleteQuesRespAttribute({ questionId: this.questionWrapper.Id }).then(delresult => {
                                         console.log('result', delresult);
@@ -403,10 +403,10 @@ export default class RtmvpcQuestionCreation extends LightningElement {
                         createQuestions({ questions: this.questionlst, isUpdate: isSubmit }).then(result => {
                             console.log('createQuestions', result[0].Id);
                             if (isSubmit) {
-                                this.totastmessage = 'Question has been Updated Successfully.';
+                                this.totastmessage = 'Updated Successfully.';
                             }
                             else {
-                                this.totastmessage = 'Question has been created Successfully.';
+                                this.totastmessage = 'Created Successfully.';
                             }
                             this.createQues = false;
                             this.childQuesCreation = false;
@@ -438,7 +438,7 @@ export default class RtmvpcQuestionCreation extends LightningElement {
                     respQueslst.push(responsemap);
                     createResponseQuestionMap({ responseQuestionmap: respQueslst }).then(result => {
                         console.log('createResponseQuestionMap', result);
-                        this.totastmessage = 'Child Question has been created Successfully.';
+                        this.totastmessage = 'Conditional Question has been created Successfully.';
                         this.createQues = false;
                         this.childQuesCreation = false;
                         const selectedEvent = new CustomEvent('handleaftersave', {

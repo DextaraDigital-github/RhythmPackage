@@ -3,7 +3,7 @@ import getResponseAttributes from '@salesforce/apex/QuestionAttributeResponseSel
 import deleteResponseAttribute from '@salesforce/apex/QuestionAttributeResponseService.deleteResponseAttribute';
 import errorLogRecord from '@salesforce/apex/AssessmentController.errorLogRecord';
 export default class RtmvpcCreateResponseAttributes extends LightningElement {
-    @track tableheaders = ['Response Value', 'Preferred/ Non-preferred', 'Upload Required', 'Score', 'Weight'];
+    @track tableheaders = ['Response Value', 'Preferred/ Non-Preferred', 'Upload Required', 'Score', 'Weight'];
     @track showtable = true;
     @track preferredOptions = [{ 'label': 'Preferred', 'value': 'Preferred' }, { 'label': 'Non Preferred', 'value': 'Non Preferred' }];
     @track reqFileOptions = [{ 'label': 'Yes', 'value': 'Yes' }, { 'label': 'No', 'value': 'No' }, { 'label': 'Optional', 'value': 'Optional' }];
