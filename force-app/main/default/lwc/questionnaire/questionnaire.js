@@ -236,7 +236,6 @@ export default class Questionnaire extends LightningElement {
             this.isTemplate = false;
             this.handleOnload();
         } catch (e) {
-            console.log('CatchError----->', e);
         }
     }
     renderedCallback() {
@@ -324,11 +323,9 @@ export default class Questionnaire extends LightningElement {
             this.isTemplate = true;
         } else {
             this.assessment = this.accountassessmentid;
-            console.log('SUPACCASSID----->', this.accountassessmentid);
             getAccountAssessmentRecordData({ assrecordId: this.accountassessmentid }).then(result => {
                 if (typeof result[0].Rhythm__Assessment__r !== 'undefined' && typeof result[0].Rhythm__Assessment__r.Rhythm__Template__c !== 'undefined') {
                     this.documentParentId = result[0].Rhythm__Assessment__r.Rhythm__Template__c;
-                    console.log('documentParentId----->', this.documentParentId);
                 }
             }).catch(error => {
                 let errormap = {};
@@ -349,23 +346,18 @@ export default class Questionnaire extends LightningElement {
             ]).then(() => {
                 this.configAWS();
             })
-                .catch(error => {
-                    let errormap = {};
-                    errormap.componentName = 'Questionnaire';
-                    errormap.methodName = 'configAWS';
-                    errormap.className = 'AssessmentController';
-                    errormap.errorData = error.message;
-                    errorLogRecord({ errorLogWrapper: JSON.stringify(errormap) }).then(() => { });
-                });
+            .catch(error => {
+                let errormap = {};
+                errormap.componentName = 'Questionnaire';
+                errormap.methodName = 'configAWS';
+                errormap.className = 'AssessmentController';
+                errormap.errorData = error.message;
+                errorLogRecord({ errorLogWrapper: JSON.stringify(errormap) }).then(() => { });
+            });
         }
-        console.log('assessment', this.assessment);
         getActionRecords({ accountAssessment: this.assessment }).then((result) => {
             this.actionData = result;
-
-
         });
-        console.log()
-
 
         this.questionMap = new Map();
         this.questionsList = [];
@@ -2346,5 +2338,19 @@ export default class Questionnaire extends LightningElement {
     }
     ccloseModal(){
         isCustomerModalPopup = false;
+    }
+    handleDownload(event) {
+        if(this.isTemplate == false){
+            getSignedURL({
+                location: event.target.title,
+                file: event.currentTarget.dataset.id,
+                expires: 30
+            })
+            .then(result => {
+                if (result) {
+                    window.open(result);
+                }
+            });
+        }
     }
 }
