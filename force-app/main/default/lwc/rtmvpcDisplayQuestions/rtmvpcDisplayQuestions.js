@@ -115,6 +115,7 @@ export default class RtmvpcDisplayQuestions extends LightningElement {
                 parent.forEach(parentdata => {
                     let childlst = [];
                     let snumber =0;
+                    let qnumber = (parentdata.Name).split('-');
                     children.forEach(child => {
                         if (parentdata.Id === child.Rhythm__Parent_Question__c) {
                             snumber++;
@@ -124,7 +125,7 @@ export default class RtmvpcDisplayQuestions extends LightningElement {
                             child['isMetCriteria'] = false;
                             child['priorityicon'] = '';
                             child['isiconavailable'] = true;
-                            let qnumber = (parentdata.Name).split('-');
+                            
                             if(snumber<10){
                                 child.Name = qnumber[1] + '.0'+snumber;
                             }
@@ -142,6 +143,7 @@ export default class RtmvpcDisplayQuestions extends LightningElement {
                         }
                         if (childlst.length > 0) {
                             console.log('childlst', childlst);
+                            parentdata.Name = qnumber[1];
                             parentdata['_children'] = childlst;
                         }
 
