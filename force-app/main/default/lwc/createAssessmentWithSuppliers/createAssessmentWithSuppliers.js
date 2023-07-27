@@ -3,6 +3,7 @@ import { NavigationMixin } from 'lightning/navigation';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import addSuppliers from '@salesforce/apex/AssessmentController.sendAssessment';
 import getTemplateData from '@salesforce/apex/AssessmentController.getTemplateData';
+import fetchAssessmentTemplates from '@salesforce/apex/AssessmentController.fetchAssessmentTemplates';
 import getTodayDate from '@salesforce/apex/AssessmentController.getTodayDate';
 import errorLogRecord from '@salesforce/apex/AssessmentController.errorLogRecord';
 import TIME_ZONE from '@salesforce/i18n/timeZone';
@@ -26,10 +27,38 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
     locale = LOCALE_DATA;
     todayDate;
     templateStatus ='';
+    @track templateOptions = [];
 
     connectedCallback() {
         this.getTodayDate();
         this.fetchTemplateData();
+        this.fetchAssessmentTempData();
+    }
+    /* Fetches list of Assessment Templates from Apex */
+    fetchAssessmentTempData() {
+        fetchAssessmentTemplates({}).then(result => {
+            this.formatAssessmentTempData(result);
+        }).catch(error => {
+            this.configureToast('Error loading Templates', 'Please contact your Administrator.', 'error');
+        });
+    }
+    /* Formats the Assessment Template data fetched from Apex into required format so as to display as options in the combobox */
+    formatAssessmentTempData(result) {
+        this.templateOptions = [];
+        typeof result != 'undefined' && result.forEach(template => {
+            this.templateId = (typeof this.templateId != 'undefined' && template.Id.includes(this.templateId))?template.Id:this.templateId;
+            this.templateOptions.push({ label: template.Name, value: template.Id });
+        });
+    }
+
+    /* Displays toast message */
+    configureToast(_title, _message, _variant) {
+        const toast = new ShowToastEvent({
+            title: _title,
+            message: _message,
+            variant: _variant
+        });
+        this.dispatchEvent(toast);
     }
 
     handleChange(event){
@@ -93,6 +122,7 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
             let validatedData = this.validateData();
             if(validatedData.isSave){
                 let fields = event.detail.fields;
+                fields.Rhythm__Template__c = this.templateId;
                 fields = Object.assign( { 'sobjectType': 'Rhythm__Assessment__c'}, fields );
                 this.assessmentRecord = fields;
                 this.showNewAssessment = false;

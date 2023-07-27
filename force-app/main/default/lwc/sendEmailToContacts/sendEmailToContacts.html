@@ -11,16 +11,19 @@
 							<h1 id="modal-heading-01" class="slds-modal__title slds-hyphenate">{currentPage.label}</h1>
 						</center>
 					</div>
+					<!-- Renders only in Read-only mode and displays buttons to navigate through pages -->
 					<template if:true={email.limitProp}>
 						<div
 							class="slds-col slds-large-size_1-of-3 slds-medium-size_1-of-3 slds-size_1-of-1">
 							<lightning-button-group class="slds-float_right">
+								<!-- Navigation to previous/suppliers screen -->
 								<template lwc:if={currentPage.buttons.prevButton.show}>
 									<lightning-button label={currentPage.buttons.prevButton.label} variant="brand"
 										data-pageno={currentPage.pageNo} onclick={prevSendEmailHandler}
 										disabled={show.disableBtns}>
 									</lightning-button>
 								</template>
+								<!-- Navigation to next/email screen -->
 								<template lwc:if={currentPage.buttons.nextButton.show}>
 									<lightning-button label={currentPage.buttons.nextButton.label} variant="brand"
 										data-pageno={currentPage.pageNo} onclick={nextSendEmailHandler}
@@ -42,8 +45,10 @@
 					<lightning-spinner size="medium"></lightning-spinner>
 				</template>
 				<div class="sem-fh">
+					<!-- Displays a list of suppliers -->
 					<template lwc:if={pageProp.pageInfo.chooseAccounts.show}>
 						<div class="slds-grid slds-grid_vertical">
+							<!-- Functionality to search among suppliers -->
 							<div
 								class="sem-pp-menu slds-col slds-p-left_large slds-p-right_large slds-p-top_medium slds-p-bottom_small">
 								<lightning-input type="search" variant="label-hidden" placeholder="Search Suppliers"
@@ -54,6 +59,7 @@
 									Supplier(s) found
 								</div>
 							</div>
+							<!-- Displays the list of suppliers -->
 							<div class="slds-col slds-scrollable">
 								<lightning-datatable min-column-width="200" key-field="Id" data={accountsData}
 									columns={columnsList} onrowselection={rowSelectionHandler}
@@ -64,8 +70,10 @@
 							</div>
 						</div>
 					</template>
+					<!-- Displays fields to compaose an email -->
 					<template lwc:elseif={pageProp.pageInfo.composeEmail.show}>
 						<div class="sem-fh slds-grid slds-grid_vertical">
+							<!-- Displays number of suppliers selected and contains navigation to previous/suppliers screen -->
 							<div
 								class="sem-pp-menu slds-col slds-p-left_large slds-p-right_large slds-p-top_medium slds-p-bottom_small">
 								<!-- <lightning-combobox label="Email Template" value={email.templateId}
@@ -74,6 +82,7 @@
 								</lightning-combobox> -->
 								<button class="slds-button slds-button_neutral slds-size_1-of-1" data-pageno={currentPage.pageNo} onclick={prevSendEmailHandler}>Suppliers Selected ({email.selectedAccountsCount})</button>
 							</div>
+							<!-- Contains information related to Email -->
 							<div
 								class="sem-fh slds-col slds-p-left_large slds-p-right_large slds-p-top_medium slds-p-bottom_medium slds-scrollable">
 								<template if:true={email.limitProp}>
@@ -94,6 +103,8 @@
 										</lightning-layout-item>
 									</lightning-layout>
 								</template>
+
+								<!-- Subject Information -->
 								<div class="slds-m-bottom_small slds-col slds-grid slds-wrap slds-size_1-of-1">
 									<span class="slds-col slds-size_1-of-1 slds-large-size_2-of-12 slds-form-element__label">Subject</span>
 									<input class="xyz slds-col slds-size_1-of-1 slds-large-size_10-of-12" style="border:0px solid black; border-bottom: 1px solid #c9c9c9;" value={email.subject} onchange={emSubjectChangeHandler} readonly={email.limitProp} />
@@ -101,6 +112,8 @@
 										value={email.subject} onchange={emSubjectChangeHandler}
 										read-only={email.limitProp}></lightning-input> -->
 								</div>
+
+								<!-- Message Information -->
 								<div class="slds-m-bottom_small slds-col">
 									<div class="slds-form-element__label">Message</div>
 									<template if:true={email.isBuilderContent}>
@@ -116,6 +129,8 @@
 										</lightning-input-rich-text>
 									</template>
 								</div>
+								
+								<!-- Attachments Information -->
 								<div class="slds-col">
 									<template if:false={email.limitProp}>
 										<lightning-file-upload name="uploadAttachment" label="Attachments"
@@ -135,6 +150,8 @@
 					</template>
 				</div>
 			</div>
+
+			<!-- Modal Footer for navigation between pages -->
 			<template if:false={email.limitProp}>
 				<div class="slds-modal__footer">
 					<template lwc:if={currentPage.buttons.prevButton.show}>

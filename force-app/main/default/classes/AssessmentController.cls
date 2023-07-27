@@ -1,6 +1,6 @@
 /** 
 * Class Name        : AssessmentController
-* Developer         : Sai Koushik Nimmaturi and Reethika Velpula           
+* Developer         : Sai Koushik Nimmaturi, Reethika Velpula, Sri Kushal Reddy N          
 * Created Date      : 
 * @description       : AssessmentController class is used for SOQl on Question__c,Section__c,Assessment_Template__c and DML operations on the objects Assessment__c,Response__c.
 * Last Modified Date: 
@@ -331,6 +331,8 @@ public with sharing class AssessmentController {
             String errorMsg = e.getMessage();
             throw new AuraHandledException(errorMsg);
         }
+        
+        //return null;
     }
      @AuraEnabled
     public static void updateRejectFlag(List<SObject> updateRejectFlagList){
@@ -1143,6 +1145,15 @@ public with sharing class AssessmentController {
             string errorMsg = e.getMessage();
             throw new AuraHandledException(ErrorMsg);
         }
+    }
+        
+    /**
+    * @description Fetches the Assessment_Template__c records based on search string and other parameters
+    * @return List of Assessment_Template__c records
+    */
+    @AuraEnabled
+    public static List<sObject> fetchAssessmentTemplates() {
+        return AssessmentService.fetchAssessmentTemplates();
     }
     
     /**

@@ -1,4 +1,5 @@
 import { LightningElement, api, track } from 'lwc';
+import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { loadStyle } from 'lightning/platformResourceLoader';
 import fetchEmailMessages from '@salesforce/apex/EmailController.fetchEmailMessages';
 import ComponentStylesheet from '@salesforce/resourceUrl/ComponentStyleSheet';
@@ -28,12 +29,11 @@ export default class RtmvpcRelatedEmails extends LightningElement {
     fetchEmailMsgsData() {
         let _parameterMap = JSON.stringify({ assessmentId: this.recordId });
         fetchEmailMessages({ parameterMap: _parameterMap }).then(result => {
-            console.log('fetchEmailMessages data : ', result);
             this.emailsDataMap = this.formatEmailMsgsMap(result);
             this.emailsData = this.formatEmailMsgsData(this.emailsDataMap);
             this.assignPageProp();
         }).catch(error => {
-            console.log('fetchEmailMessages error : ', JSON.stringify(error));
+            this.configureToast('Error loading Accounts', 'Please contact your Administrator.', 'error');
         });
     }
     /* Prepares a Map of EmailMessages */
@@ -86,6 +86,16 @@ export default class RtmvpcRelatedEmails extends LightningElement {
         this.pageProp.pageInfo = {};
         this.pageProp.pageInfo.chooseAccounts = { label: this.pageProp.pageNames[0].label, name: this.pageProp.pageNames[0].name, show: false, pageNo: 0, buttons: { prevButton: { label: "Previous", show: false }, nextButton: { label: "View Email", show: true }, saveButton: false } };
         this.pageProp.pageInfo.composeEmail = { label: this.pageProp.pageNames[1].label, name: this.pageProp.pageNames[1].name, show: false, pageNo: 1, buttons: { prevButton: { label: "View Suppliers", show: true }, nextButton: { label: "Previous", show: false }, saveButton: false } };
+    }
+
+    /* Displays toast message */
+    configureToast(_title, _message, _variant) {
+        const toast = new ShowToastEvent({
+            title: _title,
+            message: _message,
+            variant: _variant
+        });
+        this.dispatchEvent(toast);
     }
 
     /* Handles row actions performed on datatable */

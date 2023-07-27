@@ -87,11 +87,9 @@ export default class SendEmailToContacts extends NavigationMixin(LightningElemen
             this.show.searchCount = this.accountsData.length;
             this.show.spinner = false;
             this.show.accSearchLoading = false;
-            console.log('fetchAccounts Data : ', this.accountsData);
         }).catch(error => {
             this.configureToast('Error loading Accounts', 'Please contact your Administrator.', 'error');
-            console.log('fetchAccounts Error : ', JSON.stringify(error));
-        })
+        });
     }
     /* Formats the Account data fetched from Apex into required format so as to display as options in the combobox */
     formatAccountsData(result) {
@@ -108,11 +106,8 @@ export default class SendEmailToContacts extends NavigationMixin(LightningElemen
             this.emailTemplatesData = JSON.parse(JSON.stringify(result));
             this.emailTemplatesData.push({ 'Id': 'null', 'Name': '--None--', Subject: this.assessmentName, Body: '' });
             this.emailTemplatesOpt = this.formatEmailTempsData(this.emailTemplatesData);
-            console.log('fetchEmailtemplates Data : ', this.emailTemplatesData);
-
         }).catch(error => {
             this.configureToast('Error loading Email Templates', 'Please contact your Administrator.', 'error');
-            console.log('fetchEmailtemplates Error : ', JSON.stringify(error));
         })
     }
     /* Formats the Email Template data fetched from Apex into required format so as to display as options in the combobox */
@@ -129,15 +124,14 @@ export default class SendEmailToContacts extends NavigationMixin(LightningElemen
         let _this = this;
         const messageCallback = function (response) {
             if (response.data.payload.Rhythm__Source__c === 'SendEmailBatch status') {
-                console.log('subscribeToPlatformEvent response : ', response);
                 let status = JSON.parse(response.data.payload.Rhythm__Data__c);
-                if (status.success === _this.email.selectedAccounts.length || status.error === 0) {
+                if (status.success === _this.email.selectedAccountsCount) {
                     _this.configureToast('Success', 'Successfully sent emails to ' + status.success + ' Suppliers.', 'success');
                     _this.show.spinner = false;
                     _this.closeSendEmailHandler();
                 }
-                else if (status.success > 0 && status.error > 0) {
-                    _this.configureToast('Couldn\'t send email to all Suppliers', 'Succesfully sent to ' + status.success + ' Suppliers and couldn\'t send to ' + status.error + ' Suppliers.', 'info');
+                else if (status.success > 0 && (this.selectedAccountsCount-status.success) > 0) {
+                    _this.configureToast('Couldn\'t send email to all Suppliers', 'Succesfully sent to ' + status.success + ' Suppliers and couldn\'t send to ' + (this.selectedAccountsCount-status.success) + ' Suppliers.', 'info');
                     _this.show.spinner = false;
                     _this.closeSendEmailHandler();
                 }
@@ -158,7 +152,6 @@ export default class SendEmailToContacts extends NavigationMixin(LightningElemen
 
     /* Displays toast message */
     configureToast(_title, _message, _variant) {
-        console.log('configureToast');
         const toast = new ShowToastEvent({
             title: _title,
             message: _message,
@@ -192,7 +185,6 @@ export default class SendEmailToContacts extends NavigationMixin(LightningElemen
             }
             this.email.selectedAccounts = selectedAccounts;
             this.email.selectedAccountsCount = this.email.selectedAccounts.length;
-            console.log('rowSelectionHandler this.email.selectedAccounts : ', selectedAccounts);
         }
     }
     /* Used to sort Data in datatable -- START*/
@@ -247,9 +239,8 @@ export default class SendEmailToContacts extends NavigationMixin(LightningElemen
         });
         eval("$A.get('e.force:refreshView').fire();");
     }
-    closeModalHandler()
-    {
-        const closemodal = new CustomEvent('closemodal',{});
+    closeModalHandler() {
+        const closemodal = new CustomEvent('closemodal', {});
         this.dispatchEvent(closemodal);
     }
     /* Calls an Apex method to send an email to the Accounts selected */
@@ -262,11 +253,9 @@ export default class SendEmailToContacts extends NavigationMixin(LightningElemen
                 this.email.attachmentsData.contentDocuments = [...this.email.attachmentsData.customContentDocuments, ...this.email.attachmentsData.standardContentDocuments];   //If any standard attachment is removed, we make customAttachments to true and merge both the available standard and custom attachments as the template id wi;; be removed and custom subject and body will be used while sending email
             }
             sendEmail({ parameterMap: JSON.stringify(this.email) }).then(result => {
-                console.log('sendEmail Data : ', result);
             }).catch(error => {
                 this.commonErrorMessage();
                 this.show.disableBtns = false;
-                console.log('sendEmail Error : ', JSON.stringify(error));
             });
         }
         else {
@@ -320,7 +309,6 @@ export default class SendEmailToContacts extends NavigationMixin(LightningElemen
                 break;
             }
         }
-        console.log('emTempChangeHandler this.email : ', this.email);
     }
     /* Prepares attachments JSON to display the attachments as pill conatiners on UI */
     emAddAttachments(attachments) {
