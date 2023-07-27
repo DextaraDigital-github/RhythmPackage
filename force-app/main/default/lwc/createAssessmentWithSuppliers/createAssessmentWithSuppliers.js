@@ -155,6 +155,10 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
             validatedDetails.isSave = false;
             validatedDetails.message = 'End Date of an Assessment Program cannot be before the Start Date'
         }
+        if(typeof this.templateId === 'undefined' || this.templateId === null || (typeof this.templateId != 'undefined' && this.templateId != null && this.templateId.trim().length === 0)) {
+            validatedDetails.isSave = false;
+            validatedDetails.message = 'Template Name cannot be empty';
+        }
         return validatedDetails;
     }
 

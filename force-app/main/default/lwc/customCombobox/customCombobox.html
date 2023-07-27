@@ -1,7 +1,12 @@
 <template>
 	<div class="slds-form-element">
 		<template lwc:if={show.label}>
-			<label class="slds-form-element__label">{label}</label>
+			<label class="slds-form-element__label">
+                <template lwc:if={required}>
+                    <abbr class="slds-required" title="required">* </abbr>
+                </template>
+                {label}
+            </label>
 		</template>
 		<div class="slds-form-element__control">
 			<div class="slds-combobox_container">
@@ -57,7 +62,7 @@
                                                 </span>
 											</template>
 											<template lwc:if={option.label}>
-												<span class="slds-media__body">
+												<span class="slds-p-top_x-small slds-media__body">
                                                     <span class="slds-listbox__option-text slds-listbox__option-text_entity">{option.label}</span>
 												</span>
 											</template>

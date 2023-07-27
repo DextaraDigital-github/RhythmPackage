@@ -3,6 +3,7 @@ import selectedActionRecord from '@salesforce/apex/CAPAController.selectedAction
 import saveActionResponse from '@salesforce/apex/CAPAController.saveActionResponse';
 import greenFlag from '@salesforce/resourceUrl/greenFlag';
 import redFlag from '@salesforce/resourceUrl/redFlag';
+import notifyUsers from '@salesforce/apex/CAPAController.notifyUsers';
 
 export default class ActionDetailForm extends LightningElement {
 
@@ -43,11 +44,19 @@ export default class ActionDetailForm extends LightningElement {
     }
     handleCloseButton(){
       saveActionResponse({ actionResponse: this.showresponse ,isUpdate:true}).then(() => {
+        console.log('kkkkk',this.showresponse);
         this.showPopup=false;
         this.showToast = true;
         this.success=true;
         this.totastmessage = 'Action form Submitted successfully';
         if(this.actionFormData[0].Rhythm__Status__c === 'Closed'){
+          let userlist = [];
+              userlist.push(this.showresponse[0].Rhythm__Ownership__c);
+              notifyUsers({ actionData: (this.showresponse[0]), body: 'Action Item has been marked as closed', userList: userlist }).then(() => {
+
+            }).catch(error => {
+              console.log('ggfgf', error);
+            })
             this.isSave=false;
         }
 
