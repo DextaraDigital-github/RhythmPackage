@@ -2,10 +2,10 @@
 <template>
 	<template if:true={responses}>
 		<template if:true={isPreviewComponent}>
-		<template if:true={conditionaval}>
-			<p>↳[{conditionaval}]: </p>
+			<template if:true={conditionaval}>
+				<p>↳[{conditionaval}]: </p>
+			</template>
 		</template>
-	</template>
 		<template for:each={responses} for:item="questionary">
 			<div key={questionary.Id} class="temp_question_border-bottom">
 				<div class="qactivelabelcont" data-id={questionary.Id} onclick={handleQuestionHighlight}>
@@ -86,8 +86,7 @@
 											options={questionary.optionsWrapper.multiPickListOptions} size="4"
 											disabled={questionary.isEditable} onchange={handleChange}
 											value={questionary.optionsWrapper.selectedListOptions}
-											disable-reordering="true"
-											onclick={openChatHandler}>
+											disable-reordering="true" onclick={openChatHandler}>
 										</lightning-dual-listbox>
 									</template>
 									<template if:true={questionary.isDate}>
@@ -173,29 +172,31 @@
 									<!-- Flag Starts here -->
 									<template if:true={issupplier}>
 										<template if:true={questionary.customerFlag}>
-										<template if:true={questionary.Rhythm__Flag__c}>
-											<lightning-icon data-id={questionary.Id} icon-name="utility:priority"
-												size="x-small" class="cib-flag slds-m-right_medium"
-												onclick={openChatHandler}>
-											</lightning-icon>
-										</template></template>
+											<template if:true={questionary.Rhythm__Flag__c}>
+												<lightning-icon data-id={questionary.Id} icon-name="utility:priority"
+													size="x-small" class="cib-flag slds-m-right_medium"
+													onclick={openChatHandler}>
+												</lightning-icon>
+											</template></template>
 									</template>
 									<template if:false={issupplier}>
-									<template if:true={questionary.customerFlag}>
-										<template if:true={questionary.Rhythm__Flag__c}>
-											<lightning-icon data-id={questionary.Id} icon-name="utility:priority"
-												size="x-small" class="cib-flag slds-m-right_medium" onclick={openReview}>
-											</lightning-icon>
-										</template>
-										<template if:false={questionary.Rhythm__Flag__c}>
-											<template if:false={questionary.reviewForm}>
-											<lightning-icon data-id={questionary.Id} icon-name="utility:priority"
-												size="x-small" class="cib-forward:hover slds-m-right_medium"
-												onclick={openReview}>
-											</lightning-icon>
+										<template if:true={questionary.customerFlag}>
+											<template if:true={questionary.Rhythm__Flag__c}>
+												<lightning-icon data-id={questionary.Id} icon-name="utility:priority"
+													size="x-small" class="cib-flag slds-m-right_medium"
+													onclick={openReview}>
+												</lightning-icon>
+											</template>
+											<template if:false={questionary.Rhythm__Flag__c}>
+												<template if:false={questionary.reviewForm}>
+													<lightning-icon data-id={questionary.Id}
+														icon-name="utility:priority" size="x-small"
+														class="cib-forward:hover slds-m-right_medium"
+														onclick={openReview}>
+													</lightning-icon>
+												</template>
 											</template>
 										</template>
-									</template>
 									</template>
 									<!-- Flag Ends here -->
 								</div>
@@ -203,66 +204,78 @@
 						</div>
 					</div>
 				</div>
-				<div class="slds-col slds-size_11-of-12 slds-text-align_right slds-m-top_x-small">
-
-					<template if:true={issupplier}>
-						<template if:true={questionary.customerFlag}>
-										<template if:true={questionary.rejectButton}>
-											<lightning-button variant="brand" label="Rejected" title="titleName"
-							 data-id={questionary.Id} class="slds-p-left_medium button ">
-							 </lightning-button>
-										</template></template>
-					</template>
-
-                     <template if:false={issupplier}>
-					<template if:true={questionary.customerFlag}>
-					<template if:false={questionary.rejectButton}>
-						<template if:false={questionary.needData}>
-							<lightning-button variant="brand" label="Reject" title="titleName" onclick={handleReject}
-							 data-id={questionary.Id} class="slds-p-left_medium button" disabled={questionary.disableReject}></lightning-button>  
+				<div
+					class="slds-col slds-grid slds-grid_vertical-align-center slds-size_10-of-12 slds-text-align_right slds-p-top_x-small slds-p-horizontal_small slds-p-bottom_small">
+					<div class="slds-col">
+						<template if:true={issupplier}>
+							<template if:true={questionary.customerFlag}>
+								<template if:true={questionary.rejectButton}>
+									<lightning-button variant="brand" label="Rejected" data-id={questionary.Id}
+										class="slds-p-left_medium  rqt-redbtn" icon-name="utility:close">
+									</lightning-button>
+								</template></template>
 						</template>
-						<template if:true={questionary.needData}>
-							<lightning-button variant="brand" label="Approved" title="titleName" onclick={handleReject}
-							 data-id={questionary.Id} class="slds-p-left_medium button" disabled={questionary.disableReject}></lightning-button>  
-						</template>							
-					</template>
-					<template if:true={questionary.rejectButton}>
-							<lightning-button variant="brand" label="Rejected" title="titleName" onclick={handleReject}
-							 data-id={questionary.Id} class="slds-p-left_medium button" 
-							 disabled={questionary.disableReject}>
-							 </lightning-button>  							
-					</template>
-					</template>
-                     </template>
-
-					<template if:true={issupplier}>
-						<template if:true={questionary.capaAction}>
-						<template if:true={questionary.saveActionForm}>
-							<lightning-icon data-id={questionary.Id} icon-name="utility:record_alt" size="x-small"
-								onclick={openActionForm}>
-							</lightning-icon>
-						</template></template>
-					</template>
-                     <template if:false={issupplier}>
-					<template if:true={questionary.capaAction}>
-						<template if:false={questionary.saveActionForm}>
-							<template if:false={questionary.reviewForm}>
-							<lightning-icon data-id={questionary.Id} icon-name="utility:record_alt" size="x-small"
-							onclick={openActionForm}>
-						</lightning-icon>							
-						</template>						
+						<template if:false={issupplier}>
+							<template if:true={questionary.customerFlag}>
+								<template if:false={questionary.rejectButton}>
+									<template if:false={questionary.needData}>
+										<lightning-button variant="destructive" label="Reject"
+											onclick={handleReject} data-id={questionary.Id}
+											class="slds-p-left_medium rqt-redbtn" disabled={questionary.disableReject}>
+										</lightning-button>
+									</template>
+									<template if:true={questionary.needData}>
+										<lightning-button variant="success" label="Approved" onclick={handleReject}
+											data-id={questionary.Id} class="slds-p-left_medium rqt-greenbtn"
+											disabled={questionary.disableReject} icon-name="utility:check"></lightning-button>
+									</template>
+								</template>
+								<template if:true={questionary.rejectButton}>
+									<lightning-button variant="destructive" label="Rejected" onclick={handleReject}
+										data-id={questionary.Id} class="slds-p-left_medium rqt-redbtn" icon-name="utility:close"
+										disabled={questionary.disableReject}>
+									</lightning-button>
+								</template>
+							</template>
 						</template>
-						<template if:true={questionary.saveActionForm}>							
-							<lightning-icon data-id={questionary.Id} icon-name="utility:record_alt" size="x-small"
-							onclick={openActionForm}>
-						</lightning-icon>					
-						<lightning-button-icon icon-name="utility:close" variant="bare" data-id={questionary.Id}
-								onclick={deleteForm} alternative-text="Delete file" class="closericon">
-							</lightning-button-icon>
+					</div>
+					<div class="slds-col slds-size_1-of-12 slds-float_left">
+						<template if:true={issupplier}>
+							<template if:true={questionary.capaAction}>
+								<template if:true={questionary.saveActionForm}>
+									<lightning-button data-id={questionary.Id} icon-name="utility:edit_form" label="CAPA"  alternative-text="CAPA"
+										 title="CAPA" class="slds-m-left_small" onclick={openActionForm} variant="brand"></lightning-button>
+									<!-- <lightning-icon data-id={questionary.Id} icon-name="utility:record_alt"
+										size="x-small" onclick={openActionForm}>
+									</lightning-icon> -->
+								</template></template>
 						</template>
-					</template>
+						<template if:false={issupplier}>
+							<template if:true={questionary.capaAction}>
+								<template if:false={questionary.saveActionForm}>
+									<template if:false={questionary.reviewForm}>
+										<!-- <lightning-icon data-id={questionary.Id} icon-name="utility:record_alt"
+											size="x-small" onclick={openActionForm}>
+										</lightning-icon> -->
+										<lightning-button data-id={questionary.Id} icon-name="utility:edit_form" label="CAPA"  alternative-text="CAPA"
+										 title="CAPA" class="slds-m-left_small" onclick={openActionForm}></lightning-button>
+									</template>
+								</template>
+								<template if:true={questionary.saveActionForm}>
+									<lightning-button data-id={questionary.Id} icon-name="utility:edit_form" label="CAPA"  alternative-text="CAPA"
+										 title="CAPA" class="slds-m-left_small" onclick={openActionForm} variant="brand"></lightning-button>
+									<!-- <lightning-icon data-id={questionary.Id} icon-name="utility:record_alt"
+										size="x-small" onclick={openActionForm}>
+									</lightning-icon> -->
+									<!-- <lightning-button-icon icon-name="utility:close" variant="bare" size="small" style="margin-top:2px;"
+										data-id={questionary.Id} onclick={deleteForm} alternative-text="Delete file"
+										class="closericon">
+									</lightning-button-icon> -->
+								</template>
+							</template>
 
-                     </template>
+						</template>
+					</div>
 				</div>
 
 				<!-- File upload -->
@@ -324,10 +337,11 @@
 													</span>
 												</label>
 											</div> -->
-											
+
 											<lightning-input type="file"
-												accept=".xlsx, .xls, .csv, .png, .doc, .docx, .pdf" label="Attachment : (Limit Size : 3.5mb)"
-												data-id={questionary.Id} onchange={uploadFilesHandler} disabled={questionary.isEditable}>
+												accept=".xlsx, .xls, .csv, .png, .doc, .docx, .pdf"
+												label="Attachment : (Limit Size : 3.5mb)" data-id={questionary.Id}
+												onchange={uploadFilesHandler} disabled={questionary.isEditable}>
 											</lightning-input>
 										</div>
 
@@ -343,7 +357,8 @@
 												</div>
 											</template> -->
 											<template if:true={uploadingFile}>
-												<div class="slds-m-left_xx-small slds-m-right_small slds-m-vertical_small cad-tnailcard2">
+												<div
+													class="slds-m-left_xx-small slds-m-right_small slds-m-vertical_small cad-tnailcard2">
 													<div class="slds-grid slds-wrap">
 														<div class="slds-col slds-m-left_x-small slds-m-vertical_xx-small"
 															style="width:95px;" title="Click to Download">
@@ -449,11 +464,16 @@
 				<template if:true={questionary.Children}>
 					<template for:each={questionary.Children} for:item="childquestion">
 						<template if:true={childquestion.isdisplay}>
-							<div key={childquestion.isdisplay} class="temp_dashed-border-top"> <!--temp_dashed-border-top-->
-								<c-rtmvpc-render-question-template selectquestion={selectquestionHandler} onflagchange ={handlecustomerFlag} issupplier={issupplier}
-								onselectchange={handleConversationHistory}	responses={childquestion.questions} onactionchange ={handleActionChange} onremoveicon={handleRemove}
-								key={childquestion.isdisplay} conditionaval ={childquestion.optionValue} onremovequeshighlight={removehighlightHandler}
-								 onvaluechange={handlechildchange} onrejectchange={handleRejectButton} timeline={timeline} is-preview-component={isPreviewComponent}>
+							<div key={childquestion.isdisplay} class="temp_dashed-border-top">
+								<!--temp_dashed-border-top-->
+								<c-rtmvpc-render-question-template selectquestion={selectquestionHandler}
+									onflagchange={handlecustomerFlag} issupplier={issupplier}
+									onselectchange={handleConversationHistory} responses={childquestion.questions}
+									onactionchange={handleActionChange} 
+									key={childquestion.isdisplay} conditionaval={childquestion.optionValue}
+									onremovequeshighlight={removehighlightHandler} onvaluechange={handlechildchange}
+									onrejectchange={handleRejectButton} timeline={timeLine}
+									is-preview-component={isPreviewComponent}>
 								</c-rtmvpc-render-question-template>
 							</div>
 						</template>

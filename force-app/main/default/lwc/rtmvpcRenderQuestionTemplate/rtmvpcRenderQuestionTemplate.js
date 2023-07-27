@@ -48,20 +48,20 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
     }
     /* deleteForm is used to delete the CAPA form for a question by dispatching the questionId to its parent Component
        Questionnaire */
-    deleteForm(event){
-         let questionData=event.currentTarget.dataset.id;
-         const selectedAction = new CustomEvent('removeicon', {
-         detail: questionData
-    });
-    this.dispatchEvent(selectedAction);
-    }
-    handleRemove(event){
-         const selectedAction = new CustomEvent('removeicon', {
-         detail: event.detail
-    });
-    this.dispatchEvent(selectedAction);
+    // deleteForm(event){
+    //      let questionData=event.currentTarget.dataset.id;
+    //      const selectedAction = new CustomEvent('removeicon', {
+    //      detail: questionData
+    // });
+    // this.dispatchEvent(selectedAction);
+    // }
+    // handleRemove(event){
+    //      const selectedAction = new CustomEvent('removeicon', {
+    //      detail: event.detail
+    // });
+    // this.dispatchEvent(selectedAction);
 
-    }
+    // }
       /* handleReject is used to change the status of a question to reject,rejected or approved by onClick and dispatch the
        data to its parent component (Questionnaire) */
     handleReject(event){

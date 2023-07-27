@@ -47,7 +47,7 @@ public class CAPASelector {
             			+ ' AND AccountAssessment__c=\'' + String.escapeSingleQuotes(accountAssessmentId) + '\''
                         +' WITH SECURITY_ENFORCED';
         return safe.doQuery(query); */
-        return [SELECT Question__c FROM Action__c WHERE Question__c=:questionId AND AccountAssessment__c=:accountAssessmentId
+        return [SELECT Question__c,Assigned_To__c,Name FROM Action__c WHERE Question__c=:questionId AND AccountAssessment__c=:accountAssessmentId
                 WITH SECURITY_ENFORCED];
     }
      public static List<Action__c> actionRecords()

@@ -16,9 +16,10 @@ public class CAPAController {
     }
     
     @AuraEnabled
-    public static void deleteActionData(string questionId, string accountAssessmentId){
+    public static List<Action__c> deleteActionData(string questionId, string accountAssessmentId){
         
-        CAPAService.deleteActionData(questionId,accountAssessmentId);
+        List<Action__c> deletedata=CAPAService.deleteActionData(questionId,accountAssessmentId);
+        return deletedata;
         
     }
     
@@ -58,6 +59,18 @@ public class CAPAController {
         List<Action__c> selectedActionRecord= CAPAService.selectedActionRecord(actionid);
         
         return selectedActionRecord;
+    }
+    @AuraEnabled
+    public static void send(String subject, String body, List<Id> userList){
+        CAPAService.send(subject,body,userList);
+     
+    }
+     @AuraEnabled
+    public static void notifyUsers(Map<string,object> actionData, String body, List<Id> userList){
+       
+        CAPAService.notifyUsers(actionData,body,userList);
+        
+       
     }
     
 

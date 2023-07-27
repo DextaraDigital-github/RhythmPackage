@@ -4,6 +4,9 @@
 	border-bottom: 1px solid black;
 	background-color:#D1F7C4;
 }
+.table tr{
+	border-bottom: solid 1px lightgrey;
+}
 .Customer
 {
 text-align: left;

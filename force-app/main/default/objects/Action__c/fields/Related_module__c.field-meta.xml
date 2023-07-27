@@ -12,9 +12,9 @@
         <valueSetDefinition>
             <sorted>false</sorted>
             <value>
-                <fullName>Assesments</fullName>
+                <fullName>Assessments</fullName>
                 <default>false</default>
-                <label>Assesments</label>
+                <label>Assessments</label>
             </value>
             <value>
                 <fullName>RFP</fullName>

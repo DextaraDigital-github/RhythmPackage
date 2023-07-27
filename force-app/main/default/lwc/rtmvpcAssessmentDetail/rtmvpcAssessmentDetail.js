@@ -271,10 +271,10 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
         },500);
        
     }
-    emptyFormData(event){
+    // emptyFormData(event){
         
-        this.template.querySelectorAll('c-action')[0].emptyForm(event.detail);
-    }
+    //     this.template.querySelectorAll('c-action')[0].emptyForm(event.detail);
+    // }
     closeForm(event)
     {
          let deletedataform=event.detail;

@@ -50,7 +50,7 @@ public class CAPAService {
         }
         
     }
-    public static void deleteActionData(string questionId, string accountAssessmentId)
+    public static List<Action__c> deleteActionData(string questionId, string accountAssessmentId)
     {
         
         List<Action__c> deleteData=CAPASelector.deleteActionData(questionId,accountAssessmentId);
@@ -63,6 +63,7 @@ public class CAPAService {
                     throw new SecurityControllerException(String.join( errorList, ', ' ));
                 }
             }
+            return deleteData;
         }catch(exception e){
             String errorMsg = e.getMessage();
             throw new AuraHandledException(errorMsg);
@@ -102,6 +103,23 @@ public class CAPAService {
         List<Action__c> selectedActionRecord= CAPASelector.selectedActionRecord(actionid);
         return selectedActionRecord;
         
+    }
+    
+     public static void send(String subject, String body, List<Id> userList){
+        
+         List<Messaging.SendEmailResult> mailInfo=SendEmail.send(subject,body,userList);
+         System.debug('email'+mailInfo);
+        
+       
+    }
+    public static void notifyUsers(Map<string,object> actionData, String body, List<Id> userList){
+        Set<string>userdata=new set<string>();
+        for(Id userid:userList){
+            userdata.add((String)userid);
+            
+        }      
+         SendEmail.notifyUsers(actionData,body,userdata);
+              
     }
     
     /**

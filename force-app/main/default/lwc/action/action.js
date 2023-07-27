@@ -4,6 +4,8 @@ import saveActionResponse from '@salesforce/apex/CAPAController.saveActionRespon
 import getActionResponse from '@salesforce/apex/CAPAController.getActionResponse';
 import errorLogRecord from '@salesforce/apex/AssessmentController.errorLogRecord';
 import deleteActionData from '@salesforce/apex/CAPAController.deleteActionData';
+import send from '@salesforce/apex/CAPAController.send';
+import notifyUsers from '@salesforce/apex/CAPAController.notifyUsers';
 export default class Action extends LightningElement {
   @track pickListNames = [];
   @api showresponse;
@@ -65,7 +67,7 @@ export default class Action extends LightningElement {
   }
 
   @api displayForm(response) {
-    console.log('jjj',response);
+    console.log('jjj', response);
     this.updateData = response;
     this.showForm = true;
     this.showCustom = false;
@@ -91,6 +93,7 @@ export default class Action extends LightningElement {
 
     getActionResponse({ actionResponse: response[0] }).then((result) => {
       if (typeof result != 'undefined' && result.length > 0) {
+        console.log('samp', result);
         this.resultdata = result[0];
         this.showUpdate = true;
         this.showCustom = true;
@@ -120,8 +123,8 @@ export default class Action extends LightningElement {
             || typeof result[0].Rhythm__Priority__c !== 'undefined') {
             let keydata = res['key'];
             res.onLoadValue = result[0][keydata];
-            if(res.onLoadValue === 'Closed'){
-              this.isSave=true;
+            if (res.onLoadValue === 'Closed') {
+              this.isSave = true;
             }
             this.responseMap[keydata] = result[0][keydata];
           }
@@ -149,6 +152,14 @@ export default class Action extends LightningElement {
         this.saveActionResponse.Rhythm__Supplier__c = response[0].Rhythm__Account__c;
         this.saveActionResponse.Rhythm__Assigned_To__c = response[0].assignedToId;
         this.saveActionResponse.Rhythm__Ownership__c = response[0].ownershipId;
+          this.onloadPicklist.forEach(res => {
+          if (res['key'] === 'Rhythm__Related_module__c') {
+            res.onLoadValue = 'Assessments';
+            
+           this.saveActionResponse.Rhythm__Related_module__c = 'Assessments';
+          }
+        });
+
         userMap.Name = response[0].ownershipName;
         this.resultdata.Rhythm__Ownership__r = userMap;
         userMap = {};
@@ -156,7 +167,7 @@ export default class Action extends LightningElement {
         this.resultdata.Rhythm__Assigned_To__r = userMap;
         this.showresponse = [];
         this.showresponse.push(this.saveActionResponse);
-        console.log('kkkk',this.saveActionResponse);
+        console.log('kkkk', this.saveActionResponse);
 
       }
     }).catch(error => {
@@ -170,12 +181,12 @@ export default class Action extends LightningElement {
 
     });
   }
-  @api emptyForm(formData) {
-    this.showPopup = true;
-    this.questionId = formData.questionid;
-    this.accountAssessmentId = formData.accountAssessmentId;
+  // @api emptyForm(formData) {
+  //   this.showPopup = true;
+  //   this.questionId = formData.questionid;
+  //   this.accountAssessmentId = formData.accountAssessmentId;
 
-  }
+  // }
   handleDelete() {
     this.showPopup = true;
   }
@@ -183,12 +194,20 @@ export default class Action extends LightningElement {
     this.showPopup = false;
   }
   handleDeleteButton() {
-    deleteActionData({ questionId: this.questionId, accountAssessmentId: this.accountAssessmentId }).then(() => {
+    deleteActionData({ questionId: this.questionId, accountAssessmentId: this.accountAssessmentId }).then((result) => {
+      let userlist = [];
+      userlist.push(result[0].Rhythm__Assigned_To__c);
       this.showPopup = false;
       this.showForm = false;
       this.showToast = true;
       this.success = true;
-      this.totastmessage = 'Action form deleted successfully';
+      this.totastmessage = 'Action Item has been deleted successfully';
+      send({ subject: (result[0].Name), body: 'Action Item has been deleted successfully', userList: userlist }).then(() => {
+
+      }).catch(error => {
+        console.log('ggfgf', error);
+      })
+
       const selectedAction = new CustomEvent('removedeleteicon', {
         detail: this.questionId
       });
@@ -220,12 +239,13 @@ export default class Action extends LightningElement {
     }
   }
   handleSave() {
-    console.log('save',this.showresponse);
+    console.log('save', this.showresponse);
     if ((typeof this.showresponse[0].Name !== 'undefined') && (typeof this.showresponse[0].Rhythm__Ownership__c !== 'undefined')
       && (typeof this.showresponse[0].Rhythm__Assigned_To__c !== 'undefined') && (typeof this.showresponse[0].Rhythm__Priority__c !== 'undefined')
       && (typeof this.showresponse[0].Rhythm__Status__c !== 'undefined')) {
       if (this.showresponse[0].Rhythm__Assigned_To__c !== "" && this.showresponse[0].Rhythm__Ownership__c !== "" && this.showresponse[0].Name !== "") {
-
+        let userlist = [];
+        userlist.push(this.showresponse[0].Rhythm__Assigned_To__c);
         saveActionResponse({ actionResponse: this.showresponse, isUpdate: this.showUpdate }).then(() => {
 
           if (this.showUpdate == false) {
@@ -233,9 +253,13 @@ export default class Action extends LightningElement {
             this.showUpdate = true;
             this.showToast = true;
             this.success = true;
-            this.totastmessage = 'Action form created successfully';
-            this.displayForm(this.updateData);
+            this.totastmessage = 'Action Item has been created successfully';
+            send({ subject: (this.showresponse[0].Name), body: 'Action Item has been created successfully', userList: userlist }).then(() => {
 
+            }).catch(error => {
+              console.log('ggfgf', error);
+            })
+            this.displayForm(this.updateData);
             this.saveActionResponse.saveActionForm = true;
             const selectedAction = new CustomEvent('closeform', {
               detail: this.saveActionResponse
@@ -245,11 +269,23 @@ export default class Action extends LightningElement {
           else {
             this.showToast = true;
             this.success = true;
-            this.totastmessage = 'Action form updated successfully';
+            this.totastmessage = 'Action Item has been updated successfully';
+            send({ subject: (this.showresponse[0].Name), body: 'Action Item has been updated successfully', userList: userlist }).then(() => {
+
+            }).catch(error => {
+              console.log('ggfgf', error);
+            })
             if (this.saveActionResponse.Rhythm__Status__c === 'Closed' && this.isSupplier === true) {
               this.showToast = true;
               this.success = true;
-              this.totastmessage = 'Action form submitted successfully';
+              this.totastmessage = 'Action Item has been marked as closed';
+               let userlist = [];
+              userlist.push(this.showresponse[0].Rhythm__Ownership__c);
+              notifyUsers({ actionData: (this.showresponse[0]), body: 'Action Item has been marked as closed', userList: userlist }).then(() => {
+
+            }).catch(error => {
+              console.log('ggfgf', error);
+            })
               this.isSave = true;
             }
           }
@@ -266,14 +302,14 @@ export default class Action extends LightningElement {
       else {
         this.showToast = true;
         this.success = false;
-        this.totastmessage = 'please fill the mandatory fields';
+        this.totastmessage = 'Please fill the mandatory fields';
 
       }
     }
     else {
       this.showToast = true;
       this.success = false;
-      this.totastmessage = 'please fill the mandatory fields';
+      this.totastmessage = 'Please fill the mandatory fields';
 
     }
   }
