@@ -163,7 +163,7 @@ export default class RtmvpcQuestionCreation extends LightningElement {
                 this.selQuestionType = value;
                 this.showResponseAttributes = true;
                 setTimeout(()=>{
-                     this.template.querySelectorAll('c-rtmvpc-create-response-attributes')[0].handleQuestionTypeChange();
+                     this.template.querySelectorAll('c-rtmvpc-create-response-attributes')[0].handleQuestionTypeChange(value);
                 },200);
                
             }
