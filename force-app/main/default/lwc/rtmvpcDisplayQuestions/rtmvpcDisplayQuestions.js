@@ -112,12 +112,24 @@ export default class RtmvpcDisplayQuestions extends LightningElement {
                 let questionData = JSON.parse(JSON.stringify(result));
                 let children = questionData.filter(res => typeof res.Rhythm__Parent_Question__c !== 'undefined');
                 let parent = questionData.filter(res => typeof res.Rhythm__Parent_Question__c === 'undefined');
-
+                let pnumber =0;
+                let parentnumber;
                 parent.forEach(parentdata => {
                     let childlst = [];
                     let snumber =0;
                     let qnumber = (parentdata.Name).split('-');
-                    parentdata.Name = qnumber[1];
+                    pnumber++;
+                    if(pnumber<10){
+                        parentnumber ='00'+pnumber;
+                    }
+                    else if(pnumber>=10 && pnumber <100){
+                        parentnumber ='0'+pnumber;
+                    }
+                    else{
+                        parentnumber = pnumber;
+                    }
+                    parentdata.Name = parentnumber;
+                    //parentdata.Name = qnumber[1];
                     children.forEach(child => {
                         if (parentdata.Id === child.Rhythm__Parent_Question__c) {
                             snumber++;
@@ -129,10 +141,10 @@ export default class RtmvpcDisplayQuestions extends LightningElement {
                             child['isiconavailable'] = true;
                             
                             if(snumber<10){
-                                child.Name = qnumber[1] + '.0'+snumber;
+                                child.Name = parentnumber + '.0'+snumber;
                             }
                             else{
-                                child.Name  = qnumber[1] + '.'+snumber;
+                                child.Name  = parentnumber + '.'+snumber;
                             }
                             childlst.push(child);
 

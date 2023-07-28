@@ -370,7 +370,7 @@ export default class Questionnaire extends LightningElement {
         this.questionMap = new Map();
         this.questionsList = [];
         this.sectionidslist = [];
-        let sectionName = [];
+        let sectionName = {};
         if (this.isTemplate) {
             this.isSupplier = false;
             if (this.objectApiName === 'Rhythm__AccountAssessmentRelation__c') {
@@ -394,7 +394,8 @@ export default class Questionnaire extends LightningElement {
                                     if (typeof question.Rhythm__Section__r.Id !== 'undefined') {
                                         if (!this.sectionidslist.includes(question.Rhythm__Section__r.Id)) {
                                             this.sectionidslist.push(question.Rhythm__Section__r.Id);
-                                            sectionName.push(question.Rhythm__Section__r.Name);
+                                            //sectionName.push(question.Rhythm__Section__r.Name);
+                                            sectionName[question.Rhythm__Section__r.Id] = question.Rhythm__Section__r.Name;
                                         }
                                     }
                                 }
@@ -435,8 +436,8 @@ export default class Questionnaire extends LightningElement {
                                     let sectionsList = [];
                                     for (const seckey of this.questionMap.keys()) {
 
-                                        sectionsList.push({ label: seckey, value: sectionName[count - 1] });
-                                        this.questionsList.push({ "sectionId": seckey, "section": sectionName[count], "questions": this.questionMap.get(seckey), "showNext": true, "show": false });
+                                        sectionsList.push({ label: seckey, value: sectionName[seckey] });
+                                        this.questionsList.push({ "sectionId": seckey, "section": sectionName[seckey], "questions": this.questionMap.get(seckey), "showNext": true, "show": false });
                                         count++;
                                     }
                                     //
@@ -523,7 +524,8 @@ export default class Questionnaire extends LightningElement {
                         if (typeof question.Rhythm__Section__r !== 'undefined' && typeof question.Rhythm__Section__r.Id !== 'undefined') {
                             if (!this.sectionidslist.includes(question.Rhythm__Section__r.Id)) {
                                 this.sectionidslist.push(question.Rhythm__Section__r.Id);
-                                sectionName.push(question.Rhythm__Section__r.Name);
+                                //sectionName.push(question.Rhythm__Section__r.Name);
+                                sectionName[question.Rhythm__Section__r.Id] = question.Rhythm__Section__r.Name;
                             }
                         }
                     });
@@ -547,8 +549,8 @@ export default class Questionnaire extends LightningElement {
                         let sectionsList = [];
                         for (const seckey of this.questionMap.keys()) {
 
-                            sectionsList.push({ label: seckey, value: sectionName[count - 1] });
-                            this.questionsList.push({ "sectionId": seckey, "section": sectionName[count], "questions": this.questionMap.get(seckey), "showNext": true, "show": false });
+                            sectionsList.push({ label: seckey, value: sectionName[seckey] });
+                            this.questionsList.push({ "sectionId": seckey, "section": sectionName[seckey], "questions": this.questionMap.get(seckey), "showNext": true, "show": false });
                             count++;
                         }
                         this.constructQuestionsAndAnswers(this.questionsList);
@@ -611,7 +613,8 @@ export default class Questionnaire extends LightningElement {
                         if (typeof question.Rhythm__Section__r !== 'undefined' && typeof question.Rhythm__Section__r.Id !== 'undefined') {
                             if (!this.sectionidslist.includes(question.Rhythm__Section__r.Id)) {
                                 this.sectionidslist.push(question.Rhythm__Section__r.Id);
-                                sectionName.push(question.Rhythm__Section__r.Name);
+                                //sectionName.push(question.Rhythm__Section__r.Name);
+                                sectionName[question.Rhythm__Section__r.Id] = question.Rhythm__Section__r.Name;
                             }
                         }
                     });
@@ -650,8 +653,8 @@ export default class Questionnaire extends LightningElement {
                             let sectionsList = [];
                             for (const seckey of this.questionMap.keys()) {
 
-                                sectionsList.push({ label: seckey, value: sectionName[count - 1] });
-                                this.questionsList.push({ "sectionId": seckey, "section": sectionName[count], "questions": this.questionMap.get(seckey), "showNext": true, "show": false });
+                                sectionsList.push({ label: seckey, value: sectionName[seckey] });
+                                this.questionsList.push({ "sectionId": seckey, "section": sectionName[seckey], "questions": this.questionMap.get(seckey), "showNext": true, "show": false });
                                 count++;
                             }
                             this.showButtons.Summary = false;
