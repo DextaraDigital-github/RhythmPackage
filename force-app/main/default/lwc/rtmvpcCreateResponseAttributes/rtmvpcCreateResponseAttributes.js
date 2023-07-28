@@ -97,10 +97,11 @@ export default class RtmvpcCreateResponseAttributes extends LightningElement {
         }
         console.log('this.tablerowlst', this.tablerowlst);
     }
-    @api handleQuestionTypeChange()
+    @api handleQuestionTypeChange(value)
     {
         console.log('handleQuestionTypeChange');
         this.tablerowlst=[];
+        this.quesType = value;
         this.constructNewWrapper();
     }
     constructNewWrapper() {
@@ -129,6 +130,7 @@ export default class RtmvpcCreateResponseAttributes extends LightningElement {
         this.isCheckbox = true;
         }
         else{
+        this.isCheckbox = false;
         let responsewrapper = {};
         let rownum = this.tablerowlst.length + 1;
         responsewrapper.rownum = this.tablerowlst.length + 1;
