@@ -35,7 +35,7 @@ export default class Action extends LightningElement {
   picklistdata({ error, data }) {
     if (data) {
       this.pickListNames = [];
-      for (let key in data) {
+      for(let key in data) {
         let pickListNamedata = [];
         data[key].forEach(item => {
           let map = { 'label': item, 'value': item };
@@ -121,7 +121,7 @@ export default class Action extends LightningElement {
         this.onloadPicklist.forEach(res => {
           if (typeof result[0].Rhythm__Related_module__c !== 'undefined' || typeof result[0].Rhythm__Status__c !== 'undefined'
             || typeof result[0].Rhythm__Priority__c !== 'undefined') {
-            let keydata = res['key'];
+            let keydata = res.key;
             res.onLoadValue = result[0][keydata];
             if (res.onLoadValue === 'Closed') {
               this.isSave = true;
@@ -140,7 +140,7 @@ export default class Action extends LightningElement {
         this.showresponse.push(this.saveActionResponse);
       }
       else {
-        var userMap = {};
+        let userMap = {};
         this.showCustom = true;
         this.showUpdate = false;
         this.showPicklist = true;
@@ -153,7 +153,7 @@ export default class Action extends LightningElement {
         this.saveActionResponse.Rhythm__Assigned_To__c = response[0].assignedToId;
         this.saveActionResponse.Rhythm__Ownership__c = response[0].ownershipId;
           this.onloadPicklist.forEach(res => {
-          if (res['key'] === 'Rhythm__Related_module__c') {
+          if (res.key === 'Rhythm__Related_module__c') {
             res.onLoadValue = 'Assessments';
             
            this.saveActionResponse.Rhythm__Related_module__c = 'Assessments';
@@ -232,10 +232,10 @@ export default class Action extends LightningElement {
   handleSelectedValue(event) {
     let name = event.currentTarget.dataset.id;
     if (name === 'Ownership') {
-      this.saveActionResponse['Rhythm__Ownership__c'] = event.detail;
+      this.saveActionResponse.Rhythm__Ownership__c = event.detail;
     }
     else {
-      this.saveActionResponse['Rhythm__Assigned_To__c'] = event.detail;
+      this.saveActionResponse.Rhythm__Assigned_To__c = event.detail;
     }
   }
   handleSave() {
@@ -279,7 +279,7 @@ export default class Action extends LightningElement {
               this.showToast = true;
               this.success = true;
               this.totastmessage = 'Action Item has been marked as closed';
-               let userlist = [];
+              userlist = [];
               userlist.push(this.showresponse[0].Rhythm__Ownership__c);
               notifyUsers({ actionData: (this.showresponse[0]), body: 'Action Item has been marked as closed', userList: userlist }).then(() => {
 

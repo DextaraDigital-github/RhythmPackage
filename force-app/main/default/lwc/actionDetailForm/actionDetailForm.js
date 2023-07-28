@@ -19,6 +19,7 @@ export default class ActionDetailForm extends LightningElement {
     ];
     greenFlagUrl = greenFlag;
     redFlagUrl = redFlag;
+    
     connectedCallback() {
         selectedActionRecord({actionid:this.actionid}).then(res=>{
           this.actionFormData=res;
