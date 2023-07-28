@@ -33,11 +33,11 @@ public class CAPAService {
             }
             else{
                 Database.SaveResult[] saveResult = safe.doUpdate(actionResponse);
-                errorList = SecurityCheckController.safeClassExceptionHandlerInsert(saveResult);
+                errorsList = SecurityCheckController.safeClassExceptionHandlerInsert(saveResult);
             }
-            if(errorList.size()>0){
+            if(errorsList.size()>0){
                 Database.rollback(sp);
-                throw new SecurityControllerException(String.join( errorList, ', ' ));
+                throw new SecurityControllerException(String.join( errorsList, ', ' ));
             }
         }catch(exception e){
             String errorMsg = e.getMessage();
