@@ -65,9 +65,11 @@ export default class SendEmailToContacts extends NavigationMixin(LightningElemen
     }
     /* Assigns current page properties to restrict properties on UI to a particular page */
     assignCurrentPageProp(pageNumber) {
-        typeof this.pageProp != 'undefined' && typeof this.pageProp.pageNames != 'undefined' && this.pageProp.pageNames.forEach(page => {
-            this.pageProp.pageInfo[page.name].show = (this.pageProp.pageInfo[page.name].pageNo === pageNumber);
-        });
+        if(typeof this.pageProp != 'undefined' && typeof this.pageProp.pageNames != 'undefined'){
+            this.pageProp.pageNames.forEach(page => {
+                this.pageProp.pageInfo[page.name].show = (this.pageProp.pageInfo[page.name].pageNo === pageNumber);
+            });
+        }
         this.currentPage = this.pageProp.pageInfo[this.pageProp.pageNames[Number(pageNumber)].name];
     }
 
@@ -87,16 +89,18 @@ export default class SendEmailToContacts extends NavigationMixin(LightningElemen
             this.show.searchCount = this.accountsData.length;
             this.show.spinner = false;
             this.show.accSearchLoading = false;
-        }).catch(error => {
+        }).catch(() => {
             this.configureToast('Error loading Accounts', 'Please contact your Administrator.', 'error');
         });
     }
     /* Formats the Account data fetched from Apex into required format so as to display as options in the combobox */
     formatAccountsData(result) {
         let accData = [];
-        typeof result != 'undefined' && result.forEach(acc => {
-            accData.push({ Id: acc.Rhythm__Account__c, Name: acc.Rhythm__Account__r.Name });
-        });
+        if(typeof result != 'undefined'){
+            result.forEach(acc => {
+                accData.push({ Id: acc.Rhythm__Account__c, Name: acc.Rhythm__Account__r.Name });
+            });
+        }
         return accData;
     }
 
@@ -106,16 +110,18 @@ export default class SendEmailToContacts extends NavigationMixin(LightningElemen
             this.emailTemplatesData = JSON.parse(JSON.stringify(result));
             this.emailTemplatesData.push({ 'Id': 'null', 'Name': '--None--', Subject: this.assessmentName, Body: '' });
             this.emailTemplatesOpt = this.formatEmailTempsData(this.emailTemplatesData);
-        }).catch(error => {
+        }).catch(() => {
             this.configureToast('Error loading Email Templates', 'Please contact your Administrator.', 'error');
         })
     }
     /* Formats the Email Template data fetched from Apex into required format so as to display as options in the combobox */
     formatEmailTempsData(result) {
         let emailTemplatesOpt = [];
-        typeof result != 'undefined' && result.forEach(emailtemp => {
-            emailTemplatesOpt.push({ label: emailtemp.Name, value: emailtemp.Id });
-        });
+        if(typeof result != 'undefined'){
+            result.forEach(emailtemp => {
+                emailTemplatesOpt.push({ label: emailtemp.Name, value: emailtemp.Id });
+            });
+        }
         return emailTemplatesOpt;
     }
 
@@ -245,15 +251,15 @@ export default class SendEmailToContacts extends NavigationMixin(LightningElemen
     }
     /* Calls an Apex method to send an email to the Accounts selected */
     sendEmailHandler() {
-        if (this.email.subject.trim() != '' && this.email.body.trim() != '') {
+        if (this.email.subject.trim() !== '' && this.email.body.trim() !== '') {
             this.show.disableBtns = true;
             this.show.spinner = true;
             this.email.assessmentId = this.assessmentId;
             if (this.email.hasCustomAttachments) {
                 this.email.attachmentsData.contentDocuments = [...this.email.attachmentsData.customContentDocuments, ...this.email.attachmentsData.standardContentDocuments];   //If any standard attachment is removed, we make customAttachments to true and merge both the available standard and custom attachments as the template id wi;; be removed and custom subject and body will be used while sending email
             }
-            sendEmail({ parameterMap: JSON.stringify(this.email) }).then(result => {
-            }).catch(error => {
+            sendEmail({ parameterMap: JSON.stringify(this.email) }).then(() => {
+            }).catch(() => {
                 this.commonErrorMessage();
                 this.show.disableBtns = false;
             });
@@ -312,40 +318,42 @@ export default class SendEmailToContacts extends NavigationMixin(LightningElemen
     }
     /* Prepares attachments JSON to display the attachments as pill conatiners on UI */
     emAddAttachments(attachments) {
-        typeof attachments != 'undefined' && attachments.forEach(attachment => {
-            let a = {};
-            a.type = "icon";
+        if(typeof attachments != 'undefined'){
+            attachments.forEach(attachment => {
+                let a = {};
+                a.type = "icon";
 
-            /* Executes for attachments existing with the email template */
-            if (typeof attachment.ContentDocument != 'undefined') {
-                a.label = attachment.ContentDocument.Title;
-                a.name = attachment.ContentDocumentId;
-                a.isStandardAttachment = true;
-                a.fileType = attachment.ContentDocument.FileType.toLowerCase();
-                this.email.attachmentsData.standardContentDocuments.push(a.name);
-            }
-            /* Executes for every new attachment uploaded by the customer */
-            else {
-                a.label = attachment.name.slice(0, attachment.name.lastIndexOf('.'));
-                a.name = attachment.documentId;
-                a.isStandardAttachment = false;
-                a.fileType = attachment.name.slice(attachment.name.lastIndexOf('.') + 1);
-                this.email.attachmentsData.customContentDocuments.push(a.name);
-                this.email.attachmentsData.deleteContentDocuments.push(a.name);
-            }
+                /* Executes for attachments existing with the email template */
+                if (typeof attachment.ContentDocument != 'undefined') {
+                    a.label = attachment.ContentDocument.Title;
+                    a.name = attachment.ContentDocumentId;
+                    a.isStandardAttachment = true;
+                    a.fileType = attachment.ContentDocument.FileType.toLowerCase();
+                    this.email.attachmentsData.standardContentDocuments.push(a.name);
+                }
+                /* Executes for every new attachment uploaded by the customer */
+                else {
+                    a.label = attachment.name.slice(0, attachment.name.lastIndexOf('.'));
+                    a.name = attachment.documentId;
+                    a.isStandardAttachment = false;
+                    a.fileType = attachment.name.slice(attachment.name.lastIndexOf('.') + 1);
+                    this.email.attachmentsData.customContentDocuments.push(a.name);
+                    this.email.attachmentsData.deleteContentDocuments.push(a.name);
+                }
 
-            switch (a.fileType) {
-                case 'png':
-                case 'jpg':
-                case 'jpeg': a.iconName = 'doctype:image'; break;
-                case 'docs': a.iconName = 'doctype:word'; break;
-                case 'pdf': a.iconName = 'doctype:pdf'; break;
-                case 'csv': a.iconName = 'doctype:csv'; break;
-                default: a.iconName = 'doctype:attachment'; break;
-            }
-            a.href = '/sfc/servlet.shepherd/document/download/' + attachment.ContentDocumentId + '?operationContext=S1'; //Creating a downloadable link
-            this.email.attachmentsData.attachments.push(a);
-        });
+                switch (a.fileType) {
+                    case 'png':
+                    case 'jpg':
+                    case 'jpeg': a.iconName = 'doctype:image'; break;
+                    case 'docs': a.iconName = 'doctype:word'; break;
+                    case 'pdf': a.iconName = 'doctype:pdf'; break;
+                    case 'csv': a.iconName = 'doctype:csv'; break;
+                    default: a.iconName = 'doctype:attachment'; break;
+                }
+                a.href = '/sfc/servlet.shepherd/document/download/' + attachment.ContentDocumentId + '?operationContext=S1'; //Creating a downloadable link
+                this.email.attachmentsData.attachments.push(a);
+            });
+        }
     }
 
     /* Handles the change in email's subject */

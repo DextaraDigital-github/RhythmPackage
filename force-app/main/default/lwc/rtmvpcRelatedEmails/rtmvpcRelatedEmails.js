@@ -32,41 +32,45 @@ export default class RtmvpcRelatedEmails extends LightningElement {
             this.emailsDataMap = this.formatEmailMsgsMap(result);
             this.emailsData = this.formatEmailMsgsData(this.emailsDataMap);
             this.assignPageProp();
-        }).catch(error => {
+        }).catch(() => {
             this.configureToast('Error loading Accounts', 'Please contact your Administrator.', 'error');
         });
     }
     /* Prepares a Map of EmailMessages */
     formatEmailMsgsMap(result) {
         let emailMap = new Map();
-        typeof result != 'undefined' && result.forEach(user => {
-            typeof user.EmailMessageRelations != 'undefined' && user.EmailMessageRelations.forEach(email => {
-                let emailJson = {};
-                if (!emailMap.has(email.EmailMessageId)) {
-                    emailJson.limitProp = true;
-                    emailJson.assessmentId = this.recordId;
-                    emailJson.isBuilderContent = true;
-                    emailJson.fromName = email.EmailMessage.FromName;
-                    let monthMap = new Map([['01','Jan'],['02','Feb'],['03','Mar'],['04','Apr'],['05','May'],['06','Jun'],['07','Jul'],['08','Aug'],['09','Sep'],['10','Oct'],['11','Nov'],['12','Dec']]);
-                    emailJson.sentDate = email.EmailMessage.CreatedDate.split('T')[0].split('-')[2] + ' ' + monthMap.get(email.EmailMessage.CreatedDate.split('T')[0].split('-')[1]) + ', ' + email.EmailMessage.CreatedDate.split('T')[0].split('-')[0];
-                    emailJson.subject = email.EmailMessage.Subject;
-                    emailJson.body = email.EmailMessage.HtmlBody;
-                    emailJson.templateId = (typeof email.EmailMessage.EmailTemplate != 'undefined') ? email.EmailMessage.EmailTemplate.Name : '--None--';
-                    emailJson.emailTemplatesOpt = [{ label: emailJson.templateId, value: emailJson.templateId }];
-                    emailJson.selectedAccounts = [];
-                    emailJson.accountsData = [];
-                }
-                else {
-                    emailJson = emailMap.get(email.EmailMessageId);
-                }
-                if (typeof user.Contact != 'undefined' && typeof user.Contact.AccountId != 'undefined' && typeof user.Contact.Account != 'undefined' && typeof user.Contact.Account.Name != 'undefined') {
-                    emailJson.selectedAccounts.push(user.Contact.AccountId);
-                    emailJson.selectedAccountsCount = emailJson.selectedAccounts.length;
-                    emailJson.accountsData.push({ Id: user.Contact.AccountId, Name: user.Contact.Account.Name });
-                    emailMap.set(email.EmailMessageId, emailJson);
+        if(typeof result != 'undefined'){
+            result.forEach(user => {
+                if(typeof user.EmailMessageRelations != 'undefined'){
+                        user.EmailMessageRelations.forEach(email => {
+                        let emailJson = {};
+                        if (!emailMap.has(email.EmailMessageId)) {
+                            emailJson.limitProp = true;
+                            emailJson.assessmentId = this.recordId;
+                            emailJson.isBuilderContent = true;
+                            emailJson.fromName = email.EmailMessage.FromName;
+                            let monthMap = new Map([['01','Jan'],['02','Feb'],['03','Mar'],['04','Apr'],['05','May'],['06','Jun'],['07','Jul'],['08','Aug'],['09','Sep'],['10','Oct'],['11','Nov'],['12','Dec']]);
+                            emailJson.sentDate = email.EmailMessage.CreatedDate.split('T')[0].split('-')[2] + ' ' + monthMap.get(email.EmailMessage.CreatedDate.split('T')[0].split('-')[1]) + ', ' + email.EmailMessage.CreatedDate.split('T')[0].split('-')[0];
+                            emailJson.subject = email.EmailMessage.Subject;
+                            emailJson.body = email.EmailMessage.HtmlBody;
+                            emailJson.templateId = (typeof email.EmailMessage.EmailTemplate != 'undefined') ? email.EmailMessage.EmailTemplate.Name : '--None--';
+                            emailJson.emailTemplatesOpt = [{ label: emailJson.templateId, value: emailJson.templateId }];
+                            emailJson.selectedAccounts = [];
+                            emailJson.accountsData = [];
+                        }
+                        else {
+                            emailJson = emailMap.get(email.EmailMessageId);
+                        }
+                        if (typeof user.Contact != 'undefined' && typeof user.Contact.AccountId != 'undefined' && typeof user.Contact.Account != 'undefined' && typeof user.Contact.Account.Name != 'undefined') {
+                            emailJson.selectedAccounts.push(user.Contact.AccountId);
+                            emailJson.selectedAccountsCount = emailJson.selectedAccounts.length;
+                            emailJson.accountsData.push({ Id: user.Contact.AccountId, Name: user.Contact.Account.Name });
+                            emailMap.set(email.EmailMessageId, emailJson);
+                        }
+                    });
                 }
             });
-        });
+        }
         return emailMap;
     }
     /* Prepares a List of EmailMessages to display in datatable */
