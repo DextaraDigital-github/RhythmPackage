@@ -8,7 +8,7 @@
 
 public with sharing class AccountAssessmentRelationHandler implements ITriggerHandler{
     public static SecurityCheckController safe = new SecurityCheckController();
-    private static Savepoint sp;
+    private static Savepoint sp; 
 
 
      /**
