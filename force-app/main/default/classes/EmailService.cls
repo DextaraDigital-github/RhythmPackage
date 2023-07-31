@@ -23,9 +23,13 @@ public with sharing class EmailService {
         List<String> accFields = new List<String>{'Account__c', 'Account__r.Name'};
         String accFilter = ' WHERE Assessment__c = \'' + String.escapeSingleQuotes(assessmentId) + '\' AND Account__r.Name LIKE \'%' + String.escapeSingleQuotes(searchKey) + '%\' ';
         Map<String,Object> accParameterMap = new Map<String,Object>{'fields'=>accFields, 'filter'=>accFilter};
-        List<AccountAssessmentRelation__c> aarList = AccountAssessmentRelationSelector.fetchAccounts(accParameterMap).values();
-        if(aarList != null) {
-            return aarList;
+        Map<Id,AccountAssessmentRelation__c> aarMap = AccountAssessmentRelationSelector.fetchAccounts(accParameterMap);
+        if(aarMap != null)
+        {
+            List<AccountAssessmentRelation__c> aarList = aarMap.values();
+        	if(aarList != null) {
+            	return aarList;
+            }
         }
         return null;
     }
@@ -38,11 +42,12 @@ public with sharing class EmailService {
         List<String> emailTempFields = new List<String>{'Id', 'Name', 'Subject', 'HtmlValue', 'IsBuilderContent'};
         List<String> childQuery = new List<String>{'(SELECT Id, ContentDocumentId, ContentDocument.FileType, ContentDocument.Title FROM ContentDocumentLinks)'};
         Map<String,Object> emailtempParameterMap = new Map<String,Object>{'fields'=>emailTempFields, 'childQuery'=>childQuery};
-        Map<Id,EmailTemplate> emailTemplateMap =EmailTemplateSelector.fetchEmailTemplates(emailtempParameterMap);
-        if(emailTemplateMap != null ){
-            List<EmailTemplate> etList = emailTemplateMap.values();
-            if(etList != null) {
-                return etList;
+        Map<Id,EmailTemplate> emailTemplateMap = EmailTemplateSelector.fetchEmailTemplates(emailtempParameterMap);
+        if(emailTemplateMap != null)
+        {
+            List<EmailTemplate> emailTemplateList = emailTemplateMap.values();
+        	if(emailTemplateList != null) {
+            	return emailTemplateList;
             }
         }
         return null;
@@ -80,13 +85,17 @@ public with sharing class EmailService {
         Map<String,Object> newParameterMap = (Map<String,Object>)JSON.deserializeUntyped(parameterMap);
         String assessmentId = (String)newParameterMap.get('assessmentId');
         
-        List<String> userFields = new List<String>{'Id', 'Contact.AccountId', 'Contact.Account.Name'};
+        List<String> userFields = new List<String>{'Id', 'Email', 'Contact.AccountId', 'Contact.Account.Name'};
         String userFilter=' WHERE Id IN (SELECT RelationId FROM EmailMessageRelation WHERE EmailMessage.RelatedToId = \''+String.escapeSingleQuotes(assessmentId)+'\' AND RelationType = \'ToAddress\') ';
-        List<String> childQuery = new List<String>{' (SELECT Id, EmailMessageId, EmailMessage.FromName, EmailMessage.CreatedDate, EmailMessage.Subject, EmailMessage.HtmlBody, EmailMessage.EmailTemplate.Name FROM EmailMessageRelations WHERE EmailMessage.RelatedToId = \''+String.escapeSingleQuotes(assessmentId)+'\' AND RelationType = \'ToAddress\' ORDER BY EmailMessage.CreatedDate DESC) '};
+        List<String> childQuery = new List<String>{' (SELECT Id, EmailMessageId, EmailMessage.FromName, EmailMessage.CreatedDate, EmailMessage.Subject, EmailMessage.HtmlBody, EmailMessage.EmailTemplate.Name, EmailMessage.RelatedTo.Name FROM EmailMessageRelations WHERE EmailMessage.RelatedToId = \''+String.escapeSingleQuotes(assessmentId)+'\' AND RelationType = \'ToAddress\' ORDER BY EmailMessage.CreatedDate DESC) '};
         Map<String,Object> emParameterMap = new Map<String,Object>{'fields'=>userFields, 'filter'=>userFilter, 'childQuery'=>childQuery};
-        List<User> userList = UserSelector.fetchUsers(emParameterMap).values();
-        if(userList != null) {
-            return userList;
+        Map<Id,User> userMap = UserSelector.fetchUsers(emParameterMap);
+        if(userMap != null)
+        {
+            List<User> userList = userMap.values();
+        	if(userList != null) {
+            	return userList;
+            }
         }
         return null;
     }
