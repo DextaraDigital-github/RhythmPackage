@@ -52,6 +52,7 @@ public with sharing class TestDataFactory{
                 }
             }
         } catch(Exception e){
+			system.debug('createRecords Exception --->'+e);
             throw new AuraHandledException(e.getMessage());
         }
         return records;
@@ -208,6 +209,15 @@ public with sharing class TestDataFactory{
         }
         return createRecords(qlist,true,attributes);
     }
+    
+    public static List<Question__c> createResponseAttributes(Integer numToInsert, Boolean doInsert,Map<String, Object> attributes){
+        List<Response_Attribute__c> qlist = new List<Response_Attribute__c>();
+        for(Integer i=0; i< numToInsert; i++){
+        Response_Attribute__c q = new Response_Attribute__c();
+        qlist.add(q);
+        }
+        return createRecords(qlist,true,attributes);
+    }
  
     /**
     * @description createAssessment method is used to create Assessment records
@@ -277,6 +287,43 @@ public with sharing class TestDataFactory{
         }
         return createRecords(supplierList,true,attributes);
     }
+
+	    /**
+    * @description createAction method is used to create Action__c records
+    * @param numToInsert This is a number of records to insert.  
+    * @param doInsert This is boolean value whether to insert record or not.
+    * @param attributes This is a map which contain record data to insert.
+    * @return
+    */
+    public static List<Action__c> createAction(Integer numToInsert, Boolean doInsert,Map<String, Object> attributes){
+        List<Action__c> accList = new List<Action__c>();
+        for(Integer i=0; i< numToInsert; i++){
+            Action__c act = new Action__c();
+            accList.add(act);
+        }
+        return createRecords(accList,true,attributes);
+    }
+
+	/**
+    * @description createContentVersion method is used to create contentversion records
+    * @param numToInsert This is a number of records to insert.  
+    * @param doInsert This is boolean value whether to insert record or not.
+    * @param attributes This is a map which contain record data to insert.
+    * @return
+    */
+    public static List<ContentVersion> createContentVersion(Integer numToInsert, Boolean doInsert, Map<String, Object> attributes){
+        List<ContentVersion> insertContentVer = new List<ContentVersion>();
+        for(Integer i=0; i< numToInsert; i++){
+            ContentVersion cv = new ContentVersion();
+            cv.Title = 'Test Document';
+            cv.PathOnClient = 'TestDocument.pdf';
+            cv.VersionData = Blob.valueOf('Test Content');
+            cv.IsMajorVersion = true;
+            insertContentVer.add(cv);
+        }
+        return createRecords(insertContentVer, doInsert, attributes);
+    }
+   
 
     /**
     * @description It is used to throw the exception.
