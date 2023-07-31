@@ -25,7 +25,6 @@ public with sharing class TemplateService {
                         + ' WHERE Name LIKE '+templateName;
             List<Assessment_Template__c> dupList = safe.doQuery(query);
             if(dupList.isEmpty() == true){
-                TemplateSelector ts = new TemplateSelector();
                 if(string.isNotBlank(templateId)){
                     List<SObject> templateList = new List<sObject>();
                     List<String> errorList =  new List<String>();
@@ -54,10 +53,9 @@ public with sharing class TemplateService {
                 resWrap.isSuccess = false;
                 resWrap.recordId = '';
                 resWrap.errorCode = '';
-                resWrap.message = 'Template exists with the same name, Please try with another name.';
+                resWrap.message = 'Template exists with the same name already, try using a different name. ';
             }
         }catch(exception e){
-            system.debug('cloneTemplate---->'+e.getMessage());
             resWrap.isSuccess = false;
             resWrap.recordId = '';
             resWrap.errorCode = '';
@@ -72,12 +70,11 @@ public with sharing class TemplateService {
     * @param newTemplateId This is a record id of an New Template.
     */
     private static void cloneSections(string templateId,string newTemplateId){
-        SectionSelector ss = new SectionSelector();
         List<Section__c> newSectionsList = new List<Section__c>();
         List<Question__c> oldPQueList = new List<Question__c>();
         Map<Id,Id> sectionIdsMap = new Map<Id,Id>();
 
-        List<Section__c> sectionsList = ss.getSectionsforTemplate(templateId);
+        List<Section__c> sectionsList = SectionSelector.getSectionsforTemplate(templateId);
         for(Section__c section : sectionsList){
             Section__c newSection = section.clone(false, true); //do a deep clone
             newSection.Assessment_Template__c = newTemplateId;
@@ -155,15 +152,12 @@ public with sharing class TemplateService {
         List<Question__c> oldCQueList = new List<Question__c>();
         Map<Id,Id> cqIdsMap = new Map<Id,Id>();
         Map<Id,Id> questionIdsMap = new Map<Id,Id>();
-        QuestionSelector qs = new QuestionSelector();
         
         mqIds.addAll(pqIdsMap.keySet());
         if(mqIds.isEmpty() == false){
-            List<Question__c> cqs = qs.getSubQuestions(mqIds);
-            system.debug('cqsSize---->'+cqs.size());
+            List<Question__c> cqs = QuestionSelector.getSubQuestions(mqIds);
             oldCQueList.addAll(cqs);
         }
-        system.debug('oldCQueList----->'+oldCQueList.size());
         if(oldCQueList.isEmpty() == false){
             for(Question__c cq : oldCQueList){
                 Question__c newQuestion = cq.clone(false, true);
@@ -176,7 +170,6 @@ public with sharing class TemplateService {
             if (sp == null){
                 sp = Database.setSavepoint();
             }
-            system.debug('cqList----->'+cqList.size());
             if(cqList.isEmpty() == false){
                 Database.SaveResult[] results = safe.doInsert(cqList);
                 List<String> errorsList = SecurityCheckController.safeClassExceptionHandlerInsert(results);
@@ -191,7 +184,6 @@ public with sharing class TemplateService {
             }
             questionIdsMap.putAll(pqIdsMap);
             questionIdsMap.putAll(cqIdsMap);
-            system.debug('questionIdsMap----->'+questionIdsMap.size());
             if(questionIdsMap.isEmpty() == false){
                 cloneResponseAttrs(questionIdsMap);
             }
@@ -206,8 +198,6 @@ public with sharing class TemplateService {
 
         Map<Id,Id> raIdsMap = new Map<Id,Id>();
         List<Response_Attribute__c> raList = new List<Response_Attribute__c>();
-
-        //QuestionAttributeResponseSelector qrs = new QuestionAttributeResponseSelector();
         List<Response_Attribute__c> resAttList = QuestionAttributeResponseSelector.getRespAttforQuestion(questionIdsMap);
     
         for(Response_Attribute__c ra : resAttList){
@@ -225,7 +215,6 @@ public with sharing class TemplateService {
         if (sp == null){
             sp = Database.setSavepoint();
         }
-        system.debug('raList----->'+raList.size());
         if(raList.isEmpty() == false){
             Database.SaveResult[] results = safe.doInsert(raList);
             List<String> errorsList = SecurityCheckController.safeClassExceptionHandlerInsert(results);
@@ -250,11 +239,8 @@ public with sharing class TemplateService {
     */
     private static void cloneResponseQMap(Map<Id,Id> raIdsMap,Map<Id,Id> questionIdsMap){
         List<Response_Question_Map__c> rqmList = new List<Response_Question_Map__c>();
-        // MOVE THIS QUERY TO RESPONSE MAP SELECTOR - VERY IMP
-        List<Response_Question_Map__c> oldRQMList = [SELECT Id,QuestionId__c,ResponseAttributeId__c
-                                                    FROM Response_Question_Map__c
-                                                    WHERE ResponseAttributeId__c IN:raIdsMap.keySet()
-                                                    WITH SECURITY_ENFORCED];
+
+        List<Response_Question_Map__c> oldRQMList = ResponseQuestionMapSelector.getResponeQmap(raIdsMap);
         
         for(Response_Question_Map__c rqm : oldRQMList){
             Response_Question_Map__c newRQM = rqm.clone(false, true);
@@ -265,7 +251,6 @@ public with sharing class TemplateService {
         if (sp == null){
             sp = Database.setSavepoint();
         }
-        system.debug('rqmList----->'+rqmList.size());
         if(rqmList.isEmpty() == false){
             Database.SaveResult[] results = safe.doInsert(rqmList);
             List<String> errorsList = SecurityCheckController.safeClassExceptionHandlerInsert(results);

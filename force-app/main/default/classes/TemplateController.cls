@@ -16,14 +16,11 @@ public with sharing class TemplateController {
     public static ResultWrapper doClone(string templateId,SObject templateRecord){
         try{
             ResultWrapper resWrap = TemplateService.cloneTemplate(templateId,templateRecord);
-            system.debug('resWrap------>'+resWrap);
             return resWrap;
         }catch(exception e){
-            system.debug('doClone---->'+e.getMessage());
             string errorMsg = e.getMessage();
             throw new AuraHandledException(ErrorMsg);
         }
-        
     }
 
     /**

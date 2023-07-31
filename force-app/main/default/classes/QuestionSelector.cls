@@ -15,17 +15,16 @@ public with sharing class QuestionSelector {
     * @param templateId This is a record id of an Template.
     * @return 
     */
-    Public List<Question__c> getSubQuestions(set<Id> mqIds){
-        string query = 'SELECT Id,Name,Question__c,Assessment_Template__c,'
-                    +  'Question_Type__c,Conditional_Response__c,HelpText__c,OptionValueSet__c,'
-                    +  'Parent_Question__c,Question_Sequence_Number__c,Required__c,'
-                    +  'Requires_File_Upload__c,Section__c'
-                    + ' FROM Question__c'
-                    + ' WHERE Parent_Question__c != null'
-                    + ' AND Parent_Question__c IN:mqIds'
-                    + ' ORDER BY CreatedDate ASC';
-        Map<String, Object> bindVariables = new Map<String, Object>{'mqIds' => mqIds};
-        List<Question__c>  questionList = safe.doQueryWithBinds(query,bindVariables);
+    public static List<Question__c> getSubQuestions(set<Id> mqIds){
+        List<Question__c> questionList = [SELECT Id,Name,Question__c,Assessment_Template__c,
+                                        Question_Type__c,Conditional_Response__c,HelpText__c,OptionValueSet__c,
+                                        Parent_Question__c,Question_Sequence_Number__c,Required__c,
+                                        Requires_File_Upload__c,Section__c
+                                        FROM Question__c
+                                        WHERE Parent_Question__c != null
+                                        AND Parent_Question__c IN:mqIds
+                                        WITH SECURITY_ENFORCED
+                                        ORDER BY CreatedDate ASC];
         return questionList;
     }
 
