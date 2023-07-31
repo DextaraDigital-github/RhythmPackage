@@ -17,11 +17,10 @@ import updateAccountAssessmentStatus from '@salesforce/apex/AssessmentController
 import deleteFileAttachment from '@salesforce/apex/AssessmentController.deleteFileAttachment';
 //import getResponseFlag from '@salesforce/apex/AssessmentController.getResponseFlag';
 import getAccountAssessmentRecordData from '@salesforce/apex/AssessmentController.getAccountAssessmentRecordData';
-import getQuestionRespAttributes from '@salesforce/apex/QuestionAttributeResponseSelector.getQuestionRespAttributes';
+import getQuestionRespAttributes from '@salesforce/apex/QuestionAttributeResponseController.getQuestionRespAttributes';
 import insertRejectFlag from '@salesforce/apex/AssessmentController.insertRejectFlag';
 import updateRejectFlag from '@salesforce/apex/AssessmentController.updateRejectFlag';
 import getActionRecords from '@salesforce/apex/CAPAController.getActionRecords';
-
 
 import RTM_FONTS from '@salesforce/resourceUrl/rtmfonts';
 import CUS_STYLES from '@salesforce/resourceUrl/rtmcpcsldscustomstyles';
@@ -362,12 +361,8 @@ export default class Questionnaire extends LightningElement {
         console.log('assessment', this.assessment);
         getActionRecords({ accountAssessment: this.assessment }).then((result) => {
             this.actionData = result;
-
-
         });
-        console.log()
-
-
+        this.loading = true;
         this.questionMap = new Map();
         this.questionsList = [];
         this.sectionidslist = [];
@@ -568,6 +563,7 @@ export default class Questionnaire extends LightningElement {
                                     let childsequence = 0;
                                     childQuestion.questions.forEach(ques => {
                                         ques.snumber = sequence + '.' + (++childsequence);
+                                        ques.showUpload = (childQuestion.uploadrequired === 'Yes') ? true : false;
                                     });
                                 });
                             })

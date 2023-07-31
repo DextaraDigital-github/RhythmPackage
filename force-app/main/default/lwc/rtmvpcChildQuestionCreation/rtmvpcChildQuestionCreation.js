@@ -1,5 +1,5 @@
 import { LightningElement, api, track } from 'lwc';
-import getResponseAttributes from '@salesforce/apex/QuestionAttributeResponseSelector.getResponseAttributes';
+import getQuestionRespAttributes from '@salesforce/apex/QuestionAttributeResponseController.getQuestionRespAttributes';
 export default class RtmvpcChildQuestionCreation extends LightningElement {
     @api childwrapper;
     @track questionnaire;
@@ -8,12 +8,16 @@ export default class RtmvpcChildQuestionCreation extends LightningElement {
     @track options = [];
     @track data;
     @track createQues = false;
+    @track loading = false;
     @track showcreateChild;
     connectedCallback() {
         this.showcreateChild = true;
+        this.loading = true;
         console.log('childwrapper', this.childwrapper);
         this.questionnaire = this.childwrapper;
-            getResponseAttributes({ questionId: this.childwrapper.questionId }).then(result => {
+        let questionslst = [];
+         questionslst.push(this.childwrapper.questionId);
+            getQuestionRespAttributes({ questionlst: questionslst }).then(result => {
                 this.data = result;
                 console.log('Result');
                 result.forEach(res => {
@@ -28,6 +32,7 @@ export default class RtmvpcChildQuestionCreation extends LightningElement {
                     }
                     
                 });
+                this.loading = false;
                 this.loadCmp = true;
             })
         

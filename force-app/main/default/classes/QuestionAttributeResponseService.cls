@@ -8,51 +8,11 @@
 public with sharing class QuestionAttributeResponseService {
     public static SecurityCheckController safe = new SecurityCheckController();//use singleton pattern
     private static Savepoint sp;
-    @AuraEnabled	
-	public static List<String> getQuestionTypeValues()
-    {
-        List<String> picklistvaluelst = new List<String>();
-        Schema.DescribeFieldResult objFieldDescribe = Question__c.Question_Type__c.getDescribe();
-		List<Schema.PicklistEntry> lstPickListValues = objFieldDescribe.getPickListValues();
-		for (Schema.PicklistEntry objPickList : lstPickListValues) {
-            picklistvaluelst.add(objPickList.getValue());
-		}
-        return picklistvaluelst;
-    }
-    @AuraEnabled
-    public static List<SObject> createQuestions(List<SObject> questions, Boolean isUpdate)
-    {
-        System.debug('questions'+questions);
-        if(isUpdate)
-        {
-            if(questions.isEmpty() == false){
-                Database.SaveResult[] results = safe.doUpdate(questions);
-                List<String> errorsList = SecurityCheckController.safeClassExceptionHandlerInsert(results);
-                system.debug('errorsList---->'+errorsList);
-                if(errorsList.size()>0){
-                    Database.rollback(sp);
-                    throw new SecurityControllerException(String.join(errorsList, ', ' ));
-                }
-            }
-            //UPDATE questions;
-        }
-        else
-        {
-            if(questions.isEmpty() == false){
-                Database.SaveResult[] results = safe.doInsert(questions);
-                List<String> errorsList = SecurityCheckController.safeClassExceptionHandlerInsert(results);
-                system.debug('errorsList---->'+errorsList);
-                if(errorsList.size()>0){
-                    Database.rollback(sp);
-                    throw new SecurityControllerException(String.join(errorsList, ', ' ));
-                }
-            }
-            //INSERT questions;
-        }
-        
-        return questions;
-    }
-    @AuraEnabled
+    /**
+    * @description Create Response Attributes for Questions 
+    * @param responseAttributes It is a List of maps of Response_Attribute__c Object 
+    * @return List of Response_Attribute__c records
+    */
     public static List<SObject> createResponseAttributes(List<SObject> responseAttributes)
     {
         System.debug('responseAttributes'+responseAttributes);
@@ -84,7 +44,11 @@ public with sharing class QuestionAttributeResponseService {
             }
         return responseQuestionmap;
     }
-    @AuraEnabled  
+   /**
+    * @description Updates Response Attributes for corresponding Questions 
+    * @param responseAttributes It is a list of maps of Response_Attribute__c Object with the Response_Attribute__c Id. 
+    * @return List of Updated Response_Attribute__c records
+    */ 
     public static List<SObject> updateResponseAttributes(List<SObject> responseAttributes)
     {
         if(responseAttributes.isEmpty() == false){
@@ -99,7 +63,11 @@ public with sharing class QuestionAttributeResponseService {
         //UPDATE responseAttributes;
         return responseAttributes;
     }
-    @AuraEnabled
+   /**
+    * @description delete a particular Response Attribute Record
+    * @param responseId is a Response_Attribute__c Record Id. 
+    * @return List of deleted Response_Attribute__c records
+    */
     public static List<Sobject> deleteResponseAttribute(String responseId)
     {
         List<Sobject> delrespAtr = QuestionAttributeResponseSelector.getQuestionResponseAttribute(responseId);
@@ -115,8 +83,6 @@ public with sharing class QuestionAttributeResponseService {
         
         //DELETE delrespAtr;
         return delrespAtr;
-    }
-    public class SecurityControllerException extends Exception{
     }
     
     /**
@@ -145,34 +111,14 @@ public with sharing class QuestionAttributeResponseService {
         Map<String,Object> newParameterMap = (Map<String,Object>)JSON.deserializeUntyped(parameterMap);
         return QuestionSelector.updateQuestionsSequence(newParameterMap);
     }
-    @AuraEnabled
-    public static List<SObject> deleteQuestion(String questionId,String templateId)
+    /**
+    * @description delete Response Attributes for corresponding Questions 
+    * @param questionId It is a List of Question Ids 
+    * @return List of deleted Response_Attribute__c records
+    */
+    public static List<SObject> deleteQuesRespAttribute(List<String> questionId)
     {
-        List<SObject> delQues = QuestionAttributeResponseSelector.getQuestionsData(questionId,templateId);
-        //List<SObject> delRespAtr = QuestionAttributeResponseSelector.getResponseAttributes(questionId);
-        List<SObject> delChildQues = QuestionAttributeResponseSelector.getChildQuestions(questionId,templateId);
-        List<Database.DeleteResult> deleteResult = safe.doDelete(delChildQues);
-                    List<String> errorList = SecurityCheckController.safeClassExceptionHandlerDelete(deleteResult);
-                    if(errorList.size()>0){
-                        Database.rollback(sp);
-                        throw new SecurityControllerException(String.join( errorList, ', ' ));
-                    }
-        DELETE delQues;
-        if(!delChildQues.isEmpty())
-        {
-           List<Database.DeleteResult> deletechildResult = safe.doDelete(delChildQues);
-                    List<String> errorchildList = SecurityCheckController.safeClassExceptionHandlerDelete(deletechildResult);
-                    if(errorchildList.size()>0){
-                        Database.rollback(sp);
-                        throw new SecurityControllerException(String.join( errorList, ', ' ));
-                    }
-        }
-        return delQues;
-    }
-    @AuraEnabled
-    public static List<SObject> deleteQuesRespAttribute(String questionId)
-    {
-        List<SObject> delrespAtr = QuestionAttributeResponseSelector.getResponseAttributes(questionId);
+        List<SObject> delrespAtr = QuestionAttributeResponseSelector.getQuestionRespAttributes(questionId);
         if(!delrespAtr.isEmpty())
         {
              List<Database.DeleteResult> delRespAttr = safe.doDelete(delrespAtr);
@@ -183,5 +129,24 @@ public with sharing class QuestionAttributeResponseService {
                     }
         }
         return delrespAtr;
+    }
+   /**
+    * @description gets al Response Attribute Records based on  Response_Attribute__c Ids
+    * @param questionlst is a list of Response_Attribute__c id. 
+    * @return List of Response_Attribute__c records
+    */
+    public static List<SObject> getQuesRespAttribute(List<String> respAttrId){
+        return QuestionAttributeResponseSelector.getQuesRespAttribute(respAttrId);
+    }
+   /**
+    * @description gets al Response Attribute Records based on  Question__c Id
+    * @param questionlst is a list of Question__c id. 
+    * @return List of Response_Attribute__c records
+    */
+    public static List<SObject> getQuestionRespAttributes(List<String> questionlst){
+        return QuestionAttributeResponseSelector.getQuestionRespAttributes(questionlst);
+    }
+    
+    public class SecurityControllerException extends Exception{
     }
 }

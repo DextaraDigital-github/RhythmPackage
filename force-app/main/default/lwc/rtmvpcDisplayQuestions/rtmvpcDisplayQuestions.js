@@ -2,8 +2,8 @@ import { LightningElement, track, api } from 'lwc';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { loadStyle } from 'lightning/platformResourceLoader';
 import componentStyleSheet from '@salesforce/resourceUrl/ComponentStyleSheet';
-import getQuestions from '@salesforce/apex/QuestionAttributeResponseSelector.getQuestions';
-import deleteQuestion from '@salesforce/apex/QuestionAttributeResponseService.deleteQuestion';
+import getQuestions from '@salesforce/apex/QuestionController.getQuestions';
+import deleteQuestion from '@salesforce/apex/QuestionController.deleteQuestion';
 import getTemplateRecord from '@salesforce/apex/TemplateSelector.getTemplateRecord';
 import errorLogRecord from '@salesforce/apex/AssessmentController.errorLogRecord';
 
@@ -76,7 +76,7 @@ export default class RtmvpcDisplayQuestions extends LightningElement {
             'label': 'Delete',
             'name': 'delete'
         });
-        if (row.isMetCriteria === true) {
+        if (row['isMetCriteria'] === true) {
             actions.push({
                 'label': 'Add Conditional Question',
                 'name': 'addchildquestion'
@@ -109,9 +109,12 @@ export default class RtmvpcDisplayQuestions extends LightningElement {
             console.log('this.tempStatus = true',this.tempStatus );
             getQuestions({ templateId: this.recordId }).then(result => {
                 //this.data = result;
+                console.log('result',result);
                 let questionData = JSON.parse(JSON.stringify(result));
                 let children = questionData.filter(res => typeof res.Rhythm__Parent_Question__c !== 'undefined');
                 let parent = questionData.filter(res => typeof res.Rhythm__Parent_Question__c === 'undefined');
+                console.log('children',children);
+                console.log('parent',parent);
                 let pnumber =0;
                 let parentnumber;
                 parent.forEach(parentdata => {

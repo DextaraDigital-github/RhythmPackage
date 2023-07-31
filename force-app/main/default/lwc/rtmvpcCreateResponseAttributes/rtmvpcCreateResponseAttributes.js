@@ -1,6 +1,6 @@
 import { LightningElement, track, api } from 'lwc';
-import getResponseAttributes from '@salesforce/apex/QuestionAttributeResponseSelector.getResponseAttributes';
-import deleteResponseAttribute from '@salesforce/apex/QuestionAttributeResponseService.deleteResponseAttribute';
+import getQuestionRespAttributes from '@salesforce/apex/QuestionAttributeResponseController.getQuestionRespAttributes';
+import deleteResponseAttribute from '@salesforce/apex/QuestionAttributeResponseController.deleteResponseAttribute';
 import errorLogRecord from '@salesforce/apex/AssessmentController.errorLogRecord';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 export default class RtmvpcCreateResponseAttributes extends LightningElement {
@@ -38,9 +38,11 @@ export default class RtmvpcCreateResponseAttributes extends LightningElement {
         if(typeof this.isdisable!=='undefined'){
             disable = this.isdisable;
         }
-        getResponseAttributes({ questionId: this.questionId }).then(result => {
+        let lst =[];
+        lst.push(this.questionId);
+        getQuestionRespAttributes({ questionlst: lst }).then(result => {
             result.forEach(res => {
-                console.log('getResponseAttributes',res);
+                console.log('getQuestionRespAttributes',res);
                 if(this.quesType==='Checkbox')
                 {
                     disable = true;
@@ -66,8 +68,8 @@ export default class RtmvpcCreateResponseAttributes extends LightningElement {
         }).catch(error => {
             let errormap = {};
             errormap.componentName = 'RtmvpcCreateResponseAttributes';
-            errormap.methodName = 'getResponseAttributes';
-            errormap.className = 'QuestionAttributeResponseSelector';
+            errormap.methodName = 'getQuestionRespAttributes';
+            errormap.className = 'QuestionAttributeResponseController';
             errormap.errorData = error.message;
             errorLogRecord({ errorLogWrapper: JSON.stringify(errormap) }).then(() => { });
         });
