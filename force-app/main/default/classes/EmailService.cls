@@ -38,9 +38,12 @@ public with sharing class EmailService {
         List<String> emailTempFields = new List<String>{'Id', 'Name', 'Subject', 'HtmlValue', 'IsBuilderContent'};
         List<String> childQuery = new List<String>{'(SELECT Id, ContentDocumentId, ContentDocument.FileType, ContentDocument.Title FROM ContentDocumentLinks)'};
         Map<String,Object> emailtempParameterMap = new Map<String,Object>{'fields'=>emailTempFields, 'childQuery'=>childQuery};
-        List<EmailTemplate> etList = EmailTemplateSelector.fetchEmailTemplates(emailtempParameterMap).values();
-        if(etList != null) {
-            return etList;
+        Map<Id,EmailTemplate> emailTemplateMap =EmailTemplateSelector.fetchEmailTemplates(emailtempParameterMap);
+        if(emailTemplateMap != null ){
+            List<EmailTemplate> etList = emailTemplateMap.values();
+            if(etList != null) {
+                return etList;
+            }
         }
         return null;
     }

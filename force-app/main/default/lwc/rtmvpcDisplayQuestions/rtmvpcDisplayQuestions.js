@@ -76,7 +76,7 @@ export default class RtmvpcDisplayQuestions extends LightningElement {
             'label': 'Delete',
             'name': 'delete'
         });
-        if (row['isMetCriteria'] === true) {
+        if (row.isMetCriteria === true) {
             actions.push({
                 'label': 'Add Conditional Question',
                 'name': 'addchildquestion'

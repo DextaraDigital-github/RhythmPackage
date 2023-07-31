@@ -45,10 +45,12 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
     /* Formats the Assessment Template data fetched from Apex into required format so as to display as options in the combobox */
     formatAssessmentTempData(result) {
         this.templateOptions = [];
-        typeof result != 'undefined' && result.forEach(template => {
-            this.templateId = (typeof this.templateId != 'undefined' && template.Id.includes(this.templateId))?template.Id:this.templateId;
-            this.templateOptions.push({ label: template.Name, value: template.Id, icon: 'custom:custom13' });
-        });
+        if(typeof result != 'undefined'){
+            result.forEach(template => {
+                this.templateId = (typeof this.templateId != 'undefined' && template.Id.includes(this.templateId))?template.Id:this.templateId;
+                this.templateOptions.push({ label: template.Name, value: template.Id, icon: 'custom:custom13' });
+            });
+        }
     }
 
     /* Displays toast message */
@@ -74,7 +76,7 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
                 this.todayDate = result;
             }
         })
-        .catch(error => {
+        .catch(() => {
            
         });
     }
@@ -133,8 +135,8 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
                 this.showNotification('Error',validatedData.message,'error');
             }
         }catch(e){
-           
-        }
+            
+        };
     }
 
     validateData(){
