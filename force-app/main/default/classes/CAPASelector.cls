@@ -41,7 +41,7 @@ public class CAPASelector {
     }
     public static Object notifyUsers(){
         customNotificationType custom=[SELECT Id from customNotificationType WHERE DeveloperName = 'Action_Notification'
-                                        WITH SECURITY_ENFORCED];
+                                        ];
         return custom.Id;
         
     }

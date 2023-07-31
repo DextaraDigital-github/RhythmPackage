@@ -27,6 +27,7 @@ export default class RtmvpcAssessmentChatter extends LightningElement {
 
    @api
    displayConversation(chatmap) {
+      console.log('catmap',chatmap);
       this.newChat = '';
       this.responseWrapper = {};
       this.showData = chatmap.openChat;

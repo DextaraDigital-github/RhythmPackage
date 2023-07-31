@@ -124,7 +124,8 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
         console.log('openaction',event.currentTarget.dataset.id);
         let actionMap={};
         actionMap.quesId=event.currentTarget.dataset.id;
-        actionMap.showCapaForm=false;
+        actionMap.showCapaForm=true;
+
  
          const selectedEvent = new CustomEvent('actionchange', {
                 detail: actionMap
@@ -383,7 +384,7 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
             }
         }
         this.chatterMap.questionId = quesId;
-         this.chatterMap.showCapaForm=true;
+         this.chatterMap.openReviewComments=true;
         const selectedEvent = new CustomEvent('selectchange', {
             detail: this.chatterMap
         });

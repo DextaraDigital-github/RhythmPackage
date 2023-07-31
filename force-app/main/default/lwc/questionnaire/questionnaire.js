@@ -103,6 +103,7 @@ export default class Questionnaire extends LightningElement {
     @track responseList = [];
     @track assessmentRecordName;
     @track filterQuestionsAndAnswers;
+    //@track selectedAction=[];
 
 
     @track renderFlag = true;
@@ -370,7 +371,7 @@ export default class Questionnaire extends LightningElement {
         this.questionMap = new Map();
         this.questionsList = [];
         this.sectionidslist = [];
-        let sectionName = {};
+        let sectionName = [];
         if (this.isTemplate) {
             this.isSupplier = false;
             if (this.objectApiName === 'Rhythm__AccountAssessmentRelation__c') {
@@ -394,8 +395,8 @@ export default class Questionnaire extends LightningElement {
                                     if (typeof question.Rhythm__Section__r.Id !== 'undefined') {
                                         if (!this.sectionidslist.includes(question.Rhythm__Section__r.Id)) {
                                             this.sectionidslist.push(question.Rhythm__Section__r.Id);
-                                            //sectionName.push(question.Rhythm__Section__r.Name);
-                                            sectionName[question.Rhythm__Section__r.Id] = question.Rhythm__Section__r.Name;
+                                           // sectionName.push(question.Rhythm__Section__r.Name);
+                                           sectionName[question.Rhythm__Section__r.Id] = question.Rhythm__Section__r.Name;
                                         }
                                     }
                                 }
@@ -2058,30 +2059,55 @@ export default class Questionnaire extends LightningElement {
     handleActionResponse(event) {
         let responseMap = {};
         this.responseList = [];
+        var selectedChat={};
         console.log('kkk');
         responseMap.Rhythm__Question__c = event.detail.quesId;
-        responseMap.showForm = event.detail.showForm;
+        //responseMap.showForm = event.detail.showForm;
+        responseMap.showCapaForm = event.detail.showCapaForm;
         responseMap.isSupplier = this.isSupplier;
         responseMap.Rhythm__AccountAssessment__c = this.recordId;
+        selectedChat.accountassessmentId=this.recordId;
+        selectedChat.accountType='vendor';
+
         if (this.isSupplier === true) {
             responseMap.Rhythm__AccountAssessment__c = this.accountassessmentid;
+            selectedChat.accountassessmentId=this.accountassessmentid;
+            selectedChat.accountType='supplier';
         }
         responseMap.accountName = this.accountName;
         responseMap.Rhythm__Account__c = this.accountId;
         responseMap.Rhythm__Related_Record__c = this.assessmentRecordName;
         this.responseList.push(responseMap);
+        selectedChat.questionId=event.detail.quesId;
+        selectedChat.openChat=false;
+ 
         const selectedAction = new CustomEvent('selectaction', {
-            detail: this.responseList
+            detail: {action:this.responseList,chat:selectedChat}
         });
         this.dispatchEvent(selectedAction);
 
     }
     handlechatHistory(event) {
         this.showChat = event.detail;
+        var selectedActionMap={};
+        var selectedActionList=[];
+        selectedActionMap.Rhythm__Question__c=this.showChat.questionId;
+        selectedActionMap.isSupplier=this.isSupplier;
+        selectedActionMap.Rhythm__AccountAssessment__c = this.recordId;
+        if (this.isSupplier === true) {
+            selectedActionMap.Rhythm__AccountAssessment__c = this.accountassessmentid;
+        }
+        selectedActionMap.accountName = this.accountName;
+        console.log('llll',this.accountName);
+        selectedActionMap.Rhythm__Account__c = this.accountId;
+        selectedActionMap.Rhythm__Related_Record__c = this.assessmentRecordName;
+        selectedActionList.push(selectedActionMap);
+        console.log('llll',selectedActionList);
         const selectedChat = new CustomEvent('selectconversation', {
-            detail: this.showChat
+            detail: {chat:this.showChat,actionData:selectedActionList}
         });
         this.dispatchEvent(selectedChat);
+
     }
 
     /* summaryClickHandler is used to navigate to the sections */

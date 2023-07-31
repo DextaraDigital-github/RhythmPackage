@@ -51,6 +51,9 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
     @track showCapaForm=false;
     @track showResponseForm;
     @track showCapaForm=false;
+    @track openReviewComments=false;
+    @track actionData;
+    @track selectedchatData;
 
     connectedCallback() {
         this.customerId = this.recordId;
@@ -253,9 +256,12 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
     }
     handleAction(event)
     {
-        console.log('hhh',this.assessmentTimeline);
-        this.showResponseForm=event.detail;
+        console.log('hhh',event.detail);
+        this.showResponseForm=event.detail.action;
         this.showCapaForm=this.showResponseForm[0].showCapaForm;
+        this.openReviewComments=false;
+        this.selectedchatData=event.detail.chat;
+        console.log('sample',  this.showResponseForm,this.openReviewComments);
         this.assessmentTimeline.forEach(res=>{
             if(res.status === 'In Review'){
                this.showResponseForm[0].ownershipId=res.id;
@@ -303,16 +309,49 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
     }
     /* chatHistory is used to get the question id, assessment id and flag boolean from the child component (Questionnaire) and pass it to the child component(AssessmentChatter)*/
     chatHistory(event) {
-        this.showChat = event.detail;
-         this.showCapaForm=event.detail.showCapaForm;
+        this.showChat = event.detail.chat;
+         //this.showCapaForm=event.detail.showCapaForm;
+         this.openReviewComments= this.showChat.openReviewComments;
+         this.showCapaForm=false;
+
         console.log('chatter',this.showChat);
         this.showChat.accountassessmentId = this.accountassessmentid;
         this.showData = this.showChat.openChat;
         this.showconverstion = this.showChat.disableSendButton;
+        this.actionData = event.detail.actionData;
+        this.assessmentTimeline.forEach(res=>{
+            if(res.status === 'In Review'){
+               this.actionData[0].ownershipId=res.id;
+               this.actionData[0].ownershipName=res.name;
+            }
+            else if(res.status ==='Submitted'){
+                this.actionData[0].assignedToId=res.id;
+                this.actionData[0].assignedToName=res.name;
+            }
+        })
+        console.log('sample',this.actionData);
          setTimeout(()=>{
             console.log('chatter===>',this.template.querySelectorAll('c-rtmvpc-assessment-chatter'));
             this.template.querySelectorAll('c-rtmvpc-assessment-chatter')[0].displayConversation(this.showChat);
-        },500);
+        },300);
+        
+
+    }
+    handleSelectedAction()
+    {
+        this.openReviewComments=false;
+        this.showCapaForm=true;
+         setTimeout(()=>{
+             this.template.querySelectorAll('c-action')[0].displayForm(this.actionData);
+        },300);
+
+    }
+    handleSelectedChat(){
+        this.openReviewComments=true;
+        this.showCapaForm=false;
+         setTimeout(()=>{
+          this.template.querySelectorAll('c-rtmvpc-assessment-chatter')[0].displayConversation(this.selectedchatData);
+        },300);
     }
 
     showsummaryHandler() {
