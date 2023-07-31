@@ -50,12 +50,16 @@ export default class RtmvpcRelatedEmails extends LightningElement {
                             emailJson.isBuilderContent = true;
                             emailJson.fromName = email.EmailMessage.FromName;
                             let monthMap = new Map([['01','Jan'],['02','Feb'],['03','Mar'],['04','Apr'],['05','May'],['06','Jun'],['07','Jul'],['08','Aug'],['09','Sep'],['10','Oct'],['11','Nov'],['12','Dec']]);
-                            emailJson.sentDate = email.EmailMessage.CreatedDate.split('T')[0].split('-')[2] + ' ' + monthMap.get(email.EmailMessage.CreatedDate.split('T')[0].split('-')[1]) + ', ' + email.EmailMessage.CreatedDate.split('T')[0].split('-')[0];
+                            let hh = Number(email.EmailMessage.CreatedDate.split('T')[1].split(':')[0]);
+                            let mm = email.EmailMessage.CreatedDate.split('T')[1].split(':')[1];
+                            emailJson.sentDate = (email.EmailMessage.CreatedDate.split('T')[0].split('-')[2] + ' ' + monthMap.get(email.EmailMessage.CreatedDate.split('T')[0].split('-')[1]) + ', ' + email.EmailMessage.CreatedDate.split('T')[0].split('-')[0]) + ' ' + ((hh < 10?'0':'') + (hh > 12?(hh - 12 < 10?'0':'')+(hh - 12):hh) + ':' + (mm) + (hh > 12?'PM':'AM'));
+                            emailJson.assessmentName = email.EmailMessage.RelatedTo.Name;
                             emailJson.subject = email.EmailMessage.Subject;
                             emailJson.body = email.EmailMessage.HtmlBody;
                             emailJson.templateId = (typeof email.EmailMessage.EmailTemplate != 'undefined') ? email.EmailMessage.EmailTemplate.Name : '--None--';
                             emailJson.emailTemplatesOpt = [{ label: emailJson.templateId, value: emailJson.templateId }];
                             emailJson.selectedAccounts = [];
+                            emailJson.columnsList = [{ fieldName: 'Name', label: 'Name', sortable: true }, { fieldName: 'Email', label: 'Email', sortable: true }];
                             emailJson.accountsData = [];
                         }
                         else {
@@ -64,7 +68,7 @@ export default class RtmvpcRelatedEmails extends LightningElement {
                         if (typeof user.Contact != 'undefined' && typeof user.Contact.AccountId != 'undefined' && typeof user.Contact.Account != 'undefined' && typeof user.Contact.Account.Name != 'undefined') {
                             emailJson.selectedAccounts.push(user.Contact.AccountId);
                             emailJson.selectedAccountsCount = emailJson.selectedAccounts.length;
-                            emailJson.accountsData.push({ Id: user.Contact.AccountId, Name: user.Contact.Account.Name });
+                            emailJson.accountsData.push({ Id: user.Contact.AccountId, Name: user.Contact.Account.Name, Email: user.Email });
                             emailMap.set(email.EmailMessageId, emailJson);
                         }
                     });
