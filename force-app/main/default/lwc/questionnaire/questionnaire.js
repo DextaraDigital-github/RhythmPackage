@@ -366,7 +366,7 @@ export default class Questionnaire extends LightningElement {
         this.questionMap = new Map();
         this.questionsList = [];
         this.sectionidslist = [];
-        let sectionName = [];
+        let sectionName = {};
         if (this.isTemplate) {
             this.isSupplier = false;
             if (this.objectApiName === 'Rhythm__AccountAssessmentRelation__c') {
