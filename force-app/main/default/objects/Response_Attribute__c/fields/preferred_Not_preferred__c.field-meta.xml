@@ -3,7 +3,7 @@
     <fullName>preferred_Not_preferred__c</fullName>
     <externalId>false</externalId>
     <label>preferred/Not preferred</label>
-    <required>true</required>
+    <required>false</required>
     <trackHistory>false</trackHistory>
     <trackTrending>false</trackTrending>
     <type>Picklist</type>
