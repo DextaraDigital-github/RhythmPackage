@@ -17,7 +17,7 @@ import updateAccountAssessmentStatus from '@salesforce/apex/AssessmentController
 import deleteFileAttachment from '@salesforce/apex/AssessmentController.deleteFileAttachment';
 //import getResponseFlag from '@salesforce/apex/AssessmentController.getResponseFlag';
 import getAccountAssessmentRecordData from '@salesforce/apex/AssessmentController.getAccountAssessmentRecordData';
-import getQuestionRespAttributes from '@salesforce/apex/QuestionAttributeResponseSelector.getQuestionRespAttributes';
+import getQuestionRespAttributes from '@salesforce/apex/QuestionAttributeResponseController.getQuestionRespAttributes';
 import insertRejectFlag from '@salesforce/apex/AssessmentController.insertRejectFlag';
 import updateRejectFlag from '@salesforce/apex/AssessmentController.updateRejectFlag';
 import getActionRecords from '@salesforce/apex/CAPAController.getActionRecords';
@@ -362,16 +362,11 @@ export default class Questionnaire extends LightningElement {
         console.log('assessment', this.assessment);
         getActionRecords({ accountAssessment: this.assessment }).then((result) => {
             this.actionData = result;
-
-
         });
-        console.log()
-
-
         this.questionMap = new Map();
         this.questionsList = [];
         this.sectionidslist = [];
-        let sectionName = [];
+        let sectionName = {};
         if (this.isTemplate) {
             this.isSupplier = false;
             if (this.objectApiName === 'Rhythm__AccountAssessmentRelation__c') {
@@ -515,6 +510,7 @@ export default class Questionnaire extends LightningElement {
 
             }
             else {
+                this.loading = true;
                 this.isPreviewComponent = true;
                 this.showRefreshbutton = true;
                 this.savedResponseMap = {};
@@ -568,6 +564,7 @@ export default class Questionnaire extends LightningElement {
                                     let childsequence = 0;
                                     childQuestion.questions.forEach(ques => {
                                         ques.snumber = sequence + '.' + (++childsequence);
+                                        ques.showUpload = (childQuestion.uploadrequired === 'Yes') ? true : false;
                                     });
                                 });
                             })
