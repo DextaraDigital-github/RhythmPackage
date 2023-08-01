@@ -2,8 +2,8 @@ import { LightningElement, api, track } from 'lwc';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { loadStyle } from 'lightning/platformResourceLoader';
 import componentStylesheet from '@salesforce/resourceUrl/ComponentStyleSheet';
-import fetchQuestions from '@salesforce/apex/QuestionAttributeResponseController.fetchQuestions';
-import updateQuestionsSequence from '@salesforce/apex/QuestionAttributeResponseController.updateQuestionsSequence';
+import fetchQuestions from '@salesforce/apex/QuestionController.fetchQuestions';
+import updateQuestionsSequence from '@salesforce/apex/QuestionController.updateQuestionsSequence';
 
 export default class RtmvpcChildQuestionReordering extends LightningElement {
     @api question;   //Stores the selected question
