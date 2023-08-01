@@ -26,9 +26,9 @@ export default class RtmvpcChildQuestionReordering extends LightningElement {
 
     /* Renders the UI to make the indicate the active response in the navigation item with WHITE background-color */
     renderNavBar() {
-        if (typeof this.activeResponse !== 'undefined') {
+        if (typeof this.activeResponse != undefined) {
             let navItems = this.template.querySelectorAll('[data-name="response"]');
-            if (typeof navItems !== 'undefined' && navItems.length > 0) {
+            if (typeof navItems != 'undefined' && navItems.length > 0) {
                 this.responseList.forEach(navItem => {
                     this.template.querySelectorAll('[data-response="' + navItem + '"]')[0].classList.remove('slds-is-active');
                 });
@@ -64,7 +64,7 @@ export default class RtmvpcChildQuestionReordering extends LightningElement {
     /* Formats the questions data into the required format */
     formatQuestionsData(result) {
         this.responseMap = new Map();
-        this.responseList = (typeof this.question.Rhythm__OptionValueSet__c != 'undefined') ? this.question.Rhythm__OptionValueSet__c.split('\r\n') : [];
+        this.responseList = (typeof this.question.Rhythm__OptionValueSet__c != 'undefined') ? this.question.Rhythm__OptionValueSet__c.split(', ') : [];
         result.forEach(question => {
             let responseJson;
             if (!this.responseMap.has(question.Rhythm__Conditional_Response__c)) {
@@ -115,7 +115,7 @@ export default class RtmvpcChildQuestionReordering extends LightningElement {
                 this.show.spinner = false;
                 this.configureToast('Some error has occured', 'Please contact your administrator.', 'error');
             }
-        }).catch(() => {
+        }).catch(error => {
             this.show.saveBtn = true;
             this.show.spinner = false;
             this.configureToast('Some error has occured', 'Please contact your administrator.', 'error');
