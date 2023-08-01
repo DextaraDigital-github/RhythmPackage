@@ -223,7 +223,8 @@ public class QuestionControllerTest {
             List<SObject> qType1 = QuestionController.createQuestions(questionlst,false);
             set<Id> st = new set<Id>();
             st.add(ques[0].Id);
-            List<SObject> qType = QuestionSelector.getSubQuestions(st);
+            QuestionSelector qs = new QuestionSelector();
+            List<SObject> qType = qs.getSubQuestions(st);
             Test.stopTest();
             System.assertEquals(qType.size()>0, true,'Question deleted successfully'); 
         }

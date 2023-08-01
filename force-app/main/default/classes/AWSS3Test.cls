@@ -76,18 +76,22 @@ private class AWSS3Test {
 */
     @isTest
     private static void testGetAuthenticationData() {
-        List<Assessment_Template__c> templist=[select id from Assessment_Template__c];
-        List<Action__c> actlist=[select id,Question__c,AccountAssessment__c from Action__c];
-        Rhythm__S3Configuration__mdt config1 = new Rhythm__S3Configuration__mdt();
-        config1.Rhythm__Value__c = 'Config1';
-        Rhythm__S3Configuration__mdt config2 = new Rhythm__S3Configuration__mdt();
-        config2.Rhythm__Value__c = 'Config2';
-        Test.startTest();
-        List<s3configuration__mdt> result = AWSS3Controller.getAuthenticationData();
-        AWSS3Controller.getTemplateDetails(templist[0].id);
-        AWSS3Controller.saveActionRecord(actlist);
-        Test.stopTest(); 
-        System.assertEquals(6, result.size(), 'Incorrect number of records returned');
+        String ids= UserInfo.getUserId();
+        User u=[select id from user where id=:ids limit 1];
+        System.runAs(u) {
+            List<Assessment_Template__c> templist=[select id from Assessment_Template__c];
+            List<Action__c> actlist=[select id,Question__c,AccountAssessment__c from Action__c];
+            Rhythm__S3Configuration__mdt config1 = new Rhythm__S3Configuration__mdt();
+            config1.Rhythm__Value__c = 'Config1';
+            Rhythm__S3Configuration__mdt config2 = new Rhythm__S3Configuration__mdt();
+            config2.Rhythm__Value__c = 'Config2';
+            Test.startTest();
+            List<s3configuration__mdt> result = AWSS3Controller.getAuthenticationData();
+            AWSS3Controller.getTemplateDetails(templist[0].id);
+            AWSS3Controller.saveActionRecord(actlist);
+            Test.stopTest(); 
+            System.assertEquals(6, result.size(), 'Incorrect number of records returned');
+        }
     }
     
     /**
@@ -107,33 +111,42 @@ private class AWSS3Test {
 */
     @isTest
     private  static void testcreateResponseforFileUpload() {
-        List<Response__c> resplist=[select id,Question__c,AccountAssessmentRelation__c from Response__c];
-        List<Rhythm__AccountAssessmentRelation__c> asslist=[select Id,Rhythm__Account__c, Rhythm__Assessment__c from Rhythm__AccountAssessmentRelation__c LIMIT 1];
-        List<Question__c> quslist=[SELECT Id from Question__c LIMIT 1];
-        Test.startTest();
-        Map<String,Object> filemap = new Map<String,Object>();
-        filemap.put('assessmentId', resplist[0].AccountAssessmentRelation__c);
-        filemap.put('quesId', resplist[0].Question__c); 
-        AWSS3Controller.createResponseforFileUpload(JSON.serialize(resplist));
-        Test.stopTest();
-        System.assertEquals(1,asslist.size(),'Assert Failed');
+        String ids= UserInfo.getUserId();
+        User u=[select id from user where id=:ids limit 1];
+        System.runAs(u) {
+            List<Response__c> resplist=[select id,Question__c,AccountAssessmentRelation__c from Response__c];
+            List<Rhythm__AccountAssessmentRelation__c> asslist=[select Id,Rhythm__Account__c, Rhythm__Assessment__c from Rhythm__AccountAssessmentRelation__c LIMIT 1];
+            List<Question__c> quslist=[SELECT Id from Question__c LIMIT 1];
+            Test.startTest();
+            Map<String,Object> filemap = new Map<String,Object>();
+            filemap.put('assessmentId', resplist[0].AccountAssessmentRelation__c);
+            filemap.put('quesId', resplist[0].Question__c); 
+            AWSS3Controller.createResponseforFileUpload(JSON.serialize(filemap));
+            Test.stopTest();
+            System.assertEquals(1,asslist.size(),'Assert Failed');
+        }
     }
     /**
 * @description
 */
     @isTest
     private  static void testcreateRespforFileUpload() {
-        List<Response__c> resp=[Select id from Response__c];
-        delete resp;
-        List<Rhythm__AccountAssessmentRelation__c> asslist=[select Id,Account__c, Assessment__c from Rhythm__AccountAssessmentRelation__c LIMIT 1];
-        List<Question__c> quslist=[SELECT Id from Question__c LIMIT 1];
-        Test.startTest();
-        Map<String,Object> filemap = new Map<String,Object>();
-        filemap.put('assessmentId', asslist[0].Id);
-        filemap.put('quesId', quslist[0].Id); 
-        AWSS3Controller.createResponseforFileUpload(JSON.serialize(filemap));
-        Test.stopTest();
-        System.assertEquals(1,asslist.size(),'Assert Failed');
+        String ids= UserInfo.getUserId();
+        User u=[select id from user where id=:ids limit 1];
+        System.runAs(u) {
+            List<Response__c> resp=[Select id,Question__c,AccountAssessmentRelation__c  from Response__c];
+            delete resp;
+            List<Rhythm__AccountAssessmentRelation__c> asslist=[select Id,Account__c, Assessment__c from Rhythm__AccountAssessmentRelation__c LIMIT 1];
+            List<Question__c> quslist=[SELECT Id from Question__c LIMIT 1];
+            Test.startTest();
+            Map<String,Object> filemap = new Map<String,Object>();
+            filemap.put('assessmentId', resp[0].AccountAssessmentRelation__c);
+            filemap.put('quesId', resp[0].Question__c);
+            
+            AWSS3Controller.createResponseforFileUpload (JSON.serialize(filemap));
+            Test.stopTest();
+            System.assertEquals(1,asslist.size(),'Assert Failed');
+        }
     }
     
     /**
@@ -141,12 +154,16 @@ private class AWSS3Test {
 */
     @isTest
     private  static void testUploadFiles() {
-        List<Account> acc = [Select Id,Name from Account];
-        Test.startTest();
-        AWSS3Controller.uploadFiles(acc[0].Id, 'Account', null, false);
-        AWSS3Service.convertToHex('c','test');
-        Test.stopTest();
-        System.assertEquals(1,acc.size(),'Assert Failed');
+        String ids= UserInfo.getUserId();
+        User u=[select id from user where id=:ids limit 1];
+        System.runAs(u) {
+            List<Account> acc = [Select Id,Name from Account];
+            Test.startTest();
+            AWSS3Controller.uploadFiles(acc[0].Id, 'Account', null, false);
+            AWSS3Service.convertToHex('c','test');
+            Test.stopTest();
+            System.assertEquals(1,acc.size(),'Assert Failed');
+        }
     }
     
     /**
@@ -154,15 +171,19 @@ private class AWSS3Test {
 */
     @isTest
     private static void awsTest(){
-        Dom.Document doc = new Dom.Document();
-        Dom.Xmlnode rootNode = doc.createRootElement('TestReport', null, null);
-        rootNode.addChildElement('detail', null, null);
-        test.startTest(); 
-        AWS.getChildNodeBoolean(rootNode,'Rhythm','detail');
-        AWS.getChildNodeInteger(rootNode,'Rhythm','rootNode');
-        AWS.getChildNodeText(rootNode,'Rhythm','rootNode');
-        new AWS.ServiceException(rootNode);
-        test.stopTest();
-        System.assertEquals(1,1,'Assert Failed');
+        String ids= UserInfo.getUserId();
+        User u=[select id from user where id=:ids limit 1];
+        System.runAs(u) {
+            Dom.Document doc = new Dom.Document();
+            Dom.Xmlnode rootNode = doc.createRootElement('TestReport', null, null);
+            rootNode.addChildElement('detail', null, null);
+            test.startTest(); 
+            AWS.getChildNodeBoolean(rootNode,'Rhythm','detail');
+            AWS.getChildNodeInteger(rootNode,'Rhythm','rootNode');
+            AWS.getChildNodeText(rootNode,'Rhythm','rootNode');
+            new AWS.ServiceException(rootNode);
+            test.stopTest();
+            System.assertEquals(1,1,'Assert Failed');
+        }
     }
 }

@@ -54,7 +54,8 @@ public class SectionSelectorTest {
         String tempId = sec[0].Assessment_Template__c;
         System.runAs(u){
             Test.startTest();
-            List<Section__c> seclst =SectionSelector.getSectionsforTemplate(tempId);
+            SectionSelector ss = new SectionSelector();
+            List<Section__c> seclst =ss.getSectionsforTemplate(tempId);
             Test.stopTest();
            System.assertEquals(seclst.size()>0, true,'Response Attribute Deleted successfully');
         } 

@@ -121,8 +121,7 @@ public with sharing class QuestionAttributeResponseSelector {
         }
     }
 
-    @AuraEnabled
-    public static List<Response_Attribute__c> getRespAttforQuestion(Map<Id,Id> questionIdsMap){
+    public List<Response_Attribute__c> getRespAttforQuestion(Map<Id,Id> questionIdsMap){
         List<Response_Attribute__c> resAttList = [SELECT Id,QuestionId__c,Name,
                                     preferred_Not_preferred__c,Response_value__c,
                                     Score__c,Upload_Required__c,Weight__c

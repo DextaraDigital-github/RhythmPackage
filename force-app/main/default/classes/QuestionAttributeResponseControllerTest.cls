@@ -190,7 +190,8 @@ public class QuestionAttributeResponseControllerTest {
         quesmap.put(ques[0].Id,ques[0].Id);
         System.runAs(u){
            Test.startTest();
-            List<SObject> respType = QuestionAttributeResponseSelector.getRespAttforQuestion(quesmap);
+           QuestionAttributeResponseSelector qs = new QuestionAttributeResponseSelector();
+            List<SObject> respType = qs.getRespAttforQuestion(quesmap);
            Test.stopTest();
            System.assertEquals(respType.size()>0, true,'Response Attribute Deleted successfully');
         }

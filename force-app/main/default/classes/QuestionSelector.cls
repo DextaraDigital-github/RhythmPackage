@@ -15,7 +15,7 @@ public with sharing class QuestionSelector {
     * @param templateId This is a record id of an Template.
     * @return 
     */
-    Public static List<Question__c> getSubQuestions(set<Id> mqIds){
+    public List<Question__c> getSubQuestions(set<Id> mqIds){
         string query = 'SELECT Id,Name,Question__c,Assessment_Template__c,'
                     +  'Question_Type__c,Conditional_Response__c,HelpText__c,OptionValueSet__c,'
                     +  'Parent_Question__c,Question_Sequence_Number__c,Required__c,'
