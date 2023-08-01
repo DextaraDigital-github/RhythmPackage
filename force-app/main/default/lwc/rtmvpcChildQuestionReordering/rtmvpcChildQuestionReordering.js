@@ -64,7 +64,7 @@ export default class RtmvpcChildQuestionReordering extends LightningElement {
     /* Formats the questions data into the required format */
     formatQuestionsData(result) {
         this.responseMap = new Map();
-        this.responseList = (typeof this.question.Rhythm__OptionValueSet__c != 'undefined') ? this.question.Rhythm__OptionValueSet__c.split(', ') : [];
+        this.responseList = (typeof this.question.options != 'undefined') ? this.question.options.split('\r\n') : [];
         result.forEach(question => {
             let responseJson;
             if (!this.responseMap.has(question.Rhythm__Conditional_Response__c)) {

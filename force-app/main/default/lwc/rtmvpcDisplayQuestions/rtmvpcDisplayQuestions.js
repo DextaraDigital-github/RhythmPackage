@@ -169,6 +169,7 @@ export default class RtmvpcDisplayQuestions extends LightningElement {
                         || parentdata.Rhythm__Question_Type__c === 'Picklist (Multi-Select)' || parentdata.Rhythm__Question_Type__c === 'Checkbox') {
                         parentdata['isMetCriteria'] = true;
                         parentdata.Rhythm__OptionValueSet__c = parentdata.Rhythm__OptionValueSet__c.replaceAll('\r\n',', ');
+                        parentdata.options=parentdata.Rhythm__OptionValueSet__c;
                         parentdata['priorityicon'] = 'utility:record_create';
                         parentdata['isiconavailable'] = false;
                     }

@@ -53,7 +53,7 @@ export default class RtmvpcQuestionCreation extends LightningElement {
     @api
     getParentQuestionCondition(conditionValue) {
         console.log('getParentQuestionCondition', conditionValue);
-        if (typeof conditionValue != 'undefined') {
+        if (typeof conditionValue !== 'undefined') {
             this.questionWrapper['Rhythm__Conditional_Response__c'] = conditionValue.conditionalResponse;
             //this.questionWrapper['Rhythm__Section__c'] = 
             this.responseAttributeId = conditionValue.responseAttributeId;
@@ -135,7 +135,7 @@ export default class RtmvpcQuestionCreation extends LightningElement {
             });
             this.createQues = true;
         }
-        if (typeof this.childQuesCreation != 'undefined' && typeof this.childwrapper != 'undefined') {
+        if (typeof this.childQuesCreation !== 'undefined' && typeof this.childwrapper !== 'undefined') {
             this.displayNew = false;
             this.questionWrapper['Rhythm__Parent_Question__c'] = this.childwrapper.questionId;
             this.questionWrapper['Rhythm__Assessment_Template__c'] = this.childwrapper.templateId;
@@ -172,6 +172,7 @@ export default class RtmvpcQuestionCreation extends LightningElement {
         if (type !== undefined || type !== null) {
             if (type === 'Rhythm__Question_Type__c' && (value === 'Picklist' || value === 'Radio' || value === 'Picklist (Multi-Select)' || value === 'Checkbox')) {
                 this.selQuestionType = value;
+                this.questionWrapper.Rhythm__Requires_File_Upload__c = false;
                 this.showResponseAttributes = true;
                 setTimeout(() => {
                     this.template.querySelectorAll('c-rtmvpc-create-response-attributes')[0].handleQuestionTypeChange(value);
