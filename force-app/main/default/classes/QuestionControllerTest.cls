@@ -31,11 +31,11 @@ public class QuestionControllerTest {
             Map<String, Object> respAttributes = new Map<String, Object>{'Rhythm__preferred_Not_preferred__c'=>'Preferred',
                 'Rhythm__QuestionId__c'=>ques[0].Id,'Rhythm__Response_value__c'=>'Yes','Rhythm__Score__c'=>5,
                 'Rhythm__Weight__c'=>10,'Rhythm__Upload_Required__c'=>'Yes'};
-            List<Question__c> resp =TestDataFactory.createResponseAttributes(1,true,respAttributes);
+            List<Response_Attribute__c> resp =TestDataFactory.createResponseAttributes(1,true,respAttributes);
             Map<String, Object> respAttributes2 = new Map<String, Object>{'Rhythm__preferred_Not_preferred__c'=>'Preferred',
                 'Rhythm__QuestionId__c'=>ques[0].Id,'Rhythm__Response_value__c'=>'No','Rhythm__Score__c'=>5,
                 'Rhythm__Weight__c'=>10,'Rhythm__Upload_Required__c'=>'Yes'};
-            List<Question__c> resp2 =TestDataFactory.createResponseAttributes(1,true,respAttributes2);
+            List<Response_Attribute__c> resp2 =TestDataFactory.createResponseAttributes(1,true,respAttributes2);
             
            /* Map<String, Object> assessmentattributes = new Map<String, Object>{'Template__c'=>templist[0].Id,
             'Name'=>'Assessment 2023','Rhythm__Status__c'=>'New','Rhythm__Number_of_Questions__c'=>10};
@@ -151,6 +151,79 @@ public class QuestionControllerTest {
         System.runAs(u){
             Test.startTest();
             List<SObject> qType = QuestionController.getQuestionsData(ques[0].Id,ques[0].Assessment_Template__c);
+            Test.stopTest();
+            System.assertEquals(qType.size()>0, true,'Question deleted successfully'); 
+        }
+    }
+        @isTest
+    static void fetchQuestionsTest()
+    {
+       user u = [SELECT Id,UserName FROM User WHERE Email='standarduser@testorg.com' LIMIT 1];
+        List<Question__c> ques = [SELECT id,Assessment_Template__c,Section__c from Question__c];
+        Question__c quesAtr = new Question__c();
+        quesAtr.Assessment_Template__c = ques[0].Assessment_Template__c;
+        quesAtr.Section__c = ques[0].Rhythm__Section__c;
+        quesAtr.Question__c =' Test Question';
+        quesAtr.Question_Type__c ='Text';
+        quesAtr.Rhythm__Parent_Question__c = ques[0].Id;
+        List<Sobject> questionlst = new List<SObject>();
+        questionlst.add(quesAtr);
+        
+        System.runAs(u){
+            Test.startTest();
+            List<SObject> qType1 = QuestionController.createQuestions(questionlst,false);
+            Map<String,Object> mp = new Map<String,Object>();
+        	mp.put('assessmentId',ques[0].Id);
+        	
+            List<SObject> qType = QuestionController.fetchQuestions(JSON.serialize(mp));
+            //List<SObject> qType2 = QuestionController.fetchQuestions(null);
+            Test.stopTest();
+            System.assertEquals(qType.size()>0, true,'Question deleted successfully'); 
+        }
+    }
+    @isTest
+    static void updateQuestionsSequenceTest()
+    {
+        user u = [SELECT Id,UserName FROM User WHERE Email='standarduser@testorg.com' LIMIT 1];
+        List<Question__c> ques = [SELECT id,Assessment_Template__c,Section__c from Question__c];
+        Question__c quesAtr = new Question__c();
+        quesAtr.Assessment_Template__c = ques[0].Assessment_Template__c;
+        quesAtr.Section__c = ques[0].Rhythm__Section__c;
+        quesAtr.Question__c =' Test Question';
+        quesAtr.Question_Type__c ='Text';
+        quesAtr.Rhythm__Parent_Question__c = ques[0].Id;
+        List<Sobject> questionlst = new List<SObject>();
+        questionlst.add(quesAtr);
+        
+        System.runAs(u){
+            Test.startTest();
+            List<SObject> qType1 = QuestionController.createQuestions(questionlst,false);
+            Map<String,Object> mp = new Map<String,Object>();
+        	mp.put('questionIdList',new List<String>{qType1[0].Id});
+        	mp.put('questionId',ques[0].Id);
+            List<SObject> qType = QuestionController.updateQuestionsSequence(JSON.serialize(mp));
+            Test.stopTest();
+            System.assertEquals(qType.size()>0, true,'Question deleted successfully'); 
+        }
+    }
+     @isTest
+    static void getSubQuestionsTest(){
+        user u = [SELECT Id,UserName FROM User WHERE Email='standarduser@testorg.com' LIMIT 1];
+        List<Question__c> ques = [SELECT id,Assessment_Template__c,Section__c from Question__c];
+        Question__c quesAtr = new Question__c();
+        quesAtr.Assessment_Template__c = ques[0].Assessment_Template__c;
+        quesAtr.Section__c = ques[0].Rhythm__Section__c;
+        quesAtr.Question__c =' Test Question';
+        quesAtr.Question_Type__c ='Text';
+        quesAtr.Rhythm__Parent_Question__c = ques[0].Id;
+        List<Sobject> questionlst = new List<SObject>();
+        questionlst.add(quesAtr);
+        System.runAs(u){
+            Test.startTest();
+            List<SObject> qType1 = QuestionController.createQuestions(questionlst,false);
+            set<Id> st = new set<Id>();
+            st.add(ques[0].Id);
+            List<SObject> qType = QuestionSelector.getSubQuestions(st);
             Test.stopTest();
             System.assertEquals(qType.size()>0, true,'Question deleted successfully'); 
         }

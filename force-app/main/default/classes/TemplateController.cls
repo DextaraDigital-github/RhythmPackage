@@ -15,7 +15,8 @@ public with sharing class TemplateController {
     @AuraEnabled
     public static ResultWrapper doClone(string templateId,SObject templateRecord){
         try{
-            ResultWrapper resWrap = TemplateService.cloneTemplate(templateId,templateRecord);
+            TemplateService ts = new TemplateService();
+            ResultWrapper resWrap = ts.cloneTemplate(templateId,templateRecord);
             return resWrap;
         }catch(exception e){
             string errorMsg = e.getMessage();

@@ -168,9 +168,9 @@
 											<c-rtmvpc-render-question-template responses={questionaryEntry.questions}
 												issupplier={isSupplier} sectionid={questionaryEntry.sectionId}
 												assessmentid={assessment} onvaluechange={onResponseChange}
-												onfileupload={handleFileUpload} onselectchange={handlechatHistory}
+												onfileupload={handleFileUpload} onselectchange={handlechatHistory} ongetdata={handleOnload}
 												ondeleteattachment={handledeletefile} 
-												onselectquestion={selectquestionHandler} recid={recordId}
+												onselectquestion={selectquestionHandler} recid={recordId} accountassessmentid={accountassessmentid}
 												onflagchange={handleFlagResponseMethod} uploading-file={uploadingFile}
 												onactionchange={handleActionResponse} onrejectchange={handleReject}
 												timeline={timeline} is-preview-component={isPreviewComponent}>

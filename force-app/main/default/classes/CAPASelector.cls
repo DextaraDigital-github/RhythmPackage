@@ -1,7 +1,4 @@
-public class CAPASelector {
-    /* public static SecurityCheckController safe = new SecurityCheckController();//use singleton pattern
-     private static Savepoint sp;*/
-    
+public with sharing class CAPASelector {
     public static List<user> getRecordsList(string userName){
         return [SELECT Name from user WHERE Name LIKE : userName WITH SECURITY_ENFORCED];
     }

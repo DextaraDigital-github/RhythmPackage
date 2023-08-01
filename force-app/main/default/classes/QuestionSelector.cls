@@ -15,16 +15,17 @@ public with sharing class QuestionSelector {
     * @param templateId This is a record id of an Template.
     * @return 
     */
-    public static List<Question__c> getSubQuestions(set<Id> mqIds){
-        List<Question__c> questionList = [SELECT Id,Name,Question__c,Assessment_Template__c,
-                                        Question_Type__c,Conditional_Response__c,HelpText__c,OptionValueSet__c,
-                                        Parent_Question__c,Question_Sequence_Number__c,Required__c,
-                                        Requires_File_Upload__c,Section__c
-                                        FROM Question__c
-                                        WHERE Parent_Question__c != null
-                                        AND Parent_Question__c IN:mqIds
-                                        WITH SECURITY_ENFORCED
-                                        ORDER BY CreatedDate ASC];
+    Public static List<Question__c> getSubQuestions(set<Id> mqIds){
+        string query = 'SELECT Id,Name,Question__c,Assessment_Template__c,'
+                    +  'Question_Type__c,Conditional_Response__c,HelpText__c,OptionValueSet__c,'
+                    +  'Parent_Question__c,Question_Sequence_Number__c,Required__c,'
+                    +  'Requires_File_Upload__c,Section__c'
+                    + ' FROM Question__c'
+                    + ' WHERE Parent_Question__c != null'
+                    + ' AND Parent_Question__c IN:mqIds'
+                    + ' ORDER BY CreatedDate ASC';
+        Map<String, Object> bindVariables = new Map<String, Object>{'mqIds' => mqIds};
+        List<Question__c>  questionList = safe.doQueryWithBinds(query,bindVariables);
         return questionList;
     }
 
@@ -44,7 +45,7 @@ public with sharing class QuestionSelector {
         		return qList;
             }
             catch(Exception e) {
-                errorList = new List<ErrorTransactionLog__c>();
+                /*errorList = new List<ErrorTransactionLog__c>();
             	errorRec = new ErrorTransactionLog__c();
                 errorRec.Class_Name__c = 'ContentVersionSelector';
                 errorRec.Error_Stack_Trace__c = e.getStackTraceString();
@@ -52,7 +53,7 @@ public with sharing class QuestionSelector {
                 errorRec.LWC_Component_Name__c = '';
                 errorRec.Method_Name__c = 'fetchContentVersions';
                 errorList.add(errorRec);
-                Database.SaveResult[] results = Database.insert(errorList, false);
+                Database.SaveResult[] results = Database.insert(errorList, false);*/
                 throw new AuraHandledException(e.getMessage());   //Throws an exception
             }
         }
@@ -93,7 +94,6 @@ public with sharing class QuestionSelector {
     * @param templateId It is an id of Template
     * @return List of Question__c records
     */
-    @AuraEnabled
     Public Static List<SObject> getQuestions(String templateId)
     {
          try{
@@ -111,9 +111,7 @@ public with sharing class QuestionSelector {
         }
         catch(Exception e)
         {
-            String errorMsg = e.getMessage();
-            System.debug('errorMsg'+errorMsg);
-            throw new AuraHandledException(errorMsg);
+            throw new AuraHandledException(e.getMessage());
         }
         /*List<SObject> questionslst =[SELECT id,name,Section__c,Section__r.Name,SectionName__c, Question__c,Question_Type__c,OptionValueSet__c FROM 
                                  Question__c WHERE Assessment_Template__c =:templateId];
@@ -125,7 +123,6 @@ public with sharing class QuestionSelector {
     * @param questionId it is an id of Question
     * @return List of Question__c record
     */
-    @AuraEnabled
     Public Static List<SObject> getQuestionsData(String questionId, String templateId)
     {
         try{
@@ -147,9 +144,7 @@ public with sharing class QuestionSelector {
         }
         catch(Exception e)
         {
-            String errorMsg = e.getMessage();
-            System.debug('errorMsg'+errorMsg);
-            throw new AuraHandledException(errorMsg);
+            throw new AuraHandledException(e.getMessage());
         }
     }
     /**
@@ -158,7 +153,6 @@ public with sharing class QuestionSelector {
     * @param questionId it is an id of Question
     * @return List of Question__c record
     */
-    @AuraEnabled
     Public Static List<SObject> getChildQuestions(String questionId,String templateId)
     {
         try{
@@ -171,9 +165,7 @@ public with sharing class QuestionSelector {
         }
         catch(Exception e)
         {
-            String errorMsg = e.getMessage();
-            System.debug('errorMsg'+errorMsg);
-            throw new AuraHandledException(errorMsg);
+            throw new AuraHandledException(e.getMessage());
         }
     }
 }

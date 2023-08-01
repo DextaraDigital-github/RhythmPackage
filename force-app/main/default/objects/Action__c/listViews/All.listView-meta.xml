@@ -3,7 +3,6 @@
     <fullName>All</fullName>
     <columns>Supplier__c</columns>
     <columns>Related_module__c</columns>
-    <columns>Related_Record__c</columns>
     <columns>NAME</columns>
     <columns>Action_Item_Description__c</columns>
     <columns>Ownership__c</columns>

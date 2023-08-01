@@ -107,17 +107,27 @@ public with sharing class TestDataFactory{
         }
         return createRecords(usersToInsert, doInsert, attributes);
     }
+
+     /**
+    * @description createUser method is used to create Role records
+    * @return
+    */ 
+    public static UserRole createTestRole(){
+        UserRole ur = new UserRole(Name = 'CEO');
+        List<UserRole> lstuserRole = new List<UserRole>();
+        lstuserRole.add(ur);
+        List<UserRole> retUserRole = createRecords(lstuserRole, true, new Map<String, Object>());
+        return retUserRole[0];
+    }
     /**
     * @description createUser method is used to create Users records
-    * @param numToInsert This is a number of records to insert.  
-    * @param doInsert This is boolean value whether to insert record or not.
-    * @param attributes This is a map which contain record data to insert.
     * @return
     */ 
     public static User createTestUser(){
+        UserRole ur = createTestRole();
         Profile portalProfile = [SELECT Id FROM Profile WHERE Name='Standard Platform User' WITH SECURITY_ENFORCED Limit 1];
         List<user> lstuser = new List<User>();
-         String orgId = UserInfo.getOrganizationId();
+        String orgId = UserInfo.getOrganizationId();
         String dateString = String.valueof(Datetime.now()).replace(' ','').replace(':','').replace('-','');
         Integer randomInt = Integer.valueOf(math.rint(math.random()*1000000));
         String uniqueName = orgId + dateString + randomInt;
@@ -126,7 +136,7 @@ public with sharing class TestDataFactory{
         EmailEncodingKey='UTF-8', LastName='Testing', LanguageLocaleKey='en_US',
         LocaleSidKey='en_US', ProfileId = portalProfile.Id,
         TimeZoneSidKey='America/Los_Angeles',
-        UserName=uniqueUserName);
+        UserName=uniqueUserName,UserRoleId =ur.Id);
         lstuser.add(u);
         set<Id> userId = new set<Id>();
         List<user> retUser = createRecords(lstuser, true, new Map<String, Object>());
@@ -210,7 +220,7 @@ public with sharing class TestDataFactory{
         return createRecords(qlist,true,attributes);
     }
     
-    public static List<Question__c> createResponseAttributes(Integer numToInsert, Boolean doInsert,Map<String, Object> attributes){
+    public static List<Response_Attribute__c> createResponseAttributes(Integer numToInsert, Boolean doInsert,Map<String, Object> attributes){
         List<Response_Attribute__c> qlist = new List<Response_Attribute__c>();
         for(Integer i=0; i< numToInsert; i++){
         Response_Attribute__c q = new Response_Attribute__c();
@@ -218,7 +228,14 @@ public with sharing class TestDataFactory{
         }
         return createRecords(qlist,true,attributes);
     }
- 
+ 	    public static List<Response_Question_Map__c> createResponseQuestionMap(Integer numToInsert, Boolean doInsert,Map<String, Object> attributes){
+        List<Response_Question_Map__c> qlist = new List<Response_Question_Map__c>();
+        for(Integer i=0; i< numToInsert; i++){
+        Response_Question_Map__c q = new Response_Question_Map__c();
+        qlist.add(q);
+        }
+        return createRecords(qlist,true,attributes);
+    }
     /**
     * @description createAssessment method is used to create Assessment records
     * @param numToInsert This is a number of records to insert.  

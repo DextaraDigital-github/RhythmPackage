@@ -1,3 +1,10 @@
+/*
+* Component Name    : rtmvpcQuestionCreation
+* Developer         : Sai Koushik Nimmaturi        
+* Created Date      : 
+* Description       : This component is used for the question creation.
+* Last Modified Date: 
+*/
 import { LightningElement, track, api } from 'lwc';
 import { loadStyle } from 'lightning/platformResourceLoader';
 import ComponentStylesheet from '@salesforce/resourceUrl/ComponentStyleSheet';
@@ -40,6 +47,9 @@ export default class RtmvpcQuestionCreation extends LightningElement {
     @track childTempId;
     @track responseAttributeId;
 
+    /* 
+    This method is used to get Response value of Parent Question for creating the Conditional Question.
+    */
     @api
     getParentQuestionCondition(conditionValue) {
         console.log('getParentQuestionCondition', conditionValue);
@@ -49,11 +59,13 @@ export default class RtmvpcQuestionCreation extends LightningElement {
             this.responseAttributeId = conditionValue.responseAttributeId;
         }
     }
+    /* Connectedcallback is used to get data on onload */
     connectedCallback() {
-        console.log('this.tempStatus', this.tempstatus);
         //this.questionWrapper.Rhythm__Question__c = '';
         this.isdisabled = !this.tempstatus;
-        console.log('this.isdisabled', this.isdisabled);
+        /* 
+        This method is used to get Response Type values for Question Object.
+        */
         getQuestionTypeValues({}).then(data => {
             console.log('data===>', data);
             let optionsList = [];
@@ -64,9 +76,7 @@ export default class RtmvpcQuestionCreation extends LightningElement {
 
                 });
                 this.options = optionsList;
-                console.log('this.options', this.options);
                 this.handleOnLoad();
-                console.log('this.options==>', this.options);
             }
 
         }).catch(error => {
@@ -80,12 +90,14 @@ export default class RtmvpcQuestionCreation extends LightningElement {
         ]);
     }
     handleOnLoad() {
-        console.log('this.assessmentTemplate', this.assessmentTemplate);
         this.questionWrapper.Rhythm__Question__c = '';
         if (typeof this.assessmentTemplate !== 'undefined') {
             this.createQues = true;
         }
         if (typeof this.questionId !== 'undefined') {
+            /* 
+            This method is used to get Questions data in Onload.
+            */
             getQuestionsData({ questionId: this.questionId, templateId: this.templateId }).then(result => {
                 console.log('result', result);
                 this.questionWrapper['Id'] = result[0].Id;
@@ -113,7 +125,6 @@ export default class RtmvpcQuestionCreation extends LightningElement {
                 if (typeof result[0].Rhythm__Assessment_Template__c !== 'undefined') {
                     this.questionWrapper.Rhythm__Assessment_Template__c = result[0].Rhythm__Assessment_Template__c;
                 }
-                console.log('this.questionWrapper', this.questionWrapper);
             }).catch(error => {
                 let errormap = {};
                 errormap.componentName = 'RtmvpcQuestionCreation';
@@ -121,12 +132,10 @@ export default class RtmvpcQuestionCreation extends LightningElement {
                 errormap.className = 'QuestionAttributeResponseService';
                 errormap.errorData = error.message;
                 errorLogRecord({ errorLogWrapper: JSON.stringify(errormap) }).then(() => { });
-
             });
             this.createQues = true;
         }
         if (typeof this.childQuesCreation != 'undefined' && typeof this.childwrapper != 'undefined') {
-            console.log('this.childQuesCreation', this.childQuesCreation);
             this.displayNew = false;
             this.questionWrapper['Rhythm__Parent_Question__c'] = this.childwrapper.questionId;
             this.questionWrapper['Rhythm__Assessment_Template__c'] = this.childwrapper.templateId;
@@ -136,18 +145,20 @@ export default class RtmvpcQuestionCreation extends LightningElement {
         }
         console.log('this.questionWrapper', this.questionWrapper);
     }
+    /* 
+        This method is used to close the popup of creating questions.
+    */
     handleClose() {
         this.createQues = false;
         this.childQuesCreation = false;
-        console.log('handlecancel');
         const selectedEvent = new CustomEvent('handlecancel', {
             detail: this.createQues
         });
         this.dispatchEvent(selectedEvent);
     }
-    handleClick() {
-        this.createQues = true;
-    }
+    /* 
+        This method method is used to change the wrapper and display the changed responsed for questions on UI.
+    */
     handleChange(event) {
 
         let type = event.currentTarget.dataset.id;
@@ -175,9 +186,15 @@ export default class RtmvpcQuestionCreation extends LightningElement {
             this.questionWrapper[type] = value;
         }
     }
+    /* 
+        This method method is used to close the toast message.
+    */
     closeToastHandler() {
         this.showToast = false;
     }
+    /* 
+        This method method is used to Select the sections value (custom lookup).
+    */
     handleSelectedValue(event) {
         console.log('Hello>>>', this.templateId);
         this.questionWrapper['Rhythm__Section__c'] = event.detail;
@@ -185,10 +202,16 @@ export default class RtmvpcQuestionCreation extends LightningElement {
             this.questionWrapper['Rhythm__Assessment_Template__c'] = this.assessmentTemplate;
         }
     }
+    /* 
+        This method method is used to get the changed values of Response Attributes.
+    */
     handleResponseAttribute(event) {
         this.responseAttributes = event.detail;
 
     }
+    /* 
+        This method method is used to display the toast messages.
+    */
     configureToast(_title, _message, _variant) {
         const toast = new ShowToastEvent({
             title: _title,
@@ -197,6 +220,9 @@ export default class RtmvpcQuestionCreation extends LightningElement {
         });
         this.dispatchEvent(toast);
     }
+    /* 
+        This method method is used to save Questions to backend.
+    */
     handlesave() {
         this.loading = true;
         let isSubmit = false;
@@ -245,6 +271,7 @@ export default class RtmvpcQuestionCreation extends LightningElement {
                     if (preferredlst.length === 0 && requiredupdatelst.length === 0
                         && (Array.from(set1).length) === this.responseAttributes.length && scorelst.length === 0 && weightlst.length === 0) {
                         createQuestions({ questions: this.questionlst, isUpdate: isSubmit }).then(result => {
+                            let questionId = result[0].Id;
                             console.log('result', result[0].Id);
                             this.responseAttributes.forEach(resp => {
                                 resp['Rhythm__QuestionId__c'] = result[0].Id;
@@ -255,7 +282,6 @@ export default class RtmvpcQuestionCreation extends LightningElement {
 
                             createResponseAttributes({ responseAttributes: inserlst }).then(result => {
                                 console.log('result', result);
-
                             }).catch(error => {
 
                                 let errormap = {};
@@ -276,6 +302,24 @@ export default class RtmvpcQuestionCreation extends LightningElement {
                                     errormap.errorData = error.message;
                                     errorLogRecord({ errorLogWrapper: JSON.stringify(errormap) }).then(() => { });
                                 })
+                            }
+                            if (isChildCreated) {
+                                let responsemap = { 'sobjectType': 'Rhythm__Response_Question_Map__c' };
+                                responsemap['Rhythm__QuestionId__c'] = questionId;
+                                responsemap['Rhythm__ResponseAttributeId__c'] = this.responseAttributeId;
+                                let respQueslst = [];
+                                respQueslst.push(responsemap);
+                                createResponseQuestionMap({ responseQuestionmap: respQueslst }).then(result => {
+                                    console.log('createResponseQuestionMap', result);
+                                    this.totastmessage = 'Conditional Question has been created Successfully.';
+                                    this.createQues = false;
+                                    this.childQuesCreation = false;
+                                    this.loading = false;
+                                    const selectedEvent = new CustomEvent('handleaftersave', {
+                                        detail: this.totastmessage
+                                    });
+                                    this.dispatchEvent(selectedEvent);
+                                });
                             }
                             if (isSubmit) {
                                 this.totastmessage = 'Updated Successfully';

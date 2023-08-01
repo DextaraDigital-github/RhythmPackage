@@ -17,10 +17,11 @@ import updateAccountAssessmentStatus from '@salesforce/apex/AssessmentController
 import deleteFileAttachment from '@salesforce/apex/AssessmentController.deleteFileAttachment';
 //import getResponseFlag from '@salesforce/apex/AssessmentController.getResponseFlag';
 import getAccountAssessmentRecordData from '@salesforce/apex/AssessmentController.getAccountAssessmentRecordData';
-import getQuestionRespAttributes from '@salesforce/apex/QuestionAttributeResponseController.getQuestionRespAttributes';
+import getQuestionRespAttributes from '@salesforce/apex/QuestionAttributeResponseSelector.getQuestionRespAttributes';
 import insertRejectFlag from '@salesforce/apex/AssessmentController.insertRejectFlag';
 import updateRejectFlag from '@salesforce/apex/AssessmentController.updateRejectFlag';
 import getActionRecords from '@salesforce/apex/CAPAController.getActionRecords';
+
 
 import RTM_FONTS from '@salesforce/resourceUrl/rtmfonts';
 import CUS_STYLES from '@salesforce/resourceUrl/rtmcpcsldscustomstyles';
@@ -361,12 +362,16 @@ export default class Questionnaire extends LightningElement {
         console.log('assessment', this.assessment);
         getActionRecords({ accountAssessment: this.assessment }).then((result) => {
             this.actionData = result;
+
+
         });
-        this.loading = true;
+        console.log()
+
+
         this.questionMap = new Map();
         this.questionsList = [];
         this.sectionidslist = [];
-        let sectionName = {};
+        let sectionName = [];
         if (this.isTemplate) {
             this.isSupplier = false;
             if (this.objectApiName === 'Rhythm__AccountAssessmentRelation__c') {
@@ -379,7 +384,7 @@ export default class Questionnaire extends LightningElement {
                         this.accountName = result[0].Rhythm__Account__r.Name;
                         this.accountId = result[0].Rhythm__Account__c;
                         this.assessment = result[0].Rhythm__Assessment__r.Id;
-                        this.assessmentRecordName = result[0].Rhythm__Assessment__r.Name
+                        this.assessmentRecordName = result[0].Rhythm__Assessment__r.Name;
                         let assessmentTemplateId = result[0].Rhythm__Assessment__r.Rhythm__Template__c;
                         this.assessmentStatus = result[0].Rhythm__Status__c;
                         /* get all Sections data and Questions data of a particular Template Id */
@@ -563,7 +568,6 @@ export default class Questionnaire extends LightningElement {
                                     let childsequence = 0;
                                     childQuestion.questions.forEach(ques => {
                                         ques.snumber = sequence + '.' + (++childsequence);
-                                        ques.showUpload = (childQuestion.uploadrequired === 'Yes') ? true : false;
                                     });
                                 });
                             })
@@ -599,6 +603,7 @@ export default class Questionnaire extends LightningElement {
                 let assessmentTemplateId = result[0].Rhythm__Assessment__r.Rhythm__Template__c;
                 this.accountName = result[0].Rhythm__Account__r.Name;
                 this.accountId = result[0].Rhythm__Account__c;
+                 this.assessmentRecordName = result[0].Rhythm__Assessment__r.Name;
                 this.showDisclosure = result[0].Rhythm__Assessment__r.Rhythm__Disclosure__c;
                 this.AssessmentName = result[0].Name;
                 this.assessmentStatus = result[0].Rhythm__Status__c;
@@ -2072,7 +2077,8 @@ export default class Questionnaire extends LightningElement {
         }
         responseMap.accountName = this.accountName;
         responseMap.Rhythm__Account__c = this.accountId;
-        responseMap.Rhythm__Related_Record__c = this.assessmentRecordName;
+        responseMap.Rhythm__Related_Record__c = this.assessment;
+        responseMap.relatedRecordName = this.assessmentRecordName;
         this.responseList.push(responseMap);
         selectedChat.questionId=event.detail.quesId;
         selectedChat.openChat=false;
@@ -2096,7 +2102,9 @@ export default class Questionnaire extends LightningElement {
         selectedActionMap.accountName = this.accountName;
         console.log('llll',this.accountName);
         selectedActionMap.Rhythm__Account__c = this.accountId;
-        selectedActionMap.Rhythm__Related_Record__c = this.assessmentRecordName;
+        //selectedActionMap.Rhythm__Related_Record__c = this.assessmentRecordName;
+        selectedActionMap.Rhythm__Related_Record__c = this.assessment;
+        selectedActionMap.Rhythm__Related_Record__Name = this.assessmentRecordName;
         selectedActionList.push(selectedActionMap);
         console.log('llll',selectedActionList);
         const selectedChat = new CustomEvent('selectconversation', {

@@ -1,9 +1,14 @@
-public class CAPAService {
+public with sharing class CAPAService {
     public static SecurityCheckController safe = new SecurityCheckController();//use singleton pattern
     private static Savepoint sp;
-    public static Map<string,List<string>> getPicklistValues()
-    { 
+    public static Map<string,List<string>> getPicklistValues(){
         try{
+            if ((!Schema.sObjectType.Action__c.isAccessible())
+                || (!Schema.sObjectType.Action__c.fields.Related_module__c.isAccessible())
+                || (!Schema.sObjectType.Action__c.fields.Priority__c.isAccessible())
+                || (!Schema.sObjectType.Action__c.fields.Status__c.isAccessible())) {
+                return null;
+            }
             Map<String, List<string>> values = new Map<String,List<string>>{};
                 List<string> picklistField=new List<string>{'Rhythm__Related_module__c','Rhythm__Priority__c','Rhythm__Status__c'};
                 List<Schema.DescribeSobjectResult> results = Schema.describeSObjects(new List<String>{'Rhythm__Action__c'}); 
@@ -24,6 +29,7 @@ public class CAPAService {
             throw new AuraHandledException(errorMsg);
         }
     }
+
     public static void saveActionResponse(List<SObject> actionResponse, Boolean isUpdate){
         try{
             List<String> errorsList = new List<String>();
@@ -43,11 +49,9 @@ public class CAPAService {
             String errorMsg = e.getMessage();
             throw new AuraHandledException(errorMsg);
         }
-        
     }
-    public static List<Action__c> deleteActionData(string questionId, string accountAssessmentId)
-    {
-        
+
+    public static List<Action__c> deleteActionData(string questionId, string accountAssessmentId){
         List<Action__c> deleteData=CAPASelector.deleteActionData(questionId,accountAssessmentId);
         try{
             if(deleteData.isEmpty() == false){
@@ -63,66 +67,50 @@ public class CAPAService {
             String errorMsg = e.getMessage();
             throw new AuraHandledException(errorMsg);
         }
-        
-        
     }
     
      public static List<user> getRecordsList(string userName){
        List<user> userData= CAPASelector.getRecordsList(userName);
-         return userData;
+        return userData;
     }
     
      public static List<Action__c> getActionResponse(Map<String,string> actionResponse){
-        
         List<Action__c> actionItemData=CAPASelector.getActionResponse(actionResponse);
-          return actionItemData;
-        
+        return actionItemData;
     }
     
     public static List<Action__c> getActionRecords(string accountAssessment){
-        
-         List<Action__c> actionRecords=CAPASelector.getActionRecords(accountAssessment);
+        List<Action__c> actionRecords=CAPASelector.getActionRecords(accountAssessment);
         return actionRecords;
-        
     }
     
      public static List<Action__c> actionRecords(){
-        
         List<Action__c> actionItemRecords= CAPASelector.actionRecords();
-          return actionItemRecords;
-        
+        return actionItemRecords;
     }
     
     public static List<Action__c> selectedActionRecord(string actionid){
-        
         List<Action__c> selectedActionRecord= CAPASelector.selectedActionRecord(actionid);
         return selectedActionRecord;
-        
     }
-    
-     public static void send(String subject, String body, List<Id> userList){
-        
-         List<Messaging.SendEmailResult> mailInfo=SendEmail.send(subject,body,userList);
-         System.debug('email'+mailInfo);
-        
-       
+
+    public static void send(String subject, String body, List<Id> userList){
+        List<Messaging.SendEmailResult> mailInfo=SendEmail.send(subject,body,userList);
     }
+
     public static void notifyUsers(Map<string,object> actionData, String body, List<Id> userList){
         Object targetId=CAPASelector.notifyUsers();
         actionData.put('targetId',targetId);
         Set<string>userdata=new set<string>();
         for(Id userid:userList){
             userdata.add((String)userid);
-            
         }      
-         SendEmail.notifyUsers(actionData,body,userdata);
-              
+        SendEmail.notifyUsers(actionData,body,userdata);  
     }
     
     /**
-* @description It is used to throw the exception
-*/
+    * @description It is used to throw the exception
+    */
     public class SecurityControllerException extends Exception{
-    }    
-    
+    }
 }

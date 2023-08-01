@@ -207,7 +207,9 @@ public with sharing class QuestionTriggerHandler implements ITriggerHandler{
         Set<Id> templateIds = new Set<Id>();
         try {
             for(Question__c question: qusLst) {
-                templateIds.add(question.Assessment_Template__c);
+                if(string.isBlank(question.Historical_Id__c)){
+                    templateIds.add(question.Assessment_Template__c);
+                }
             }
             if(templateIds.isEmpty() == false){
                 string queQuery = 'SELECT Id,Question_Sequence_Number__c'

@@ -1,11 +1,11 @@
 /** 
 * Class Name        : QuestionController
-* Developer         : Sai Koushik Nimmaturi         
+* Developer         : Sai Koushik Nimmaturi, Sri Kushal Reddy N         
 * Created Date      : 11-07-2023
 * @description      : QuestionController class is used to perform Fetching,manipulating operations.
 * Last Modified Date: 11-07-2023
 */
-public class QuestionController {
+public with sharing class QuestionController {
     /**
     * @description To get all the Response type field values.
     * @return 
@@ -69,5 +69,25 @@ public class QuestionController {
     @AuraEnabled
     Public Static List<SObject> getQuestionsData(String questionId, String templateId){
         return QuestionService.getQuestionsData(questionId, templateId);
+    }
+    
+    /**
+    * @description Fetches the Question__c records based on search string and other parameters
+    * @param parameterMap It is a stringified JSON of parameters required to fetch Question__c records
+    * @return List of Question__c records
+    */
+    @AuraEnabled
+    public static List<sObject> fetchQuestions(String parameterMap) {
+        return QuestionService.fetchQuestions(parameterMap);
+    }
+    
+    /**
+    * @description Updates the Child Questions with updated Sequence
+    * @param parameterMap It is a stringified JSON of parameters required to update and fetch updated Question__c records
+    * @return List of Question__c records
+    */
+    @AuraEnabled
+    public static List<sObject> updateQuestionsSequence(String parameterMap) {
+        return QuestionService.updateQuestionsSequence(parameterMap);
     }
 }

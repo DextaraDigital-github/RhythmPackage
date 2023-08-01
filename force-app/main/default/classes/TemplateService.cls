@@ -6,7 +6,7 @@
 * Last Modified Date: 
 */
 
-public with sharing class TemplateService {
+public with sharing class TemplateService{
     public static SecurityCheckController safe = new SecurityCheckController();//use singleton pattern
     private static Savepoint sp; // To rollback
 
@@ -15,7 +15,7 @@ public with sharing class TemplateService {
     * @param templateId This is a record id of an Template.
     * @return 
     */
-    public static TemplateController.ResultWrapper cloneTemplate(string templateId,SObject templateRecord){
+    public TemplateController.ResultWrapper cloneTemplate(string templateId,SObject templateRecord){
         TemplateController.ResultWrapper resWrap = new TemplateController.ResultWrapper();
         try{
             string templateName = string.valueOf(templateRecord.get('Name'));
@@ -69,12 +69,13 @@ public with sharing class TemplateService {
     * @param templateId This is a record id of an Old Template.
     * @param newTemplateId This is a record id of an New Template.
     */
-    private static void cloneSections(string templateId,string newTemplateId){
+    private void cloneSections(string templateId,string newTemplateId){
         List<Section__c> newSectionsList = new List<Section__c>();
         List<Question__c> oldPQueList = new List<Question__c>();
         Map<Id,Id> sectionIdsMap = new Map<Id,Id>();
+        SectionSelector ss = new SectionSelector();
 
-        List<Section__c> sectionsList = SectionSelector.getSectionsforTemplate(templateId);
+        List<Section__c> sectionsList = ss.getSectionsforTemplate(templateId);
         for(Section__c section : sectionsList){
             Section__c newSection = section.clone(false, true); //do a deep clone
             newSection.Assessment_Template__c = newTemplateId;
@@ -108,7 +109,7 @@ public with sharing class TemplateService {
     * @param newTemplateId This is a record id of an New Template.
     * @param oldPQueList This is a List of old questions.
     */
-    private static void cloneParentQuestions(Map<Id,Id> sectionIdsMap,string newTemplateId,List<Question__c> oldPQueList){
+    private void cloneParentQuestions(Map<Id,Id> sectionIdsMap,string newTemplateId,List<Question__c> oldPQueList){
         Map<Id,Id> pqIdsMap = new Map<Id,Id>();
         List<Question__c> pqList = new List<Question__c>();
         for(Question__c pq : oldPQueList){
@@ -145,17 +146,18 @@ public with sharing class TemplateService {
     * @param newTemplateId This is a record id of an New Template.
     * @param pqIdsMap This is a map of old questions and new questions.
     */
-    private static void cloneChildQuestions(Map<Id,Id> sectionIdsMap,string newTemplateId,Map<Id,Id> pqIdsMap){
+    private void cloneChildQuestions(Map<Id,Id> sectionIdsMap,string newTemplateId,Map<Id,Id> pqIdsMap){
         
         set<Id> mqIds = new set<Id>();
         List<Question__c> cqList = new List<Question__c>();
         List<Question__c> oldCQueList = new List<Question__c>();
         Map<Id,Id> cqIdsMap = new Map<Id,Id>();
         Map<Id,Id> questionIdsMap = new Map<Id,Id>();
+        QuestionSelector qs = new QuestionSelector();
         
         mqIds.addAll(pqIdsMap.keySet());
         if(mqIds.isEmpty() == false){
-            List<Question__c> cqs = QuestionSelector.getSubQuestions(mqIds);
+            List<Question__c> cqs = qs.getSubQuestions(mqIds);
             oldCQueList.addAll(cqs);
         }
         if(oldCQueList.isEmpty() == false){
@@ -194,11 +196,12 @@ public with sharing class TemplateService {
     * @description To Clone the Response Value Attributes.
     * @param questionIdsMap This is a map old and new question Ids.
     */
-    private static void cloneResponseAttrs(Map<Id,Id> questionIdsMap){
+    private void cloneResponseAttrs(Map<Id,Id> questionIdsMap){
 
         Map<Id,Id> raIdsMap = new Map<Id,Id>();
         List<Response_Attribute__c> raList = new List<Response_Attribute__c>();
-        List<Response_Attribute__c> resAttList = QuestionAttributeResponseSelector.getRespAttforQuestion(questionIdsMap);
+        QuestionAttributeResponseSelector qrs = new QuestionAttributeResponseSelector();
+        List<Response_Attribute__c> resAttList = qrs.getRespAttforQuestion(questionIdsMap);
     
         for(Response_Attribute__c ra : resAttList){
             Response_Attribute__c newRA = ra.clone(false, true);
@@ -237,10 +240,10 @@ public with sharing class TemplateService {
     * @param raIdsMap This is a map old and new response question map Ids.
     * @param questionIdsMap This is a map old and new question Ids.
     */
-    private static void cloneResponseQMap(Map<Id,Id> raIdsMap,Map<Id,Id> questionIdsMap){
+    private void cloneResponseQMap(Map<Id,Id> raIdsMap,Map<Id,Id> questionIdsMap){
         List<Response_Question_Map__c> rqmList = new List<Response_Question_Map__c>();
-
-        List<Response_Question_Map__c> oldRQMList = ResponseQuestionMapSelector.getResponeQmap(raIdsMap);
+        ResponseQuestionMapSelector rqms = new ResponseQuestionMapSelector();
+        List<Response_Question_Map__c> oldRQMList = rqms.getResponeQmap(raIdsMap);
         
         for(Response_Question_Map__c rqm : oldRQMList){
             Response_Question_Map__c newRQM = rqm.clone(false, true);

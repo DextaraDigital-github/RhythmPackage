@@ -28,7 +28,7 @@
 							<h1 class="slds-col slds-size_1-of-3 slds-form-element__label" title="Field 1">Related
 								Record</h1>
 							<p class="slds-col slds-size_2-of-3 slds-form-element__control">
-								{rec.Rhythm__Related_Record__c}</p>
+								{rec.Rhythm__Related_Record__r.Name}</p>
 						</div>
 					</lightning-layout-item>
 					<lightning-layout-item size="6" padding="around-small" key={rec}>
@@ -124,14 +124,14 @@
 							</h1>
 							<div class="slds-col slds-size_1-of-3 slds-form-element__control">
 								<template if:true={isSave}>
-									<lightning-input type="text" onchange={handleChange} variant="label-hidden"
+									<lightning-textarea  type="text" onchange={handleChange} variant="label-hidden"
 										value={rec.Rhythm__Comments__c} data-id="Rhythm__Comments__c">
-									</lightning-input>
+									</lightning-textarea >
 								</template>
 								<template if:false={isSave}>
-									<lightning-input type="text" onchange={handleChange} variant="label-hidden"
+									<lightning-textarea type="text" onchange={handleChange} variant="label-hidden"
 										value={rec.Rhythm__Comments__c} data-id="Rhythm__Comments__c" disabled="true">
-									</lightning-input>
+									</lightning-textarea>
 								</template>
 
 							</div>

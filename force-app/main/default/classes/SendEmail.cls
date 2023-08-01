@@ -64,39 +64,4 @@ public with sharing class SendEmail {
             System.debug('Problem sending notification: ' + e.getMessage());
         }
     }
-    
-    /**
-    * @description Sends an email to a list of users using an email template
-    * @param templateId Contains Id of the email template which should be used to send the email
-    * @param userList Contains a list of users to whom the emails should be sent
-    * @return List of Messaging.SendEmailResult (contains status of the sent emails)
-    */
-    public static List<Messaging.SendEmailResult> send(Id templateId, List<Id> userList) {
-        if(templateId != null && String.isNotBlank(String.valueOf(templateId)) && userList !=null && !userList.isEmpty()) {
-            List<Messaging.SingleEmailMessage> emailList = new List<Messaging.SingleEmailMessage>();
-            for(Id userId:userList) {
-                Messaging.SingleEmailMessage email = new Messaging.SingleEmailMessage();
-                email.setTemplateId(templateId);
-                email.setTreatTargetObjectAsRecipient(true);
-                email.setTargetObjectId(userId);
-                emailList.add(email);
-            }
-            try {
-            	return Messaging.sendEmail(emailList);
-            }
-            catch(Exception e) {
-				errorList = new List<ErrorTransactionLog__c>();
-            	errorRec = new ErrorTransactionLog__c();
-                errorRec.Class_Name__c = 'UserSelector';
-                errorRec.Error_Stack_Trace__c = e.getStackTraceString();
-                errorRec.Name = 'Error while creating User records';
-                errorRec.LWC_Component_Name__c = '';
-                errorRec.Method_Name__c = 'fetchUsers';
-                errorList.add(errorRec);
-                safe.doInsert(errorList);
-                throw new AuraHandledException(e.getMessage());   //Throws an exception                
-            }
-        }
-        return null;
-    }
 }

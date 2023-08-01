@@ -13,7 +13,7 @@ export default class ActionItemGrid extends NavigationMixin(LightningElement) {
     @track urlId;
     @track viewColList = [
         { label: 'Action Item Name', fieldName: 'Name' },
-        { label: 'Related Record', fieldName: 'Rhythm__Related_Record__c' },
+        { label: 'Related Record', fieldName: 'Rhythm__Related_Record__r' },
         { label: 'Ownership', fieldName: 'Rhythm__OwnershipName__c' },
         { label: 'Assigned To', fieldName: 'Rhythm__Assigned_To__r' },
         { label: 'Due Date', fieldName: 'Rhythm__Due_Date__c', type: 'date' },
@@ -42,7 +42,7 @@ export default class ActionItemGrid extends NavigationMixin(LightningElement) {
                         if (this.viewColList[i].fieldName == key) {
                             var actionRecordMap = {};
                             this.fieldCheck = true;
-                            if (key === 'Rhythm__Related_Record__c' || key === 'Rhythm__Due_Date__c' || key === 'Rhythm__Priority__c'
+                            if ( key === 'Rhythm__Due_Date__c' || key === 'Rhythm__Priority__c'
                                 || key === 'Rhythm__Status__c' || key === 'Rhythm__OwnershipName__c') {
                                 actionRecordMap.fieldName = key;
                                 actionRecordMap.value = res[key];
@@ -65,7 +65,7 @@ export default class ActionItemGrid extends NavigationMixin(LightningElement) {
                                 }
                                 actionRecordList.push(actionRecordMap);
                             }
-                            if (key === 'Rhythm__Assigned_To__r') {
+                            if (key === 'Rhythm__Assigned_To__r' || key==='Rhythm__Related_Record__r') {
                                 actionRecordMap.fieldName = key;
                                 actionRecordMap.value = res[key]['Name'];
                                 actionRecordList.push(actionRecordMap);

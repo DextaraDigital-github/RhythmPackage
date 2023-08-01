@@ -6,6 +6,13 @@ import errorLogRecord from '@salesforce/apex/AssessmentController.errorLogRecord
 import deleteActionData from '@salesforce/apex/CAPAController.deleteActionData';
 import send from '@salesforce/apex/CAPAController.send';
 import notifyUsers from '@salesforce/apex/CAPAController.notifyUsers';
+import getSignedURL from '@salesforce/apex/AWSS3Controller.getFileSignedUrl';
+import filesUpload from '@salesforce/apex/AWSS3Controller.uploadFiles';
+import saveActionRecord from '@salesforce/apex/AWSS3Controller.saveActionRecord';
+import getAuthentication from '@salesforce/apex/AWSS3Controller.getAuthenticationData';
+import awsjssdk from '@salesforce/resourceUrl/AWSJSSDK';
+import { loadScript } from 'lightning/platformResourceLoader';
+import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 export default class Action extends LightningElement {
   @track pickListNames = [];
   @api showresponse;
@@ -31,11 +38,231 @@ export default class Action extends LightningElement {
   @track options = [{ label: 'Open', value: 'Open' },
   { label: 'Closed', value: 'Closed' }
   ];
+  /* S3 Code Starts*/
+  @track recId;
+  @track objectApiName = 'Rhythm__Action__c';
+  @track accessKey;
+  @track secretKey;
+  @track region;
+  @track endpoint;
+  @track selectedFilesToUpload = [];
+  @track fileName;
+  @track file; //holding file instance
+  @track myFile;
+  @track fileType;//holding file type
+  @track fileReaderObj;
+  @track base64FileData;
+  @track s3;
+  @track keyList = [];
+  @track getFilesFlag = false;
+  @track renderRetriveFlag = 0;
+  @track renderFlag = true;
+  @track newFlag = false;
+  @track relatedRecordName;
+  previewUrl;
+  keyString;
+  fileKey;
+  showDeleteModal = false;
+  //Accept File Formats
+  get acceptedFormats() {
+    return ['.pdf', '.png', '.jpg', '.jpeg', '.xlsx', '.xls', '.txt', '.docx', '.doc'];
+  }
+  connectedCallback() {
+    Promise.all([
+      loadScript(this, awsjssdk),
+    ])
+      .then(() => {
+        this.configAWS();
+      });
+  }
+  renderedCallback() {
+    Promise.all([
+      loadScript(this, awsjssdk),
+    ])
+      .then(() => {
+        setTimeout(() => {
+          this.configAWS();
+        }, 100);
+      });
+  }
+  //AWS configuration
+  configAWS() {
+    if (this.renderFlag === true) {
+      getAuthentication({})
+        .then(result => {
+          if (result) {
+            let metadataRecs = JSON.parse(JSON.stringify(result));
+            metadataRecs && metadataRecs.forEach(rec => {
+              (rec["DeveloperName"] === 'region') && (this.region = rec["Rhythm__Value__c"]);
+              (rec["DeveloperName"] === 'accessKey') && (this.accessKey = rec["Rhythm__Value__c"]);
+              (rec["DeveloperName"] === 'secretKey') && (this.secretKey = rec["Rhythm__Value__c"]);
+              (rec["DeveloperName"] === 's3bucket') && (this.bucketName = rec["Rhythm__Value__c"]);
+              (rec["DeveloperName"] === 'endpoint') && (this.endpoint = rec["Rhythm__Value__c"]);
+            });
+            const AWS = window.AWS;
+            AWS.config.update({
+              accessKeyId: this.accessKey,//Assigning access key id
+              secretAccessKey: this.secretKey,//Assigning secret access key
+              region_config: this.region
+            });
+            this.s3 = new AWS.S3({
+              params: {
+                Bucket: this.bucketName //Assigning S3 bucket name
+              }
+            });
+            this.renderFlag = false;
+            this.renderRetriveFlag = 0;
+            this.retrieveFilesFromS3();
+          }
+        });
+    }
+    else {
+      if (this.renderRetriveFlag < 1) {
+        this.retrieveFilesFromS3();
+      }
+    }
+  }
+  // Retrieve the files from S3 folder
+  retrieveFilesFromS3() {
+    const folderName = this.objectApiName + '/' + this.responseMap.Id + '/';
+    this.s3.listObjects({ Bucket: this.bucketName, Prefix: folderName }, (err, data) => {
+      if (err) {
+        console.error(err);
+      } else {
+        const files = data.Contents;
+        let fileList = [];
+        this.keyList = [];
+        files && files.forEach(file => {
+          const objectKey = file.Key;
+          fileList.push({ key: objectKey, url: this.endpoint + '/' + objectKey, value: objectKey.substring(objectKey.lastIndexOf("/") + 1) });
+        });
+        this.keyList = fileList.reverse();
+        this.renderRetriveFlag = this.renderRetriveFlag++;
+        if (this.keyList.length != 0) {
+          this.getFilesFlag = true;
+        }
+        else {
+          this.getFilesFlag = false;
+        }
+      }
+    });
+  }
+  //Download the file from AWS S3
+  handleDownload(event) {
+    getSignedURL({
+      location: event.target.title,
+      file: event.currentTarget.dataset.id,
+      expires: 30
+    })
+      .then(result => {
+        if (result) {
+          window.open(result);
+        }
+      });
+  }
+  //Open Delete Modal Popup
+  handleDeletePopup(event) {
+    this.showDeleteModal = true;
+    this.fileKey = event.target.name;
+    this.keyString = this.fileKey.replace(this.endpoint + '/', '');
+  }
+  //Close Delete Modal Popup
+  handleCloseDelPopup() {
+    this.showDeleteModal = false;
+  }
+  //Delete File from AWS S3
+  handleDeleteFile() {
+    this.handleCloseDelPopup();
+    this.renderFlag = true;
+    this.configAWS();
+    const params = {
+      Bucket: this.bucketName,
+      Key: this.keyString
+    };
+    this.s3.deleteObject(params, (error, data) => {
+      if (data) {
+        this.showToastMessage('Deleted', this.fileKey.substring(this.fileKey.lastIndexOf("/") + 1) + ' - Deleted Successfully', 'success');
+        this.fileKey = '';
+        this.keyString = '';
+        this.previewUrl = '';
+        this.showFrame = false;
+      }
+    });
+  }
+  //Upload files to AWS after uploaded successfully to salesforce
+  handleUploadFinished() {
+    if (this.responseMap.Id != null) {
+      filesUpload({
+        recId: this.accountAssessmentId, objectName: this.objectApiName, pathRecId: this.responseMap.Id, deleteFlag:true
+      }).then(result => {
+        if (result) {
+          this.renderFlag = true;
+          this.showToastMessage('Uploaded', 'Uploaded Successfully', 'success');
+        }
+        else {
+          this.showToastMessage('Exceeded File Limit', 'The maximum file size you can upload is 10 MB', 'error');
+        }
+      })
+        .catch(error => {
+          window.console.log(error);
+        });
+    }
+    else {
+      var userMap = {};
+      let actionResp = [];
+      //this.saveActionResponse = this.responseMap;
+      this.saveActionResponse.sobjectType = 'Rhythm__Action__c';
+      this.saveActionResponse.Rhythm__Question__c = this.questionId;
+      this.saveActionResponse.Rhythm__AccountAssessment__c = this.accountAssessmentId;
+      actionResp.push(JSON.parse(JSON.stringify(this.saveActionResponse)));
+      saveActionRecord({ actionResponse: actionResp }).then((res) => {
+        this.responseMap.Id = res;
+        filesUpload({
+          recId: this.accountAssessmentId, objectName: this.objectApiName, pathRecId: res, deleteFlag:true
+        }).then(result => {
+          if (result) {
+            this.showCustom = true;
+            this.showUpdate = true;
+            this.showPicklist = true;
+            this.saveActionResponse.saveActionForm = true;
+            this.renderFlag = true;
+            const selectedAction = new CustomEvent('closeform', {
+              detail: this.saveActionResponse
+            });
+            this.dispatchEvent(selectedAction);
+            this.showToastMessage('Uploaded', 'Uploaded Successfully', 'success');
+          }
+          else {
+            this.showToastMessage('Exceeded File Limit', 'The maximum file size you can upload is 10 MB', 'error');
+          }
+        })
+          .catch(error => {
+            window.console.log(error);
+          });
+      }).catch(error => {
+      });
+    }
+  }
+  //Toast Message handler
+  async showToastMessage(title, message, variant) {
+    this.dispatchEvent(
+      new ShowToastEvent({
+        title: title,
+        message: message,
+        variant: variant,
+      }),
+    );
+    this.renderFlag = true;
+    this.configAWS();
+    //eval("$A.get('e.force:refreshView').fire();");
+    //this.retrieveFilesFromS3();
+  }
+  /* S3 Code Ends*/
   @wire(getPicklistValues, {})
   picklistdata({ error, data }) {
     if (data) {
       this.pickListNames = [];
-      for(let key in data) {
+      for (let key in data) {
         let pickListNamedata = [];
         data[key].forEach(item => {
           let map = { 'label': item, 'value': item };
@@ -83,6 +310,7 @@ export default class Action extends LightningElement {
     this.accountAssessmentId = response[0].Rhythm__AccountAssessment__c;
     //this.isSupplier=response[0].isSupplier;
     this.accountName = response[0].accountName;
+    this.relatedRecordName=response[0].relatedRecordName;
     this.responseMap = {};
     this.resultdata = {};
     this.onloadPicklist.forEach(res => {
@@ -113,6 +341,7 @@ export default class Action extends LightningElement {
         }
         if (typeof result[0].Rhythm__Related_Record__c !== 'undefined') {
           this.responseMap.Rhythm__Related_Record__c = result[0].Rhythm__Related_Record__c;
+           //this.responseMap.Rhythm__Related_Record__Name=response[0].Rhythm__Related_Record__Name;
         }
         if (typeof result[0].Rhythm__Supplier__c !== 'undefined') {
           this.responseMap.Rhythm__Supplier__c = result[0].Rhythm__Supplier__c;
@@ -152,11 +381,13 @@ export default class Action extends LightningElement {
         this.saveActionResponse.Rhythm__Supplier__c = response[0].Rhythm__Account__c;
         this.saveActionResponse.Rhythm__Assigned_To__c = response[0].assignedToId;
         this.saveActionResponse.Rhythm__Ownership__c = response[0].ownershipId;
-          this.onloadPicklist.forEach(res => {
+        //this.responseMap.Rhythm__Related_Record__Name=response[0].Rhythm__Related_Record__Name;
+       // console.log('jjjfk',this.responseMap.Rhythm__Related_Record__Name);
+        this.onloadPicklist.forEach(res => {
           if (res.key === 'Rhythm__Related_module__c') {
             res.onLoadValue = 'Assessments';
-            
-           this.saveActionResponse.Rhythm__Related_module__c = 'Assessments';
+
+            this.saveActionResponse.Rhythm__Related_module__c = 'Assessments';
           }
         });
 
@@ -283,9 +514,9 @@ export default class Action extends LightningElement {
               userlist.push(this.showresponse[0].Rhythm__Ownership__c);
               notifyUsers({ actionData: (this.showresponse[0]), body: 'Action Item has been marked as closed', userList: userlist }).then(() => {
 
-            }).catch(error => {
-              console.log('ggfgf', error);
-            })
+              }).catch(error => {
+                console.log('ggfgf', error);
+              })
               this.isSave = true;
             }
           }

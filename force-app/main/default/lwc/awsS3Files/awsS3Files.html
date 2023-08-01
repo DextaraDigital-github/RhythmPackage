@@ -2,7 +2,7 @@
 	<lightning-card>
 		<lightning-layout multiple-rows="true">
 			<lightning-layout-item size="12" medium-device-size="5" style="border: solid 1px lightgrey;">
-				<div style="height:300px;" class="slds-scrollable">
+				<div style={heightStyle} class="slds-scrollable">
 					<table border="0" cellpadding="0" cellspacing="0" class="table tr">
 						<tr height="16" hidden>
 							<td colspan="16">
@@ -15,7 +15,7 @@
 						<template for:each={keyList} for:item="item" for:index="index">
 							<tr height="50px" key={item.key}>
 								<!-- style="border: solid 2px lightgrey;" -->
-								<td colspan="16" data-id={item.key} title={item.url} onclick={filePreview}>
+								<td colspan="16">
 									<lightning-icon icon-name="doctype:flash" alternative-text="File"
 										class="slds-p-around_x-small">
 									</lightning-icon>
@@ -37,13 +37,17 @@
 								</td>
 							</tr>
 						</template>
+
 					</table>
 				</div>
-				<div style="text-align:right;padding: 15px;">
-					<lightning-file-upload record-id={recordId} accept={acceptedFormats} name="fileUploader"
-						class="file-selector-large" title="Upload" onuploadfinished={handleUploadFinished} multiple>
-					</lightning-file-upload>
-				</div>
+				<template if:false={disableFlag}>
+					<div style="text-align:right;padding: 15px;">
+						<lightning-file-upload record-id={recordId} accept={acceptedFormats} name="fileUploader"
+							class="file-selector-large" title="Upload" onuploadfinished={handleUploadFinished} multiple>
+						</lightning-file-upload>
+					</div>
+				</template>
+				
 			</lightning-layout-item>
 			<lightning-layout-item size="12" medium-device-size="7" padding="around-small"
 				style="border: solid 1px lightgrey;">

@@ -7,8 +7,7 @@
 */
 
 public with sharing class ResponseQuestionMapSelector {
-    @AuraEnabled
-    public static List<Response_Question_Map__c> getResponeQmap(Map<Id,Id> raIdsMap){
+    public List<Response_Question_Map__c> getResponeQmap(Map<Id,Id> raIdsMap){
         List<Response_Question_Map__c> resQmapList = [SELECT Id,QuestionId__c,ResponseAttributeId__c
                                                 FROM Response_Question_Map__c
                                                 WHERE ResponseAttributeId__c IN:raIdsMap.keySet()

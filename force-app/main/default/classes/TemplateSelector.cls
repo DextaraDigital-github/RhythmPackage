@@ -52,11 +52,11 @@ public with sharing class TemplateSelector {
     */
     @AuraEnabled
     public static List<Assessment_Template__c> getTemplateRecord(string templateId){
-        string query = 'SELECT Id,Status__c'
-                    + ' FROM Assessment_Template__c'
-                    + ' WHERE Id=\'' + String.escapeSingleQuotes(templateId) + '\''
-                    + ' WITH SECURITY_ENFORCED';
-        List<Assessment_Template__c>  templateList = safe.doQuery(query);
+        templateId = String.escapeSingleQuotes(templateId);
+        List<Assessment_Template__c> templateList = [SELECT Id,Status__c
+                                                    FROM Assessment_Template__c
+                                                    WHERE Id=:templateId
+                                                    WITH SECURITY_ENFORCED];
         return templateList;
     }
 }

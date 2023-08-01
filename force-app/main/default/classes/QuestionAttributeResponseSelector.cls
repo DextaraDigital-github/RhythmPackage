@@ -5,7 +5,7 @@
 * @description      : QuestionAttributeResponseSelector contains queries related to Response Attribute Object.
 * Last Modified Date: 
 */
-public class QuestionAttributeResponseSelector {
+public with sharing class QuestionAttributeResponseSelector {
 	public static SecurityCheckController safe = new SecurityCheckController();
     private static Savepoint sp;
    /**
@@ -30,45 +30,14 @@ public class QuestionAttributeResponseSelector {
         }
         catch(Exception e)
         {
-            String errorMsg = e.getMessage();
-            System.debug('errorMsg'+errorMsg);
-            throw new AuraHandledException(errorMsg);
+            throw new AuraHandledException(e.getMessage());
         }
         /*List<Sobject> sections = [SELECT id,name,Assessment_Template__c FROM section__c WHERE  Assessment_Template__c =:templateId
                                   AND name LIKE :sectionName];
         
         return sections;*/
     }
-	/**
-    * @description gets all Response Attribute Record based on Question__c Id
-    * @param responseId is a Question__c id. 
-    * @return List of Response_Attribute__c record.
-    */
-    @AuraEnabled
-    public static List<SObject> getResponseAttributes(String questionId)
-    {
-        System.debug('questionId'+questionId);
-         try{
-            /*String query =  'SELECT id,name,Response_value__c,Score__c,Upload_Required__c,preferred_Not_preferred__c,Weight__c'
-                            + ' FROM Response_Attribute__c'
-                            + ' WHERE QuestionId__c=\'' + String.escapeSingleQuotes(questionId) + '\''
-                            + ' WITH SECURITY_ENFORCED'
-                            + ' ORDER BY CreatedDate Desc';*/
-        List<SObject> questionslst =[SELECT id,name,Response_value__c,Score__c,Upload_Required__c,preferred_Not_preferred__c,Weight__c FROM 
-                                 	 Response_Attribute__c WHERE QuestionId__c=:questionId WITH SECURITY_ENFORCED ORDER BY CreatedDate Desc];
-        return questionslst;
-            //return safe.doQuery(query);
-        }
-        catch(Exception e)
-        {
-            String errorMsg = e.getMessage();
-            System.debug('errorMsg'+errorMsg);
-            throw new AuraHandledException(errorMsg);
-        }
-       /* List<SObject> questionslst =[SELECT id,name,Response_value__c,Score__c,Upload_Required__c,preferred_Not_preferred__c,Weight__c FROM 
-                                 	 Response_Attribute__c WHERE QuestionId__c=:questionId ];
-        return questionslst;*/
-    }
+
        /**
     * @description gets all Response Attribute Record based on Response_Attribute__c Id
     * @param responseId is a Response_Attribute__c id. 
@@ -90,9 +59,7 @@ public class QuestionAttributeResponseSelector {
         }
         catch(Exception e)
         {
-            String errorMsg = e.getMessage();
-            System.debug('errorMsg'+errorMsg);
-            throw new AuraHandledException(errorMsg);
+            throw new AuraHandledException(e.getMessage());
         }
     }
  	 /**
@@ -113,9 +80,7 @@ public class QuestionAttributeResponseSelector {
         }
         catch(Exception e)
         {
-            String errorMsg = e.getMessage();
-            System.debug('errorMsg'+errorMsg);
-            throw new AuraHandledException(errorMsg);
+            throw new AuraHandledException(e.getMessage());
         }
     }
 	
@@ -124,7 +89,6 @@ public class QuestionAttributeResponseSelector {
     * @param questionlst is a list of Question__c id. 
     * @return List of Response_Attribute__c records
     */
-    @AuraEnabled
     public static List<SObject> getQuestionRespAttributes(List<String> questionlst)
     {
         try{
@@ -137,9 +101,7 @@ public class QuestionAttributeResponseSelector {
         }
         catch(Exception e)
         {
-            String errorMsg = e.getMessage();
-            System.debug('errorMsg'+errorMsg);
-            throw new AuraHandledException(errorMsg);
+            throw new AuraHandledException(e.getMessage());
         }
     }
     
@@ -155,9 +117,7 @@ public class QuestionAttributeResponseSelector {
         }
         catch(Exception e)
         {
-            String errorMsg = e.getMessage();
-            System.debug('errorMsg'+errorMsg);
-            throw new AuraHandledException(errorMsg);
+            throw new AuraHandledException(e.getMessage());
         }
     }
 

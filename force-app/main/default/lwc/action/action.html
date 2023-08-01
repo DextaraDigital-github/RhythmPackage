@@ -24,11 +24,11 @@
 						</lightning-input>
 					</lightning-layout-item>
 					<lightning-layout-item size="12">
-						<lightning-input type="text" label="Action Item Description" onchange={handleChange}
+						<lightning-textarea type="text" label="Action Item Description" onchange={handleChange}
 							disabled={isSupplier} data-id="Rhythm__Action_Item_Description__c"
 							value={responseMap.Rhythm__Action_Item_Description__c}
 							class="slds-p-left_xx-small slds-p-right_x-small slds-p-top_small">
-						</lightning-input>
+						</lightning-textarea>
 					</lightning-layout-item>
 
 					<template for:each={lookupLabel} for:item="labelName">
@@ -57,7 +57,7 @@
 					<lightning-layout-item size="12" padding="around_x-small">
 						<lightning-input type="text" label="Related Record" onchange={handleChange}
 							class="slds-p-left_xx-small slds-p-right_x-small slds-p-top_small"
-							value={responseMap.Rhythm__Related_Record__c} data-id="Rhythm__Related_Record__c"
+							value={relatedRecordName} data-id="Rhythm__Related_Record__c"
 							disabled=true>
 						</lightning-input>
 					</lightning-layout-item>
@@ -68,10 +68,10 @@
 						</lightning-input>
 					</lightning-layout-item>
 					<lightning-layout-item size="12" padding="around_x-small">
-						<lightning-input type="text" label="Comments" onchange={handleChange} disabled={isSave}
+						<lightning-textarea type="text" label="Comments" onchange={handleChange} disabled={isSave}
 							value={responseMap.Rhythm__Comments__c} data-id="Rhythm__Comments__c"
 							class="slds-p-left_xx-small slds-p-right_x-small slds-p-top_small">
-						</lightning-input>
+						</lightning-textarea >
 					</lightning-layout-item>
 					<template if:true={isSupplier}>
 						<lightning-layout-item size="12" padding="around_x-small">
@@ -129,9 +129,16 @@
 						</table>
 			
 					<div style="text-align:right;padding: 15px;">
-						<lightning-file-upload record-id={responseMap.Id} accept={acceptedFormats} name="fileUploader"
+						<template if:true={isSupplier}>
+						<lightning-file-upload record-id={accountAssessmentId} accept={acceptedFormats} name="fileUploader"
+							class="file-selector-large" title="Upload" onuploadfinished={handleUploadFinished} disabled={isSave} multiple>
+						</lightning-file-upload>
+						</template>
+						<template if:false={isSupplier}>
+						<lightning-file-upload record-id={accountAssessmentId} accept={acceptedFormats} name="fileUploader"
 							class="file-selector-large" title="Upload" onuploadfinished={handleUploadFinished} multiple>
 						</lightning-file-upload>
+						</template>
 					</div>
 					<!-- S3 Code -->
 				</template>

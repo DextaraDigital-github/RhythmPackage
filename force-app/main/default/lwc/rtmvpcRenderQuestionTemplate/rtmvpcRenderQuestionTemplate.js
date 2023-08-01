@@ -18,6 +18,7 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
     @api assessmentid;
     @track checkedLabel;
     @api accountassessment;
+    @track objectApiName='Rhythm__Response__c';
     @api sectionid;
     @api accountid;
     @track customeFlagsList = [];
@@ -34,6 +35,7 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
             this.conditionaldisplay = true;
         }
         console.log('isSupplier',this.issupplier);
+        console.log('accountassessmentid',this.accountassessmentid);
         console.log('Responses',this.responses);
         this.chatterMap.openChat = false;
         this.chatterMap.disableSendButton = true;
@@ -391,6 +393,13 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
         // Dispatches the event.
         this.dispatchEvent(selectedEvent);
 
+    }
+    handleOnLoad(event) {
+         const selectedEvent = new CustomEvent('getdata', {
+            detail: event.detail
+        });
+        // Dispatches the event.
+        this.dispatchEvent(selectedEvent);
     }
     handleConversationHistory(event)
     {

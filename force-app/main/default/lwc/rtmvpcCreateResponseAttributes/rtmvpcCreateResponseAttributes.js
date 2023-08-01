@@ -13,7 +13,7 @@ export default class RtmvpcCreateResponseAttributes extends LightningElement {
     @api quesType;
     @api isdisable;
     @track isCheckbox = false;
-
+    /* Connectedcallback is used to get data on onload */
     connectedCallback() {
         console.log('quesType',this.quesType);
         if (typeof this.questionId != 'undefined') {
@@ -23,6 +23,9 @@ export default class RtmvpcCreateResponseAttributes extends LightningElement {
             this.constructNewWrapper();
         }
     }
+     /* 
+        This method method is used to display the toast messages.
+    */
      configureToast(_title, _message, _variant) {
         const toast = new ShowToastEvent({
             title: _title,
@@ -31,6 +34,9 @@ export default class RtmvpcCreateResponseAttributes extends LightningElement {
         });
         this.dispatchEvent(toast);
     }
+    /*
+        This method is used to construct the wrapper
+    */
     constructWrapper() {
         let disable = false;
         console.log('this.questionId', this.questionId);
@@ -40,6 +46,9 @@ export default class RtmvpcCreateResponseAttributes extends LightningElement {
         }
         let lst =[];
         lst.push(this.questionId);
+        /*
+            Apex method is used to get the Response Attribute data in onload for particular question.
+        */
         getQuestionRespAttributes({ questionlst: lst }).then(result => {
             result.forEach(res => {
                 console.log('getQuestionRespAttributes',res);
@@ -76,6 +85,9 @@ export default class RtmvpcCreateResponseAttributes extends LightningElement {
 
         console.log(this.tablerowlst);
     }
+    /*
+        handleDeleteRow method is used to delete the Response Attribute data for a particular row.
+    */
     handleDeleteRow(event) {
         let index = event.currentTarget.dataset.id;
         let tabdata = this.tablerowlst[index - 1];
@@ -99,6 +111,9 @@ export default class RtmvpcCreateResponseAttributes extends LightningElement {
         }
         console.log('this.tablerowlst', this.tablerowlst);
     }
+    /*
+        handleQuestionTypeChange method is used to change the wrapper based on response type change.
+    */
     @api handleQuestionTypeChange(value)
     {
         console.log('handleQuestionTypeChange');
@@ -106,6 +121,9 @@ export default class RtmvpcCreateResponseAttributes extends LightningElement {
         this.quesType = value;
         this.constructNewWrapper();
     }
+     /*
+        This method is used to construct the wrapper for clickling on add new response attribute
+    */
     constructNewWrapper() {
         if(this.quesType ==='Checkbox')
         {
@@ -145,6 +163,9 @@ export default class RtmvpcCreateResponseAttributes extends LightningElement {
         this.tablerowlst.push(responsewrapper);
         }   
     }
+    /*
+        This method is used to store the values of Response Attributes.
+    */
     handleChange(event) {
         let dataId = event.currentTarget.dataset.id;
         let respValue = event.target.value;
@@ -168,6 +189,9 @@ export default class RtmvpcCreateResponseAttributes extends LightningElement {
         const selectedEvent = new CustomEvent('selectedvalue', { detail: responselst });
         this.dispatchEvent(selectedEvent);
     }
+    /*
+        This method is used to add the new response attribute.
+    */
     handleNewRow() {
         this.constructNewWrapper();
     }

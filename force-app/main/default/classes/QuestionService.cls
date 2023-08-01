@@ -1,11 +1,11 @@
 /** 
 * Class Name        : QuestionSelector
-* Developer         : Sai Koushik Nimmaturi      
+* Developer         : Sai Koushik Nimmaturi, Sri Kushal Reddy N
 * Created Date      : 
 * @description      : QuestionService contains DML operations related to Question Object.
 * Last Modified Date: 
 */
-public class QuestionService {
+public with sharing class QuestionService {
 	Public Static SecurityCheckController safe = new SecurityCheckController();//use singleton pattern
     private static Savepoint sp;
     Public class SecurityControllerException extends Exception{
@@ -14,7 +14,7 @@ public class QuestionService {
     * @description To get all the Response type field values.
     * @return 
     */
-     @AuraEnabled	
+	
 	Public Static List<String> getQuestionTypeValues()
     {
         List<String> picklistvaluelst = new List<String>();
@@ -31,10 +31,8 @@ public class QuestionService {
     * @param isUpdate  is boolean value, if true updates the question, if false inserts the question.
     * @return Map of Id and its Question__c record
     */
-    @AuraEnabled
     Public Static List<SObject> createQuestions(List<SObject> questions, Boolean isUpdate)
     {
-        System.debug('questions'+questions);
         if(isUpdate)
         {
             if(questions.isEmpty() == false){
@@ -70,13 +68,10 @@ public class QuestionService {
     * @param isUpdate  is boolean value, if true updates the question, if false inserts the question.
     * @return Map of Id and its Question__c record
     */
-    @AuraEnabled
     Public Static List<SObject> deleteQuestion(String questionId,String templateId)
     {
         List<SObject> delQues = QuestionSelector.getQuestionsData(questionId,templateId);
         List<SObject> delChildQues = QuestionSelector.getChildQuestions(questionId,templateId);
-        System.debug('delQues'+delQues);
-        System.debug('delChildQues'+delChildQues);
         List<Database.DeleteResult> deleteResult = safe.doDelete(delQues);
                     List<String> errorList = SecurityCheckController.safeClassExceptionHandlerDelete(deleteResult);
                     if(errorList.size()>0){
@@ -123,5 +118,32 @@ public class QuestionService {
     @AuraEnabled
     Public Static List<SObject> getQuestionsData(String questionId, String templateId){
         return QuestionSelector.getQuestionsData(questionId, templateId);
+    }
+    
+    /**
+    * @description Updates the Child Questions with updated Sequence
+    * @param parameterMap It is a stringified JSON of parameters required to update and fetch updated Question__c records
+    * @return List of Question__c records
+    */
+    public static List<sObject> fetchQuestions(String parameterMap)
+    {
+        Map<String,Object> newParameterMap = (Map<String,Object>)JSON.deserializeUntyped(parameterMap);
+        String assessmentId = (String)newParameterMap.get('assessmentId');
+        String filter = ' WHERE Parent_Question__c = \''+String.escapeSingleQuotes(assessmentId)+'\' ORDER BY Question_Sequence_Number__c ASC';
+        
+        List<String> fields = new List<String>{'Id', 'Question__c', 'Conditional_Response__c', 'Question_Sequence_Number__c'};
+        Map<String,Object> quesParameterMap = new Map<String,Object>{ 'fields'=>fields, 'filter'=>filter };
+        return QuestionSelector.fetchQuestions(quesParameterMap);
+    }
+    
+    /**
+    * @description Fetches the Question__c records based on search string and other parameters
+    * @param parameterMap It is a stringified JSON of parameters required to fetch Question__c records
+    * @return List of Question__c records
+    */
+    public static List<sObject> updateQuestionsSequence(String parameterMap)
+    {
+        Map<String,Object> newParameterMap = (Map<String,Object>)JSON.deserializeUntyped(parameterMap);
+        return QuestionSelector.updateQuestionsSequence(newParameterMap);
     }
 }
