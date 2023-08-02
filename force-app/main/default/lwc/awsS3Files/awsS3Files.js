@@ -23,7 +23,7 @@ export default class AWSS3FileOperations extends LightningElement {
     @track base64FileData;
     @track s3;
     @track keyList = [];
-    @track getFilesFlag = false;
+    @track getFilesFlag = true;
     @track renderFlag = true;
     @track disableFlag = false;
     heightStyle = 'height:300px;';
@@ -32,7 +32,7 @@ export default class AWSS3FileOperations extends LightningElement {
     fileKey;
     showDeleteModal = false;
     showFrame = false;
-    
+    noFilesContent = 'No Files Uploaded...';
 
     //Accept File Formats
     get acceptedFormats() {
@@ -49,12 +49,12 @@ export default class AWSS3FileOperations extends LightningElement {
                     }
                 });
         }
-        else  if (this.objectApiName === 'Rhythm__Action__c') {
-             this.disableFlag = true;
-             this.heightStyle = 'height:387px;';
+        else if (this.objectApiName === 'Rhythm__Action__c') {
+            this.disableFlag = true;
+            this.heightStyle = 'height:387px;';
         }
         else {
-           this.disableFlag = false; 
+            this.disableFlag = false;
         }
 
         Promise.all([
@@ -126,7 +126,7 @@ export default class AWSS3FileOperations extends LightningElement {
                     fileList.push({ key: objectKey, url: this.endpoint + '/' + objectKey, value: objectKey.substring(objectKey.lastIndexOf("/") + 1) });
                 });
                 this.keyList = fileList.reverse();
-                if (this.keyList.length >  0) {
+                if (this.keyList.length > 0) {
                     this.getFilesFlag = true;
                 }
                 else {
