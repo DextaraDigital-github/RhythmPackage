@@ -37,17 +37,21 @@
 						</div>
 					</div>
 					<!-- Displays button and picklist for navigations --END-->
-					<div>
-						<template if:true={showRefreshbutton}>
-							<lightning-button variant="base" label="Refresh" title="Refresh" onclick={handleOnload}></lightning-button>
-						</template>
-					</div>
-					<div
-						style="position:absolute; display:inline-block; right:13px; margin-top:-47px; font-weight:bold;">
+					
+					<div class="slds-grid slds-grid_align-end slds-grid_vetical-align-end slds-m-bottom_xx-small" style="width:100%">
 						<template if:true={isTemplate}>
-							<a class="slds-button slds-button_reset slds-accordion__summary-action"
-								title="Expand All / Collapse All" onclick={handleCollapseExpand}
-								aria-controls="referenceId-21" aria-expanded="true">{buttonlabel}</a>
+							<div class="slds-col slds-grid slds-grid_vertical-align-center" style="font-weight:bold;">
+								<div class="slds-p-bottom_xx-small slds-p-horizontal_small">
+									<a class="slds-button slds-button_icon slds-accordion__summary-action"
+										title="Expand All / Collapse All" onclick={handleCollapseExpand}
+										aria-controls="referenceId-21" aria-expanded="true">{buttonlabel}</a>
+								</div>
+							</div>
+						</template>
+						<template if:true={showRefreshbutton}>
+							
+								<lightning-button-icon icon-name="utility:refresh" size="small" onclick={handleOnload} alternative-text="Refresh" title="Refresh">
+								</lightning-button-icon>
 						</template>
 					</div>
 					

@@ -6,7 +6,9 @@
 * Last Modified Date : 
 */
 public with sharing class QuestionAttributeResponseController {
-     /**
+    static QuestionAttributeResponseService service = QuestionAttributeResponseService.getInstance();
+
+    /**
     * @description Create Response Attributes for Questions 
     * @param responseAttributes It is a List of maps of Response_Attribute__c Object 
     * @return List of Response_Attribute__c records
@@ -14,7 +16,7 @@ public with sharing class QuestionAttributeResponseController {
     @AuraEnabled
     public static List<SObject> createResponseAttributes(List<SObject> responseAttributes)
     {
-        return QuestionAttributeResponseService.createResponseAttributes(responseAttributes);
+        return service.createResponseAttributes(responseAttributes);
     }
    /**
     * @description delete Response Attributes for corresponding Questions 
@@ -23,7 +25,7 @@ public with sharing class QuestionAttributeResponseController {
     */
     @AuraEnabled
     public static List<SObject> deleteQuesRespAttribute(List<String> questionId){
-        return QuestionAttributeResponseService.deleteQuesRespAttribute(questionId);
+        return service.deleteQuesRespAttribute(questionId);
     }
    /**
     * @description Updates Response Attributes for corresponding Questions 
@@ -32,7 +34,7 @@ public with sharing class QuestionAttributeResponseController {
     */
     @AuraEnabled  
     public static List<SObject> updateResponseAttributes(List<SObject> responseAttributes){
-        return QuestionAttributeResponseService.updateResponseAttributes(responseAttributes);
+        return service.updateResponseAttributes(responseAttributes);
     }
    /**
     * @description delete a particular Response Attribute Record
@@ -41,7 +43,7 @@ public with sharing class QuestionAttributeResponseController {
     */
     @AuraEnabled
     public static List<Sobject> deleteResponseAttribute(String responseId){
-        return QuestionAttributeResponseService.deleteResponseAttribute(responseId);
+        return service.deleteResponseAttribute(responseId);
     }
       /**
     * @description gets al Response Attribute Records based on  Response_Attribute__c Ids
@@ -50,7 +52,7 @@ public with sharing class QuestionAttributeResponseController {
     */
     @AuraEnabled
     public static List<SObject> getQuesRespAttribute(List<String> respAttrId){
-        return QuestionAttributeResponseService.getQuesRespAttribute(respAttrId);
+        return service.getQuesRespAttribute(respAttrId);
     }
    /**
     * @description gets al Response Attribute Records based on  Question__c Id
@@ -59,7 +61,7 @@ public with sharing class QuestionAttributeResponseController {
     */
     @AuraEnabled
     public static List<SObject> getQuestionRespAttributes(List<String> questionlst){
-        return QuestionAttributeResponseService.getQuestionRespAttributes(questionlst);
+        return service.getQuestionRespAttributes(questionlst);
     }
     
 }

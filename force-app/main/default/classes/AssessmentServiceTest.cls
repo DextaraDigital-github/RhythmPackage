@@ -8,18 +8,17 @@
 
 @isTest
 public class AssessmentServiceTest {
-    
+    static AssessmentService service = AssessmentService.getInstance();
     /**
 * @description
 */
     @isTest
-    Public Static void fetchAssessmentTemplatesTest() {
-        
+    public static void fetchAssessmentTemplatesTest() {
         try{
             user u = [SELECT Id,UserName FROM User WHERE Profile.Name='Standard Platform User' LIMIT 1];
             System.runAs(u){
 				Test.startTest();
-                AssessmentService.fetchAssessmentTemplates();
+                service.fetchAssessmentTemplates();
 				Test.stopTest();
             }
         }

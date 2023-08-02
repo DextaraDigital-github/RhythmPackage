@@ -1,7 +1,21 @@
 public with sharing class CAPAService {
     public static SecurityCheckController safe = new SecurityCheckController();//use singleton pattern
     private static Savepoint sp;
-    public static Map<string,List<string>> getPicklistValues(){
+
+    private static CAPAService service = null; //private static instance of the class
+    static CAPASelector selector = CAPASelector.getInstance();
+    /**
+    * @description Singleton Design Pattern 
+    */
+    public static CAPAService getInstance(){
+           if(service == null){
+                service = new CAPAService();
+            }
+        return service;
+    }
+
+    // RED FOR NO COMMENTS
+    public Map<string,List<string>> getPicklistValues(){
         try{
             if ((!Schema.sObjectType.Action__c.isAccessible())
                 || (!Schema.sObjectType.Action__c.fields.Related_module__c.isAccessible())
@@ -30,7 +44,7 @@ public with sharing class CAPAService {
         }
     }
 
-    public static void saveActionResponse(List<SObject> actionResponse, Boolean isUpdate){
+    public void saveActionResponse(List<SObject> actionResponse, Boolean isUpdate){
         try{
             List<String> errorsList = new List<String>();
             if(isUpdate == false){
@@ -51,8 +65,8 @@ public with sharing class CAPAService {
         }
     }
 
-    public static List<Action__c> deleteActionData(string questionId, string accountAssessmentId){
-        List<Action__c> deleteData=CAPASelector.deleteActionData(questionId,accountAssessmentId);
+    public List<Action__c> deleteActionData(string questionId, string accountAssessmentId){
+        List<Action__c> deleteData=selector.deleteActionData(questionId,accountAssessmentId);
         try{
             if(deleteData.isEmpty() == false){
                 List<Database.DeleteResult> deleteResult = safe.doDelete(deleteData);
@@ -69,37 +83,37 @@ public with sharing class CAPAService {
         }
     }
     
-     public static List<user> getRecordsList(string userName){
-       List<user> userData= CAPASelector.getRecordsList(userName);
+    public List<user> getRecordsList(string userName){
+       List<user> userData= selector.getRecordsList(userName);
         return userData;
     }
     
-     public static List<Action__c> getActionResponse(Map<String,string> actionResponse){
-        List<Action__c> actionItemData=CAPASelector.getActionResponse(actionResponse);
+    public List<Action__c> getActionResponse(Map<String,string> actionResponse){
+        List<Action__c> actionItemData = selector.getActionResponse(actionResponse);
         return actionItemData;
     }
     
-    public static List<Action__c> getActionRecords(string accountAssessment){
-        List<Action__c> actionRecords=CAPASelector.getActionRecords(accountAssessment);
+    public List<Action__c> getActionRecords(string accountAssessment){
+        List<Action__c> actionRecords = selector.getActionRecords(accountAssessment);
         return actionRecords;
     }
     
-     public static List<Action__c> actionRecords(){
-        List<Action__c> actionItemRecords= CAPASelector.actionRecords();
+     public List<Action__c> actionRecords(){
+        List<Action__c> actionItemRecords = selector.actionRecords();
         return actionItemRecords;
     }
     
-    public static List<Action__c> selectedActionRecord(string actionid){
-        List<Action__c> selectedActionRecord= CAPASelector.selectedActionRecord(actionid);
+    public List<Action__c> selectedActionRecord(string actionid){
+        List<Action__c> selectedActionRecord= selector.selectedActionRecord(actionid);
         return selectedActionRecord;
     }
 
-    public static void send(String subject, String body, List<Id> userList){
-        List<Messaging.SendEmailResult> mailInfo=SendEmail.send(subject,body,userList);
+    public void send(String subject, String body, List<Id> userList){
+        List<Messaging.SendEmailResult> mailInfo = SendEmail.send(subject,body,userList);
     }
 
-    public static void notifyUsers(Map<string,object> actionData, String body, List<Id> userList){
-        Object targetId=CAPASelector.notifyUsers();
+    public void notifyUsers(Map<string,object> actionData, String body, List<Id> userList){
+        Object targetId = selector.notifyUsers();
         actionData.put('targetId',targetId);
         Set<string>userdata=new set<string>();
         for(Id userid:userList){

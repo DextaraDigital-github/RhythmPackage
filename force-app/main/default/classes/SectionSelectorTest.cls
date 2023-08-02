@@ -7,6 +7,7 @@
 */
 @isTest
 public class SectionSelectorTest {
+    static SectionSelector selector = SectionSelector.getInstance();
 	@testSetup
     static void methodName() {
         User custUser = new User();
@@ -54,8 +55,7 @@ public class SectionSelectorTest {
         String tempId = sec[0].Assessment_Template__c;
         System.runAs(u){
             Test.startTest();
-            SectionSelector ss = new SectionSelector();
-            List<Section__c> seclst =ss.getSectionsforTemplate(tempId);
+            List<Section__c> seclst =selector.getSectionsforTemplate(tempId);
             Test.stopTest();
            System.assertEquals(seclst.size()>0, true,'Response Attribute Deleted successfully');
         } 
@@ -68,7 +68,7 @@ public class SectionSelectorTest {
         String tempId = sec[0].Assessment_Template__c;
         System.runAs(u){
             Test.startTest();
-            List<Section__c> seclst =SectionSelector.getSections(tempId,sec[0].Name);
+            List<Section__c> seclst =selector.getSections(tempId,sec[0].Name);
             System.debug('seclst'+seclst);
             Test.stopTest();
            System.assertEquals(seclst.size()>0, false,'Sections retrieved successfully');

@@ -8,6 +8,18 @@
 public with sharing class AWSS3Service extends AWS {
     public static SecurityCheckController safe = new SecurityCheckController();//use singleton pattern
     private static Savepoint sp;
+
+    private static AWSS3Service serviceClasa = null; //private static instance of the class
+    
+    /**
+    * @description Singleton Design Pattern 
+    */
+    public static AWSS3Service getInstance(){
+            if(serviceClasa == null){
+                serviceClasa = new AWSS3Service();
+            }
+        return serviceClasa;
+    }
     
     public String fileName;
     public String folderName;
@@ -74,7 +86,7 @@ public with sharing class AWSS3Service extends AWS {
 * @param expires This is minutes to be expired in. 
 * @return Download File URL
 */
-    public static String getSignedURL(String location, String file, Integer expires) {
+    public String getSignedURL(String location, String file, Integer expires) {
         String accessKey;
         String secretKey;
         String bucketName;
@@ -143,7 +155,7 @@ public with sharing class AWSS3Service extends AWS {
 * @param encodeSlash This is the boolean value to encode with slash
 * @return Encoded String 
 */ 
-    public static String uriEncode(String input, Boolean encodeSlash) {
+    public String uriEncode(String input, Boolean encodeSlash) {
         String result = '';
         try {
             for (Integer i = 0; i < input.length(); i++) {
@@ -170,7 +182,7 @@ public with sharing class AWSS3Service extends AWS {
 * @param result
 * @return Hexvalue String 
 */ 
-    public static String convertToHex(String ch, String result) {
+    public String convertToHex(String ch, String result) {
         if(ch != null){ 
             String hexValue = EncodingUtil.convertToHex(Blob.valueOf(ch)).toUpperCase();    
             if (hexValue.length() == 2) {
@@ -188,8 +200,7 @@ public with sharing class AWSS3Service extends AWS {
 * @param pathRecId This is the recordId.
 * @return flag on uploaded successfully
 */ 
-    @AuraEnabled
-    public static Boolean uploadFiles(Id recId, String objectName, Id pathRecId,Boolean deleteFlag) {
+    public Boolean uploadFiles(Id recId, String objectName, Id pathRecId,Boolean deleteFlag) {
         Boolean uploadedFlag = false;
         List<Id> contDocIds = new List<Id>();
         List<String> errorList = new List<String>();
@@ -255,7 +266,7 @@ public with sharing class AWSS3Service extends AWS {
 * @param value
 * @return size
 */ 
-    public static String fileSizeToString(Long value) {
+    public String fileSizeToString(Long value) {
         /* string representation if a file's size, such as 2 KB, 4.1 MB, etc */
         if (value < 1024) {
             return string.valueOf(value) + ' Bytes';
@@ -284,8 +295,7 @@ public with sharing class AWSS3Service extends AWS {
 * @param actionResponse
 * @return Id 
  */
-     @AuraEnabled
-    public static Id saveActionRecord(List<SObject> actionResponse){
+    public Id saveActionRecord(List<SObject> actionResponse){
         try{
             Id actionRecordId;
             if(actionResponse.size() > 0){
@@ -317,8 +327,7 @@ public with sharing class AWSS3Service extends AWS {
 * @param fileResp
 * @return Id 
 */ 
-    @AuraEnabled
-    public static Id createResponseforFileUpload(String fileResp) {
+    public Id createResponseforFileUpload(String fileResp) {
         try{
             Id respId;
             Map<String,Object> filemap = (Map<String,Object>) JSON.deserializeUntyped(fileResp);

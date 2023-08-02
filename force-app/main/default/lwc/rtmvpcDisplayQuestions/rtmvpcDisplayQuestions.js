@@ -4,7 +4,7 @@ import { loadStyle } from 'lightning/platformResourceLoader';
 import componentStyleSheet from '@salesforce/resourceUrl/ComponentStyleSheet';
 import getQuestions from '@salesforce/apex/QuestionController.getQuestions';
 import deleteQuestion from '@salesforce/apex/QuestionController.deleteQuestion';
-import getTemplateRecord from '@salesforce/apex/TemplateSelector.getTemplateRecord';
+import getTemplateRecord from '@salesforce/apex/TemplateController.getTemplateRecord';
 import errorLogRecord from '@salesforce/apex/AssessmentController.errorLogRecord';
 
 const columns = [

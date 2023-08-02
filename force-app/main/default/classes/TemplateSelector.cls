@@ -9,27 +9,35 @@ public with sharing class TemplateSelector {
     public static SecurityCheckController safe = new SecurityCheckController();  //Implementing singleton pattern
     public static List<ErrorTransactionLog__c> errorList;   //Stores list of ErrorTransactionLog__c records to store errors
     public static ErrorTransactionLog__c errorRec;   //Used for creating an instance for ErrorTransactionLog__c to log/store an error
+
+    private static TemplateSelector selector = null; //private static instance of the class
+    
+    /**
+    * @description Singleton Design Pattern 
+    */
+    public static TemplateSelector getInstance(){
+           if(selector == null){
+                selector = new TemplateSelector();
+            }
+        return selector;
+    }
     
     /**
     * @description Fetches the Assessment_Template__c records w.r.t fields, filter, child queries, etc.
     * @param parameterMap It is a Map of all parameters like fields, filter, child queries, etc.
     * @return Map of Id and its Assessment_Template__c record
     */
-    public static Map<Id,Assessment_Template__c> fetchAssessmentTemplates(Map<String,Object> parameterMap)
-    {
+    public Map<Id,Assessment_Template__c> fetchAssessmentTemplates(Map<String,Object> parameterMap){
         List<String> fields = (List<String>)JSON.deserialize(JSON.serialize(parameterMap.get('fields')), List<String>.class);
         String filter = (String)parameterMap.get('filter');
-        if(fields != null && !fields.isEmpty())
-        {
+        if(fields != null && !fields.isEmpty()){
             filter = (filter == null)?'':filter;
             String query = 'SELECT ' + String.join(fields,',')+' FROM Assessment_Template__c '+filter;
-            try
-            {
+            try{
                 List<Assessment_Template__c> templateList = safe.doQuery(query);
                 return new Map<Id,Assessment_Template__c>(templateList);
             }
-            catch(Exception e)
-            {
+            catch(Exception e){
                 errorList = new List<ErrorTransactionLog__c>();
             	errorRec = new ErrorTransactionLog__c();
                 errorRec.Class_Name__c = 'TemplateSelector';
@@ -50,8 +58,7 @@ public with sharing class TemplateSelector {
     * @param templateId This is a record id of an Template.
     * @return 
     */
-    @AuraEnabled
-    public static List<Assessment_Template__c> getTemplateRecord(string templateId){
+    public List<Assessment_Template__c> getTemplateRecord(string templateId){
         templateId = String.escapeSingleQuotes(templateId);
         List<Assessment_Template__c> templateList = [SELECT Id,Status__c
                                                     FROM Assessment_Template__c

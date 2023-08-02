@@ -7,6 +7,7 @@
 */
 @isTest
 private class AWSS3Test {
+    static AWSS3Service service = AWSS3Service.getInstance();
     /**
 * @description
 */
@@ -101,8 +102,8 @@ private class AWSS3Test {
     private  static void testGetFileSignedUrl() {
         Test.startTest();
         String result = AWSS3Controller.getFileSignedUrl('location', 'file', 60);
-        AWSS3Service.convertToHex('01','test');
-        AWSS3Service.uriEncode('01*',true);
+        service.convertToHex('01','test');
+        service.uriEncode('01*',true);
         Test.stopTest();
         System.assertEquals(result, result, 'Assert Failed');
     }
@@ -160,7 +161,7 @@ private class AWSS3Test {
             List<Account> acc = [Select Id,Name from Account];
             Test.startTest();
             AWSS3Controller.uploadFiles(acc[0].Id, 'Account', null, false);
-            AWSS3Service.convertToHex('c','test');
+            service.convertToHex('c','test');
             Test.stopTest();
             System.assertEquals(1,acc.size(),'Assert Failed');
         }

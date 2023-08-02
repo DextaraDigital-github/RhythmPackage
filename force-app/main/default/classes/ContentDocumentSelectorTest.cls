@@ -7,30 +7,25 @@
 */
 @isTest
 private class ContentDocumentSelectorTest {
+    static ContentDocumentSelector selector = ContentDocumentSelector.getInstance();
     /**
     * @description
     */
-@isTest
+    @isTest
     private static void fetchContentDocumentstest() {
- String ids= UserInfo.getUserId();
+        String ids= UserInfo.getUserId();
         User u=[select id from user where id=:ids limit 1];
         System.runAs(u) {
-        test.startTest();
-        try {
-            List<String> cdFields = new List<String>{'Id'};
+            test.startTest();
+            try {
+                List<String> cdFields = new List<String>{'Id'};
                 String cdfilter = 'where Id in deleteContentDocuments';
-                    Map<String,Object> emailtempParameterMap = new Map<String,Object>{'fields'=>cdFields, 'filter'=>cdfilter};
-                        
-                        ContentDocumentSelector.fetchContentDocuments(emailtempParameterMap);
-            
-            
-       
+                Map<String,Object> emailtempParameterMap = new Map<String,Object>{'fields'=>cdFields, 'filter'=>cdfilter};
+                selector.fetchContentDocuments(emailtempParameterMap);
+            }catch (AuraHandledException e) {
+                //System.assert(e.getMessage().contains('colon'), 'expecting a colon');
+            }
+            test.stopTest();
         }
-        catch (AuraHandledException e) {
-            //System.assert(e.getMessage().contains('colon'), 'expecting a colon');
-        }
-        test.stopTest();
- 
-}
-}
+    }
 }

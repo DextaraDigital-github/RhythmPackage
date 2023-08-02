@@ -8,6 +8,9 @@
 public with sharing class SendEmailBatch implements Database.batchable<sObject>, Database.Stateful {
     public static SecurityCheckController safe = null;   //Implementing singleton pattern
     public emailWrapper ew = null;
+
+    static ContentDocumentSelector selector = ContentDocumentSelector.getInstance();
+    static ContentVersionSelector cvSelector = ContentVersionSelector.getInstance();
     
     /**
     * @description Initializes the data
@@ -58,7 +61,7 @@ public with sharing class SendEmailBatch implements Database.batchable<sObject>,
         List<String> cvFields = new List<String>{'Id', 'VersionData', 'FileExtension', 'PathOnClient'};
         String cvFilter = 'where ContentDocumentId in (\''+String.join(contentDocuments,'\',\'')+'\')';
         Map<String,Object> cvParameterMap = new Map<String,Object>{'fields'=>cvFields, 'filter'=>cvFilter};
-        Map<Id,ContentVersion> cvMap = ContentVersionSelector.fetchContentVersions(cvParameterMap);
+        Map<Id,ContentVersion> cvMap = cvSelector.fetchContentVersions(cvParameterMap);
         List<ContentVersion> cvList = new List<ContentVersion>();
         if(cvMap != null) {
             cvList = cvMap.values();
@@ -177,7 +180,7 @@ public with sharing class SendEmailBatch implements Database.batchable<sObject>,
             List<String> cdFields = new List<String>{'Id'};
             String cdFilter = 'where Id in (\''+String.join(deleteContentDocuments,'\',\'')+'\')';
             Map<String,Object> cdParameterMap = new Map<String,Object>{'fields'=>cdFields, 'filter'=>cdFilter};
-            List<ContentDocument> cdList = ContentDocumentSelector.fetchContentDocuments(cdParameterMap).values();
+            List<ContentDocument> cdList = selector.fetchContentDocuments(cdParameterMap).values();
             safe = new SecurityCheckController();
             safe.doDelete(cdList);
             safe = null;

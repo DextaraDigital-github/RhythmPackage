@@ -245,10 +245,8 @@ public class CAPAControllerTest {
         user u = [SELECT Id,UserName FROM User WHERE Email='standarduser@testorg.com' LIMIT 1];
         System.runAs(u){
             Test.startTest();
-            CAPASelector.getCurrentDate();
+            CAPAController.getCurrentDate();
 			Test.stopTest();
         }
     }
-    
-    
 }

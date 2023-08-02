@@ -9,6 +9,8 @@ public with sharing class AssessmentController {
     
     public static SecurityCheckController safe = new SecurityCheckController();//use singleton pattern
     private static Savepoint sp;//prudhvi to work
+
+    static AssessmentService accAssService = AssessmentService.getInstance();
     
     /**
     * @description Gets the assessment information.
@@ -1153,7 +1155,7 @@ public with sharing class AssessmentController {
     */
     @AuraEnabled
     public static List<sObject> fetchAssessmentTemplates() {
-        return AssessmentService.fetchAssessmentTemplates();
+        return accAssService.fetchAssessmentTemplates();
     }
     
     /**

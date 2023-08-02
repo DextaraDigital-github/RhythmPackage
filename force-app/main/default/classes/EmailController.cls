@@ -7,6 +7,7 @@
 */
 public with sharing class EmailController {
      
+    static EmailService service = EmailService.getInstance();
     /**
     * @description Fetches the Account records based on search string and other parameters
     * @param parameterMap It is a stringified JSON of parameters required to fetch AccountAssessmentRelation records
@@ -14,7 +15,7 @@ public with sharing class EmailController {
     */
     @AuraEnabled
     public static List<sObject> fetchAccounts(String parameterMap) {
-        return EmailService.fetchAccounts(parameterMap);
+        return service.fetchAccounts(parameterMap);
     }
     
     /**
@@ -23,7 +24,7 @@ public with sharing class EmailController {
     */
     @AuraEnabled
     public static List<sObject> fetchEmailtemplates() {
-        return EmailService.fetchEmailTemplates();
+        return service.fetchEmailTemplates();
     }
     
     /**
@@ -32,7 +33,7 @@ public with sharing class EmailController {
     */
     @AuraEnabled
     public static void sendEmail(String parameterMap) {
-        EmailService.sendEmail(parameterMap);
+        service.sendEmail(parameterMap);
     }
     
     /**
@@ -42,6 +43,6 @@ public with sharing class EmailController {
     */
     @AuraEnabled
     public static List<sObject> fetchEmailMessages(String parameterMap) {
-        return EmailService.fetchEmailMessages(parameterMap);
+        return service.fetchEmailMessages(parameterMap);
     }
 }

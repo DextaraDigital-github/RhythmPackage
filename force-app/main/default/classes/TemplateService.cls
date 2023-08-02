@@ -10,6 +10,24 @@ public with sharing class TemplateService{
     public static SecurityCheckController safe = new SecurityCheckController();//use singleton pattern
     private static Savepoint sp; // To rollback
 
+    static ResponseQuestionMapSelector selector = ResponseQuestionMapSelector.getInstance();
+    static SectionSelector secSelector = SectionSelector.getInstance();
+    static QuestionAttributeResponseSelector attrSelector =  QuestionAttributeResponseSelector.getInstance();
+    static QuestionSelector queSelector =  QuestionSelector.getInstance();
+    static TemplateSelector tempSelector = TemplateSelector.getInstance();
+
+    private static TemplateService service = null; //private static instance of the class
+    
+    /**
+    * @description Singleton Design Pattern 
+    */
+    public static TemplateService getInstance(){
+           if(service == null){
+            service = new TemplateService();
+            }
+        return service;
+    }
+
     /**
     * @description To Clone the Template and its related records.
     * @param templateId This is a record id of an Template.
@@ -73,9 +91,8 @@ public with sharing class TemplateService{
         List<Section__c> newSectionsList = new List<Section__c>();
         List<Question__c> oldPQueList = new List<Question__c>();
         Map<Id,Id> sectionIdsMap = new Map<Id,Id>();
-        SectionSelector ss = new SectionSelector();
 
-        List<Section__c> sectionsList = ss.getSectionsforTemplate(templateId);
+        List<Section__c> sectionsList = secSelector.getSectionsforTemplate(templateId);
         for(Section__c section : sectionsList){
             Section__c newSection = section.clone(false, true); //do a deep clone
             newSection.Assessment_Template__c = newTemplateId;
@@ -153,11 +170,10 @@ public with sharing class TemplateService{
         List<Question__c> oldCQueList = new List<Question__c>();
         Map<Id,Id> cqIdsMap = new Map<Id,Id>();
         Map<Id,Id> questionIdsMap = new Map<Id,Id>();
-        QuestionSelector qs = new QuestionSelector();
         
         mqIds.addAll(pqIdsMap.keySet());
         if(mqIds.isEmpty() == false){
-            List<Question__c> cqs = qs.getSubQuestions(mqIds);
+            List<Question__c> cqs = queSelector.getSubQuestions(mqIds);
             oldCQueList.addAll(cqs);
         }
         if(oldCQueList.isEmpty() == false){
@@ -200,8 +216,7 @@ public with sharing class TemplateService{
 
         Map<Id,Id> raIdsMap = new Map<Id,Id>();
         List<Response_Attribute__c> raList = new List<Response_Attribute__c>();
-        QuestionAttributeResponseSelector qrs = new QuestionAttributeResponseSelector();
-        List<Response_Attribute__c> resAttList = qrs.getRespAttforQuestion(questionIdsMap);
+        List<Response_Attribute__c> resAttList = attrSelector.getRespAttforQuestion(questionIdsMap);
     
         for(Response_Attribute__c ra : resAttList){
             Response_Attribute__c newRA = ra.clone(false, true);
@@ -242,8 +257,7 @@ public with sharing class TemplateService{
     */
     private void cloneResponseQMap(Map<Id,Id> raIdsMap,Map<Id,Id> questionIdsMap){
         List<Response_Question_Map__c> rqmList = new List<Response_Question_Map__c>();
-        ResponseQuestionMapSelector rqms = new ResponseQuestionMapSelector();
-        List<Response_Question_Map__c> oldRQMList = rqms.getResponeQmap(raIdsMap);
+        List<Response_Question_Map__c> oldRQMList = selector.getResponeQmap(raIdsMap);
         
         for(Response_Question_Map__c rqm : oldRQMList){
             Response_Question_Map__c newRQM = rqm.clone(false, true);
@@ -264,7 +278,9 @@ public with sharing class TemplateService{
         }
     }
 
-
+    public List<Assessment_Template__c> getTemplateRecord(string templateId){
+        return tempSelector.getTemplateRecord(templateId);
+    }
      /**
     * @description It is used to throw the exception
     */

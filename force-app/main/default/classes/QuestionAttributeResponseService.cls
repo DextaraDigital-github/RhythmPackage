@@ -8,59 +8,51 @@
 public with sharing class QuestionAttributeResponseService {
     public static SecurityCheckController safe = new SecurityCheckController();//use singleton pattern
     private static Savepoint sp;
+    private static QuestionAttributeResponseService service = null; //private static instance of the class
+
+    static QuestionAttributeResponseSelector selector = QuestionAttributeResponseSelector.getInstance();
+
+    /**
+    * @description Singleton Design Pattern 
+    */
+    public static QuestionAttributeResponseService getInstance(){
+           if(service == null){
+            service = new QuestionAttributeResponseService();
+            }
+        return service;
+    }
+
     /**
     * @description Create Response Attributes for Questions 
     * @param responseAttributes It is a List of maps of Response_Attribute__c Object 
     * @return List of Response_Attribute__c records
     */
-    public static List<SObject> createResponseAttributes(List<SObject> responseAttributes)
-    {
-        System.debug('responseAttributes'+responseAttributes);
+    public List<SObject> createResponseAttributes(List<SObject> responseAttributes){
         if(responseAttributes.isEmpty() == false){
-                Database.SaveResult[] results = safe.doInsert(responseAttributes);
-                List<String> errorsList = SecurityCheckController.safeClassExceptionHandlerInsert(results);
-                system.debug('errorsList---->'+errorsList);
-                if(errorsList.size()>0){
-                    Database.rollback(sp);
-                    throw new SecurityControllerException(String.join(errorsList, ', ' ));
-                }
+            Database.SaveResult[] results = safe.doInsert(responseAttributes);
+            List<String> errorsList = SecurityCheckController.safeClassExceptionHandlerInsert(results);
+            if(errorsList.size()>0){
+                Database.rollback(sp);
+                throw new SecurityControllerException(String.join(errorsList, ', ' ));
             }
-        //return responseQuestionmap;
-        //INSERT responseAttributes;
+        }
         return responseAttributes;
     }
-     @AuraEnabled 
-    public static List<SObject> createResponseQuestionMap(List<SObject> responseQuestionmap)
-    {
-        //INSERT responseQuestionmap;
-        if(responseQuestionmap.isEmpty() == false){
-                Database.SaveResult[] results = safe.doInsert(responseQuestionmap);
-                List<String> errorsList = SecurityCheckController.safeClassExceptionHandlerInsert(results);
-                system.debug('errorsList---->'+errorsList);
-                if(errorsList.size()>0){
-                    Database.rollback(sp);
-                    throw new SecurityControllerException(String.join(errorsList, ', ' ));
-                }
-            }
-        return responseQuestionmap;
-    }
+     
    /**
     * @description Updates Response Attributes for corresponding Questions 
     * @param responseAttributes It is a list of maps of Response_Attribute__c Object with the Response_Attribute__c Id. 
     * @return List of Updated Response_Attribute__c records
     */ 
-    public static List<SObject> updateResponseAttributes(List<SObject> responseAttributes)
-    {
+    public List<SObject> updateResponseAttributes(List<SObject> responseAttributes){
         if(responseAttributes.isEmpty() == false){
-                Database.SaveResult[] results = safe.doUpdate(responseAttributes);
-                List<String> errorsList = SecurityCheckController.safeClassExceptionHandlerInsert(results);
-                system.debug('errorsList---->'+errorsList);
-                if(errorsList.size()>0){
-                    Database.rollback(sp);
-                    throw new SecurityControllerException(String.join(errorsList, ', ' ));
-                }
+            Database.SaveResult[] results = safe.doUpdate(responseAttributes);
+            List<String> errorsList = SecurityCheckController.safeClassExceptionHandlerInsert(results);
+            if(errorsList.size()>0){
+                Database.rollback(sp);
+                throw new SecurityControllerException(String.join(errorsList, ', ' ));
             }
-        //UPDATE responseAttributes;
+        }
         return responseAttributes;
     }
    /**
@@ -68,20 +60,16 @@ public with sharing class QuestionAttributeResponseService {
     * @param responseId is a Response_Attribute__c Record Id. 
     * @return List of deleted Response_Attribute__c records
     */
-    public static List<Sobject> deleteResponseAttribute(String responseId)
-    {
-        List<Sobject> delrespAtr = QuestionAttributeResponseSelector.getQuestionResponseAttribute(responseId);
-        System.debug('delrespAtr'+delrespAtr);
+    public List<Sobject> deleteResponseAttribute(String responseId){
+        List<Sobject> delrespAtr = selector.getQuestionResponseAttribute(responseId);
         if(delrespAtr.isEmpty() == false){
-                    List<Database.DeleteResult> deleteResult = safe.doDelete(delrespAtr);
-                    List<String> errorList = SecurityCheckController.safeClassExceptionHandlerDelete(deleteResult);
-                    if(errorList.size()>0){
-                        Database.rollback(sp);
-                        throw new SecurityControllerException(String.join( errorList, ', ' ));
-                    }
-                }
-        
-        //DELETE delrespAtr;
+            List<Database.DeleteResult> deleteResult = safe.doDelete(delrespAtr);
+            List<String> errorList = SecurityCheckController.safeClassExceptionHandlerDelete(deleteResult);
+            if(errorList.size()>0){
+                Database.rollback(sp);
+                throw new SecurityControllerException(String.join( errorList, ', ' ));
+            }
+        }
         return delrespAtr;
     }
     
@@ -90,17 +78,15 @@ public with sharing class QuestionAttributeResponseService {
     * @param questionId It is a List of Question Ids 
     * @return List of deleted Response_Attribute__c records
     */
-    public static List<SObject> deleteQuesRespAttribute(List<String> questionId)
-    {
-        List<SObject> delrespAtr = QuestionAttributeResponseSelector.getQuestionRespAttributes(questionId);
-        if(!delrespAtr.isEmpty())
-        {
-             List<Database.DeleteResult> delRespAttr = safe.doDelete(delrespAtr);
-                    List<String> errorRespAttr = SecurityCheckController.safeClassExceptionHandlerDelete(delRespAttr);
-                    if(errorRespAttr.size()>0){
-                        Database.rollback(sp);
-                        throw new SecurityControllerException(String.join( errorRespAttr, ', ' ));
-                    }
+    public List<SObject> deleteQuesRespAttribute(List<String> questionId){
+        List<SObject> delrespAtr = selector.getQuestionRespAttributes(questionId);
+        if(!delrespAtr.isEmpty()){
+            List<Database.DeleteResult> delRespAttr = safe.doDelete(delrespAtr);
+            List<String> errorRespAttr = SecurityCheckController.safeClassExceptionHandlerDelete(delRespAttr);
+            if(errorRespAttr.size()>0){
+                Database.rollback(sp);
+                throw new SecurityControllerException(String.join( errorRespAttr, ', ' ));
+            }
         }
         return delrespAtr;
     }
@@ -109,16 +95,16 @@ public with sharing class QuestionAttributeResponseService {
     * @param questionlst is a list of Response_Attribute__c id. 
     * @return List of Response_Attribute__c records
     */
-    public static List<SObject> getQuesRespAttribute(List<String> respAttrId){
-        return QuestionAttributeResponseSelector.getQuesRespAttribute(respAttrId);
+    public List<SObject> getQuesRespAttribute(List<String> respAttrId){
+        return selector.getQuesRespAttribute(respAttrId);
     }
    /**
     * @description gets al Response Attribute Records based on  Question__c Id
     * @param questionlst is a list of Question__c id. 
     * @return List of Response_Attribute__c records
     */
-    public static List<SObject> getQuestionRespAttributes(List<String> questionlst){
-        return QuestionAttributeResponseSelector.getQuestionRespAttributes(questionlst);
+    public List<SObject> getQuestionRespAttributes(List<String> questionlst){
+        return selector.getQuestionRespAttributes(questionlst);
     }
     
     public class SecurityControllerException extends Exception{

@@ -7,6 +7,7 @@
 */
 @isTest
 private class ContentVersionSelectorTest {
+    static ContentVersionSelector selector = ContentVersionSelector.getInstance();
  @isTest
     /**
     * @description
@@ -18,15 +19,10 @@ private class ContentVersionSelectorTest {
         test.startTest();
         try {
             List<String> cvfields = new List<String>{'Id', 'VersionData', 'FileExtension', 'PathOnClient'};
-                String cvfilter = 'where ContentDocumentId in';
-                    Map<String,Object> emailtempParameterMap = new Map<String,Object>{'fields'=>cvfields, 'filter'=>cvfilter};
-                        
-                        ContentVersionSelector.fetchContentVersions(emailtempParameterMap);
-            
-            
-       
-        }
-        catch (AuraHandledException e) {
+            String cvfilter = 'where ContentDocumentId in';
+            Map<String,Object> emailtempParameterMap = new Map<String,Object>{'fields'=>cvfields, 'filter'=>cvfilter};    
+            selector.fetchContentVersions(emailtempParameterMap);
+        }catch (AuraHandledException e) {
             //System.assert(e.getMessage().contains('field'), 'field doesn\'t exists');
         }
         test.stopTest();

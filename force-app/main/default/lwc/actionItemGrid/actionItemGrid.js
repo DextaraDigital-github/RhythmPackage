@@ -1,6 +1,6 @@
 import { LightningElement, track, wire } from 'lwc';
 import actionRecords from '@salesforce/apex/CAPAController.actionRecords';
-import getCurrentDate from '@salesforce/apex/CAPASelector.getCurrentDate';
+import getCurrentDate from '@salesforce/apex/CAPAController.getCurrentDate';
 import greenFlag from '@salesforce/resourceUrl/greenFlag';
 import redFlag from '@salesforce/resourceUrl/redFlag';
 import orangeFlag from '@salesforce/resourceUrl/orangeFlag';

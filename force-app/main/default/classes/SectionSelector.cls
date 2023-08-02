@@ -8,6 +8,18 @@
 public with sharing class SectionSelector {
     public static SecurityCheckController safe = new SecurityCheckController();//use singleton pattern
     
+
+    private static SectionSelector selector = null; //private static instance of the class
+    
+    /**
+    * @description Singleton Design Pattern 
+    */
+    public static SectionSelector getInstance(){
+           if(selector == null){
+                selector = new SectionSelector();
+            }
+        return selector;
+    }
     /**
     * @description To get all the sections related to a template.
     * @param templateId This is a record id of an Template.
@@ -25,26 +37,21 @@ public with sharing class SectionSelector {
         List<Section__c>  sectionsList = safe.doQuery(query);
         return sectionsList;
     }
-        @AuraEnabled
-    public static List<Sobject> getSections(String templateId, String sectionName)
-    {
+
+    // RED FOR NO COMMENTS
+    public List<Sobject> getSections(String templateId, String sectionName){
         sectionName = '\'%'+sectionName+'%\'';
-        System.debug('templateId : '+templateId +'  sectionName : '+sectionName);
         try{
-            List<Sobject> sections = [SELECT id,name,Assessment_Template__c FROM section__c WHERE  Assessment_Template__c =:templateId
-                                  AND name LIKE :sectionName WITH SECURITY_ENFORCED ORDER BY CreatedDate Desc];
-            //return safe.doQuery(query);
-            return sections;
-        }
-        catch(Exception e)
-        {
+            String query =  'SELECT Id,Name,Assessment_Template__c'
+                            + ' FROM section__c'
+                            + ' WHERE Assessment_Template__c=\'' + templateId + '\''
+                            + ' AND Name LIKE ' + sectionName
+                            + ' WITH SECURITY_ENFORCED'
+                            + ' ORDER BY CreatedDate DESC';
+            return safe.doQuery(query);
+        }catch(Exception e){
             String errorMsg = e.getMessage();
-            System.debug('errorMsg'+errorMsg);
             throw new AuraHandledException(errorMsg);
         }
-        /*List<Sobject> sections = [SELECT id,name,Assessment_Template__c FROM section__c WHERE  Assessment_Template__c =:templateId
-                                  AND name LIKE :sectionName];
-        
-        return sections;*/
     }
 }

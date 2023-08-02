@@ -8,7 +8,7 @@
 
 @isTest
 public class UserSelectorTest {
-
+    static UserSelector selector = UserSelector.getInstance(); 
  
     /**
 * @description
@@ -41,7 +41,7 @@ public class UserSelectorTest {
                 
                 
                 Test.startTest();
-                Map<Id, User> result = UserSelector.fetchUsers(parameterMap);
+                Map<Id, User> result = selector.fetchUsers(parameterMap);
                 Test.stopTest();
                 
                 System.assertEquals(testUsers.size(), result.size());

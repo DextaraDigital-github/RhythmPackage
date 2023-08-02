@@ -7,6 +7,8 @@
 */
 @isTest
 public class EmailTemplateSelectorTest {
+
+    static EmailTemplateSelector selector = EmailTemplateSelector.getInstance();
     /**
     * @description
     */
@@ -14,24 +16,20 @@ public class EmailTemplateSelectorTest {
     private static void fetchEmailTemplatesTest() {
 		String ids= UserInfo.getUserId();
 		User u=[select id from user where id=:ids limit 1];
-	System.runAs(u) {
-        test.startTest();
-        try {
-            List<String> emailTempFields = new List<String>{'Id', 'Name', 'Subject', 'HtmlValue', 'IsBuilderContent'};
+        System.runAs(u) {
+            test.startTest();
+            try {
+                List<String> emailTempFields = new List<String>{'Id', 'Name', 'Subject', 'HtmlValue', 'IsBuilderContent'};
                 List<String> childQuery = new List<String>{'(Select Id, ContentDocumentId, ContentDocument.FileType, ContentDocument.Title from ContentDocumentLinks)'};
-                    Map<String,Object> emailtempParameterMap = new Map<String,Object>{'fields'=>emailTempFields, 'childQuery'=>childQuery};
-                        
-                        EmailTemplateSelector.fetchEmailTemplates(emailtempParameterMap);
-            
-            //update the emailtempParameterMap to throw an exception
-            
-            emailtempParameterMap.put('filter', ' WHERE InvalidField__c = true');
-            EmailTemplateSelector.fetchEmailTemplates(emailtempParameterMap);
+                Map<String,Object> emailtempParameterMap = new Map<String,Object>{'fields'=>emailTempFields, 'childQuery'=>childQuery};  
+                selector.fetchEmailTemplates(emailtempParameterMap);
+                emailtempParameterMap.put('filter', ' WHERE InvalidField__c = true');
+                selector.fetchEmailTemplates(emailtempParameterMap);
+            }
+            catch (AuraHandledException e) {
+                //System.assert(e.getMessage().contains('field'), 'field doesn\'t exists');
+            }
+            test.stopTest();
         }
-        catch (AuraHandledException e) {
-            //System.assert(e.getMessage().contains('field'), 'field doesn\'t exists');
-        }
-        test.stopTest();
     }
-}
 }

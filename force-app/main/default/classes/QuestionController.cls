@@ -6,13 +6,15 @@
 * Last Modified Date: 11-07-2023
 */
 public with sharing class QuestionController {
+
+   static QuestionService service = QuestionService.getInstance();
     /**
     * @description To get all the Response type field values.
     * @return 
     */
     @AuraEnabled
-    Public Static List<String> getQuestionTypeValues(){
-        return QuestionService.getQuestionTypeValues();
+    public static List<String> getQuestionTypeValues(){
+        return service.getQuestionTypeValues();
     }
     
     /**
@@ -22,8 +24,8 @@ public with sharing class QuestionController {
     * @return Map of Id and its Question__c record
     */
     @AuraEnabled
-    Public Static List<SObject> createQuestions(List<SObject> questions, Boolean isUpdate){
-        return QuestionService.createQuestions(questions, isUpdate);
+    public static List<SObject> createQuestions(List<SObject> questions, Boolean isUpdate){
+        return service.createQuestions(questions, isUpdate);
     }
     
     /**
@@ -33,8 +35,8 @@ public with sharing class QuestionController {
     * @return Map of Id and its Question__c record
     */
     @AuraEnabled
-    Public Static List<SObject> deleteQuestion(String questionId,String templateId){
-        return QuestionService.deleteQuestion(questionId, templateId);
+    public static List<SObject> deleteQuestion(String questionId,String templateId){
+        return service.deleteQuestion(questionId, templateId);
     }
     
     /**
@@ -43,8 +45,8 @@ public with sharing class QuestionController {
     * @return List of Question__c records
     */
     @AuraEnabled
-    Public Static List<SObject> getQuestions(String templateId){
-        List<SObject> questionsLst = QuestionService.getQuestions(templateId);
+    public static List<SObject> getQuestions(String templateId){
+        List<SObject> questionsLst = service.getQuestions(templateId);
         return questionsLst;
     }
     
@@ -55,8 +57,8 @@ public with sharing class QuestionController {
     * @return List of Question__c record
     */
     @AuraEnabled
-    Public Static List<SObject> getChildQuestions(String questionId,String templateId){
-        List<SObject> questionsLst = QuestionService.getChildQuestions(questionId,templateId);
+    public static List<SObject> getChildQuestions(String questionId,String templateId){
+        List<SObject> questionsLst = service.getChildQuestions(questionId,templateId);
         return questionsLst;
     }
         
@@ -67,8 +69,8 @@ public with sharing class QuestionController {
     * @return List of Question__c record
     */
     @AuraEnabled
-    Public Static List<SObject> getQuestionsData(String questionId, String templateId){
-        return QuestionService.getQuestionsData(questionId, templateId);
+    public static List<SObject> getQuestionsData(String questionId, String templateId){
+        return service.getQuestionsData(questionId, templateId);
     }
     
     /**
@@ -78,7 +80,7 @@ public with sharing class QuestionController {
     */
     @AuraEnabled
     public static List<sObject> fetchQuestions(String parameterMap) {
-        return QuestionService.fetchQuestions(parameterMap);
+        return service.fetchQuestions(parameterMap);
     }
     
     /**
@@ -88,6 +90,6 @@ public with sharing class QuestionController {
     */
     @AuraEnabled
     public static List<sObject> updateQuestionsSequence(String parameterMap) {
-        return QuestionService.updateQuestionsSequence(parameterMap);
+        return service.updateQuestionsSequence(parameterMap);
     }
 }

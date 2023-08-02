@@ -8,6 +8,8 @@
 public with sharing class AWSS3Controller {  
     public static SecurityCheckController safe = new SecurityCheckController();//use singleton pattern
     private static Savepoint sp;
+
+    static AWSS3Service service = AWSS3Service.getInstance();
     
     /**
 * @description get Authentication Data. 
@@ -37,7 +39,7 @@ public with sharing class AWSS3Controller {
         try {
             String signedURL;
             if(location != null && file != null && expires > 0) {
-                signedURL = AWSS3Service.getSignedURL(location, file, expires); 
+                signedURL = service.getSignedURL(location, file, expires); 
             }
             return signedURL;
         } catch(exception e) {
@@ -59,7 +61,7 @@ public with sharing class AWSS3Controller {
         try {
             if(recId != null && objectName != null) {
                 
-                uploadedFlag=AWSS3Service.uploadFiles(recId, objectName, pathRecId,deleteFlag);
+                uploadedFlag=service.uploadFiles(recId, objectName, pathRecId,deleteFlag);
             }
             return uploadedFlag;
         } catch(exception e) {
@@ -79,7 +81,7 @@ public with sharing class AWSS3Controller {
             Id respId;
             Map<String,Object> filemap = (Map<String,Object>) JSON.deserializeUntyped(fileResp);
             if(filemap.size() > 0) {
-                respId = AWSS3Service.createResponseforFileUpload(fileResp); 
+                respId = service.createResponseforFileUpload(fileResp); 
             }
             return  respId;
         }
@@ -99,7 +101,7 @@ public with sharing class AWSS3Controller {
         try{
             Id actionRecordId;
             if(actionResponse.size() > 0){
-                actionRecordId = AWSS3Service.saveActionRecord(actionResponse);
+                actionRecordId = service.saveActionRecord(actionResponse);
             }
             return actionRecordId; 
         }catch(exception e){

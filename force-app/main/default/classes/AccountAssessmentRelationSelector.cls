@@ -9,13 +9,24 @@ public with sharing class AccountAssessmentRelationSelector {
     public static SecurityCheckController safe = new SecurityCheckController();   //Implementing singleton pattern
     public static List<ErrorTransactionLog__c> errorList;   //Stores list of ErrorTransactionLog__c records to store errors
     public static ErrorTransactionLog__c errorRec;   //Used for creating an instance for ErrorTransactionLog__c to log/store an error
+
+    private static AccountAssessmentRelationSelector selector = null; //private static instance of the class
+    /**
+    * @description Singleton Design Pattern 
+    */
+    public static AccountAssessmentRelationSelector getInstance(){
+           if(selector == null){
+                selector = new AccountAssessmentRelationSelector();
+            }
+        return selector;
+    }
     
     /**
     * @description Fetches the AccountAssessmentRelation__c records w.r.t fields, filter, child queries, etc.
     * @param parameterMap It is a Map of all parameters like fields, filter, child queries, etc.
     * @return Map of Id and its AccountAssessmentRelation__c record
     */
-    public static Map<Id,AccountAssessmentRelation__c> fetchAccounts(Map<String,Object> parameterMap) {
+    public Map<Id,AccountAssessmentRelation__c> fetchAccounts(Map<String,Object> parameterMap) {
         List<String> fields = (List<String>)JSON.deserialize(JSON.serialize(parameterMap.get('fields')), List<String>.class);
         String filter = (String)parameterMap.get('filter');
         if(fields!=null && !fields.isEmpty()) {

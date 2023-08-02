@@ -12,7 +12,7 @@ import getQuestionTypeValues from '@salesforce/apex/QuestionController.getQuesti
 import createQuestions from '@salesforce/apex/QuestionController.createQuestions';
 import createResponseAttributes from '@salesforce/apex/QuestionAttributeResponseController.createResponseAttributes';
 import getQuestionsData from '@salesforce/apex/QuestionController.getQuestionsData';
-import createResponseQuestionMap from '@salesforce/apex/QuestionAttributeResponseService.createResponseQuestionMap';
+import createResponseQuestionMap from '@salesforce/apex/ResponseQuestionMapController.createResponseQuestionMap';
 import updateResponseAttributes from '@salesforce/apex/QuestionAttributeResponseController.updateResponseAttributes';
 import errorLogRecord from '@salesforce/apex/AssessmentController.errorLogRecord';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
@@ -86,7 +86,7 @@ export default class RtmvpcQuestionCreation extends LightningElement {
     }
     renderedCallback() {
         Promise.all([
-            loadStyle(this, this._ComponentStylesheet)
+            loadStyle(this,ComponentStylesheet)
         ]);
     }
     handleOnLoad() {

@@ -7,6 +7,7 @@
 */
 @isTest
 private class EmailControllerTest {
+    static EmailService service = EmailService.getInstance();
     /**
     * @description
     */
@@ -35,81 +36,70 @@ private class EmailControllerTest {
 			TestDataFactory.createAssessment(1,true,assessmentattributes);
         }
     }
-
-
     /**
     * @description
     */
     @isTest
     private static void method1(){
-         String ids= UserInfo.getUserId();
+        String ids= UserInfo.getUserId();
         User u=[select id from user where id=:ids limit 1];
         System.runAs(u) {
-        List<Assessment__c> aslist = [Select Id from Assessment__c];
-        List<Account> acc = [Select Id from Account];
-        system.debug('aslist'+aslist);
-        Map<String,Id> parmap = new Map<String,Id>{'assessmentId'=>aslist[0].Id};
-        Map<String,Object> parmap1 = new Map<String,Object>{'selectedAccounts'=>acc};  
-        String str = JSON.serialize(parmap);
-        String str1 = JSON.serialize(parmap1);
-        
-        EmailController.fetchAccounts(str);
-        EmailController.fetchEmailtemplates();
-        EmailController.fetchEmailMessages(str);
-        System.assert(true,acc.size()>0);
-        
+            List<Assessment__c> aslist = [Select Id from Assessment__c];
+            List<Account> acc = [Select Id from Account];
+            system.debug('aslist'+aslist);
+            Map<String,Id> parmap = new Map<String,Id>{'assessmentId'=>aslist[0].Id};
+            Map<String,Object> parmap1 = new Map<String,Object>{'selectedAccounts'=>acc};  
+            String str = JSON.serialize(parmap);
+            String str1 = JSON.serialize(parmap1);
+            
+            EmailController.fetchAccounts(str);
+            EmailController.fetchEmailtemplates();
+            EmailController.fetchEmailMessages(str);
+            System.assert(true,acc.size()>0);
+        }
     }
-}
     /**
     * @description
     */
- @isTest
+    @isTest
     private static void sendEmailTest() {
 	 String ids= UserInfo.getUserId();
         User u=[select id from user where id=:ids limit 1];
         System.runAs(u) {	
-Test.startTest();
-        try {
-            List<Account> accountList=[select id from Account limit 1];
-            List<String> accountIds = new List<String>();
-            for (Account acc : accountList) {
-                accountIds.add(acc.Id);
-            }
-            String selectedAccounts = JSON.serialize(accountIds);
-            
-            Assessment_Template__c templates=[select id from Assessment_Template__c];
-            List<Assessment__c> assessmentList=[select id from Assessment__c];
-            
-            Map<String, Object> paramMap = new Map<String, Object>();
-            paramMap.put('assessmentId', assessmentList[0].Id);
-            paramMap.put('subject', 'Testing mails');
-            paramMap.put('body', 'Hello');
-            paramMap.put('isBuilderContent', false);
-            paramMap.put('selectedAccounts', accountIds);
-            paramMap.put('templateId', templates.Id);
-            paramMap.put('hasCustomAttachments', false);
-            paramMap.put('hasCustomContents', false);
-            paramMap.put('attachmentsData', new Map<String, Object>{
-                'attachments'=> new List<Object>(),
-                    'contentDocuments'=> new List<Object>(),
-                    'customContentDocuments'=> new List<Object>(),
-                    'standardContentDocuments'=> new List<Object>(),
-                    'deleteContentDocuments'=> new List<Object>()
-                    });
-            
-            String parameterMap = JSON.serialize(paramMap);
-            
-            EmailService.sendEmail(parameterMap);
-            
-            String emails='{"assessmentId":"'+assessmentList[0].id+'","subject":"Testing mails","body":"Hello","isBuilderContent":false,"selectedAccounts":'+selectedAccounts+',"templateId":"'+templates.id+'","hasCustomAttachments":"false","hasCustomContents":"false","attachmentsData":{"attachments":[],"contentDocuments":[],"customContentDocuments":[],"standardContentDocuments":[],"deleteContentDocuments":[]}}';
-            
-            EmailController.sendEmail(emails);
+            Test.startTest();
+                try {
+                    List<Account> accountList=[select id from Account limit 1];
+                    List<String> accountIds = new List<String>();
+                    for (Account acc : accountList) {
+                        accountIds.add(acc.Id);
+                    }
+                    String selectedAccounts = JSON.serialize(accountIds);
+                    Assessment_Template__c templates=[select id from Assessment_Template__c];
+                    List<Assessment__c> assessmentList=[select id from Assessment__c];
+                    Map<String, Object> paramMap = new Map<String, Object>();
+                    paramMap.put('assessmentId', assessmentList[0].Id);
+                    paramMap.put('subject', 'Testing mails');
+                    paramMap.put('body', 'Hello');
+                    paramMap.put('isBuilderContent', false);
+                    paramMap.put('selectedAccounts', accountIds);
+                    paramMap.put('templateId', templates.Id);
+                    paramMap.put('hasCustomAttachments', false);
+                    paramMap.put('hasCustomContents', false);
+                    paramMap.put('attachmentsData', new Map<String, Object>{
+                            'attachments'=> new List<Object>(),
+                            'contentDocuments'=> new List<Object>(),
+                            'customContentDocuments'=> new List<Object>(),
+                            'standardContentDocuments'=> new List<Object>(),
+                            'deleteContentDocuments'=> new List<Object>()
+                            });
+                    String parameterMap = JSON.serialize(paramMap);
+                    service.sendEmail(parameterMap);
+                    String emails='{"assessmentId":"'+assessmentList[0].id+'","subject":"Testing mails","body":"Hello","isBuilderContent":false,"selectedAccounts":'+selectedAccounts+',"templateId":"'+templates.id+'","hasCustomAttachments":"false","hasCustomContents":"false","attachmentsData":{"attachments":[],"contentDocuments":[],"customContentDocuments":[],"standardContentDocuments":[],"deleteContentDocuments":[]}}';
+                    EmailController.sendEmail(emails);
+                }catch(Exception e) {
+                    
+                }
+            Test.stopTest();
         }
-        catch(Exception e) {
-            
-        }
-		test.stopTest();
     }
-}
-    
 }
