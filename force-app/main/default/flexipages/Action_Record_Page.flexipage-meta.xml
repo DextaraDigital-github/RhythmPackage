@@ -45,6 +45,16 @@
     <flexiPageRegions>
         <itemInstances>
             <componentInstance>
+                <componentName>awsS3Files</componentName>
+                <identifier>Rhythm_awsS3Files</identifier>
+            </componentInstance>
+        </itemInstances>
+        <name>Facet-8fcfc02b-50aa-4159-a0b8-b279d9ed4914</name>
+        <type>Facet</type>
+    </flexiPageRegions>
+    <flexiPageRegions>
+        <itemInstances>
+            <componentInstance>
                 <componentInstanceProperties>
                     <name>active</name>
                     <value>true</value>
@@ -59,6 +69,20 @@
                 </componentInstanceProperties>
                 <componentName>flexipage:tab</componentName>
                 <identifier>detailTab</identifier>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
+                <componentInstanceProperties>
+                    <name>body</name>
+                    <value>Facet-8fcfc02b-50aa-4159-a0b8-b279d9ed4914</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>title</name>
+                    <value>Files</value>
+                </componentInstanceProperties>
+                <componentName>flexipage:tab</componentName>
+                <identifier>flexipage_tab</identifier>
             </componentInstance>
         </itemInstances>
         <mode>Replace</mode>
