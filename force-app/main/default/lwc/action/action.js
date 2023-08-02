@@ -59,6 +59,7 @@ export default class Action extends LightningElement {
   @track renderFlag = true;
   @track newFlag = false;
   @track relatedRecordName;
+  @track optionsData;
   previewUrl;
   keyString;
   fileKey;
@@ -283,6 +284,7 @@ export default class Action extends LightningElement {
         this.pickListNames.push(obj);
       }
       this.onloadPicklist = this.pickListNames;
+      console.log('picklist',this.onloadPicklist);
     } else if (error) {
       let errormap = {};
       errormap.componentName = 'Action';
@@ -314,6 +316,10 @@ export default class Action extends LightningElement {
     this.responseMap = {};
     this.resultdata = {};
     this.onloadPicklist.forEach(res => {
+      if(res.key ==='Rhythm__Status__c'){
+      this.optionsData=JSON.parse(JSON.stringify(res.options));
+      console.log('options',this.optionsData);
+      }
       if (typeof res.onLoadValue !== 'undefined') {
         res.onLoadValue = '';
       }
@@ -352,7 +358,19 @@ export default class Action extends LightningElement {
             || typeof result[0].Rhythm__Priority__c !== 'undefined') {
             let keydata = res.key;
             res.onLoadValue = result[0][keydata];
+            if(res.onLoadValue === 'Open' || res.onLoadValue ==='Closed'){
             if (res.onLoadValue === 'Closed') {
+              this.isSave = true;
+            }
+            res.options=JSON.parse(JSON.stringify(this.optionsData));
+            }
+            if(res.onLoadValue === 'Expired'){
+              let optionMap={};
+              optionMap.label='Expired';
+              optionMap.value='Expired';
+              res.options.push(optionMap);
+              this.options= res.options;
+              console.log('reethika',res.options);
               this.isSave = true;
             }
             this.responseMap[keydata] = result[0][keydata];
@@ -365,6 +383,7 @@ export default class Action extends LightningElement {
           this.responseMap.Rhythm__Ownership__c = result[0].Rhythm__Ownership__c;
         }
         this.saveActionResponse = this.responseMap;
+        console.log('reposnedata',this.responseMap.Rhythm__Status__c);
         this.showresponse = [];
         this.showresponse.push(this.saveActionResponse);
       }
@@ -459,6 +478,15 @@ export default class Action extends LightningElement {
     this.saveActionResponse[name] = changedData;
     this.showresponse = [];
     this.showresponse.push(this.saveActionResponse);
+    console.log('changeddata',changedData);
+    if(name === 'Rhythm__Status__c'){
+     this.onloadPicklist.forEach(res => {
+              console.log('res.options');
+              if(res.key ==='Rhythm__Status__c'){
+               res.options=JSON.parse(JSON.stringify(this.optionsData));
+              }
+            });
+    }
   }
   handleSelectedValue(event) {
     let name = event.currentTarget.dataset.id;
@@ -505,7 +533,8 @@ export default class Action extends LightningElement {
 
             }).catch(error => {
               console.log('ggfgf', error);
-            })
+            });
+           
             if (this.saveActionResponse.Rhythm__Status__c === 'Closed' && this.isSupplier === true) {
               this.showToast = true;
               this.success = true;

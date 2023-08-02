@@ -146,7 +146,7 @@ public with sharing class AssessmentTemplateController {
         try {
             templateId = String.escapeSingleQuotes(templateId) ;
             if(String.isNotBlank(templateId)) {
-                List<Question__c> questionList = [SELECT Id,Rhythm__Question__c, Section__c
+                List<Question__c> questionList = [SELECT Id,Rhythm__Question__c,Section__c,Parent_Question__c
                                 FROM Question__c
                                 WHERE Assessment_Template__c= :templateId
                                 AND Section__c != NULL

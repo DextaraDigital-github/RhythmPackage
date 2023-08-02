@@ -3,6 +3,7 @@ import selectedActionRecord from '@salesforce/apex/CAPAController.selectedAction
 import saveActionResponse from '@salesforce/apex/CAPAController.saveActionResponse';
 import greenFlag from '@salesforce/resourceUrl/greenFlag';
 import redFlag from '@salesforce/resourceUrl/redFlag';
+import orangeFlag from '@salesforce/resourceUrl/orangeFlag';
 import notifyUsers from '@salesforce/apex/CAPAController.notifyUsers';
 
 export default class ActionDetailForm extends LightningElement {
@@ -14,17 +15,29 @@ export default class ActionDetailForm extends LightningElement {
     @track success=false;
     @track isSave=true;
     @track showPopup=false;
+    @track expired=false;
     @track options =[{label :'Open', value:'Open'},
     {label:'Closed',value : 'Closed'}
     ];
     greenFlagUrl = greenFlag;
     redFlagUrl = redFlag;
+    orangeFlagUrl=orangeFlag;
     
     connectedCallback() {
         selectedActionRecord({actionid:this.actionid}).then(res=>{
           this.actionFormData=res;
-          if(this.actionFormData[0].Rhythm__Status__c === 'Closed'){
+          console.log('sampletest',this.actionFormData);
+          if(this.actionFormData[0].Rhythm__Status__c === 'Closed' || this.actionFormData[0].Rhythm__Status__c === 'Expired' ){
             this.isSave=false;
+            if(this.actionFormData[0].Rhythm__Status__c === 'Expired'){
+              this.expired=true;
+              console.log('sampletest12',this.expired);
+              let optionMap={};
+              optionMap.label='Expired';
+              optionMap.value='Expired';
+              this.options.push(optionMap);
+
+            }
         }
                
         })

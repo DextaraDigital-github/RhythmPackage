@@ -25,7 +25,7 @@ export default class AWSS3FileOperations extends LightningElement {
     @track keyList = [];
     @track getFilesFlag = false;
     @track renderFlag = true;
-    @track disableFlag = true;
+    @track disableFlag = false;
     heightStyle = 'height:300px;';
     previewUrl;
     keyString;
@@ -126,7 +126,7 @@ export default class AWSS3FileOperations extends LightningElement {
                     fileList.push({ key: objectKey, url: this.endpoint + '/' + objectKey, value: objectKey.substring(objectKey.lastIndexOf("/") + 1) });
                 });
                 this.keyList = fileList.reverse();
-                if (this.keyList.length != 0) {
+                if (this.keyList.length >  0) {
                     this.getFilesFlag = true;
                 }
                 else {

@@ -7,9 +7,10 @@
   TEXT(Status__c) == &apos;Closed&apos;,
 
   IMAGE(&apos;/resource/Rhythm__GreenFlag&apos;,&apos;green&apos;,30,30),
-
-  IMAGE(&apos;/resource/Rhythm__RedFlag&apos;, &apos;red&apos;,30,30)
-
+ IF(
+  TEXT(Status__c) == &apos;Expired&apos;, IMAGE(&apos;/resource/Rhythm__orangeFlag&apos;, &apos;orange&apos;,30,30), IMAGE(&apos;/resource/Rhythm__RedFlag&apos;, &apos;red&apos;,30,30)
+)
+ 
 )</formula>
     <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
     <label>Flag Status</label>

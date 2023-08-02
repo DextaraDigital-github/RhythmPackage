@@ -3,6 +3,7 @@ import actionRecords from '@salesforce/apex/CAPAController.actionRecords';
 import getCurrentDate from '@salesforce/apex/CAPASelector.getCurrentDate';
 import greenFlag from '@salesforce/resourceUrl/greenFlag';
 import redFlag from '@salesforce/resourceUrl/redFlag';
+import orangeFlag from '@salesforce/resourceUrl/orangeFlag';
 import { CurrentPageReference, NavigationMixin } from 'lightning/navigation';
 export default class ActionItemGrid extends NavigationMixin(LightningElement) {
     @track show = { grid: false, survey: false };
@@ -25,6 +26,7 @@ export default class ActionItemGrid extends NavigationMixin(LightningElement) {
     @track actionRecordsData;
     greenFlagUrl = greenFlag;
     redFlagUrl = redFlag;
+    orangeFlagUrl=orangeFlag;
     connectedCallback() {
         this.show.grid = true;
         getCurrentDate({}).then((result) => {
@@ -60,7 +62,10 @@ export default class ActionItemGrid extends NavigationMixin(LightningElement) {
                                 if (res['Rhythm__Status__c'] == 'Closed') {
                                     actionRecordMap.isFlag = true;
                                 }
-                                else {
+                                if(res['Rhythm__Status__c'] == 'Expired'){
+                                    actionRecordMap.isOrangeFlag = true;
+                                }
+                                else if(res['Rhythm__Status__c'] == 'Open'){
                                     actionRecordMap.isRedFlag = true;
                                 }
                                 actionRecordList.push(actionRecordMap);

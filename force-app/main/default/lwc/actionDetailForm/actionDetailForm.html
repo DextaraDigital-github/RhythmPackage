@@ -61,8 +61,13 @@
 							<h1 class="slds-col slds-size_1-of-3 slds-form-element__label" title="Field2">Flag Status
 							</h1>
 							<template if:false={isSave}>
+								<template if:false={expired}>
 								<img src={greenFlagUrl} style="height:30px; width:30px;" />
-                    </template>
+								</template>
+								<template if:true={expired}>
+									<img src={orangeFlagUrl} style="height:30px; width:30px;" />
+								</template>
+                         </template>
 								<template if:true={isSave}>
 									<img src={redFlagUrl}  style="height:30px; width:30px;" />
                     </template>

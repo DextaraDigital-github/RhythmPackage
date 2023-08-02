@@ -31,6 +31,7 @@ import { loadStyle } from 'lightning/platformResourceLoader';
 import awsjssdk from '@salesforce/resourceUrl/AWSJSSDK';
 import { loadScript } from 'lightning/platformResourceLoader';
 import getAuthentication from '@salesforce/apex/AWSS3Controller.getAuthenticationData';
+import getSignedURL from '@salesforce/apex/AWSS3Controller.getFileSignedUrl';
 
 export default class Questionnaire extends LightningElement {
 
@@ -315,6 +316,23 @@ export default class Questionnaire extends LightningElement {
         });
     }
 
+    //Download the file from AWS S3
+    handleDownload(event) {
+        if(this.isTemplate == false){
+            getSignedURL({
+                location: event.target.title,
+                file: event.currentTarget.dataset.id,
+                expires: 30
+            })
+            .then(result => {
+                if (result) {
+                    //this.previewUrl = result;
+                    window.open(result);
+                }
+            });
+        }
+    }
+
     /* handleOnload is used to get Sections data and corresponding Questions data and Responses data on onload */
     handleOnload() {
         console.log('assessment', this.assessment);
@@ -329,6 +347,7 @@ export default class Questionnaire extends LightningElement {
             getAccountAssessmentRecordData({ assrecordId: this.accountassessmentid }).then(result => {
                 if (typeof result[0].Rhythm__Assessment__r !== 'undefined' && typeof result[0].Rhythm__Assessment__r.Rhythm__Template__c !== 'undefined') {
                     this.documentParentId = result[0].Rhythm__Assessment__r.Rhythm__Template__c;
+                    this.objectApiName = 'Rhythm__Assessment_Template__c';
                     console.log('documentParentId----->', this.documentParentId);
                 }
             }).catch(error => {

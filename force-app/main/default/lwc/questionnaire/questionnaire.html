@@ -50,14 +50,13 @@
 								aria-controls="referenceId-21" aria-expanded="true">{buttonlabel}</a>
 						</template>
 					</div>
-
-
+					
 					<div>
 						<template if:true={showFiles}>
 							<lightning-layout multiple-rows="true">
 								<template for:each={keyList} for:item="item" for:index="index">
 									<lightning-layout-item size="4" key={item.key}>
-										<table>
+										<table style="table-layout: fixed;">
 											<tr hidden>
 												<td>
 												</td>
@@ -65,11 +64,11 @@
 												</td>
 											</tr>
 											<tr>
-												<td>
-													<lightning-icon icon-name="doctype:flash" alternative-text="File" class="slds-p-around_x-small">
+												<td width="10px">
+													<lightning-icon data-id={item.key} onclick={handleDownload} title={item.url} icon-name="doctype:flash" alternative-text="File" size="xx-small" class="slds-p-around_x-small">
 													</lightning-icon>
 												</td>
-												<td align="left">
+												<td width="90px">
 													{item.value}
 												</td>
 											</tr>
