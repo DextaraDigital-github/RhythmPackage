@@ -56,7 +56,7 @@ public with sharing class CAPASelector {
                 Ownership__c,Ownership__r.Name,Assigned_To__c,Assigned_To__r.Name 
                 FROM Action__c 
                 WHERE Id=:actionid
-                WITH SECURITY_ENFORCED];
+                WITH SECURITY_ENFORCED]; 
     }
 
     // RED FLAG FOR SEC ENFORCED
