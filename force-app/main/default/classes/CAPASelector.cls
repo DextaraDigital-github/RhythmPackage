@@ -32,7 +32,7 @@ public with sharing class CAPASelector {
     Public static List<Action__c> selectedActionRecord(string actionid)
     {
         return [SELECT Name,Action_Item_Description__c,Due_Date__c,CreatedBy.Name,Flag_Status__c,Comments__c,
-                Related_module__c,Related_Record__c,Supplier__r.Name,OwnershipName__c,Priority__c,Status__c,created__c,
+                Related_module__c,Related_Record__c,Related_Record__r.Name,Supplier__r.Name,OwnershipName__c,Priority__c,Status__c,created__c,
                 Ownership__c,Ownership__r.Name,Assigned_To__c,Assigned_To__r.Name FROM Action__c WHERE Id=:actionid
                 WITH SECURITY_ENFORCED];
     }
