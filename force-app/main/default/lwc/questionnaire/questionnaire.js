@@ -556,7 +556,7 @@ export default class Questionnaire extends LightningElement {
                                     let childsequence = 0;
                                     childQuestion.questions.forEach(ques => {
                                         ques.snumber = sequence + '.' + (++childsequence);
-                                        ques.showUpload = (childQuestion.uploadrequired === 'Yes') ? true : false;
+                                        ques.showUpload = (childQuestion.uploadrequired === 'Yes' || childQuestion.uploadrequired === 'Optional') ? true : false;
                                     });
                                 });
                             })
@@ -858,7 +858,7 @@ export default class Questionnaire extends LightningElement {
                                         if (ques.required) {
                                             this.requiredQuestionList.push(ques.Id);
                                         }
-                                        ques.showUpload = (subquestion.uploadrequired === 'Yes') ? true : false;
+                                        ques.showUpload = (subquestion.uploadrequired === 'Yes' || subquestion.uploadrequired === 'Optional') ? true : false;
                                     })
                                 }
                                 else {
