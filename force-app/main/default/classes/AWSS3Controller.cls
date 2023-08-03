@@ -118,7 +118,7 @@ public with sharing class AWSS3Controller {
     @AuraEnabled(Cacheable=true)
     public static Boolean getTemplateDetails(String templateId) {
         try {
-            Boolean hasStatusNew = false;
+            Boolean hasStatusNew = true;
             templateId = String.escapeSingleQuotes(templateId);
             if(String.isNotBlank(templateId)) {
                 List<Assessment_Template__c> assessmentList=  [SELECT Status__c
@@ -126,8 +126,8 @@ public with sharing class AWSS3Controller {
                                                                 WHERE Id= :templateId
                                                                 WITH SECURITY_ENFORCED];
                 Assessment_Template__c assessmentTemp = (AssessmentList.size()==1)?AssessmentList[0]:null;
-                if(assessmentTemp  != null && assessmenttemp.Status__c.equalsIgnoreCase('Active')){
-                    hasStatusNew = true;
+                if(assessmentTemp  != null && assessmenttemp.Status__c.equalsIgnoreCase('New')){
+                    hasStatusNew = false;
                 }
             }
             return hasStatusNew;
