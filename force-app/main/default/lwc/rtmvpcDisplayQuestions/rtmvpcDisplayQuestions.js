@@ -166,7 +166,7 @@ export default class RtmvpcDisplayQuestions extends LightningElement {
 
                     });
                     if (parentdata.Rhythm__Question_Type__c === 'Picklist' || parentdata.Rhythm__Question_Type__c === 'Radio'
-                        || parentdata.Rhythm__Question_Type__c === 'Picklist (Multi-Select)' || parentdata.Rhythm__Question_Type__c === 'Checkbox') {
+                        || parentdata.Rhythm__Question_Type__c === 'Checkbox') {
                         parentdata['isMetCriteria'] = true;
                         parentdata.Rhythm__OptionValueSet__c = parentdata.Rhythm__OptionValueSet__c.replaceAll('\r\n',', ');
                         parentdata.options=parentdata.Rhythm__OptionValueSet__c;
@@ -253,7 +253,7 @@ export default class RtmvpcDisplayQuestions extends LightningElement {
             }
             if (actionName === 'addchildquestion') {
                 if (row.Rhythm__Question_Type__c === 'Picklist' || row.Rhythm__Question_Type__c === 'Radio'
-                    || row.Rhythm__Question_Type__c === 'Picklist (Multi-Select)' || row.Rhythm__Question_Type__c === 'Checkbox') {
+                    || row.Rhythm__Question_Type__c === 'Checkbox') {
                     this.childQuesWrapper.questionId = row.Id;
                     this.childQuesWrapper.question = row.Rhythm__Question__c;
                     this.childQuesWrapper.sectionName = row.Rhythm__Section__r.Name;
@@ -264,7 +264,7 @@ export default class RtmvpcDisplayQuestions extends LightningElement {
                     this.createChildQues = true;
                 }
                 else {
-                    this.totastmessage = 'Child Question will be added for only Picklist, multi picklist and Radio type Questions';
+                    this.totastmessage = 'Child Question will be added for only Picklist and Radio type Questions';
                     this.success = false;
                     this.showToast = true;
                 }

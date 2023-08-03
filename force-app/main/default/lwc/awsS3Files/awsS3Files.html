@@ -12,30 +12,48 @@
 								</td>
 								<td colspan="16">
 								</td>
+								<template if:false={disableFlag}>
+									<td colspan="16">
+									</td>
+								</template>
 							</tr>
 							<template for:each={keyList} for:item="item" for:index="index">
 								<tr height="50px" key={item.key}>
 									<!-- style="border: solid 2px lightgrey;" -->
 									<td colspan="16">
-										<lightning-icon icon-name="doctype:flash" alternative-text="File"
+										<lightning-icon icon-name={item.icon} alternative-text="File"
 											class="slds-p-around_x-small">
 										</lightning-icon>
 									</td>
-									<td colspan="16" class="slds-p-around_x-small" data-id={item.key} title={item.url}
-										onclick={filePreview} style="overflow: auto;word-break: break-word;">
-										<p data-id={item.key} title={item.url} onclick={filePreview}>{item.value}</p>
+									<td colspan="16" class="slds-p-around_x-small"
+										style="overflow: auto;word-break: break-word;">
+										<p>{item.value}</p>
 									</td>
+									<template if:true={item.preview}>
+										<td colspan="16">
+											<lightning-icon class="slds-p-around_x-small" icon-name="utility:preview"
+												size='x-small' data-id={item.key} title={item.url}
+												onclick={filePreview}>
+											</lightning-icon>
+										</td>
+									</template>
+									<template if:false={item.preview}>
+										<td colspan="16">
+										</td>
+									</template>
 									<td colspan="16">
 										<lightning-icon class="slds-p-around_x-small" icon-name="utility:download"
 											size='x-small' data-id={item.key} title={item.url} onclick={handleDownload}>
 										</lightning-icon>
 									</td>
+									 <template if:false={disableFlag}>
 									<td colspan="16">
 										<lightning-icon icon-name="utility:delete" size='x-small'
 											alternative-text="Delete" class="slds-p-around_x-small slds-m-left_xx-small"
 											key={item.key} name={item.key} title="Delete" onclick={handleDeletePopup}>
 										</lightning-icon>
 									</td>
+									 </template>
 								</tr>
 							</template>
 

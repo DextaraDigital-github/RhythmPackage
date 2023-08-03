@@ -88,7 +88,30 @@ public with sharing class AssessmentController {
     */
     @AuraEnabled
     public static List<SObject> createSupplierResponse(List<SObject> suppResponseList,String paramMap){
-        try{
+        Map<String,object> queryMap = (Map<String,Object>)JSON.deserializeUntyped(paramMap);
+        String accAssmtId =(string)queryMap.get('accountassessmentid');
+        SObjectType responseType = Schema.getGlobalDescribe().get('Rhythm__Response__c');
+		Map<String,Schema.SObjectField> fieldMap = responseType.getDescribe().fields.getMap();
+        Schema.SObjectField idVal = fieldMap.get('Id');
+        
+        Database.UpsertResult[] upsertResult = safe.doUpsert(suppResponseList,idVal);
+        String assmtQuery =  'SELECT Id,Name,Follow_Up_Requests__c,Status__c,'
+                               +'Assessment__c,Account__c,PdfConvertor__c'
+                               +' FROM AccountAssessmentRelation__c'
+                               +' WHERE Id=\'' + String.escapeSingleQuotes(accAssmtId) + '\''
+                               +' WITH SECURITY_ENFORCED';
+
+            List<AccountAssessmentRelation__c> assessment = safe.doQuery(assmtQuery);
+            if(!assessment.isEmpty()){
+                assessment[0].Status__c =(String)queryMap.get('status');
+                assessment[0].PdfConvertor__c =(String)queryMap.get('pdfContnet');
+                if((String)queryMap.get('status')=='Submitted'){
+                    assessment[0].Submission_Date__c = DateTime.now();
+                }
+                Database.SaveResult[] updResult = safe.doUpdate(assessment);
+            }   
+        return suppResponseList;
+        /*try{
             Map<String,object> queryMap = (Map<String,Object>)JSON.deserializeUntyped(paramMap);
             String accAssmtId =(string)queryMap.get('accountassessmentid');
             List<Id> questionIds = new List<Id>();
@@ -153,7 +176,7 @@ public with sharing class AssessmentController {
         }catch(exception e){
             string errorMsg = e.getMessage();
             throw new AuraHandledException(errorMsg);
-        }
+        }*/
     }
     
     /**

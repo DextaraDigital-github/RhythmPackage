@@ -10,10 +10,11 @@
                 </p> -->
 
 				<!-- Displays status message when an assessment is saved/ submitted --START-->
+				<template if:true={ishideToast}>
 				<template if:true={showToast}>
 					<c-Show-Toast-Message message-from-component={totastmessage} is-show-modal={showToast}
 						is-sucess={success} onclosetoast={closeToastHandler}></c-Show-Toast-Message>
-				</template>
+				</template></template>
 				<!-- Displays status message when an assessment is saved/ submitted --END-->
 
 				<div class="rtmvpc-card slds-p-around_x-small">
@@ -171,8 +172,8 @@
 											<c-rtmvpc-render-question-template responses={questionaryEntry.questions}
 												issupplier={isSupplier} sectionid={questionaryEntry.sectionId}
 												assessmentid={assessment} onvaluechange={onResponseChange}
-												onfileupload={handleFileUpload} onselectchange={handlechatHistory} ongetdata={handleOnload}
-												ondeleteattachment={handledeletefile} 
+												onfileupload={handleFileUpload} onselectchange={handlechatHistory} 
+												ondeleteattachment={handledeletefile} ongetdata={handleGetRespRecord}
 												onselectquestion={selectquestionHandler} recid={recordId} accountassessmentid={accountassessmentid}
 												onflagchange={handleFlagResponseMethod} uploading-file={uploadingFile}
 												onactionchange={handleActionResponse} onrejectchange={handleReject}

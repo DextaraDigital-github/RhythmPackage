@@ -198,6 +198,7 @@ public with sharing class AWSS3Service extends AWS {
 * @param recId This is the record Id.
 * @param objectName This is the object name of a record.
 * @param pathRecId This is the recordId.
+* @param deleteFlag This is the deleteFlag.
 * @return flag on uploaded successfully
 */ 
     public Boolean uploadFiles(Id recId, String objectName, Id pathRecId,Boolean deleteFlag) {
@@ -327,9 +328,9 @@ public with sharing class AWSS3Service extends AWS {
 * @param fileResp
 * @return Id 
 */ 
-    public Id createResponseforFileUpload(String fileResp) {
+    public Response__c createResponseforFileUpload(String fileResp) {
         try{
-            Id respId;
+            Response__c respId;
             Map<String,Object> filemap = (Map<String,Object>) JSON.deserializeUntyped(fileResp);
             String quesId = (String)filemap.get('quesId');
             quesId = String.escapeSingleQuotes(quesId);
@@ -348,7 +349,7 @@ public with sharing class AWSS3Service extends AWS {
                           AND Is_Latest_Response__c = true
                           WITH SECURITY_ENFORCED];
                 if(srList.isEmpty() == false){
-                    respId = srList[0].Id;
+                    respId = srList[0];
                 }
                 else{
                     Response__c res=new Response__c();
@@ -358,7 +359,7 @@ public with sharing class AWSS3Service extends AWS {
                     srList.add(res);
                     Database.SaveResult[] saveResult = safe.doInsert(srList);
                     errorList = SecurityCheckController.safeClassExceptionHandlerInsert(saveResult);
-                    respId = srList[0].Id;
+                    respId = srList[0];
                 }
                 if(errorList.size()>0){
                     Database.rollback(sp);

@@ -50,7 +50,6 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
                 }
             });
         }
-
     }
     /* deleteForm is used to delete the CAPA form for a question by dispatching the questionId to its parent Component
        Questionnaire */
@@ -71,8 +70,9 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
       /* handleReject is used to change the status of a question to reject,rejected or approved by onClick and dispatch the
        data to its parent component (Questionnaire) */
     handleReject(event){
+        console.log('handleReject===>');
         console.log('koushik',this.responses);
-        var quesId = event.currentTarget.dataset.id;
+        var quesId = event.currentTarget.dataset.label;
         var label= event.target.label;
         var rejectMap={};
         rejectMap.questionId=quesId;
@@ -81,7 +81,6 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
                 this.responses.forEach(res => {
                     if(res.Id === quesId){
                         if(label === 'Reject' || label ==='Rejected'){
-                         
                         rejectMap.rejectResponse = !(res.rejectButton);
                            console.log('label', rejectMap.rejectResponse);
                         this.timeline.forEach(res=>{
@@ -395,7 +394,19 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
 
     }
     handleOnLoad(event) {
+        
          const selectedEvent = new CustomEvent('getdata', {
+            bubbles:true,
+            composed :false,
+            detail: event.detail
+        });
+        // Dispatches the event.
+        this.dispatchEvent(selectedEvent);
+    }
+    handleFileRecord(event){
+        const selectedEvent = new CustomEvent('getdata', {
+            bubbles:true,
+            composed :false,
             detail: event.detail
         });
         // Dispatches the event.

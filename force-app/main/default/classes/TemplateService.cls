@@ -59,13 +59,13 @@ public with sharing class TemplateService{
                         Database.rollback(sp);
                         throw new SecurityControllerException(String.join( errorList, ', ' ));
                     }else if (templateList.isEmpty() == false && templateList[0].Id != null){
-                        newTemplateId = templateList[0].Id;  
+                        newTemplateId = templateList[0].Id;
+                        cloneSections(templateId,newTemplateId);
+                        resWrap.isSuccess = true;
+                        resWrap.recordId = newTemplateId;
+                        resWrap.message = '';
+                        resWrap.errorCode = '';
                     }
-                    cloneSections(templateId,newTemplateId);
-                    resWrap.isSuccess = true;
-                    resWrap.recordId = newTemplateId;
-                    resWrap.message = '';
-                    resWrap.errorCode = '';
                 }
             }else{
                 resWrap.isSuccess = false;

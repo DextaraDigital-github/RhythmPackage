@@ -45,7 +45,7 @@
 												<lightning-input name={questionary.question} data-key={questionary.Id}
 													data-con={questionary.conditional} type="text"
 													variant="label-hidden" disabled={questionary.isEditable}
-													onchange={handleChange} value={questionary.value}
+													onblur={handleChange} value={questionary.value}
 													required={questionary.required} onclick={openChatHandler}>
 													<lightning-icon size="xx-small" alternative-text="help"
 														icon-name="utility:info" title="Name" variant="info">
@@ -56,7 +56,7 @@
 												<lightning-input name={questionary.question} data-key={questionary.Id}
 													data-con={questionary.conditional} type="Number"
 													variant="label-hidden" disabled={questionary.isEditable}
-													onchange={handleChange} value={questionary.value}
+													onblur={handleChange} value={questionary.value}
 													required={questionary.required} onclick={openChatHandler}>
 													<lightning-icon size="xx-small" alternative-text="help"
 														icon-name="utility:info" title="Name" variant="info">
@@ -67,7 +67,7 @@
 												<lightning-input-rich-text name={questionary.question}
 													data-key={questionary.Id} data-con={questionary.conditional}
 													type="text" variant="label-hidden" disabled={questionary.isEditable}
-													onchange={handleChange} value={questionary.value}
+													onblur={handleChange} value={questionary.value}
 													required={questionary.required} onclick={openChatHandler}>
 													<lightning-icon size="xx-small" alternative-text="help"
 														icon-name="utility:info" title="Name" variant="info">
@@ -132,7 +132,7 @@
 													data-con={questionary.conditional} variant="label-hidden"
 													style="max-width:150px;" name={questionary.question}
 													data-key={questionary.Id} placeholder="xxx-xxx-xxxx"
-													disabled={questionary.isEditable} onchange={handleChange}
+													disabled={questionary.isEditable} onblur={handleChange}
 													pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" onclick={openChatHandler}>
 												</lightning-input>
 											</template>
@@ -141,7 +141,7 @@
 													data-currency={questionary.Id} variant="label-hidden"
 													value={questionary.value} data-con={questionary.conditional}
 													name={questionary.question} data-key={questionary.Id}
-													disabled={questionary.isEditable} onchange={handleChange}
+													disabled={questionary.isEditable} onblur={handleChange}
 													onclick={openChatHandler}>
 												</lightning-input>
 											</template>
@@ -150,7 +150,7 @@
 													data-currency={questionary.Id} variant="label-hidden"
 													value={questionary.value} data-con={questionary.conditional}
 													name={questionary.question} data-key={questionary.Id}
-													disabled={questionary.isEditable} onchange={handleChange}
+													disabled={questionary.isEditable} onblur={handleChange}
 													onclick={openChatHandler}>
 												</lightning-input>
 											</template>
@@ -158,7 +158,7 @@
 												<lightning-input type="email" value={questionary.value}
 													data-con={questionary.conditional} variant="label-hidden"
 													name={questionary.question} data-key={questionary.Id}
-													disabled={questionary.isEditable} onchange={handleChange}
+													disabled={questionary.isEditable} onblur={handleChange}
 													placeholder="abc@gmail.com" onclick={openChatHandler}>
 												</lightning-input>
 											</template>
@@ -242,7 +242,7 @@
 												<template if:true={issupplier}>
 													<template if:true={questionary.customerFlag}>
 														<template if:true={questionary.rejectButton}>
-															<lightning-button-icon variant="neutral" label="Rejected"
+															<lightning-button-icon variant="neutral" data-label="Rejected"
 																title="Rejected" data-id={questionary.Id}
 																class="slds-p-left_koushik  rqt-redbtn"
 																icon-name="utility:close">
@@ -254,7 +254,7 @@
 														<template if:false={questionary.rejectButton}>
 															<template if:false={questionary.needData}>
 																<lightning-button-icon variant="destructive"
-																	label="Reject" title="Reject" onclick={handleReject}
+																	data-label="Reject" title="Reject" onclick={handleReject}
 																	data-id={questionary.Id}
 																	class="slds-p-left_koushik rqt-redbtn_n"
 																	icon-name="utility:close"
@@ -263,7 +263,7 @@
 															</template>
 															<template if:true={questionary.needData}>
 																<lightning-button-icon variant="success"
-																	label="Approved" title="Approved"
+																	data-label="Approved" title="Approved"
 																	onclick={handleReject} data-id={questionary.Id}
 																	class="slds-p-left_koushik rqt-greenbtn"
 																	style="background:rgb(129 251 133);"
@@ -273,7 +273,7 @@
 														</template>
 														<template if:true={questionary.rejectButton}>
 															<lightning-button-icon variant="destructive"
-																label="Rejected" title="Rejected" onclick={handleReject}
+																data-label="Rejected" title="Rejected" onclick={handleReject}
 																data-id={questionary.Id}
 																class="slds-p-left_koushik rqt-redbtn"
 																icon-name="utility:close"
@@ -343,7 +343,7 @@
 						<template if:true={issupplier}>
 							<template if:true={questionary.customerFlag}>
 								<template if:true={questionary.rejectButton}>
-									<lightning-button variant="brand" label="Rejected" data-id={questionary.Id}
+									<lightning-button variant="brand" data-label="Rejected" data-id={questionary.Id}
 										class="slds-p-left_medium  rqt-redbtn" icon-name="utility:close">
 									</lightning-button>
 								</template></template>
@@ -352,7 +352,7 @@
 							<template if:true={questionary.customerFlag}>
 								<template if:false={questionary.rejectButton}>
 									<template if:false={questionary.needData}>
-										<lightning-button variant="destructive" label="Reject" onclick={handleReject}
+										<lightning-button variant="destructive" data-label="Reject" onclick={handleReject}
 											data-id={questionary.Id} class="slds-p-left_medium rqt-redbtn"
 											disabled={questionary.disableReject}>
 										</lightning-button>
@@ -365,7 +365,7 @@
 									</template>
 								</template>
 								<template if:true={questionary.rejectButton}>
-									<lightning-button variant="destructive" label="Rejected" onclick={handleReject}
+									<lightning-button variant="destructive" data-label="Rejected" onclick={handleReject}
 										data-id={questionary.Id} class="slds-p-left_medium rqt-redbtn"
 										icon-name="utility:close" disabled={questionary.disableReject}>
 									</lightning-button>
@@ -473,9 +473,10 @@
 														Attach Files
 													</span>
 												</label>
-											</div> --> 
-											
+											</div> -->
+											<!-- <p>{questionary.isEditable}</p> -->
 											<c-portal-s3-files object-name={objectApiName}
+												isdisabled = {questionary.isEditable}
 												response-rec-id={questionary.ResponseId} ongetdata={handleOnLoad}
 												assessment-rec-id={accountassessmentid} rec-id={recid}
 												question-id={questionary.Id}>
@@ -611,10 +612,12 @@
 								<c-rtmvpc-render-question-template selectquestion={selectquestionHandler}
 									onflagchange={handlecustomerFlag} issupplier={issupplier}
 									onselectchange={handleConversationHistory} responses={childquestion.questions}
-									onactionchange={handleActionChange} key={childquestion.isdisplay} ongetdata={handleOnload}
-									conditionaval={childquestion.optionValue} recid={recordId} accountassessmentid={accountassessmentid}
+									onactionchange={handleActionChange} key={childquestion.isdisplay}
+									ongetdata={handleFileRecord} onhandleonload={handleFileRecord}
+									conditionaval={childquestion.optionValue} recid={recordId}
+									accountassessmentid={accountassessmentid}
 									onremovequeshighlight={removehighlightHandler} onvaluechange={handlechildchange}
-									onrejectchange={handleRejectButton} timeline={timeLine}
+									onrejectchange={handleRejectButton} timeline={timeline}
 									is-preview-component={isPreviewComponent}>
 								</c-rtmvpc-render-question-template>
 							</div>

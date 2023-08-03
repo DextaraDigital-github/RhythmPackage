@@ -9,7 +9,7 @@
 						<div class=" slds-grid slds-wrap" style="border-bottom:1px solid #f1f1f1;">
 							<lightning-file-upload record-id={fileRecordID} accept={acceptedFormats} name="fileUploader"
 								class="file-selector-large" title="Upload" onuploadfinished={handleUploadFinished}
-								multiple>
+								disabled={isdisabled} multiple>
 							</lightning-file-upload>
 						</div>
 						<br/>

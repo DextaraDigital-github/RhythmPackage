@@ -10,6 +10,7 @@ import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 export default class AWSS3FileOperations extends LightningElement {
     @api assessmentRecId;
     @api recId;
+    @api isdisabled;
     @api questionId;
     @api objectName;
     @track accessKey;
@@ -177,7 +178,7 @@ export default class AWSS3FileOperations extends LightningElement {
 
 
     //Upload files to AWS after uploaded successfully to salesforce
-    handleUploadFinished(event) {
+    handleUploadFinished() {
         if (this.responseRecId == null) {
             let filemap = {};
             filemap.quesId = this.questionId;
@@ -186,7 +187,7 @@ export default class AWSS3FileOperations extends LightningElement {
                 fileResp: JSON.stringify(filemap)
             }).then(rec => {
                 if (rec) {
-                    this.responseRecId = rec;
+                    this.responseRecId = rec.Id;
                     filesUpload({
                         recId: this.fileRecordID, objectName: this.objectName, pathRecId: rec, deleteFlag: true
                     }).then(result => {
@@ -194,7 +195,7 @@ export default class AWSS3FileOperations extends LightningElement {
                             this.renderFlag = true;
                             this.showToastMessage('Uploaded', 'Uploaded Successfully', 'success');
                             const selectedEvent = new CustomEvent('getdata', {
-                                detail: event.detail
+                                detail: rec
                             });
                             // Dispatches the event.
                             this.dispatchEvent(selectedEvent);
@@ -210,7 +211,6 @@ export default class AWSS3FileOperations extends LightningElement {
             }).catch(error => {
                 console.error(error);
             });
-
         }
         else {
             filesUpload({
@@ -219,11 +219,6 @@ export default class AWSS3FileOperations extends LightningElement {
                 if (result) {
                     this.renderFlag = true;
                     this.showToastMessage('Uploaded', 'Uploaded Successfully', 'success');
-                    const selectedEvent = new CustomEvent('getdata', {
-                                detail: event.detail
-                            });
-                            // Dispatches the event.
-                            this.dispatchEvent(selectedEvent);
                 }
                 else {
                     this.showToastMessage('Exceeded File Limit', 'The maximum file size you can upload is 10 MB', 'error');

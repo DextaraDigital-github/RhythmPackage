@@ -53,6 +53,7 @@ public with sharing class AWSS3Controller {
 * @param recId This is the record Id.
 * @param objectName This is the object name of a record.
 * @param pathRecId This is the recordId.
+* @param deleteFlag This is the deleteFlag.
 * @return flag on uploaded successfully
 */ 
     @AuraEnabled
@@ -76,9 +77,9 @@ public with sharing class AWSS3Controller {
 * @return Id 
 */ 
     @AuraEnabled
-    public static Id createResponseforFileUpload(String fileResp) {
+    public static Response__c createResponseforFileUpload(String fileResp) {
         try{
-            Id respId;
+            Response__c respId;
             Map<String,Object> filemap = (Map<String,Object>) JSON.deserializeUntyped(fileResp);
             if(filemap.size() > 0) {
                 respId = service.createResponseforFileUpload(fileResp); 

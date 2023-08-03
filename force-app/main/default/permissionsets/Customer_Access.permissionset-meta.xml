@@ -73,6 +73,26 @@
         <enabled>true</enabled>
     </classAccesses>
     <classAccesses>
+        <apexClass>ResponseQuestionMapController</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>ResponseQuestionMapSelector</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>ResponseQuestionMapService</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>SectionController</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>SectionSelector</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
         <apexClass>SendEmailBatch</apexClass>
         <enabled>true</enabled>
     </classAccesses>
@@ -298,6 +318,11 @@
     <fieldPermissions>
         <editable>true</editable>
         <field>Assessment_Template__c.Number_of_Assessments__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Assessment_Template__c.Owner__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
