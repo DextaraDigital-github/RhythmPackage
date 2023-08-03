@@ -122,6 +122,7 @@ export default class Questionnaire extends LightningElement {
     isAutoSave = false;
     countAutoSave = 0;
     ishideToast = true;
+    @track selectedActionList=[];
 
     @api handleGetRespRecord(event) {
         console.log('handleFileOnload', event.detail);
@@ -2021,8 +2022,9 @@ export default class Questionnaire extends LightningElement {
                 })
             })
         })
+         this.handleselectedaction();
         const selectedChat = new CustomEvent('selectconversation', {
-            detail: this.showChat
+            detail: {chat:this.showChat,actionData:this.selectedActionList}
         });
         this.dispatchEvent(selectedChat);
     }
@@ -2094,26 +2096,30 @@ export default class Questionnaire extends LightningElement {
         this.dispatchEvent(selectedAction);
 
     }
-    handlechatHistory(event) {
-        this.showChat = event.detail;
-        var selectedActionMap={};
-        var selectedActionList=[];
-        selectedActionMap.Rhythm__Question__c=this.showChat.questionId;
-        selectedActionMap.isSupplier=this.isSupplier;
+    handleselectedaction()
+    {
+        var selectedActionMap = {};
+        this.selectedActionList = [];
+        selectedActionMap.Rhythm__Question__c = this.showChat.questionId;
+        selectedActionMap.isSupplier = this.isSupplier;
         selectedActionMap.Rhythm__AccountAssessment__c = this.recordId;
         if (this.isSupplier === true) {
             selectedActionMap.Rhythm__AccountAssessment__c = this.accountassessmentid;
         }
         selectedActionMap.accountName = this.accountName;
-        console.log('llll',this.accountName);
+        console.log('llll', this.accountName);
         selectedActionMap.Rhythm__Account__c = this.accountId;
         //selectedActionMap.Rhythm__Related_Record__c = this.assessmentRecordName;
         selectedActionMap.Rhythm__Related_Record__c = this.assessment;
         selectedActionMap.Rhythm__Related_Record__Name = this.assessmentRecordName;
-        selectedActionList.push(selectedActionMap);
-        console.log('llll',selectedActionList);
+        this.selectedActionList.push(selectedActionMap);
+
+    }
+    handlechatHistory(event) {
+        this.showChat = event.detail;
+        this.handleselectedaction();
         const selectedChat = new CustomEvent('selectconversation', {
-            detail: {chat:this.showChat,actionData:selectedActionList}
+            detail: {chat:this.showChat,actionData:this.selectedActionList}
         });
         this.dispatchEvent(selectedChat);
 
