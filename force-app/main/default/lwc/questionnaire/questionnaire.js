@@ -559,7 +559,6 @@ export default class Questionnaire extends LightningElement {
                         this.questionsList.forEach(questionWrap => {
                             let sequence = 0;
                             questionWrap.questions.forEach(question => {
-
                                 question.snumber = ++sequence;
                                 //This loop is to give all the number for all children Questions.
                                 question.Children.forEach(childQuestion => {
@@ -676,9 +675,10 @@ export default class Questionnaire extends LightningElement {
                                 //this.showButtons.Section_Navigation.value = this.section;
                             }
                             this.constructQuestionsAndAnswers(this.questionsList);
-                            let sequence = 0;
+                            
                             console.log('this.questionsAndAnswers', this.questionsAndAnswerss);
                             this.questionsAndAnswerss.forEach(questionWrap => {
+                                let sequence = 0;
                                 questionWrap.questions.forEach(question => {
                                     if (question.required) {
                                         this.requiredQuestionList.push(question.Id);

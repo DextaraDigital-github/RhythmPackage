@@ -11,10 +11,10 @@
 
 				<!-- Displays status message when an assessment is saved/ submitted --START-->
 				<template if:true={ishideToast}>
-				<template if:true={showToast}>
-					<c-Show-Toast-Message message-from-component={totastmessage} is-show-modal={showToast}
-						is-sucess={success} onclosetoast={closeToastHandler}></c-Show-Toast-Message>
-				</template></template>
+					<template if:true={showToast}>
+						<c-Show-Toast-Message message-from-component={totastmessage} is-show-modal={showToast}
+							is-sucess={success} onclosetoast={closeToastHandler}></c-Show-Toast-Message>
+					</template></template>
 				<!-- Displays status message when an assessment is saved/ submitted --END-->
 
 				<div class="rtmvpc-card slds-p-around_x-small">
@@ -38,24 +38,27 @@
 						</div>
 					</div>
 					<!-- Displays button and picklist for navigations --END-->
-					
-					<div class="slds-grid slds-grid_align-end slds-grid_vetical-align-end slds-m-bottom_xx-small" style="width:100%">
-						<template if:true={isTemplate}>
-							<div class="slds-col slds-grid slds-grid_vertical-align-center" style="font-weight:bold;">
-								<div class="slds-p-bottom_xx-small slds-p-horizontal_small">
-									<a class="slds-button slds-button_icon slds-accordion__summary-action"
-										title="Expand All / Collapse All" onclick={handleCollapseExpand}
-										aria-controls="referenceId-21" aria-expanded="true">{buttonlabel}</a>
-								</div>
-							</div>
-						</template>
+
+					<div class="slds-grid slds-grid_align-end slds-grid_vetical-align-end slds-m-bottom_xx-small"
+						style="width:100%">
+
 						<template if:true={showRefreshbutton}>
-							
-								<lightning-button-icon icon-name="utility:refresh" size="small" onclick={handleOnload} alternative-text="Refresh" title="Refresh">
-								</lightning-button-icon>
+							<template if:true={isTemplate}>
+								<div class="slds-col slds-grid slds-grid_vertical-align-center"
+									style="font-weight:bold;">
+									<div class="slds-p-bottom_xx-small slds-p-horizontal_small">
+										<a class="slds-button slds-button_icon slds-accordion__summary-action"
+											title="Expand All / Collapse All" onclick={handleCollapseExpand}
+											aria-controls="referenceId-21" aria-expanded="true">{buttonlabel}</a>
+									</div>
+								</div>
+							</template>
+							<lightning-button-icon icon-name="utility:refresh" size="small" onclick={handleOnload}
+								alternative-text="Refresh" title="Refresh">
+							</lightning-button-icon>
 						</template>
 					</div>
-					
+
 					<div>
 						<template if:true={showFiles}>
 							<lightning-layout multiple-rows="true">
@@ -70,7 +73,10 @@
 											</tr>
 											<tr>
 												<td width="10px">
-													<lightning-icon data-id={item.key} onclick={handleDownload} title={item.url} icon-name="doctype:flash" alternative-text="File" size="xx-small" class="slds-p-around_x-small">
+													<lightning-icon data-id={item.key} onclick={handleDownload}
+														title={item.url} icon-name="doctype:flash"
+														alternative-text="File" size="xx-small"
+														class="slds-p-around_x-small">
 													</lightning-icon>
 												</td>
 												<td width="90px">
@@ -83,7 +89,7 @@
 							</lightning-layout>
 						</template>
 					</div>
-					
+
 					<div>
 						<ul class="slds-accordion">
 							<li class="slds-accordion__list-item">
@@ -117,9 +123,9 @@
 
 							<template for:each={questionsAndAnswerss} for:item="questionaryEntry">
 								<li class="slds-accordion__list-item" key={questionaryEntry.section}>
-									<section data-accordian={questionaryEntry.sectionId} >
+									<section data-accordian={questionaryEntry.sectionId}>
 
-										<div class="slds-accordion__summary" >
+										<div class="slds-accordion__summary">
 											<h2 class="slds-accordion__summary-heading">
 												<button  class="slds-button slds-button_reset slds-accordion__summary-action" data-id={questionaryEntry.sectionId} onclick={handleAccordionQuestion} aria-controls="referenceId-22" aria-expanded="true">
                                                     <span class="slds-accordion__summary-action-icon slds-button__icon slds-button__icon_left" aria-hidden="true">
@@ -172,9 +178,10 @@
 											<c-rtmvpc-render-question-template responses={questionaryEntry.questions}
 												issupplier={isSupplier} sectionid={questionaryEntry.sectionId}
 												assessmentid={assessment} onvaluechange={onResponseChange}
-												onfileupload={handleFileUpload} onselectchange={handlechatHistory} 
+												onfileupload={handleFileUpload} onselectchange={handlechatHistory}
 												ondeleteattachment={handledeletefile} ongetdata={handleGetRespRecord}
-												onselectquestion={selectquestionHandler} recid={recordId} accountassessmentid={accountassessmentid}
+												onselectquestion={selectquestionHandler} recid={recordId}
+												accountassessmentid={accountassessmentid}
 												onflagchange={handleFlagResponseMethod} uploading-file={uploadingFile}
 												onactionchange={handleActionResponse} onrejectchange={handleReject}
 												timeline={timeline} is-preview-component={isPreviewComponent}>
@@ -223,7 +230,7 @@
 			<!-- Footer --END-->
 		</div>
 	</div>
-	 <template if:false={isTemplate}>
+	<template if:false={isTemplate}>
 		<div class="slds-p-horizontal_medium slds-p-vertical_x-small slds-border-top"
 			style="position:absolute; width:100%; height:40px; bottom:0px; text-align:right; background:#e8eaed; border-top:1px solid #c9c9c9;">
 			<!-- Displays Save, Save & Submit buttons if the Assessment is not Submitted --START-->
@@ -239,102 +246,105 @@
 
 			<!-- Displays Save, Save & Submit buttons if the Assessment is not Submitted --END-->
 		</div>
-		 <template if:true={isSupplierModalPopup}>
-        <!-- Modal/Popup Box LWC starts here -->
-        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
-            <div class="slds-modal__container">
-                <!-- Modal/Popup Box LWC header here -->
-                <!-- <header class="slds-modal__header"> -->
-                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeModal}>
+		<template if:true={isSupplierModalPopup}>
+			<!-- Modal/Popup Box LWC starts here -->
+			<section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+				aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+				<div class="slds-modal__container">
+					<!-- Modal/Popup Box LWC header here -->
+					<!-- <header class="slds-modal__header"> -->
+					<button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeModal}>
                         <lightning-icon icon-name="utility:close"
                             alternative-text="close"
                             variant="inverse"
                             size="small" ></lightning-icon>
                         <span class="slds-assistive-text">Close</span>
                     </button>
-                    <!-- <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Modal/PopUp Box header LWC</h2> -->
-                <!-- </header> -->
-                <!-- Modal/Popup Box LWC body starts here -->
-                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
-                    <p><b>Do you want to Submit the review?
+					<!-- <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Modal/PopUp Box header LWC</h2> -->
+					<!-- </header> -->
+					<!-- Modal/Popup Box LWC body starts here -->
+					<div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+						<p><b>Do you want to Submit the review?
                     </b></p>
-                </div>
-                <!-- Modal/Popup Box LWC footer starts here -->
-                <footer class="slds-modal__footer">
-                    <button class="slds-button slds-button_neutral" onclick={closeModal} title="No">No</button>
-                    <button class="slds-button slds-button_brand" onclick={submitAssessment} title="Yes">Yes</button>
-                </footer>
-            </div>
-        </section>
-        <div class="slds-backdrop slds-backdrop_open"></div>
-    </template>
+					</div>
+					<!-- Modal/Popup Box LWC footer starts here -->
+					<footer class="slds-modal__footer">
+						<button class="slds-button slds-button_neutral" onclick={closeModal} title="No">No</button>
+						<button class="slds-button slds-button_brand" onclick={submitAssessment} title="Yes">Yes</button>
+					</footer>
+				</div>
+			</section>
+			<div class="slds-backdrop slds-backdrop_open"></div>
+		</template>
 	</template>
 	<template if:true={isTemplate}>
-		
+
 		<template if:true={showcustomerbuttons}>
 			<template if:true={showInReview}>
 				<div class="slds-p-horizontal_medium slds-p-top_xx-small slds-border-top"
-			style="position:absolute; width:100%; height:40px; bottom:0px; text-align:right; background:#e8eaed; border-top:1px solid #c9c9c9;">
-				<lightning-button variant="Brand" label="Start Review" title="Save Response" onclick={handleStartReview}
-					flexibility="auto" class="slds-float--right slds-button_neutral">
-				</lightning-button>
+					style="position:absolute; width:100%; height:40px; bottom:0px; text-align:right; background:#e8eaed; border-top:1px solid #c9c9c9;">
+					<lightning-button variant="Brand" label="Start Review" title="Save Response"
+						onclick={handleStartReview} flexibility="auto" class="slds-float--right slds-button_neutral">
+					</lightning-button>
 				</div>
 			</template>
 			<template if:true={showSaveAndSubmit}>
 				<div class="slds-p-horizontal_medium slds-p-top_xx-small slds-border-top"
-			style="position:absolute; width:100%; height:40px; bottom:0px; text-align:right; background:#e8eaed; border-top:1px solid #c9c9c9;">
-			   <lightning-button-group>
-				<lightning-button variant="Brand" label="Save" title="Save Response"
-					onclick={handleSaveCustomer} flexibility="auto" class=" slds-m-around_xxx-small">
-				</lightning-button>
-				<lightning-button variant="Brand" label="Submit & Follow-Up" title="Save Response" disabled={showFollowButton}
-					onclick={handleSubmitCustomer} flexibility="auto" class="slds-m-around_xxx-small">
-				</lightning-button>
-				<lightning-button variant="Brand" label="Submit & Close Review" title="Save Response"
-					onclick={handleSubmitReviewCustomer} flexibility="auto" class="slds-m-around_xxx-small">
-				</lightning-button>
-				 </lightning-button-group>
+					style="position:absolute; width:100%; height:40px; bottom:0px; text-align:right; background:#e8eaed; border-top:1px solid #c9c9c9;">
+					<lightning-button-group>
+						<lightning-button variant="Brand" label="Save" title="Save Response"
+							onclick={handleSaveCustomer} flexibility="auto" class=" slds-m-around_xxx-small">
+						</lightning-button>
+						<lightning-button variant="Brand" label="Submit & Follow-Up" title="Save Response"
+							disabled={showFollowButton} onclick={handleSubmitCustomer} flexibility="auto"
+							class="slds-m-around_xxx-small">
+						</lightning-button>
+						<lightning-button variant="Brand" label="Submit & Close Review" title="Save Response"
+							onclick={handleSubmitReviewCustomer} flexibility="auto" class="slds-m-around_xxx-small">
+						</lightning-button>
+					</lightning-button-group>
 				</div>
 				<!-- &nbsp;&nbsp;
                 <lightning-button variant="Brand" label="Save" title="Save Response" onclick={handleSaveCustomer}
                     flexibility="auto" class="slds-float--right" style="margin-right:5px;"></lightning-button>
                 &nbsp;&nbsp; -->
-					 <template if:true={isCustomerModalPopup}>
-        <!-- Modal/Popup Box LWC starts here -->
-        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
-            <div class="slds-modal__container">
-                <!-- Modal/Popup Box LWC header here -->
-                <!-- <header class="slds-modal__header"> -->
-                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={ccloseModal}>
+				<template if:true={isCustomerModalPopup}>
+					<!-- Modal/Popup Box LWC starts here -->
+					<section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+						aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+						<div class="slds-modal__container">
+							<!-- Modal/Popup Box LWC header here -->
+							<!-- <header class="slds-modal__header"> -->
+							<button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={ccloseModal}>
                         <lightning-icon icon-name="utility:close"
                             alternative-text="close"
                             variant="inverse"
                             size="small" ></lightning-icon>
                         <span class="slds-assistive-text">Close</span>
                     </button>
-                    <!-- <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Modal/PopUp Box header LWC</h2> -->
-                <!-- </header> -->
-                <!-- Modal/Popup Box LWC body starts here -->
-                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-2">
-                    <p><b>Do you want to Submit the review?
+							<!-- <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Modal/PopUp Box header LWC</h2> -->
+							<!-- </header> -->
+							<!-- Modal/Popup Box LWC body starts here -->
+							<div class="slds-modal__content slds-p-around_medium" id="modal-content-id-2">
+								<p><b>Do you want to Submit the review?
                     </b></p>
-                </div>
-                <!-- Modal/Popup Box LWC footer starts here -->
-                <footer class="slds-modal__footer">
-                    <button class="slds-button slds-button_neutral" onclick={ccloseModal} title="No">No</button>
-                    <!-- <button class="slds-button slds-button_brand" onclick={submitAssessment} title="Yes">Yes</button> -->
-                </footer>
-            </div>
-        </section>
-        <div class="slds-backdrop slds-backdrop_open"></div>
-    </template>
-			
+							</div>
+							<!-- Modal/Popup Box LWC footer starts here -->
+							<footer class="slds-modal__footer">
+								<button class="slds-button slds-button_neutral" onclick={ccloseModal} title="No">No</button>
+								<!-- <button class="slds-button slds-button_brand" onclick={submitAssessment} title="Yes">Yes</button> -->
+							</footer>
+						</div>
+					</section>
+					<div class="slds-backdrop slds-backdrop_open"></div>
+				</template>
+
 
 			</template>
-			
+
 		</template>
-		
-		
+
+
 	</template>
-	
+
 </template>

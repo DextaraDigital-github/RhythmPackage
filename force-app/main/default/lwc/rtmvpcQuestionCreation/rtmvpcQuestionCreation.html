@@ -189,24 +189,14 @@
 							</div>
 						</div>
 					</lightning-layout-item>
-					<lightning-layout-item size="12" class="slds-p-left_medium slds-p-right_medium slds-p-bottom_x-small"
+				</template>
+				<lightning-layout-item size="12" class="slds-p-left_medium slds-p-right_medium slds-p-bottom_x-small"
 					small-device-size="12" medium-device-size="12" large-device-size="12">
-					<!-- <div class="slds-grid slds-grid_vertical-align-center">
-						<lightning-input variant="label-hidden" type="Checkbox" data-id="Rhythm__Required__c"
-							onchange={handleChange} checked={questionWrapper.Rhythm__Required__c}>
-						</lightning-input>
-						<span class="slds-form-element__label slds-no-flex">Required</span>
-					</div> -->
-					<!-- <lightning-combobox style="--slds-c-input-color-border: rgb(201, 201, 201);"
-							name="Question Type" label="Question Type"
-							options={options} data-id="Rhythm__Question_Type__c" onchange={handleChange} required=true>
-						</lightning-combobox> -->
 					<lightning-combobox style="--slds-c-input-color-border: rgb(201, 201, 201);" name="Response Type"
 						label="Response Type" options={options} data-id="Rhythm__Question_Type__c"
 						onchange={handleChange} required=true>
 					</lightning-combobox>
 				</lightning-layout-item>
-				</template>
 				<template if:true={showResponseAttributes}>
 					<lightning-layout-item size="12"
 						class="slds-p-left_medium slds-p-right_medium slds-p-bottom_x-small" small-device-size="12"

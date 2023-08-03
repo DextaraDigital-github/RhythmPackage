@@ -140,12 +140,12 @@ export default class AWSS3FileOperations extends LightningElement {
                     this.getFilesFlag = false;
                 }
                 this.keyList && this.keyList.forEach(rec => {
-                    rec.icon = ((rec).type === 'png') ? 'doctype:png' :
+                    rec.icon = ((rec).type === 'png') ? 'doctype:image' :
                         ((rec).type === 'pdf') ? 'doctype:pdf' :
                             ((rec).type === 'jpg') ? 'doctype:image' :
                                 ((rec).type === 'jpeg') ? 'doctype:image' :
-                                    ((rec).type === 'xlsx') ? 'doctype:xlsx' :
-                                        ((rec).type === 'xls') ? 'doctype:xls' :
+                                    ((rec).type === 'xlsx') ? 'doctype:excel' :
+                                        ((rec).type === 'xls') ? 'doctype:excel' :
                                             ((rec).type === 'txt') ? 'doctype:txt' :
                                                 ((rec).type === 'docx' || (rec).type === 'doc') ? 'doctype:word' : 'doctype:flash';
                 });
