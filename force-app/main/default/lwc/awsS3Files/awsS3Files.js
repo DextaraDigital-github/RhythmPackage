@@ -33,6 +33,7 @@ export default class AWSS3FileOperations extends LightningElement {
     showDeleteModal = false;
     showFrame = false;
     noFilesContent = 'No Files Uploaded...';
+    noPreviewContent = 'No Preview Content...';
 
     //Accept File Formats
     get acceptedFormats() {
@@ -111,7 +112,7 @@ export default class AWSS3FileOperations extends LightningElement {
         }
     }
 
-     // Retrieve the files from S3 folder
+    // Retrieve the files from S3 folder
     async retrieveFilesFromS3() {
         const folderName = this.objectApiName + '/' + this.recordId + '/';
         this.s3.listObjects({ Bucket: this.bucketName, Prefix: folderName }, (err, data) => {
@@ -126,10 +127,10 @@ export default class AWSS3FileOperations extends LightningElement {
                     let fileName = objectKey.substring(objectKey.lastIndexOf("/") + 1);
                     let fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1);
                     if (fileExtension === 'doc' || fileExtension === 'docx' || fileExtension === 'xls' || fileExtension === 'xlsx') {
-                        fileList.push({ type: fileExtension, preview: false, key: objectKey, url: this.endpoint + '/' + objectKey, value: fileName });
+                        fileList.push({ type: fileExtension, preview: false, key: objectKey, url: this.endpoint + '/' + objectKey, value: fileName.substring(fileName.indexOf("_") + 1) });
                     }
                     else {
-                        fileList.push({ type: fileExtension, preview: true, key: objectKey, url: this.endpoint + '/' + objectKey, value: fileName });
+                        fileList.push({ type: fileExtension, preview: true, key: objectKey, url: this.endpoint + '/' + objectKey, value: fileName.substring(fileName.indexOf("_") + 1) });
                     }
                 });
                 this.keyList = fileList.reverse();
@@ -191,7 +192,8 @@ export default class AWSS3FileOperations extends LightningElement {
         };
         this.s3.deleteObject(params, (error, data) => {
             if (data) {
-                this.showToastMessage('Deleted', this.fileKey.substring(this.fileKey.lastIndexOf("/") + 1) + ' - Deleted Successfully', 'success');
+                let fileName = this.fileKey.substring(this.fileKey.lastIndexOf("/") + 1);
+                this.showToastMessage('Deleted', fileName.substring(fileName.indexOf("_") + 1) + ' - Deleted Successfully', 'success');
                 this.fileKey = '';
                 this.keyString = '';
                 this.previewUrl = '';

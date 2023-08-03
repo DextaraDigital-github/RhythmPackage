@@ -46,14 +46,15 @@
 											size='x-small' data-id={item.key} title={item.url} onclick={handleDownload}>
 										</lightning-icon>
 									</td>
-									 <template if:false={disableFlag}>
-									<td colspan="16">
-										<lightning-icon icon-name="utility:delete" size='x-small'
-											alternative-text="Delete" class="slds-p-around_x-small slds-m-left_xx-small"
-											key={item.key} name={item.key} title="Delete" onclick={handleDeletePopup}>
-										</lightning-icon>
-									</td>
-									 </template>
+									<template if:false={disableFlag}>
+										<td colspan="16">
+											<lightning-icon icon-name="utility:delete" size='x-small'
+												alternative-text="Delete"
+												class="slds-p-around_x-small slds-m-left_xx-small" key={item.key}
+												name={item.key} title="Delete" onclick={handleDeletePopup}>
+											</lightning-icon>
+										</td>
+									</template>
 								</tr>
 							</template>
 
@@ -78,11 +79,13 @@
 				style="border: solid 1px lightgrey;">
 				<div style="height:363px;" class="slds-scrollable">
 					<template if:false={showFrame}>
-						<img src={previewUrl} />
-                  </template>
-						<template if:true={showFrame}>
-							<iframe src={previewUrl} style="width: 100%; height: 800px"></iframe>
-						</template>
+						<div style="margin-top: 15%;">
+							<c-no-content-illustration content={noPreviewContent}></c-no-content-illustration>
+						</div>
+					</template>
+					<template if:true={showFrame}>
+						<iframe src={previewUrl} style="width: 100%; height: 800px"></iframe>
+					</template>
 				</div>
 			</lightning-layout-item>
 		</lightning-layout>

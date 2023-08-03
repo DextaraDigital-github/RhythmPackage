@@ -63,7 +63,7 @@
 						<template if:true={showFiles}>
 							<lightning-layout multiple-rows="true">
 								<template for:each={keyList} for:item="item" for:index="index">
-									<lightning-layout-item size="4" key={item.key}>
+									<lightning-layout-item size={layoutItemSize} key={item.key}>
 										<table style="table-layout: fixed;">
 											<tr hidden>
 												<td>
@@ -74,7 +74,7 @@
 											<tr>
 												<td width="10px">
 													<lightning-icon data-id={item.key} onclick={handleDownload}
-														title={item.url} icon-name="doctype:flash"
+														title={item.url} icon-name={item.icon}
 														alternative-text="File" size="xx-small"
 														class="slds-p-around_x-small">
 													</lightning-icon>
@@ -181,7 +181,7 @@
 												onfileupload={handleFileUpload} onselectchange={handlechatHistory}
 												ondeleteattachment={handledeletefile} ongetdata={handleGetRespRecord}
 												onselectquestion={selectquestionHandler} recid={recordId}
-												accountassessmentid={accountassessmentid}
+												accountassessmentid={accountassessmentid} onuploadfile={handleuploadFile}
 												onflagchange={handleFlagResponseMethod} uploading-file={uploadingFile}
 												onactionchange={handleActionResponse} onrejectchange={handleReject}
 												timeline={timeline} is-preview-component={isPreviewComponent}>

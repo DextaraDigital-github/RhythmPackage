@@ -141,26 +141,20 @@ export default class RtmvpcDisplayQuestions extends LightningElement {
                             child.Rhythm__Question__c = x;
                             child['isMetCriteria'] = false;
                             child['priorityicon'] = '';
-                            child['isiconavailable'] = true;
-                            
+                            child['isiconavailable'] = true;  
                             if(snumber<10){
                                 child.Name = parentnumber + '.0'+snumber;
                             }
                             else{
                                 child.Name  = parentnumber + '.'+snumber;
                             }
+                            if(typeof child.Rhythm__OptionValueSet__c!=='undefined'){
+                               child.Rhythm__OptionValueSet__c= child.Rhythm__OptionValueSet__c.replaceAll('\r\n',', ');
+                            }
                             childlst.push(child);
-
-
-                            // parentdata['priorityicon'] = '';
-                            //parentdata['isiconavailable'] = true;
-
-                            //parentdata.Rhythm__Question__c = parentdata.Rhythm__Question__c + '\n';
-                            //parentdata.Rhythm__Question__c+= '==> (' + child.Rhythm__Conditional_Response__c +') : '+child.Rhythm__Question__c;
                         }
                         if (childlst.length > 0) {
                             console.log('childlst', childlst);
-                            
                             parentdata['_children'] = childlst;
                         }
 
@@ -168,8 +162,9 @@ export default class RtmvpcDisplayQuestions extends LightningElement {
                     if (parentdata.Rhythm__Question_Type__c === 'Picklist' || parentdata.Rhythm__Question_Type__c === 'Radio'
                         || parentdata.Rhythm__Question_Type__c === 'Checkbox') {
                         parentdata['isMetCriteria'] = true;
-                        parentdata.Rhythm__OptionValueSet__c = parentdata.Rhythm__OptionValueSet__c.replaceAll('\r\n',', ');
                         parentdata.options=parentdata.Rhythm__OptionValueSet__c;
+                        parentdata.Rhythm__OptionValueSet__c = parentdata.Rhythm__OptionValueSet__c.replaceAll('\r\n',', ');
+                       
                         parentdata['priorityicon'] = 'utility:record_create';
                         parentdata['isiconavailable'] = false;
                     }

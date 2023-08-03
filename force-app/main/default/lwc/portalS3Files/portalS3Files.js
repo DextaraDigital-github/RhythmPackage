@@ -104,7 +104,6 @@ export default class AWSS3FileOperations extends LightningElement {
         }
     }
 
-    // Retrieve the files from S3 folder
     async retrieveFilesFromS3() {
         const folderName = this.objectName + '/' + this.responseRecId + '/';
         this.s3.listObjects({ Bucket: this.bucketName, Prefix: folderName }, (err, data) => {
@@ -116,18 +115,36 @@ export default class AWSS3FileOperations extends LightningElement {
                 this.keyList = [];
                 files && files.forEach(file => {
                     const objectKey = file.Key;
-                    fileList.push({ key: objectKey, url: this.endpoint + '/' + objectKey, value: objectKey.substring(objectKey.lastIndexOf("/") + 1) });
+                    let fileName = objectKey.substring(objectKey.lastIndexOf("/") + 1);
+                    let fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1);
+                    if (fileExtension === 'doc' || fileExtension === 'docx' || fileExtension === 'xls' || fileExtension === 'xlsx') {
+                        fileList.push({ type: fileExtension, preview: false, key: objectKey, url: this.endpoint + '/' + objectKey, value: fileName.substring(fileName.indexOf("_") + 1) });
+                    }
+                    else {
+                        fileList.push({ type: fileExtension, preview: true, key: objectKey, url: this.endpoint + '/' + objectKey, value: fileName.substring(fileName.indexOf("_") + 1) });
+                    }
                 });
                 this.keyList = fileList.reverse();
-                if (this.keyList.length != 0) {
+                if (this.keyList.length > 0) {
                     this.getFilesFlag = true;
                 }
                 else {
                     this.getFilesFlag = false;
                 }
+                this.keyList && this.keyList.forEach(rec => {
+                    rec.icon = ((rec).type === 'png') ? 'doctype:image' :
+                        ((rec).type === 'pdf') ? 'doctype:pdf' :
+                            ((rec).type === 'jpg') ? 'doctype:image' :
+                                ((rec).type === 'jpeg') ? 'doctype:image' :
+                                    ((rec).type === 'xlsx') ? 'doctype:excel' :
+                                        ((rec).type === 'xls') ? 'doctype:excel' :
+                                            ((rec).type === 'txt') ? 'doctype:txt' :
+                                                ((rec).type === 'docx' || (rec).type === 'doc') ? 'doctype:word' : 'doctype:flash';
+                });
             }
         });
     }
+
 
     //Download the file from AWS S3
     handleDownload(event) {
@@ -167,7 +184,8 @@ export default class AWSS3FileOperations extends LightningElement {
         };
         this.s3.deleteObject(params, (error, data) => {
             if (data) {
-                this.showToastMessage('Deleted', this.fileKey.substring(this.fileKey.lastIndexOf("/") + 1) + ' - Deleted Successfully', 'success');
+                let fileName = this.fileKey.substring(this.fileKey.lastIndexOf("/") + 1);
+                this.showToastMessage('Deleted', fileName.substring(fileName.indexOf("_") + 1) + ' - Deleted Successfully', 'success');
                 this.fileKey = '';
                 this.keyString = '';
                 this.previewUrl = '';
@@ -189,7 +207,7 @@ export default class AWSS3FileOperations extends LightningElement {
                 if (rec) {
                     this.responseRecId = rec.Id;
                     filesUpload({
-                        recId: this.fileRecordID, objectName: this.objectName, pathRecId: rec, deleteFlag: true
+                        recId: this.fileRecordID, objectName: this.objectName, pathRecId: this.responseRecId, deleteFlag: true
                     }).then(result => {
                         if (result) {
                             this.renderFlag = true;
