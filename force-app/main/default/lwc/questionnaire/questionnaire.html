@@ -269,8 +269,10 @@
 					</div>
 					<!-- Modal/Popup Box LWC footer starts here -->
 					<footer class="slds-modal__footer">
-						<button class="slds-button slds-button_neutral" onclick={closeModal} title="No">No</button>
-						<button class="slds-button slds-button_brand" onclick={submitAssessment} title="Yes">Yes</button>
+							<lightning-button variant="Neutral" label="No" onclick={closeModal}
+						class="slds-m-left_x-small"></lightning-button>
+					<lightning-button variant="brand" label="Yes" onclick={submitAssessment}
+						class="slds-m-left_x-small"></lightning-button>
 					</footer>
 				</div>
 			</section>
@@ -308,43 +310,40 @@
                 <lightning-button variant="Brand" label="Save" title="Save Response" onclick={handleSaveCustomer}
                     flexibility="auto" class="slds-float--right" style="margin-right:5px;"></lightning-button>
                 &nbsp;&nbsp; -->
-				<template if:true={isCustomerModalPopup}>
-					<!-- Modal/Popup Box LWC starts here -->
-					<section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
-						aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
-						<div class="slds-modal__container">
-							<!-- Modal/Popup Box LWC header here -->
-							<!-- <header class="slds-modal__header"> -->
-							<button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={ccloseModal}>
-                        <lightning-icon icon-name="utility:close"
-                            alternative-text="close"
-                            variant="inverse"
-                            size="small" ></lightning-icon>
-                        <span class="slds-assistive-text">Close</span>
-                    </button>
-							<!-- <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Modal/PopUp Box header LWC</h2> -->
-							<!-- </header> -->
-							<!-- Modal/Popup Box LWC body starts here -->
-							<div class="slds-modal__content slds-p-around_medium" id="modal-content-id-2">
-								<p><b>Do you want to Submit the review?
-                    </b></p>
-							</div>
-							<!-- Modal/Popup Box LWC footer starts here -->
-							<footer class="slds-modal__footer">
-								<button class="slds-button slds-button_neutral" onclick={ccloseModal} title="No">No</button>
-								<!-- <button class="slds-button slds-button_brand" onclick={submitAssessment} title="Yes">Yes</button> -->
-							</footer>
-						</div>
-					</section>
-					<div class="slds-backdrop slds-backdrop_open"></div>
-				</template>
-
+			
 
 			</template>
 
 		</template>
 
 
+	</template>
+    <template if:true={isCustomerModalPopup}>
+		<!-- Modal/Popup Box LWC starts here -->
+		<section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+			aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+			<div class="slds-modal__container">
+				<!-- Modal/Popup Box LWC header here -->
+				<button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={customerCloseModal}>
+                        <lightning-icon icon-name="utility:close"
+                            alternative-text="close"
+                            variant="inverse"
+                            size="small" ></lightning-icon>
+                    </button>
+				<!-- Modal/Popup Box LWC body starts here -->
+				<div class="slds-modal__content slds-p-around_medium" id="modal-content-id-2">
+					<p><b>Do you want to Submit the review?</b></p>
+				</div>
+				<!-- Modal/Popup Box LWC footer starts here -->
+				<footer class="slds-modal__footer">
+					<lightning-button variant="Neutral" label="No" onclick={customerCloseModal}
+						class="slds-m-left_x-small"></lightning-button>
+					<lightning-button variant="brand" label="Yes" onclick={submitReviewResponse}
+						class="slds-m-left_x-small"></lightning-button>
+				</footer>
+			</div>
+		</section>
+		<div class="slds-backdrop slds-backdrop_open"></div>
 	</template>
 
 </template>

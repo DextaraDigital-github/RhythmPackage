@@ -116,6 +116,7 @@ export default class Questionnaire extends LightningElement {
     ishideToast = true;
     @track selectedActionList=[];
     layoutItemSize = 4;
+    @track fileData;
 
     @api handleGetRespRecord(event) {
         console.log('handleFileOnload', event.detail);
@@ -863,6 +864,7 @@ export default class Questionnaire extends LightningElement {
                                         if (ques.required) {
                                             this.requiredQuestionList.push(ques.Id);
                                         }
+                                        ques.showUpload = (subquestion.uploadrequired === 'Yes' || subquestion.uploadrequired === 'Optional') ? true : false;
                                     })
                                 }
                                 else {
@@ -1933,7 +1935,7 @@ export default class Questionnaire extends LightningElement {
         })
         this.handleselectedaction();
         const selectedChat = new CustomEvent('selectconversation', {
-            detail: {chat:this.showChat,actionData:this.selectedActionList}
+            detail: {chat:this.showChat,actionData:this.selectedActionList,file:this.fileData}
         });
         this.dispatchEvent(selectedChat);
     }
@@ -2014,10 +2016,11 @@ export default class Questionnaire extends LightningElement {
         this.selectedActionList.push(selectedActionMap);
     }
     handlechatHistory(event) {
-        this.showChat = event.detail;
+        this.showChat = event.detail.chat;
+        this.fileData=event.detail.file;
         this.handleselectedaction();
         const selectedChat = new CustomEvent('selectconversation', {
-            detail: {chat:this.showChat,actionData:this.selectedActionList}
+            detail: {chat:this.showChat,actionData:this.selectedActionList,file:this.fileData}
         });
         this.dispatchEvent(selectedChat);
     }
@@ -2252,8 +2255,5 @@ export default class Questionnaire extends LightningElement {
         this.showToast = true;
         this.success = true;
         this.totastmessage = 'The Assessment Status is updated to  ' + param.assessmentStatus + ' successfuly.';
-    }
-    ccloseModal() {
-        isCustomerModalPopup = false;
     }
 }
