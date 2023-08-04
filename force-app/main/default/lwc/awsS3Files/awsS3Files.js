@@ -34,6 +34,8 @@ export default class AWSS3FileOperations extends LightningElement {
     showFrame = false;
     noFilesContent = 'No Files Uploaded...';
     noPreviewContent = 'No Preview Content...';
+    @api showUpload;
+    @api isupload;
 
     //Accept File Formats
     get acceptedFormats() {
@@ -51,8 +53,15 @@ export default class AWSS3FileOperations extends LightningElement {
                 });
         }
         else if (this.objectApiName === 'Rhythm__Action__c') {
+            if(!this.showUpload === true) {
             this.disableFlag = true;
             this.heightStyle = 'height:387px;';
+            }
+            else {
+              //this.disableFlag = false;
+              console.log('this.disableflag',this.isupload);
+              this.disableFlag=!(this.isupload);
+            }
         }
         else {
             this.disableFlag = false;
@@ -232,7 +241,7 @@ export default class AWSS3FileOperations extends LightningElement {
         );
         this.renderFlag = true;
         this.configAWS();
-        eval("$A.get('e.force:refreshView').fire();");
+        //eval("$A.get('e.force:refreshView').fire();");
     }
 
     //Preivew File

@@ -8,19 +8,6 @@
 public with sharing class AWSS3Service extends AWS {
     public static SecurityCheckController safe = new SecurityCheckController();//use singleton pattern
     private static Savepoint sp;
-
-    private static AWSS3Service serviceClasa = null; //private static instance of the class
-    
-    /**
-    * @description Singleton Design Pattern 
-    */
-    public static AWSS3Service getInstance(){
-            if(serviceClasa == null){
-                serviceClasa = new AWSS3Service();
-            }
-        return serviceClasa;
-    }
-    
     public String fileName;
     public String folderName;
     public Blob fileBody;
@@ -29,10 +16,23 @@ public with sharing class AWSS3Service extends AWS {
     public HttpResponse res;
     public ContentVersion versionData;
     public static HttpRequest req;
+
+    private static AWSS3Service serviceClasa = null; //private static instance of the class
     
     /**
-* @description init method used for initialize the AWS signature and upload file.
-*/ 
+    * @description Singleton Design Pattern
+    * @return
+    */
+    public static AWSS3Service getInstance(){
+            if(serviceClasa == null){
+                serviceClasa = new AWSS3Service();
+            }
+        return serviceClasa;
+    }
+    
+    /**
+    * @description init method used for initialize the AWS signature and upload file.
+    */ 
     public override void init() {
         Map<String, String> s3Map = new Map<String, String>();
         List<s3configuration__mdt> s3List = s3configuration__mdt.getAll().values();

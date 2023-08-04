@@ -34,11 +34,15 @@ public class ActionItemExpiryBatchTest {
             Map<String, Object> respAttributes = new Map<String, Object>{'Rhythm__preferred_Not_preferred__c'=>'Preferred',
             'Rhythm__QuestionId__c'=>ques[0].Id,'Rhythm__Response_value__c'=>'Yes','Rhythm__Score__c'=>5,
             'Rhythm__Weight__c'=>10,'Rhythm__Upload_Required__c'=>'Yes'};
-            List<Response_Attribute__c> resp =TestDataFactory.createResponseAttributes(1,true,respAttributes);
+
+            TestDataFactory.createResponseAttributes(1,true,respAttributes);
+
             Map<String, Object> respAttributes2 = new Map<String, Object>{'Rhythm__preferred_Not_preferred__c'=>'Preferred',
             'Rhythm__QuestionId__c'=>ques[0].Id,'Rhythm__Response_value__c'=>'No','Rhythm__Score__c'=>5,
             'Rhythm__Weight__c'=>10,'Rhythm__Upload_Required__c'=>'Yes'};
-            List<Response_Attribute__c> resp2 =TestDataFactory.createResponseAttributes(1,true,respAttributes2);
+
+            TestDataFactory.createResponseAttributes(1,true,respAttributes2);
+
             Map<String, Object> assessmentattributes = new Map<String, Object>{'Template__c'=>templist[0].Id,
             'Name'=>'Assessment 2023','Rhythm__Status__c'=>'New','Rhythm__Number_of_Questions__c'=>10};
             List<Assessment__c> asslist=TestDataFactory.createAssessment(1,true,assessmentattributes);
@@ -48,7 +52,7 @@ public class ActionItemExpiryBatchTest {
             List<Rhythm__AccountAssessmentRelation__c> accAssessment=TestDataFactory.createAccountAssessment(1,true,accountassesments);
 
             Map<String, Object> actionAttributes =new Map<String, Object>{'Name'=>'test action','Due_Date__c'=>Date.Today()-1,'Status__c'=>'Open','Rhythm__Assigned_To__c'=>custUser.id,'Rhythm__Question__c'=>ques[0].id,'Rhythm__AccountAssessment__c'=>accAssessment[0].id};
-            List<Action__c> acclist=TestDataFactory.createAction(1,true,actionAttributes);
+            TestDataFactory.createAction(1,true,actionAttributes);
         }   
         
     }
@@ -58,7 +62,6 @@ public class ActionItemExpiryBatchTest {
         user u = [SELECT Id,UserName FROM User WHERE Email='standarduser@testorg.com' LIMIT 1];
         System.runAs(u){
             String testString;
-            Date todayDate = Date.Today();
             Test.startTest();
             ActionItemExpiryBatch b = new ActionItemExpiryBatch();
             testString = 'Success';

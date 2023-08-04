@@ -33,6 +33,7 @@ export default class Action extends LightningElement {
   @track updateData;
   @track isSupplier;
   @track isSave = false;
+  @track showAction=false;
 
   @track lookupLabel = ['Ownership', 'Assigned To'];
   @track options = [{ label: 'Open', value: 'Open' },
@@ -123,29 +124,46 @@ export default class Action extends LightningElement {
       }
     }
   }
+
   // Retrieve the files from S3 folder
   retrieveFilesFromS3() {
     const folderName = this.objectApiName + '/' + this.responseMap.Id + '/';
     this.s3.listObjects({ Bucket: this.bucketName, Prefix: folderName }, (err, data) => {
-      if (err) {
-        console.error(err);
-      } else {
-        const files = data.Contents;
-        let fileList = [];
-        this.keyList = [];
-        files && files.forEach(file => {
-          const objectKey = file.Key;
-          fileList.push({ key: objectKey, url: this.endpoint + '/' + objectKey, value: objectKey.substring(objectKey.lastIndexOf("/") + 1) });
-        });
-        this.keyList = fileList.reverse();
-        this.renderRetriveFlag = this.renderRetriveFlag++;
-        if (this.keyList.length != 0) {
-          this.getFilesFlag = true;
-        }
-        else {
-          this.getFilesFlag = false;
-        }
-      }
+       if (err) {
+                console.error(err);
+            } else {
+                const files = data.Contents;
+                let fileList = [];
+                this.keyList = [];
+                files && files.forEach(file => {
+                    const objectKey = file.Key;
+                    let fileName = objectKey.substring(objectKey.lastIndexOf("/") + 1);
+                    let fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1);
+                    if (fileExtension === 'doc' || fileExtension === 'docx' || fileExtension === 'xls' || fileExtension === 'xlsx') {
+                        fileList.push({ type: fileExtension, preview: false, key: objectKey, url: this.endpoint + '/' + objectKey, value: fileName.substring(fileName.indexOf("_") + 1) });
+                    }
+                    else {
+                        fileList.push({ type: fileExtension, preview: true, key: objectKey, url: this.endpoint + '/' + objectKey, value: fileName.substring(fileName.indexOf("_") + 1) });
+                    }
+                });
+                this.keyList = fileList.reverse();
+                if (this.keyList.length > 0) {
+                    this.getFilesFlag = true;
+                }
+                else {
+                    this.getFilesFlag = false;
+                }
+                this.keyList && this.keyList.forEach(rec => {
+                    rec.icon = ((rec).type === 'png') ? 'doctype:image' :
+                        ((rec).type === 'pdf') ? 'doctype:pdf' :
+                            ((rec).type === 'jpg') ? 'doctype:image' :
+                                ((rec).type === 'jpeg') ? 'doctype:image' :
+                                    ((rec).type === 'xlsx') ? 'doctype:excel' :
+                                        ((rec).type === 'xls') ? 'doctype:excel' :
+                                            ((rec).type === 'txt') ? 'doctype:txt' :
+                                                ((rec).type === 'docx' || (rec).type === 'doc') ? 'doctype:word' : 'doctype:flash';
+                });
+            }
     });
   }
   //Download the file from AWS S3
@@ -244,6 +262,7 @@ export default class Action extends LightningElement {
       });
     }
   }
+  
   //Toast Message handler
   async showToastMessage(title, message, variant) {
     this.dispatchEvent(
@@ -296,7 +315,12 @@ export default class Action extends LightningElement {
   }
 
   @api displayForm(response) {
+    this.showAction=false;
     console.log('jjj', response);
+    if(typeof response ==='undefined'){
+      this.showAction=true;
+    }
+   
     this.updateData = response;
     this.showForm = true;
     this.showCustom = false;
@@ -331,6 +355,7 @@ export default class Action extends LightningElement {
         this.resultdata = result[0];
         this.showUpdate = true;
         this.showCustom = true;
+        this.showAction=false;
         this.showPicklist = true;
         this.responseMap.Id = result[0].Id;
         if (typeof result[0].Name !== 'undefined') {
@@ -388,6 +413,11 @@ export default class Action extends LightningElement {
         this.showresponse.push(this.saveActionResponse);
       }
       else {
+         if(this.isSupplier === true)
+        {
+          this.showAction=true;
+        }
+        
         let userMap = {};
         this.showCustom = true;
         this.showUpdate = false;
@@ -552,6 +582,9 @@ export default class Action extends LightningElement {
         })
           .catch((error) => {
             let errormap = {};
+             this.showToast = true;
+             this.success = false;
+            this.totastmessage = 'Due date cannot be set to a past date';
             errormap.componentName = 'Action';
             errormap.methodName = 'saveActionResponse';
             errormap.className = 'CAPAService';

@@ -864,7 +864,6 @@ export default class Questionnaire extends LightningElement {
                                         if (ques.required) {
                                             this.requiredQuestionList.push(ques.Id);
                                         }
-                                        ques.showUpload = (subquestion.uploadrequired === 'Yes' || subquestion.uploadrequired === 'Optional') ? true : false;
                                     })
                                 }
                                 else {

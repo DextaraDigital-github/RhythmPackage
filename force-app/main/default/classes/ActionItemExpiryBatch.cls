@@ -15,11 +15,9 @@ global with sharing class ActionItemExpiryBatch implements Database.Batchable<sO
     */
     global Database.QueryLocator start(Database.BatchableContext bc){
         Date todayDate= Date.Today();
-        System.debug('hhh'+todayDate);
-        string query = 'SELECT Id,Status__c,Assigned_To__c,Ownership__c FROM Action__c WHERE Due_Date__c <: todayDate AND Status__c !=\'Expired\'  WITH SECURITY_ENFORCED';
+        string query = 'SELECT Id,Status__c,Assigned_To__c,Ownership__c FROM Action__c WHERE Due_Date__c <: todayDate AND Status__c !=\'Expired\' WITH SECURITY_ENFORCED';
         return Database.getQueryLocator(query);
     }
-
      /**
     * @description execute method to process the records.
     * @param bc It is an instance of BatchableContext. 
@@ -29,7 +27,6 @@ global with sharing class ActionItemExpiryBatch implements Database.Batchable<sO
     global void execute(Database.BatchableContext bc, List<Action__c> scope){
         List<ErrorTransactionLog__c> errorList = new List<ErrorTransactionLog__c>();
         try{
-             System.debug('hhh'+scope);
             List<Action__c> actionList = new List<Action__c>();
             List<Id> userIds=new List<Id>();
             for(Action__c ac:scope){
@@ -40,14 +37,12 @@ global with sharing class ActionItemExpiryBatch implements Database.Batchable<sO
                 userIds.add(ac.Assigned_To__c);
                 userIds.add(ac.Ownership__c);
             }
-             system.debug('hhh'+actionList);
             set<Id> successRecordsIdSet = new set<Id>();
             if (sp == null){
                 sp = Database.setSavepoint();
             }
             if(actionList.isEmpty() == false){
                 Database.SaveResult[] results = safe.doUpdate(actionList);
-                System.debug('seave'+results);
                 for(Database.SaveResult result : results) {
                     if(result.isSuccess()){
                         successRecordsIdSet.add(result.getId());
@@ -60,12 +55,8 @@ global with sharing class ActionItemExpiryBatch implements Database.Batchable<sO
                 }
             }
             if(userIds.isEmpty() == false){
-                System.debug('send'+userIds);
                 List<Messaging.SendEmailResult> sendmails=SendEmail.send('Action Item','Action Item has Expired',userIds);
-                System.debug('sendmails'+sendmails);
             }
-        
-          
         }catch(exception e){
             ErrorTransactionLog__c errorRec = new ErrorTransactionLog__c();
             errorRec.Class_Name__c = 'SendAssessmentNotificationsBatch';
@@ -92,6 +83,10 @@ global with sharing class ActionItemExpiryBatch implements Database.Batchable<sO
         // execute any post-processing operations
         return;
     }
+
+    /**
+    * @description It is used to throw the exception
+    */
     public class SecurityControllerException extends Exception{
     }
 }

@@ -367,12 +367,13 @@ export default class RtmvpcQuestionCreation extends LightningElement {
                                     detail: this.totastmessage
                                 });
                                 this.dispatchEvent(selectedEvent);
+                            }).catch(error=>{
+                                this.configureToast('Some Error has occured', 'Response value,Preferred/Not Preferred and Upload Required fields are mandatory', 'error');
+                                this.loading = false;
                             });
                         }
                         else {
-                            this.totastmessage = 'Selected Response Type needs at least one Response Value to create a Question';
-                            this.success = false;
-                            this.showToast = true;
+                            this.configureToast('Some Error has occured', 'Preferred/Not Preferred and Upload Required fields are mandatory', 'error');
                             this.loading = false;
                         }
                     }
@@ -481,7 +482,6 @@ export default class RtmvpcQuestionCreation extends LightningElement {
                         errormap.errorData = error.message;
                         errorLogRecord({ errorLogWrapper: JSON.stringify(errormap) }).then(() => { });
                     });
-
                 });
             }
         }

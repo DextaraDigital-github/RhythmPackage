@@ -43,11 +43,6 @@ private class AWSS3Test {
             Map<String,Object> response = new Map<String,Object>{'Question__c'=>qus[0].Id,'AccountAssessmentRelation__c'=>accAssmt[0].Id,
                 'Is_Latest_Response__c'=>True};
                     TestDataFactory.createResponse(1,true,response);
-            Action__c act=new Action__c();
-            act.Rhythm__AccountAssessment__c=accAssmt[0].Id;
-            act.Rhythm__Question__c=qus[0].Id;
-            act.Rhythm__Supplier__c=accts[0].id;
-            insert act;
         }   
         
         ContentVersion testContentVersion = new ContentVersion();
@@ -117,7 +112,6 @@ private class AWSS3Test {
         System.runAs(u) {
             List<Response__c> resplist=[select id,Question__c,AccountAssessmentRelation__c from Response__c];
             List<Rhythm__AccountAssessmentRelation__c> asslist=[select Id,Rhythm__Account__c, Rhythm__Assessment__c from Rhythm__AccountAssessmentRelation__c LIMIT 1];
-            List<Question__c> quslist=[SELECT Id from Question__c LIMIT 1];
             Test.startTest();
             Map<String,Object> filemap = new Map<String,Object>();
             filemap.put('assessmentId', resplist[0].AccountAssessmentRelation__c);
@@ -138,7 +132,6 @@ private class AWSS3Test {
             List<Response__c> resp=[Select id,Question__c,AccountAssessmentRelation__c  from Response__c];
             delete resp;
             List<Rhythm__AccountAssessmentRelation__c> asslist=[select Id,Account__c, Assessment__c from Rhythm__AccountAssessmentRelation__c LIMIT 1];
-            List<Question__c> quslist=[SELECT Id from Question__c LIMIT 1];
             Test.startTest();
             Map<String,Object> filemap = new Map<String,Object>();
             filemap.put('assessmentId', resp[0].AccountAssessmentRelation__c);

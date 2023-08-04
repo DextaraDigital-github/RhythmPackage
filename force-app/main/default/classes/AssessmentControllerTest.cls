@@ -660,40 +660,23 @@ private class AssessmentControllerTest
             }
             Test.stopTest();
         }
-        
     }
     
-
     @isTest
     static void sendAssessmentUpdateTest(){
-        user u = [SELECT Id,UserName FROM User WHERE Email='standarduser@testorg.com' LIMIT 1];
-        
-            AssessmentController.ResultWrapper retWrap = new AssessmentController.ResultWrapper();
-            List<Account> accList = [select id,Name from Account];
-            List<SObject> assmentList = [select Id,Start_Date__c,End_Date__c,Template__c from Assessment__c];
-            SObject asmtRecord = assmentList[0];
-            String operationType = 'update';
-            String suppliers = '';
-            String existingSups = '';
-            String deleteList = '["' + accList[0].Id + '"]';
-            Test.startTest();
-            retWrap = AssessmentController.sendAssessment(asmtRecord,operationType,suppliers,existingSups,deleteList);
-            Test.stopTest();
-            System.assertEquals(retWrap!=null, true,'assessment sent');
-        
-    }
-   /* @isTest
-    static void addSuppliersTest(){
-        //AssessmentController.ResultWrapper retWrap = new AssessmentController.ResultWrapper();
+        AssessmentController.ResultWrapper retWrap = new AssessmentController.ResultWrapper();
         List<Account> accList = [select id,Name from Account];
-        List<SObject> assmentList = [select id,Start_Date__c,End_Date__c,Template__c from Assessment__c];
-        //SObject asmtRecord = assmentList[0];
-
-        //String suppliers = '["' + accList[0].Id + '"]';
+        List<SObject> assmentList = [select Id,Start_Date__c,End_Date__c,Template__c from Assessment__c];
+        SObject asmtRecord = assmentList[0];
+        String operationType = 'update';
+        String suppliers = '';
+        String existingSups = '';
+        String deleteList = '["' + accList[0].Id + '"]';
         Test.startTest();
-        //retWrap = AssessmentController.addSuppliers(String(asmtRecord.Id),suppliers);
+        retWrap = AssessmentController.sendAssessment(asmtRecord,operationType,suppliers,existingSups,deleteList);
         Test.stopTest();
-    }*/
+        System.assertEquals(retWrap!=null, true,'assessment sent');
+    }
 
     @isTest
     static void updateAssessmentSuppliersTest(){

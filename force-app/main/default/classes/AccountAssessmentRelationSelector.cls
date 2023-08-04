@@ -12,7 +12,8 @@ public with sharing class AccountAssessmentRelationSelector {
 
     private static AccountAssessmentRelationSelector selector = null; //private static instance of the class
     /**
-    * @description Singleton Design Pattern 
+    * @description Singleton Design Pattern
+    * @return
     */
     public static AccountAssessmentRelationSelector getInstance(){
            if(selector == null){

@@ -43,7 +43,7 @@ public with sharing class CAPASelector {
 
     public List<Action__c> actionRecords(){
         String userId = userinfo.getuserid();
-        return [SELECT Name,Due_Date__c,Related_Record__c,Ownership__r.Name,Status__c,OwnershipName__c,
+        return [SELECT Name,Due_Date__c,Related_Record__c,Related_Record__r.Name,Ownership__r.Name,Status__c,OwnershipName__c,
                 Priority__c,Assigned_To__r.Name,Flag_Status__c 
                 FROM Action__c 
                 WHERE Assigned_To__c=:userId
@@ -56,7 +56,7 @@ public with sharing class CAPASelector {
                 Ownership__c,Ownership__r.Name,Assigned_To__c,Assigned_To__r.Name 
                 FROM Action__c 
                 WHERE Id=:actionid
-                WITH SECURITY_ENFORCED]; 
+                WITH SECURITY_ENFORCED];
     }
 
     // RED FLAG FOR SEC ENFORCED

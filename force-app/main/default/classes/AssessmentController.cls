@@ -94,7 +94,7 @@ public with sharing class AssessmentController {
 		Map<String,Schema.SObjectField> fieldMap = responseType.getDescribe().fields.getMap();
         Schema.SObjectField idVal = fieldMap.get('Id');
         
-        Database.UpsertResult[] upsertResult = safe.doUpsert(suppResponseList,idVal);
+        safe.doUpsert(suppResponseList,idVal);
         String assmtQuery =  'SELECT Id,Name,Follow_Up_Requests__c,Status__c,'
                                +'Assessment__c,Account__c,PdfConvertor__c'
                                +' FROM AccountAssessmentRelation__c'
@@ -108,75 +108,9 @@ public with sharing class AssessmentController {
                 if((String)queryMap.get('status')=='Submitted'){
                     assessment[0].Submission_Date__c = DateTime.now();
                 }
-                Database.SaveResult[] updResult = safe.doUpdate(assessment);
+                safe.doUpdate(assessment);
             }   
         return suppResponseList;
-        /*try{
-            Map<String,object> queryMap = (Map<String,Object>)JSON.deserializeUntyped(paramMap);
-            String accAssmtId =(string)queryMap.get('accountassessmentid');
-            List<Id> questionIds = new List<Id>();
-            Map<Id,SObject> suppResponseMap = new Map<Id,SObject>();
-            for(SObject response:suppResponseList){
-                questionIds.add((Id)response.get('Rhythm__Question__c'));
-                suppResponseMap.put((Id)response.get('Rhythm__Question__c'),response);
-            }
-            List<Response__c> existingResponses = new List<Response__c>();
-            if(!questionIds.isEmpty()){
-                string query = 'SELECT Id,Name,Question__c,Response__c,Files__c,Assessment__c,'
-                        + 'Flag__c,Is_Latest_Response__c,AccountAssessmentRelation__c'
-                        +' FROM Response__c'
-                        +' WHERE Question__c IN:questionIds'
-                        +' AND AccountAssessmentRelation__c=\'' + String.escapeSingleQuotes(accAssmtId) + '\''
-                        +' AND Is_Latest_Response__c = true';
-                Map<String, Object> bindVariables = new Map<String, Object>{'questionIds' => questionIds};
-                existingResponses = safe.doQueryWithBinds(query,bindVariables);
-            }
-            if (sp == null){
-                sp = Database.setSavepoint();
-            }
-            for(Response__c resp :existingResponses){
-                ((Response__c)suppResponseMap.get(resp.Question__c)).put('Files__c', resp.Files__c);
-                resp.Is_Latest_Response__c = false;
-            }
-            if(suppResponseMap.values().isEmpty() == false){
-                Database.SaveResult[] results = safe.doInsert(suppResponseMap.values());
-                List<String> errorsList = SecurityCheckController.safeClassExceptionHandlerInsert(results);
-                if(errorsList.size()>0){
-                    Database.rollback(sp);
-                    throw new SecurityControllerException(String.join(errorsList, ', ' ));
-                }
-            }
-            Database.SaveResult[] saveResult = safe.doUpdate(existingResponses);
-            List<String> errorList = SecurityCheckController.safeClassExceptionHandlerInsert(saveResult);
-            if(errorList.size()>0){
-                Database.rollback(sp);
-                throw new SecurityControllerException(String.join( errorList, ', ' ));
-            }
-            String assmtQuery =  'SELECT Id,Name,Follow_Up_Requests__c,Status__c,'
-                               +'Assessment__c,Account__c,PdfConvertor__c'
-                               +' FROM AccountAssessmentRelation__c'
-                               +' WHERE Id=\'' + String.escapeSingleQuotes(accAssmtId) + '\''
-                               +' WITH SECURITY_ENFORCED';
-
-            List<AccountAssessmentRelation__c> assessment = safe.doQuery(assmtQuery);
-            if(!assessment.isEmpty()){
-                assessment[0].Status__c =(String)queryMap.get('status');
-                assessment[0].PdfConvertor__c =(String)queryMap.get('pdfContnet');
-                if((String)queryMap.get('status')=='Submitted'){
-                    assessment[0].Submission_Date__c = DateTime.now();
-                }
-                Database.SaveResult[] updResult = safe.doUpdate(assessment);
-                List<String> upderrorList = SecurityCheckController.safeClassExceptionHandlerInsert(updResult);
-                if(upderrorList.size()>0){
-                    Database.rollback(sp);
-                    throw new SecurityControllerException(String.join( upderrorList, ', ' ));
-                }
-            }
-            return suppResponseList;
-        }catch(exception e){
-            string errorMsg = e.getMessage();
-            throw new AuraHandledException(errorMsg);
-        }*/
     }
     
     /**
@@ -358,6 +292,12 @@ public with sharing class AssessmentController {
         }
     }
 
+
+    /**
+    * @description To update the rejected flag.
+    * @param updateRejectFlagList This is the list of records. 
+    * @return 
+    */
     @AuraEnabled
     /* sfge-disable-stack ApexFlsViolationRule */
     public static void updateRejectFlag(List<SObject> updateRejectFlagList){
@@ -379,6 +319,11 @@ public with sharing class AssessmentController {
         }    
     }
 
+    /**
+    * @description To create the rejected flag.
+    * @param insertRejectFlagList This is the list of records. 
+    * @return 
+    */
     @AuraEnabled
     /* sfge-disable-stack ApexFlsViolationRule */
     public static void insertRejectFlag(List<SObject> insertRejectFlagList){
@@ -408,7 +353,6 @@ public with sharing class AssessmentController {
     public static string getCommunityURL()
     {
         try{
-            Id currentNetworkId = Network.getNetworkId();
             String relativeUrlBase = URL.getSalesforceBaseUrl().toExternalForm()+'/login';
             return relativeUrlBase;
         }catch(exception e){
@@ -1232,8 +1176,6 @@ public with sharing class AssessmentController {
         @AuraEnabled public string recordId;
     }
     
-    
-   
     /**
     * @description It is used to throw the exception
     */
