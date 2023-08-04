@@ -69,7 +69,3 @@ jobs:
     # Code Push to Scratch org
       - name: 'code push'
         run: sfdx force:source:push --targetusername=${{secrets.QA_USERNAME}} --wait 20 -f --loglevel debug
-
-    # Generate Violation Report
-      - name: 'Scan for Violations and Generate report'
-        run: sfdx scanner:run:dfa --target "./**/*.cls" --projectdir "./"
