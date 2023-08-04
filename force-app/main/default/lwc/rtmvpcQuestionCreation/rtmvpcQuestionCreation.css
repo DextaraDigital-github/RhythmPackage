@@ -1,0 +1,3 @@
+.qc-menu { background-color: rgb(243,243,243); border-bottom:1.5px solid rgb(229, 229, 229); }
+
+.qc-input lightning-input { --slds-c-input-color-border: rgb(201, 201, 201); }

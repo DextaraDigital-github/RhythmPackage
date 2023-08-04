@@ -1,0 +1,203 @@
+<template>
+	<section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="modal-heading-01"
+		class="slds-modal slds-fade-in-open slds-modal_medium">
+		<div class="slds-modal__container">
+			<div class="slds-modal__header">
+				<div class="slds-grid slds-wrap">
+					<div class="slds-col slds-large-size_1-of-3 slds-medium-size_1-of-3 slds-size_0-of-1">
+					</div>
+					<div class="slds-col slds-large-size_1-of-3 slds-medium-size_1-of-3 slds-size_1-of-1">
+						<center>
+							<h1 id="modal-heading-01" class="slds-modal__title slds-hyphenate">{currentPage.label}</h1>
+						</center>
+					</div>
+					<!-- Renders only in Read-only mode and displays buttons to navigate through pages -->
+					<template if:true={email.limitProp}>
+						<div class="slds-col slds-large-size_1-of-3 slds-medium-size_1-of-3 slds-size_1-of-1">
+							<lightning-button-group class="slds-float_right">
+								<!-- Navigation to previous/suppliers screen -->
+								<template lwc:if={currentPage.buttons.prevButton.show}>
+									<lightning-button label={currentPage.buttons.prevButton.label} variant="brand"
+										data-pageno={currentPage.pageNo} onclick={prevSendEmailHandler}>
+									</lightning-button>
+								</template>
+								<!-- Navigation to next/email screen -->
+								<template lwc:if={currentPage.buttons.nextButton.show}>
+									<lightning-button label={currentPage.buttons.nextButton.label} variant="brand"
+										data-pageno={currentPage.pageNo} onclick={nextSendEmailHandler}>
+									</lightning-button>
+								</template>
+								<lightning-button label="Close" variant="brand-outline" onclick={closeModalHandler}>
+								</lightning-button>
+							</lightning-button-group>
+						</div>
+					</template>
+					<template if:false={email.limitProp}>
+						<div class="slds-col slds-large-size_1-of-3 slds-medium-size_1-of-3 slds-size_0-of-1">
+						</div>
+					</template>
+				</div>
+			</div>
+			<div class="modal-bd slds-modal__content slds-scrollable_none">
+				<template if:true={show.spinner}>
+					<lightning-spinner size="medium"></lightning-spinner>
+				</template>
+				<div class="sem-fh">
+					<!-- Displays a list of suppliers -->
+					<template lwc:if={pageProp.pageInfo.chooseAccounts.show}>
+						<div class="slds-grid slds-grid_vertical">
+							<!-- Functionality to search among suppliers -->
+							<div
+								class="sem-pp-menu slds-col slds-p-left_large slds-p-right_large slds-p-top_medium slds-p-bottom_small">
+								<lightning-input type="search" variant="label-hidden" placeholder="Search Suppliers"
+									onchange={accSearchHandler} value={show.searchText}
+									is-loading={show.accSearchLoading}>
+								</lightning-input>
+								<div class="slds-text-title slds-m-top_xx-small slds-m-left_xx-small">{show.searchCount}
+									Supplier(s) found
+								</div>
+							</div>
+							<!-- Displays the list of suppliers -->
+							<div class="slds-col slds-scrollable">
+								<lightning-datatable min-column-width="200" key-field="Id" data={accountsData}
+									columns={columnsList} onrowselection={rowSelectionHandler}
+									default-sort-direction={defaultSortDirection} sorted-direction={sortDirection}
+									sorted-by={sortedBy} onsort={onHandleSort} selected-rows={email.selectedAccounts}
+									hide-checkbox-column={email.limitProp} show-row-number-column>
+								</lightning-datatable>
+							</div>
+						</div>
+					</template>
+					<!-- Displays fields to compaose an email -->
+					<template lwc:elseif={pageProp.pageInfo.composeEmail.show}>
+						<div class="sem-fh slds-grid slds-grid_vertical">
+							<!-- Displays number of suppliers selected and contains navigation to previous/suppliers screen -->
+							<div
+								class="sem-pp-menu slds-col slds-p-left_large slds-p-right_large slds-p-top_medium slds-p-bottom_small">
+								<!-- <lightning-combobox label="Email Template" value={email.templateId}
+									options={emailTemplatesOpt} onchange={emTempChangeHandler}
+									read-only={email.limitProp}>
+								</lightning-combobox> -->
+								<button class="slds-button slds-button_neutral slds-size_1-of-1" data-pageno={currentPage.pageNo} onclick={prevSendEmailHandler}>Suppliers Selected ({email.selectedAccountsCount})</button>
+							</div>
+							<!-- Contains information related to Email -->
+							<div
+								class="sem-fh slds-col slds-p-left_large slds-p-right_large slds-p-top_medium slds-p-bottom_medium slds-scrollable">
+								<template if:true={email.limitProp}>
+									<lightning-layout multiple-rows>
+										<lightning-layout-item alignment-bump="left" size="12" small-device-size="12"
+											medium-device-size="12" large-device-size="12">
+											<div class="slds-m-bottom_small slds-grid slds-wrap">
+												<span class="slds-col slds-size_1-of-1 slds-large-size_2-of-12 slds-form-element__label">Assessment Program Name</span>
+												<input class="slds-col slds-size_1-of-1 slds-large-size_10-of-12" style="border:0px solid black; border-bottom: 1px solid #c9c9c9;" value={email.assessmentName} readonly />
+											</div>
+										</lightning-layout-item>
+										<lightning-layout-item size="12" small-device-size="12" medium-device-size="12"
+											large-device-size="12">
+											<div class="slds-m-bottom_small slds-grid slds-wrap">
+												<span class="slds-col slds-size_1-of-1 slds-large-size_2-of-12 slds-form-element__label">Sent Date</span>
+												<input class="slds-col slds-size_1-of-1 slds-large-size_10-of-12" style="border:0px solid black; border-bottom: 1px solid #c9c9c9;" value={email.sentDate} readonly />
+											</div>
+										</lightning-layout-item>
+										<lightning-layout-item alignment-bump="left" size="12" small-device-size="12"
+											medium-device-size="12" large-device-size="12">
+											<div class="slds-m-bottom_small slds-grid slds-wrap">
+												<span class="slds-col slds-size_1-of-1 slds-large-size_2-of-12 slds-form-element__label">From Name</span>
+												<input class="slds-col slds-size_1-of-1 slds-large-size_10-of-12" style="border:0px solid black; border-bottom: 1px solid #c9c9c9;" value={email.fromName} readonly />
+											</div>
+										</lightning-layout-item>
+									</lightning-layout>
+								</template>
+
+								<!-- Subject Information -->
+								<div class="slds-m-bottom_small slds-col slds-grid slds-wrap slds-size_1-of-1">
+									<span class="slds-col slds-size_1-of-1 slds-large-size_2-of-12 slds-form-element__label">Subject</span>
+									<input class="xyz slds-col slds-size_1-of-1 slds-large-size_10-of-12" style="border:0px solid black; border-bottom: 1px solid #c9c9c9;" value={email.subject} onchange={emSubjectChangeHandler} readonly={email.limitProp} />
+									<!-- <lightning-input placeholder="Add a Subject" name="subject" label="Subject"
+										value={email.subject} onchange={emSubjectChangeHandler}
+										read-only={email.limitProp}></lightning-input> -->
+								</div>
+
+								<!-- Message Information -->
+								<div class="slds-m-bottom_small slds-col">
+									<div class="slds-form-element__label">Message</div>
+									<template if:true={email.isBuilderContent}>
+										<lightning-formatted-rich-text class="slds-input"
+											placeholder="Type, insert files and more" value={email.body}
+											style="min-height: 100px;">
+										</lightning-formatted-rich-text>
+									</template>
+									<template if:false={email.isBuilderContent}>
+										<lightning-input-rich-text placeholder="Type, insert files and more"
+											value={email.body} style="min-height: 100px;"
+											onchange={emBodyChangeHandler}>
+										</lightning-input-rich-text>
+									</template>
+								</div>
+
+								<!-- Attachments Information -->
+								<div class="slds-col">
+									<template if:false={email.limitProp}>
+										<!-- S3 File Upload Code Starts -->
+										<!-- <lightning-file-upload record-id={assessmentId} accept={acceptedFormats}
+											name="fileUploader" class="file-selector-large" title="Upload"
+											onuploadfinished={handleUploadFinished} multiple>
+										</lightning-file-upload>
+										<template for:each={keyList} for:item="item" for:index="index">
+											<div class="slds-m-top_x-small" key={item}>
+												<lightning-pill-container items={item.value} data-id={item.key}
+													title={item.url} onclick={handleDownload}>
+													onitemremove={handleDeletePopup}>
+												</lightning-pill-container>
+											</div>
+										</template> -->
+										<!-- S3 File Upload Code Ends -->
+										<lightning-file-upload name="uploadAttachment" label="Attachments"
+											accept=".png,.csv,.pdf" onuploadfinished={fileUploadHandler} multiple>
+										</lightning-file-upload>
+										<template lwc:if={email.attachmentsData}>
+											<div class="slds-m-top_x-small">
+												<lightning-pill-container items={email.attachmentsData.attachments}
+													onitemremove={removeFileHandler}>
+												</lightning-pill-container>
+											</div>
+										</template>
+									</template>
+								</div>
+							</div>
+						</div>
+					</template>
+				</div>
+			</div>
+
+			<!-- Modal Footer for navigation between pages -->
+			<template if:false={email.limitProp}>
+				<div class="slds-modal__footer">
+					<template lwc:if={currentPage.buttons.prevButton.show}>
+						<lightning-button class="slds-button slds-float_left"
+							label={currentPage.buttons.prevButton.label} variant="brand"
+							data-pageno={currentPage.pageNo} onclick={prevSendEmailHandler} disabled={show.disableBtns}>
+						</lightning-button>
+					</template>
+					<lightning-button class="slds-button" label="Cancel" variant="neutral"
+						data-pageno={currentPage.pageNo} onclick={closeSendEmailHandler}
+						disabled={show.disableCancelBtn}>
+					</lightning-button>
+					<template lwc:if={currentPage.buttons.nextButton.show}>
+						<lightning-button class="slds-button" label={currentPage.buttons.nextButton.label}
+							variant="brand" data-pageno={currentPage.pageNo} onclick={nextSendEmailHandler}
+							disabled={show.disableBtns}>
+						</lightning-button>
+					</template>
+					<template lwc:elseif={currentPage.buttons.saveButton}>
+						<lightning-button class="slds-button" label="Send" variant="brand"
+							data-pageno={currentPage.pageNo} onclick={sendEmailHandler} icon-name="utility:send"
+							disabled={show.disableBtns}>
+						</lightning-button>
+					</template>
+				</div>
+			</template>
+		</div>
+	</section>
+	<div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
+</template>

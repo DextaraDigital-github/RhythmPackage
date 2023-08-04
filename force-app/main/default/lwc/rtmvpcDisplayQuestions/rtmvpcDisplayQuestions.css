@@ -1,0 +1,11 @@
+.slds-table_tree .slds-button:not(.slds-th__action-button) .rtm-button { margin-top: 0; border: 0px!important; }
+
+.rdm-grey-bg{ background-color: var(--slds-g-color-neutral-base-95,rgb(243, 243, 243)); }
+/* :host{
+	--slds-c-card-color-background: rgb(243,243,243);
+} */
+
+
+
+/* .rdm-outer { border-radius: 10px; border: 1px solid rgb(201 201 201); }
+.rdm-header { background-color: rgb(243,243,243); border-radius: 10px 10px 0 0; border-bottom: 1px solid rgb(201 201 201); } */

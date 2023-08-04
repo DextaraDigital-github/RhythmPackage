@@ -1,0 +1,19 @@
+<template>
+    <lightning-quick-action-panel header="Clone Template">
+        <lightning-record-edit-form object-api-name={objectApiName} record-id={templateId} onsubmit={handleSubmit}>
+            <lightning-messages></lightning-messages>
+            <lightning-layout multiple-rows>
+                <lightning-layout-item size="6" padding="around-small">
+                    <lightning-input-field field-name="Name" data-id="name" onchange={fieldChangeHandler} name="name" value={templateName} required></lightning-input-field>
+                </lightning-layout-item>
+                <lightning-layout-item size="6" padding="around-small">
+                    <lightning-input-field field-name="Rhythm__Status__c" data-id="status" name="status" value="New" disabled required></lightning-input-field>
+                </lightning-layout-item>
+            </lightning-layout>
+            <div class="slds-align_absolute-center">
+                <lightning-button label="Cancel" title="Cancel" onclick={closeModal}></lightning-button>
+                <lightning-button variant="brand" label="Save" title="Save" type="submit" class="slds-m-left_xx-small"></lightning-button>
+            </div>
+        </lightning-record-edit-form>
+    </lightning-quick-action-panel>
+</template>

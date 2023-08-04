@@ -157,7 +157,11 @@
 	.column.region-main {width:75%!important; max-width:100%;}
 	.column.region-sidebar-right {width:25%!important; max-width:25%;}
 	.column.region-sidebar-right article.slds-card {background:#e6eef6; }
-
+	.dx-customfix .fix_button-group-flexbox { width:100%; }
+	.dx-customfix {
+	--slds-g-color-border-base-4:#c9c9c9!important;
+	}
+                                
 	.dx-duallisthide lightning-dual-listbox .slds-dueling-list .slds-dueling-list__column:nth-child(3),
 	.dx-duallisthide lightning-dual-listbox .slds-dueling-list .slds-dueling-list__column:nth-child(4) { display:none; }
                                 

@@ -1,0 +1,227 @@
+<template>
+	<!-- <div class="cad-sec_bodyfull1 cad-titlebutton_more"> -->
+		<div class="cad-sec_vcontainer2_2" style="height:calc(100% - 0px);">
+			<div class="slds-scrollable_y" style="max-height:calc(100% - 40px); --slds-c-input-color-border: rgb(187 187 187);">
+			<!-- <div
+				style="max-height:calc(100% - 40px); --slds-c-input-color-border: rgb(187 187 187);"> -->
+				<lightning-layout multiple-rows>
+					<template if:true={showToast}>
+						<c-Show-Toast-Message message-from-component={totastmessage} is-show-modal={showToast}
+							is-sucess={success} onclosetoast={closeToastHandler}></c-Show-Toast-Message>
+					</template>
+				</lightning-layout>
+				<template if:true={showForm}>
+					<lightning-layout-item size="12">
+						<lightning-input type="text" label="Supplier Name" onchange={handleChange} disabled=true
+							class="slds-p-left_xx-small slds-p-right_x-small slds-p-top_small" value={accountName}
+							data-id="Rhythm__Supplier__c">
+						</lightning-input>
+					</lightning-layout-item>
+					<lightning-layout-item size="12">
+						<lightning-input type="text" label="Action Item name" onchange={handleChange}
+							value={responseMap.Name} data-id="Name" disabled={isSupplier}
+							class="slds-p-left_xx-small slds-p-right_x-small slds-p-top_small" required="true">
+						</lightning-input>
+					</lightning-layout-item>
+					<lightning-layout-item size="12">
+						<lightning-textarea type="text" label="Action Item Description" onchange={handleChange}
+							disabled={isSupplier} data-id="Rhythm__Action_Item_Description__c"
+							value={responseMap.Rhythm__Action_Item_Description__c}
+							class="slds-p-left_xx-small slds-p-right_x-small slds-p-top_small">
+						</lightning-textarea>
+					</lightning-layout-item>
+
+					<template for:each={lookupLabel} for:item="labelName">
+						<template if:true={showCustom}>
+							<lightning-layout-item size="12" padding="around_x-small" key={labelName}>
+								<c-custom-lookupform key={key} data-id={labelName} lookup-label={labelName}
+									onselectedvalue={handleSelectedValue} supplier={isSupplier} result={resultdata}>
+								</c-custom-lookupform>
+							</lightning-layout-item>
+						</template>
+					</template>
+
+					<template if:false={isSupplier}>
+						<template for:each={onloadPicklist} for:item="obj">
+							<template if:true={showPicklist}>
+								<lightning-layout-item size="12" padding="around_x-small" key={obj}>
+									<lightning-combobox label={obj.label} options={obj.options} key={obj.label}
+										class="slds-p-left_xx-small slds-p-right_x-small slds-p-top_small"
+										data-id={obj.key} onchange={handleChange} value={obj.onLoadValue}
+										required={obj.required}>
+									</lightning-combobox>
+								</lightning-layout-item>
+							</template>
+						</template>
+					</template>
+					<lightning-layout-item size="12" padding="around_x-small">
+						<lightning-input type="text" label="Related Record" onchange={handleChange}
+							class="slds-p-left_xx-small slds-p-right_x-small slds-p-top_small"
+							value={relatedRecordName} data-id="Rhythm__Related_Record__c"
+							disabled=true>
+						</lightning-input>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="around_x-small">
+						<lightning-input type="Date" label="Due date" onchange={handleChange}
+							data-id="Rhythm__Due_Date__c" value={responseMap.Rhythm__Due_Date__c} disabled={isSupplier}
+							class="slds-p-left_xx-small slds-p-right_x-small slds-p-top_small">
+						</lightning-input>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="around_x-small">
+						<lightning-textarea type="text" label="Comments" onchange={handleChange} disabled={isSave}
+							value={responseMap.Rhythm__Comments__c} data-id="Rhythm__Comments__c"
+							class="slds-p-left_xx-small slds-p-right_x-small slds-p-top_small">
+						</lightning-textarea >
+					</lightning-layout-item>
+					<template if:true={isSupplier}>
+						<lightning-layout-item size="12" padding="around_x-small">
+							<lightning-input type="text" label="Related Module" disabled=true
+								value={responseMap.Rhythm__Related_module__c} data-id="Rhythm__Related_Module__c"
+								class="slds-p-left_xx-small slds-p-right_x-small slds-p-top_small">
+							</lightning-input>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="around_x-small">
+							<lightning-input type="text" label="Priority" disabled=true
+								value={responseMap.Rhythm__Priority__c} data-id="Rhythm__Priority__c"
+								class="slds-p-left_xx-small slds-p-right_x-small slds-p-top_small" required="true">
+							</lightning-input>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="around_x-small">
+							<lightning-combobox options={options} label="Status" data-id="Rhythm__Status__c"
+								onchange={handleChange} value={responseMap.Rhythm__Status__c} disabled={isSave}
+								class="slds-p-left_xx-small slds-p-right_x-small slds-p-top_small" required="true">
+							</lightning-combobox>
+						</lightning-layout-item>
+
+					</template>
+					<br/>
+						<!-- S3 Code -->
+				
+						<table border="0" cellpadding="0" cellspacing="0" class="table tr">
+							<tr height="16" hidden>
+								<td colspan="16">
+								</td>
+								<td colspan="16">
+								</td>
+								<td colspan="16">
+								</td>
+							</tr>
+							<template for:each={keyList} for:item="item" for:index="index">
+								<tr height="50px" key={item.key}>
+									<!-- style="border: solid 2px lightgrey;" -->
+									<td colspan="16" >
+										<lightning-icon icon-name="doctype:flash" alternative-text="File"
+											class="slds-p-around_x-small">
+										</lightning-icon>
+									</td>
+									<td colspan="16" class="slds-p-around_x-small" data-id={item.key} title={item.url} onclick={handleDownload}
+										style="overflow: auto;word-break: break-word;">
+										<p data-id={item.key} title={item.url} onclick={handleDownload}>{item.value}</p>
+									</td>
+									<td colspan="16">
+										<lightning-icon icon-name="utility:delete" size='x-small'
+											alternative-text="Delete" class="slds-p-around_x-small slds-m-left_xx-small"
+											key={item.key} name={item.key} title="Delete" onclick={handleDeletePopup}>
+										</lightning-icon>
+									</td>
+								</tr>
+							</template>
+						</table>
+			
+					<div style="text-align:right;padding: 15px;">
+						<template if:true={isSupplier}>
+						<lightning-file-upload record-id={accountAssessmentId} accept={acceptedFormats} name="fileUploader"
+							class="file-selector-large" title="Upload" onuploadfinished={handleUploadFinished} disabled={isSave} multiple>
+						</lightning-file-upload>
+						</template>
+						<template if:false={isSupplier}>
+						<lightning-file-upload record-id={accountAssessmentId} accept={acceptedFormats} name="fileUploader"
+							class="file-selector-large" title="Upload" onuploadfinished={handleUploadFinished} multiple>
+						</lightning-file-upload>
+						</template>
+					</div>
+					<!-- S3 Code -->
+				</template>
+					<template if:true={showPopup}>
+						<section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="modal-heading-01"
+							class="slds-modal slds-fade-in-open">
+							<div class="slds-modal__container">
+								<div class="slds-modal__header">
+									<h1 id="modal-heading-01" class="slds-modal__title slds-hyphenate">Action Form
+										Deletion
+									</h1>
+								</div>
+								<div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+									<p>Are you sure you want to delete the Action Item?</p>
+								</div>
+								<div class="slds-modal__footer">
+									<button class="slds-button slds-button_neutral" aria-label="Cancel and close" onclick={handleCancelButton}>Cancel</button>
+									<button class="slds-button slds-button_brand" onclick={handleDeleteButton}>Delete</button>
+								</div>
+							</div>
+						</section>
+						<div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
+					</template>
+			</div>
+		</div>
+	<!-- </div> -->
+	<template if:true={showForm}>
+		<template if:false={isSupplier}>
+			<template if:false={showUpdate}>
+				<div class="slds-p-horizontal_medium slds-p-vertical_x-small slds-border-top"
+					style="position:absolute; width:100%; height:40px; bottom:0px; text-align:right; background:#e8eaed; border-top:1px solid #c9c9c9;">
+					<lightning-button class="slds-float_right" onclick={handleSave} variant="Brand" label="Save">
+					</lightning-button>
+				</div>
+			</template>
+			<template if:true={showUpdate}>
+				<div class="slds-p-horizontal_medium slds-p-vertical_x-small slds-border-top"
+					style="position:absolute; width:100%; height:40px; bottom:0px; text-align:right; background:#e8eaed; border-top:1px solid #c9c9c9;">
+					<lightning-button class="slds-float_right slds-p-left_xx-small" onclick={handleSave} variant="Brand"
+						label="Update"></lightning-button>
+					<lightning-button class="slds-float_right" onclick={handleDelete} variant="Brand" label="Delete">
+					</lightning-button>
+				</div>
+			</template>
+		</template>
+		<template if:false={isSave}>
+			<template if:true={isSupplier}>
+				<div class="slds-p-horizontal_medium slds-p-vertical_x-small slds-border-top"
+					style="position:absolute; width:100%; height:40px; bottom:0px; text-align:right; background:#e8eaed; border-top:1px solid #c9c9c9;">
+					<lightning-button
+						class="slds-float_right slds-p-horizontal_medium slds-p-top_xx-small slds-border-top"
+						onclick={handleSave} variant="Brand" label="Submit"></lightning-button>
+				</div>
+			</template>
+		</template>
+	</template>
+<template if:true={showDeleteModal}>
+		<div class="demo-only" style="height: 1540px;">
+			<section role="dialog" tabindex="-1" aria-labelledby="modal-heading-07" aria-modal="true"
+				aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+				<div class="slds-modal__container">
+					<header class="slds-modal__header">
+						<button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" onclick={handleCloseDelPopup} title="Close">
+                                <lightning-icon alternative-text="close" icon-name="utility:close" size="small" variant="inverse"></lightning-icon>
+                                <span class="slds-assistive-text">Close</span>
+                            </button>
+						<h2 id="modal-heading-07" class="slds-text-heading_medium slds-hyphenate">Delete File</h2>
+					</header>
+					<div class="slds-modal__content slds-p-around_medium" id="modal-content-id-7">
+						<p style="text-align:center;">
+							Are you sure you want to delete this File?
+						</p>
+					</div>
+					<footer class="slds-modal__footer">
+						<lightning-button label="Cancel" class="slds-p-around_x-small" variant="neutral"
+							onclick={handleCloseDelPopup}>
+						</lightning-button>
+						<lightning-button label="Delete" class="whiteclr" style="color: #f9f2f2!important;"
+							variant="brand" onclick={handleDeleteFile}> </lightning-button>
+					</footer>
+				</div>
+			</section>
+		</div>
+		<div class="slds-backdrop slds-backdrop_open"></div>
+	</template>
+</template>

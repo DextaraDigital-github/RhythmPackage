@@ -146,7 +146,7 @@ public with sharing class AssessmentTemplateController {
         try {
             templateId = String.escapeSingleQuotes(templateId) ;
             if(String.isNotBlank(templateId)) {
-                List<Question__c> questionList = [SELECT Id,Rhythm__Question__c, Section__c
+                List<Question__c> questionList = [SELECT Id,Rhythm__Question__c,Section__c,Parent_Question__c
                                 FROM Question__c
                                 WHERE Assessment_Template__c= :templateId
                                 AND Section__c != NULL
@@ -267,7 +267,13 @@ public with sharing class AssessmentTemplateController {
                 if(questionList.isEmpty() == false) {
                     drchildList=safe.doDelete(questionList);
                 }
-                
+                else {
+                    questionList = [SELECT Id from Question__c where Id IN:recIdList];
+                    
+                }
+                if(questionList.isEmpty() == false) {
+                    drchildList=safe.doDelete(questionList);
+                }  
                 If(recIdList.isEmpty() == false){
                     List<Section__c> deleteList = [SELECT Id FROM Section__c WHERE ID IN:recIdList 
                                                     WITH SECURITY_ENFORCED];

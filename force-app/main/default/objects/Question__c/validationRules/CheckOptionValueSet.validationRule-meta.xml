@@ -5,6 +5,7 @@
     <errorConditionFormula>AND( ISBLANK(OptionValueSet__c),
 OR(ISPICKVAL(Question_Type__c,&apos;Radio&apos;),
 ISPICKVAL(Question_Type__c, &apos;Picklist&apos;),
+ISPICKVAL(Question_Type__c, &apos;Checkbox&apos;),
 ISPICKVAL(Question_Type__c, &apos;Picklist (Multi-Select)&apos;)))</errorConditionFormula>
-    <errorMessage>Response Values cannot be empty for the selected Question Type</errorMessage>
+    <errorMessage>blank check for OptionValueSet field when questiontype is Radio, Picklist or Picklist (Multi-Select)</errorMessage>
 </ValidationRule>
