@@ -28,7 +28,6 @@ import awsjssdk from '@salesforce/resourceUrl/AWSJSSDK';
 import { loadScript } from 'lightning/platformResourceLoader';
 import getAuthentication from '@salesforce/apex/AWSS3Controller.getAuthenticationData';
 import getSignedURL from '@salesforce/apex/AWSS3Controller.getFileSignedUrl';
-
 export default class Questionnaire extends LightningElement {
     @track showButtons = {
         Summary: false,
@@ -173,7 +172,6 @@ export default class Questionnaire extends LightningElement {
             accordianClassList.add('slds-is-open');
         }
     }
-  
     /*displayCloseIcon is used to remove the delete icon when CAPA form is deleted. This method is called from its parent
        Component (AssessmentDetail) */
     @api displayCloseIcon(deleteData) {
@@ -417,7 +415,6 @@ export default class Questionnaire extends LightningElement {
                                 || query.Rhythm__Question_Type__c === 'Checkbox' || query.Rhythm__Question_Type__c === 'Picklist (Multi-Select)');
                             const ques = questionResult.filter(query => query.Rhythm__Question_Type__c !== 'Picklist' && query.Rhythm__Question_Type__c !== 'Radio'
                                 && query.Rhythm__Question_Type__c !== 'Checkbox' && query.Rhythm__Question_Type__c !== 'Picklist (Multi-Select)');
-
                             /* This method is used to get all the responses of the questions in particular section*/
                             getSupplierResponseList({ assessmentId: assessmentJunctionId }).then(suppResult => {
                                 if (suppResult && suppResult.length > 0 && suppResult[0] && suppResult[0].CreatedBy && suppResult[0].CreatedDate) {
@@ -586,6 +583,7 @@ export default class Questionnaire extends LightningElement {
                         errorLogRecord({ errorLogWrapper: JSON.stringify(errormap) }).then(() => { });
                         this.totastmessage = 'Error : ' + JSON.stringify(error);
                     });
+
                     //this.handleFilterFlag(true);
                     this.loading = false;
                 }).catch(error => {
@@ -836,7 +834,7 @@ export default class Questionnaire extends LightningElement {
         }
     }
 
-    //Used /* onResponseChange method is used to change the wrapper and display the changed responsed for questions values on UI */
+    //Used /* /onResponseChange method is used to change the wrapper and display the changed responsed for questions values on UI */
     onResponseChange(event) {
         this.requiredQuestionList = [];
         this.questionresponseafterchange = event.detail;
@@ -868,7 +866,6 @@ export default class Questionnaire extends LightningElement {
                                         }
                                         ques.showUpload = (subquestion.uploadrequired === 'Yes' || subquestion.uploadrequired === 'Optional') ? true : false;
                                     })
-
                                 }
                                 else {
                                     subquestion.isdisplay = false;
@@ -908,6 +905,7 @@ export default class Questionnaire extends LightningElement {
                                         }
                                     }
                                 });
+
                             });
                         }
                     }
@@ -916,7 +914,6 @@ export default class Questionnaire extends LightningElement {
             this.responseMap.set(this.questionresponseafterchange.questionId, this.questionresponseafterchange.option);
             this.isAutoSave = true;
             this.startAutoSave();
-
         }
     }
 
@@ -956,7 +953,30 @@ export default class Questionnaire extends LightningElement {
                                 fileresponsedatalst.push(x);
                                 this.questionsAndAnswerss[i].questions[j].Files__c = fileresponsedatalst;
                             }
-
+                            break;
+                        }
+                        if (this.questionsAndAnswerss[i].questions[j].Children.length > 0) {
+                            this.questionsAndAnswerss[i].questions[j].Children.forEach(conditionalQuestion => {
+                                if (conditionalQuestion.isdisplay) {
+                                    conditionalQuestion.questions.forEach(subquestion => {
+                                        if (subquestion.Id === this.fileResponseData.questionId) {
+                                            this.uploadingFile = false;
+                                            let filesdatastored = JSON.parse(result[0].Rhythm__Files__c);
+                                            let x = JSON.parse(JSON.stringify(filesdatastored[filesdatastored.length - 1]));
+                                            if (typeof subquestion.Files__c === 'undefined') {
+                                                let fileresponsedatalst = [];
+                                                fileresponsedatalst.push(x);
+                                                subquestion.Files__c = fileresponsedatalst;
+                                            }
+                                            else {
+                                                let fileresponsedatalst = JSON.parse(JSON.stringify(subquestion.Files__c));
+                                                fileresponsedatalst.push(x);
+                                                subquestion.Files__c = fileresponsedatalst;
+                                            }
+                                        }
+                                    })
+                                }
+                            })
                         }
                     }
                 }
@@ -987,10 +1007,27 @@ export default class Questionnaire extends LightningElement {
                             ////This loop is to iterate over the Files Questions for a particular sections and Questions in the wrapper.
                             for (let k = 0; k < this.questionsAndAnswerss[i].questions[j].Files__c.length; k++) {
                                 if (this.questionsAndAnswerss[i].questions[j].Files__c[k].name === deletefileData.name) {
-                                    this.questionsAndAnswerss[i].questions[j].Files__c.splice(k, 1); //Review for Optimization
+                                    this.questionsAndAnswerss[i].questions[j].Files__c.splice(k, 1);
                                     break;
                                 }
                             }
+                        }
+                        if (this.questionsAndAnswerss[i].questions[j].Children.length > 0) {
+                            this.questionsAndAnswerss[i].questions[j].Children.forEach(conditionalQuestion => {
+                                if (conditionalQuestion.isdisplay) {
+                                    conditionalQuestion.questions.forEach(subquestion => {
+                                        if (subquestion.Id === deletefileData.questionId &&
+                                            typeof subquestion.Files__c !== 'undefined') {
+                                            for (let k = 0; k < subquestion.Files__c.length; k++) {
+                                                if (subquestion.Files__c[k].name === deletefileData.name) {
+                                                    subquestion.Files__c.splice(k, 1);
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                    });
+                                }
+                            });
                         }
                     }
                 }
@@ -1085,7 +1122,6 @@ export default class Questionnaire extends LightningElement {
         this.isSupplierModalPopup = false;
     }
 
-
     /* constructResponse is used to call an apex class to store the response */
     constructResponse(isSubmit) {
         var isAssessmentValidated = false;
@@ -1112,6 +1148,18 @@ export default class Questionnaire extends LightningElement {
                         this.requiredQuestionList.splice(index, 1);
                     }
                 }
+                question.Children.forEach(conditionalquestion => {
+                    if (conditionalquestion.isdisplay) {
+                        conditionalquestion.questions.forEach(subquestion => {
+                            if (this.requiredQuestionList.includes(subquestion.Id) && typeof subquestion.value !== 'undefined') {
+                                if (typeof this.accountAssessmentStatus === 'undefined' || this.accountAssessmentStatus === 'New') {
+                                    let index = this.requiredQuestionList.indexOf(subquestion.Id);
+                                    this.requiredQuestionList.splice(index, 1);
+                                }
+                            }
+                        })
+                    }
+                })
                 if (typeof question.defaultValue !== 'undefined') {
                     if (responseIdlist.includes(question.Id)) {
                         let index = responseIdlist.indexOf(question.Id);
@@ -1159,7 +1207,7 @@ export default class Questionnaire extends LightningElement {
                         }
                     }
                     else {
-                        rowdata = rowdata + '<td></td>'
+                        rowdata = rowdata + '<td></td>';
                     }
                     question.Children.forEach(conditionalQuestion => {
                         if (conditionalQuestion.isdisplay) {
@@ -1286,18 +1334,13 @@ export default class Questionnaire extends LightningElement {
                 reponse.Id = this.responselstMap[seckey];
             }
             if (Array.isArray(this.responseMap.get(seckey))) {
-
                 reponse.Rhythm__Response__c = JSON.stringify(this.responseMap.get(seckey));
             }
             else if (this.responseMap.get(seckey) === true || this.responseMap.get(seckey) === false) {
                 reponse.Rhythm__Response__c = JSON.stringify(this.responseMap.get(seckey));
             }
             else {
-                console.log('this.responseMap.get(seckey)',this.responseMap.get(seckey));
-                if(typeof this.responseMap.get(seckey).Id ==='undefined'){
-                    reponse.Rhythm__Response__c = (this.responseMap.get(seckey));
-                }
-                
+                reponse.Rhythm__Response__c = (this.responseMap.get(seckey));
             }
             if (typeof flagmap[seckey] !== 'undefined') {
                 reponse.Rhythm__Flag__c = flagmap[seckey];
@@ -1307,9 +1350,6 @@ export default class Questionnaire extends LightningElement {
             }
             if (typeof conversationhistory[seckey] !== 'undefined' && conversationhistory[seckey].length > 0) {
                 reponse.Rhythm__Conversation_History__c = conversationhistory[seckey];
-            }
-            if(typeof filesmap[seckey] !=='undefined' && filesmap[seckey].length>0){
-                reponse.Rhythm__Files__c = filesmap[seckey];    
             }
             reponse.Rhythm__Is_Latest_Response__c = true;
             if (this.requiredQuestionList.includes(reponse.Rhythm__Question__c)) {
@@ -1379,9 +1419,13 @@ export default class Questionnaire extends LightningElement {
                             if (question.Flag__c !== true) {
                                 question.isEditable = true;
                             }
-                            question.Children.forEach(subQuestion => {
-                                if (subQuestion.Flag__c !== true) {
-                                    subQuestion.isEditable = true;
+                            question.Children.forEach(conditionalQuestion => {
+                                if (conditionalQuestion.isdisplay) {
+                                    conditionalQuestion.questions.forEach(subquestion => {
+                                        if (subquestion.Flag__c !== true) {
+                                            subquestion.isEditable = true;
+                                        }
+                                    });
                                 }
                             })
                         })
@@ -1625,10 +1669,12 @@ export default class Questionnaire extends LightningElement {
                 this.responseMap.set(qu.Id, savedResp.get(qu.Id).value);
             quTemp.Children = [];
             if (typeof qu.Rhythm__Section__r !== 'undefined' && typeof qu.Rhythm__Section__r.Name !== 'undefined') {
-                if (this.questionMap.has(qu.Rhythm__Section__r.Id)) {
-                    this.questionMap.get(qu.Rhythm__Section__r.Id).push(quTemp);
-                } else {
-                    this.questionMap.set(qu.Rhythm__Section__r.Id, [quTemp]);
+                if (typeof qu.Rhythm__Parent_Question__c === 'undefined') {
+                    if (this.questionMap.has(qu.Rhythm__Section__r.Id)) {
+                        this.questionMap.get(qu.Rhythm__Section__r.Id).push(quTemp);
+                    } else {
+                        this.questionMap.set(qu.Rhythm__Section__r.Id, [quTemp]);
+                    }
                 }
             }
             if (this.isTemplate || this.objectApiName === 'Rhythm__AccountAssessmentRelation__c') {
@@ -1678,17 +1724,21 @@ export default class Questionnaire extends LightningElement {
             quTemp.showUpload = qu.Rhythm__Requires_File_Upload__c;
             quTemp.showUploadProgress = false;
             quTemp.Children = [];
-            if (this.questionMap.has(qu.Rhythm__Section__r.Id)) {
-                this.questionMap.get(qu.Rhythm__Section__r.Id).push(quTemp);
-            } else {
-                this.questionMap.set(qu.Rhythm__Section__r.Id, [quTemp]);
+            if (typeof qu.Rhythm__Parent_Question__c === 'undefined') {
+                if (this.questionMap.has(qu.Rhythm__Section__r.Id)) {
+                    this.questionMap.get(qu.Rhythm__Section__r.Id).push(quTemp);
+                } else {
+                    this.questionMap.set(qu.Rhythm__Section__r.Id, [quTemp]);
+                }
             }
         }
         return quTemp;
     }
 
     // constructMultilevelhierarchy method is used to construct nested questions wrapper, based on condition of having parentQuestionId
-    constructMultilevelhierarchy(queryResults, savedResp) {
+    constructMultilevelhierarchy(queryResults, savedResp, respAttr) {
+        console.log('queryResults', queryResults);
+        console.log('constructMultilevelhierarchy respAttr', respAttr);
         const children = queryResults.filter(result => typeof result.Rhythm__Parent_Question__c !== 'undefined');
         const parent = queryResults.filter(result => typeof result.Rhythm__Parent_Question__c === 'undefined');
         const resQuestType = queryResults.filter(query => query.Rhythm__Question_Type__c === 'Picklist' || query.Rhythm__Question_Type__c === 'Radio'
@@ -1701,9 +1751,7 @@ export default class Questionnaire extends LightningElement {
             parentQueslst.push(parentdata.Id);
         });
         children.forEach(child => {
-            const hierarchyObj = this.constructWrapperConditionalQuestion(child, savedResp);
-            this.createChildHierarchy(queryResults, hierarchyObj, savedResp);
-            this.hierarchy.push(hierarchyObj);
+            childQueslst.push(child.Id);
         });
         ques.forEach(parentData => {
             if (!childQueslst.includes(parentData.Id)) {
@@ -1725,6 +1773,7 @@ export default class Questionnaire extends LightningElement {
                 }
             });
         }
+
     }
     // createChildHierarchy method is used to construct nested questions wrapper for child questions accordingly with its parent Question 
     createChildHierarchy(queryResults, parentObj, savedResp, respAttr) {
@@ -2140,6 +2189,12 @@ export default class Questionnaire extends LightningElement {
                     }
                 }
                 if (item.Children.length > 0) {
+                     if (item.customerFlag && item.Rhythm__Flag__c && item.rejectButton) {
+                        this.showToast = true;
+                        this.success = false;
+                        boolflag = true;
+                        this.totastmessage = 'The question is already rejected you cannot ask for additional info';
+                    }
                     item.Children.forEach(conditionalQuestion => {
                         if (conditionalQuestion.isdisplay) {
                             conditionalQuestion.questions.forEach(subQuestion => {
@@ -2207,5 +2262,4 @@ export default class Questionnaire extends LightningElement {
         this.success = true;
         this.totastmessage = 'The Assessment Status is updated to  ' + param.assessmentStatus + ' successfuly.';
     }
-
 }

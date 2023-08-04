@@ -21,7 +21,11 @@ public with sharing class ResponseQuestionMapService{
             }
         return service;
     }
-
+	/**
+    * @description create Response Question Map for corresponding Question and Response Attribute
+    * @param responseQuestionmap It is a List of Response_Question_Map__c maps containing Response_Question_Map__c fields.   
+    * @return List of create Response_Question_Map__c records
+    */
     public List<SObject> createResponseQuestionMap(List<SObject> responseQuestionmap){
         if(responseQuestionmap.isEmpty() == false){
             Database.SaveResult[] results = safe.doInsert(responseQuestionmap);

@@ -10,14 +10,14 @@ import { loadStyle } from 'lightning/platformResourceLoader';
 import ComponentStylesheet from '@salesforce/resourceUrl/ComponentStyleSheet';
 import getQuestionTypeValues from '@salesforce/apex/QuestionController.getQuestionTypeValues';
 import createQuestions from '@salesforce/apex/QuestionController.createQuestions';
-import createResponseAttributes from '@salesforce/apex/QuestionAttributeResponseController.createResponseAttributes';
+import createResponseAttributes from '@salesforce/apex/QuestionController.createResponseAttributes';
 import getQuestionsData from '@salesforce/apex/QuestionController.getQuestionsData';
-import createResponseQuestionMap from '@salesforce/apex/ResponseQuestionMapController.createResponseQuestionMap';
-import updateResponseAttributes from '@salesforce/apex/QuestionAttributeResponseController.updateResponseAttributes';
+import createResponseQuestionMap from '@salesforce/apex/QuestionController.createResponseQuestionMap';
+import updateResponseAttributes from '@salesforce/apex/QuestionController.updateResponseAttributes';
 import errorLogRecord from '@salesforce/apex/AssessmentController.errorLogRecord';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import getChildQuestions from '@salesforce/apex/QuestionController.getChildQuestions';
-import deleteQuesRespAttribute from '@salesforce/apex/QuestionAttributeResponseController.deleteQuesRespAttribute';
+import deleteQuesRespAttribute from '@salesforce/apex/QuestionController.deleteQuesRespAttribute';
 
 
 export default class RtmvpcQuestionCreation extends LightningElement {
@@ -52,7 +52,7 @@ export default class RtmvpcQuestionCreation extends LightningElement {
     */
     @api
     getParentQuestionCondition(conditionValue) {
-        console.log('getParentQuestionCondition', conditionValue);
+        
         if (typeof conditionValue !== 'undefined') {
             this.questionWrapper['Rhythm__Conditional_Response__c'] = conditionValue.conditionalResponse;
             //this.questionWrapper['Rhythm__Section__c'] = 
@@ -67,7 +67,6 @@ export default class RtmvpcQuestionCreation extends LightningElement {
         This method is used to get Response Type values for Question Object.
         */
         getQuestionTypeValues({}).then(data => {
-            console.log('data===>', data);
             let optionsList = [];
             if (data.length > 0) {
                 data.forEach(currentItem => {
@@ -99,7 +98,6 @@ export default class RtmvpcQuestionCreation extends LightningElement {
             This method is used to get Questions data in Onload.
             */
             getQuestionsData({ questionId: this.questionId, templateId: this.templateId }).then(result => {
-                console.log('result', result);
                 this.questionWrapper['Id'] = result[0].Id;
                 this.questionWrapper.Rhythm__Question__c = result[0].Rhythm__Question__c;
                 this.sectionId = result[0].Rhythm__Section__r.Name;
@@ -143,7 +141,6 @@ export default class RtmvpcQuestionCreation extends LightningElement {
             this.childTempId = this.childwrapper.templateId;
 
         }
-        console.log('this.questionWrapper', this.questionWrapper);
     }
     /* 
         This method is used to close the popup of creating questions.
@@ -197,7 +194,6 @@ export default class RtmvpcQuestionCreation extends LightningElement {
         This method method is used to Select the sections value (custom lookup).
     */
     handleSelectedValue(event) {
-        console.log('Hello>>>', this.templateId);
         this.questionWrapper['Rhythm__Section__c'] = event.detail;
         if (typeof this.assessmentTemplate !== 'undefined') {
             this.questionWrapper['Rhythm__Assessment_Template__c'] = this.assessmentTemplate;
@@ -273,7 +269,6 @@ export default class RtmvpcQuestionCreation extends LightningElement {
                         && (Array.from(set1).length) === this.responseAttributes.length && scorelst.length === 0 && weightlst.length === 0) {
                         createQuestions({ questions: this.questionlst, isUpdate: isSubmit }).then(result => {
                             let questionId = result[0].Id;
-                            console.log('result', result[0].Id);
                             this.responseAttributes.forEach(resp => {
                                 resp['Rhythm__QuestionId__c'] = result[0].Id;
                             });
@@ -316,10 +311,10 @@ export default class RtmvpcQuestionCreation extends LightningElement {
                                     this.createQues = false;
                                     this.childQuesCreation = false;
                                     this.loading = false;
-                                    const selectedEvent = new CustomEvent('handleaftersave', {
-                                        detail: this.totastmessage
-                                    });
-                                    this.dispatchEvent(selectedEvent);
+                                    // const selectedEvent = new CustomEvent('handleaftersave', {
+                                    //     detail: this.totastmessage
+                                    // });
+                                    // this.dispatchEvent(selectedEvent);
                                 });
                             }
                             if (isSubmit) {
@@ -337,7 +332,6 @@ export default class RtmvpcQuestionCreation extends LightningElement {
                             this.dispatchEvent(selectedEvent);
 
                         }).catch(error => {
-                            console.log('error', error);
                             let errormap = {};
                             errormap.componentName = 'RtmvpcCreateResponseAttributes';
                             errormap.methodName = 'createQuestions';
@@ -352,7 +346,7 @@ export default class RtmvpcQuestionCreation extends LightningElement {
                         }
                         else {
                             if (scorelst.length > 0 || weightlst.length > 0) {
-                                this.configureToast('Some Error has occured', 'Scores and weight should be greater than 0', 'error');
+                                this.configureToast('Some Error has occured', 'Scores and weight should be greater than or equal to zero', 'error');
                             }
                             else {
                                 this.configureToast('Some Error has occured', 'Preferred/Not Preferred and Upload Required fields are mandatory', 'error');
@@ -361,7 +355,6 @@ export default class RtmvpcQuestionCreation extends LightningElement {
                     }
                 }
                 else {
-                    console.log('First if else');
                     if (typeof this.questionWrapper.Id !== 'undefined') {
                         this.questionlst.push(this.questionWrapper);
                         if (isSubmit) {
@@ -391,11 +384,9 @@ export default class RtmvpcQuestionCreation extends LightningElement {
             }
             else {
                 this.questionlst.push(this.questionWrapper);
-                console.log('First else==>');
                 if (typeof this.childQuesCreation === 'undefined') {
                     if (typeof this.questionWrapper.Id !== 'undefined' && typeof this.responseAttributes === 'undefined') {
                         getChildQuestions({ questionId: this.questionWrapper.Id, templateId: this.templateId }).then(result => {
-                            console.log('result', result);
                             if (result.length > 0) {
                                 this.configureToast('Some Error has occured', 'Before changing the Response type, please delete Condtional questions', 'error');
                                 this.createQues = false;
@@ -404,7 +395,6 @@ export default class RtmvpcQuestionCreation extends LightningElement {
                             else {
                                 this.questionWrapper['Rhythm__OptionValueSet__c'] = '';
                                 createQuestions({ questions: this.questionlst, isUpdate: isSubmit }).then(result => {
-                                    console.log('createQuestions', result[0].Id);
                                     if (isSubmit) {
                                         this.totastmessage = 'Updated Successfully.';
                                     }
@@ -414,7 +404,6 @@ export default class RtmvpcQuestionCreation extends LightningElement {
                                     let questionlst = [];
                                     questionlst.push(this.questionWrapper.Id);
                                     deleteQuesRespAttribute({ questionId: questionlst }).then(delresult => {
-                                        console.log('result', delresult);
                                         this.createQues = false;
                                         this.childQuesCreation = false;
                                         this.loading = false;
@@ -431,7 +420,6 @@ export default class RtmvpcQuestionCreation extends LightningElement {
                                         errorLogRecord({ errorLogWrapper: JSON.stringify(errormap) }).then(() => { });
                                     });
                                 }).catch(error => {
-                                    console.log('error', error);
                                     let errormap = {};
                                     errormap.componentName = 'RtmvpcQuestionCreation';
                                     errormap.methodName = 'createQuestions';
@@ -444,7 +432,6 @@ export default class RtmvpcQuestionCreation extends LightningElement {
                     }
                     else {
                         createQuestions({ questions: this.questionlst, isUpdate: isSubmit }).then(result => {
-                            console.log('createQuestions', result[0].Id);
                             if (isSubmit) {
                                 this.totastmessage = 'Updated Successfully.';
                             }
@@ -459,7 +446,6 @@ export default class RtmvpcQuestionCreation extends LightningElement {
                             });
                             this.dispatchEvent(selectedEvent);
                         }).catch(error => {
-                            console.log('error', error);
                             let errormap = {};
                             errormap.componentName = 'RtmvpcQuestionCreation';
                             errormap.methodName = 'createQuestions';
@@ -471,18 +457,14 @@ export default class RtmvpcQuestionCreation extends LightningElement {
                 }
             }
             if (typeof this.childQuesCreation !== 'undefined' && (!isChildCreated)) {
-                console.log('First else==>');
                 //this.questionlst.push(this.questionWrapper);
                 createQuestions({ questions: this.questionlst, isUpdate: isSubmit }).then(result => {
-                    console.log('parentQuestionId', result);
-                    console.log('this.responseAttributes', this.responseAttributes);
                     let responsemap = { 'sobjectType': 'Rhythm__Response_Question_Map__c' };
                     responsemap['Rhythm__QuestionId__c'] = result[0].Id;
                     responsemap['Rhythm__ResponseAttributeId__c'] = this.responseAttributeId;
                     let respQueslst = [];
                     respQueslst.push(responsemap);
                     createResponseQuestionMap({ responseQuestionmap: respQueslst }).then(result => {
-                        console.log('createResponseQuestionMap', result);
                         this.totastmessage = 'Conditional Question has been created Successfully.';
                         this.createQues = false;
                         this.childQuesCreation = false;
@@ -492,7 +474,6 @@ export default class RtmvpcQuestionCreation extends LightningElement {
                         });
                         this.dispatchEvent(selectedEvent);
                     }).catch(error => {
-                        console.log('error', error);
                         let errormap = {};
                         errormap.componentName = 'RtmvpcQuestionCreation';
                         errormap.methodName = 'createResponseQuestionMap';

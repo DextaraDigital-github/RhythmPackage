@@ -33,7 +33,12 @@ public with sharing class EmailController {
     */
     @AuraEnabled
     public static void sendEmail(String parameterMap) {
-        service.sendEmail(parameterMap);
+        try{
+            service.sendEmail(parameterMap);
+        }catch(Exception e){
+            string errorMsg = e.getMessage();
+            throw new AuraHandledException(ErrorMsg);
+        }
     }
     
     /**

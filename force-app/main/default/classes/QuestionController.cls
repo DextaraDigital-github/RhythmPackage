@@ -8,6 +8,9 @@
 public with sharing class QuestionController {
 
    static QuestionService service = QuestionService.getInstance();
+   static QuestionAttributeResponseService quesAttributeResponseservice = QuestionAttributeResponseService.getInstance();
+   static ResponseQuestionMapService respQuestionMapservice = ResponseQuestionMapService.getInstance();
+   static TemplateService tempService = TemplateService.getInstance();
     /**
     * @description To get all the Response type field values.
     * @return 
@@ -93,5 +96,54 @@ public with sharing class QuestionController {
     @AuraEnabled
     public static List<sObject> updateQuestionsSequence(String parameterMap) {
         return service.updateQuestionsSequence(parameterMap);
+    }
+    /**
+    * @description Create Response Attributes for Questions 
+    * @param responseAttributes It is a List of maps of Response_Attribute__c Object 
+    * @return List of Response_Attribute__c records
+    */
+    @AuraEnabled
+    /* sfge-disable-stack ApexFlsViolationRule */
+    public static List<SObject> createResponseAttributes(List<SObject> responseAttributes){
+        return quesAttributeResponseservice.createResponseAttributes(responseAttributes);
+    }
+       /**
+    * @description Updates Response Attributes for corresponding Questions 
+    * @param responseAttributes It is a list of maps of Response_Attribute__c Object with the Response_Attribute__c Id. 
+    * @return List of Updated Response_Attribute__c records
+    */
+    @AuraEnabled
+    /* sfge-disable-stack ApexFlsViolationRule */
+    public static List<SObject> updateResponseAttributes(List<SObject> responseAttributes){
+        return quesAttributeResponseservice.updateResponseAttributes(responseAttributes);
+    }
+    /**
+    * @description delete Response Attributes for corresponding Questions 
+    * @param questionId It is a List of Question Ids 
+    * @return List of deleted Response_Attribute__c records
+    */
+    @AuraEnabled
+    /* sfge-disable-stack ApexFlsViolationRule */
+    public static List<SObject> deleteQuesRespAttribute(List<String> questionId){
+        return quesAttributeResponseservice.deleteQuesRespAttribute(questionId);
+    }
+   /**
+    * @description create Response Question Map for corresponding Question and Response Attribute
+    * @param responseQuestionmap It is a List of Response_Question_Map__c maps containing Response_Question_Map__c fields.   
+    * @return List of create Response_Question_Map__c records
+    */
+    @AuraEnabled
+    /* sfge-disable-stack ApexFlsViolationRule */
+    public static List<SObject> createResponseQuestionMap(List<SObject> responseQuestionmap){ 
+        return respQuestionMapservice.createResponseQuestionMap(responseQuestionmap);
+    }
+    	 /**
+    * @description gets template and its related records.
+    * @param templateId This is a record id of an Template.
+    * @return 
+    */
+    @AuraEnabled
+    public static List<Assessment_Template__c> getTemplateRecord(string templateId){
+        return tempService.getTemplateRecord(templateId);
     }
 }

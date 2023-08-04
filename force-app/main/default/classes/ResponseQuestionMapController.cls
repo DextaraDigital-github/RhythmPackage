@@ -8,10 +8,14 @@
 
 public with sharing class ResponseQuestionMapController {
     static ResponseQuestionMapService service = ResponseQuestionMapService.getInstance();
-
+	/**
+    * @description create Response Question Map for corresponding Question and Response Attribute
+    * @param responseQuestionmap It is a List of Response_Question_Map__c maps containing Response_Question_Map__c fields.   
+    * @return List of create Response_Question_Map__c records
+    */
     @AuraEnabled
     /* sfge-disable-stack ApexFlsViolationRule */
-    public static List<SObject> createResponseQuestionMap(List<SObject> responseQuestionmap){
+    public static List<SObject> createResponseQuestionMap(List<SObject> responseQuestionmap){ 
         return service.createResponseQuestionMap(responseQuestionmap);
     }
 }

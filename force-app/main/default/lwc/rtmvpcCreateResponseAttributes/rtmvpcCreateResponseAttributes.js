@@ -15,7 +15,6 @@ export default class RtmvpcCreateResponseAttributes extends LightningElement {
     @track isCheckbox = false;
     /* Connectedcallback is used to get data on onload */
     connectedCallback() {
-        console.log('quesType',this.quesType);
         if (typeof this.questionId != 'undefined') {
             this.constructWrapper();
         }
@@ -39,8 +38,6 @@ export default class RtmvpcCreateResponseAttributes extends LightningElement {
     */
     constructWrapper() {
         let disable = false;
-        console.log('this.questionId', this.questionId);
-        console.log('this.isdisable',this.isdisable);
         if(typeof this.isdisable!=='undefined'){
             disable = this.isdisable;
         }
@@ -51,16 +48,22 @@ export default class RtmvpcCreateResponseAttributes extends LightningElement {
         */
         getQuestionRespAttributes({ questionlst: lst }).then(result => {
             result.forEach(res => {
-                console.log('getQuestionRespAttributes',res);
+                let rowlabel= res.Rhythm__Response_value__c;
                 if(this.quesType==='Checkbox')
                 {
                     disable = true;
                     this.isCheckbox = true;
+                    if(res.Rhythm__Response_value__c==='true'){
+                        rowlabel = 'Checked';
+                    }
+                    else{
+                        rowlabel='Unchecked'
+                    }
                 }
                 let responsewrapper = {};
                 let rownum = this.tablerowlst.length + 1;
                 responsewrapper.rownum = this.tablerowlst.length + 1;
-                let rowdata = [{ 'label': 'Rhythm__Response_value__c','rowlabel':res.Rhythm__Response_value__c, 'value': res.Rhythm__Response_value__c, 'ispicklist': false, 'key': 'responseValue-' + rownum, 'display': true,'isEditable':disable  },
+                let rowdata = [{ 'label': 'Rhythm__Response_value__c','rowlabel':rowlabel, 'value': res.Rhythm__Response_value__c, 'ispicklist': false, 'key': 'responseValue-' + rownum, 'display': true,'isEditable':disable  },
                 { 'label': 'Rhythm__preferred_Not_preferred__c','rowlabel':res.Rhythm__preferred_Not_preferred__c, 'value': res.Rhythm__preferred_Not_preferred__c, 'ispicklist': true, 'options': this.preferredOptions, 'key': 'preffered-' + rownum, 'display': true,'isEditable':disable  },
                 { 'label': 'Rhythm__Upload_Required__c','rowlabel':res.Rhythm__Upload_Required__c, 'value': res.Rhythm__Upload_Required__c, 'ispicklist': true, 'options': this.reqFileOptions, 'key': 'uploadrequired-' + rownum, 'display': true,'isEditable':disable  },
                 { 'label': 'Rhythm__Score__c','rowlabel':res.Rhythm__Score__c, 'value': res.Rhythm__Score__c, 'ispicklist': false, 'key': 'score-' + rownum, 'display': true,'isEditable':this.isdisable  },
@@ -82,8 +85,6 @@ export default class RtmvpcCreateResponseAttributes extends LightningElement {
             errormap.errorData = error.message;
             errorLogRecord({ errorLogWrapper: JSON.stringify(errormap) }).then(() => { });
         });
-
-        console.log(this.tablerowlst);
     }
     /*
         handleDeleteRow method is used to delete the Response Attribute data for a particular row.
@@ -109,14 +110,12 @@ export default class RtmvpcCreateResponseAttributes extends LightningElement {
         if (this.tablerowlst.length == 0) {
             this.constructNewWrapper();
         }
-        console.log('this.tablerowlst', this.tablerowlst);
     }
     /*
         handleQuestionTypeChange method is used to change the wrapper based on response type change.
     */
     @api handleQuestionTypeChange(value)
     {
-        console.log('handleQuestionTypeChange');
         this.tablerowlst=[];
         this.quesType = value;
         this.constructNewWrapper();
@@ -130,7 +129,7 @@ export default class RtmvpcCreateResponseAttributes extends LightningElement {
         let responsewrapper = {};
         let rownum = this.tablerowlst.length + 1;
         responsewrapper.rownum = this.tablerowlst.length + 1;
-        let rowdata = [{ 'label': 'Rhythm__Response_value__c','rowlabel':'Yes', 'value':'true', 'ispicklist': false,'isNumber': false, 'key': 'responseValue-' + rownum, 'display': true ,'isEditable':true },
+        let rowdata = [{ 'label': 'Rhythm__Response_value__c','rowlabel':'Checked', 'value':'true', 'ispicklist': false,'isNumber': false, 'key': 'responseValue-' + rownum, 'display': true ,'isEditable':true },
         { 'label': 'Rhythm__preferred_Not_preferred__c','rowlabel':'', 'value': '', 'ispicklist': true,'isNumber': false, 'options': this.preferredOptions, 'key': 'preffered-' + rownum, 'display': true,'isEditable':false  },
         { 'label': 'Rhythm__Upload_Required__c','rowlabel':'', 'value': '', 'ispicklist': true,'isNumber': false, 'options': this.reqFileOptions, 'key': 'uploadrequired-' + rownum, 'display': true,'isEditable':false  },
         { 'label': 'Rhythm__Score__c','rowlabel':'', 'value': '', 'ispicklist': false,'isNumber': true, 'key': 'score-' + rownum, 'display': true,'isEditable':false  },
@@ -140,7 +139,7 @@ export default class RtmvpcCreateResponseAttributes extends LightningElement {
         responsewrapper = {};
         rownum = this.tablerowlst.length + 1;
         responsewrapper.rownum = this.tablerowlst.length + 1;
-        rowdata = [{ 'label': 'Rhythm__Response_value__c','rowlabel':'No', 'value':'false', 'ispicklist': false, 'isNumber': false, 'key': 'responseValue-' + rownum, 'display': true ,'isEditable':true },
+        rowdata = [{ 'label': 'Rhythm__Response_value__c','rowlabel':'Unchecked', 'value':'false', 'ispicklist': false, 'isNumber': false, 'key': 'responseValue-' + rownum, 'display': true ,'isEditable':true },
         { 'label': 'Rhythm__preferred_Not_preferred__c','rowlabel':'', 'value': '', 'ispicklist': true,'isNumber': false, 'options': this.preferredOptions, 'key': 'preffered-' + rownum, 'display': true,'isEditable':false  },
         { 'label': 'Rhythm__Upload_Required__c','rowlabel':'', 'value': '', 'ispicklist': true,'isNumber': false, 'options': this.reqFileOptions, 'key': 'uploadrequired-' + rownum, 'display': true,'isEditable':false  },
         { 'label': 'Rhythm__Score__c','rowlabel':'', 'value': '', 'ispicklist': false,'isNumber': true, 'key': 'score-' + rownum, 'display': true,'isEditable':false  },
@@ -176,7 +175,6 @@ export default class RtmvpcCreateResponseAttributes extends LightningElement {
                 item.rowlabel = respValue;
             }
         });
-        console.log('this.tablerowlst', this.tablerowlst);
         let responselst = [];
         this.tablerowlst.forEach(rowinfo => {
             let responsemap = { 'sobjectType': 'Rhythm__Response_Attribute__c' };
@@ -185,7 +183,6 @@ export default class RtmvpcCreateResponseAttributes extends LightningElement {
             });
             responselst.push(responsemap);
         })
-        console.log('resposelst', responselst);
         const selectedEvent = new CustomEvent('selectedvalue', { detail: responselst });
         this.dispatchEvent(selectedEvent);
     }

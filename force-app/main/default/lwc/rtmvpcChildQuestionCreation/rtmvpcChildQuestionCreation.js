@@ -13,16 +13,14 @@ export default class RtmvpcChildQuestionCreation extends LightningElement {
     connectedCallback() {
         this.showcreateChild = true;
         this.loading = true;
-        console.log('childwrapper', this.childwrapper);
         this.questionnaire = this.childwrapper;
         let questionslst = [];
          questionslst.push(this.childwrapper.questionId);
             getQuestionRespAttributes({ questionlst: questionslst }).then(result => {
                 this.data = result;
-                console.log('Result');
                 result.forEach(res => {
                     if (this.childwrapper.type === 'Checkbox') {
-                        this.options = [{ 'label': 'Yes', 'value': 'true' }, { 'label': 'No', 'value': 'false' }];
+                        this.options = [{ 'label': 'Checked', 'value': 'true' }, { 'label': 'Unchecked', 'value': 'false' }];
                         this.loadCmp = true;
                     }
                     else
@@ -47,7 +45,6 @@ export default class RtmvpcChildQuestionCreation extends LightningElement {
         this.dispatchEvent(selectedEvent);
     }
     handleaftersave(event) {
-        console.log('event.detail', event.detail);
         this.showcreateChild = false;
         this.loadCmp = false;
         const selectedEvent = new CustomEvent('handleaftersave', {
@@ -57,7 +54,6 @@ export default class RtmvpcChildQuestionCreation extends LightningElement {
     }
     handleChange(event) {
         let respval = event.target.value;
-        console.log('event.target.value', respval);
         let resp = {};
         this.createQues = true;
         resp.conditionalResponse = respval;
@@ -72,7 +68,6 @@ export default class RtmvpcChildQuestionCreation extends LightningElement {
 
     }
     handleclose(event) {
-        console.log('sssss;', event.detail);
         this.loadCmp = false;
         this.showcreateChild = false;
         const selectedEvent = new CustomEvent('handlecancel', {
