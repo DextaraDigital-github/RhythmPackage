@@ -64,11 +64,11 @@ jobs:
     # Connect with Salesforce ORG
       - name: 'Connect with Salesforce ORG'
         working-directory: .github/jwt/
-        run: sfdx auth:jwt:grant --clientid ${{github.event.inputs.scratch-org_consumerkey}} --jwtkeyfile server.key --username ${{github.event.inputs.scratch-org_username}} -d --instanceurl ${{github.event.inputs.scratch-org_loginurl}}
+        run: sfdx auth:jwt:grant --clientid ${{secrets.QA_CONSUMERKEY}} --jwtkeyfile server.key --username ${{secrets.QA_USERNAME}} -d --instanceurl ${{secrets.QA_LOGINURL}}
 
     # Code Push to Scratch org
       - name: 'code push'
-        run: sfdx force:source:push --targetusername=${{github.event.inputs.scratch-org_username}} --wait 20 -f --loglevel debug
+        run: sfdx force:source:push --targetusername=${{secrets.QA_USERNAME}} --wait 20 -f --loglevel debug
 
     # Generate Violation Report
       - name: 'Scan for Violations and Generate report'
