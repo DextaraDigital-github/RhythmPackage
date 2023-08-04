@@ -7,7 +7,7 @@
 */
 public with sharing class SendEmailBatch implements Database.batchable<sObject>, Database.Stateful {
     public static SecurityCheckController safe = null;   //Implementing singleton pattern
-    public emailWrapper ew = null;
+    public EmailWrapper ew = null;
 
     static ContentDocumentSelector selector = ContentDocumentSelector.getInstance();
     static ContentVersionSelector cvSelector = ContentVersionSelector.getInstance();
@@ -17,7 +17,7 @@ public with sharing class SendEmailBatch implements Database.batchable<sObject>,
     * @param parameterMap It is a Map of all parameters required to send mails
     */
     public SendEmailBatch(Map<String,Object> parameterMap) {
-        ew = new emailWrapper();
+        ew = new EmailWrapper();
         ew.parameterMap = parameterMap;
         ew.subject = (String)ew.parameterMap.get('subject');
         ew.body = (String)ew.parameterMap.get('body');
@@ -199,7 +199,7 @@ public with sharing class SendEmailBatch implements Database.batchable<sObject>,
         List<Messaging.SendEmailResult> results = Messaging.sendEmail(new Messaging.SingleEmailMessage[]{email});
     }
     
-    public class emailWrapper {
+    public class EmailWrapper {
         public Map<String,Object> parameterMap;
     	public String subject;
     	public String body;
