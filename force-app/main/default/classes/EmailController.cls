@@ -7,15 +7,15 @@
 */
 public with sharing class EmailController {
      
+    static EmailService service = EmailService.getInstance();
     /**
     * @description Fetches the Account records based on search string and other parameters
     * @param parameterMap It is a stringified JSON of parameters required to fetch AccountAssessmentRelation records
     * @return List of AccountAssessmentRelation records
     */
     @AuraEnabled
-    public static List<sObject> fetchAccounts(String parameterMap)
-    {
-        return EmailService.fetchAccounts(parameterMap);
+    public static List<sObject> fetchAccounts(String parameterMap) {
+        return service.fetchAccounts(parameterMap);
     }
     
     /**
@@ -23,9 +23,8 @@ public with sharing class EmailController {
     * @return List of Emailtemplate records
     */
     @AuraEnabled
-    public static List<EmailTemplate> fetchEmailtemplates()
-    {
-        return EmailService.fetchEmailTemplates();
+    public static List<sObject> fetchEmailtemplates() {
+        return service.fetchEmailTemplates();
     }
     
     /**
@@ -33,19 +32,17 @@ public with sharing class EmailController {
     * @param parameterMap Contains a JSON of all parameters required to send an email to selected accounts with the selected email template
     */
     @AuraEnabled
-    public static void sendEmail(String parameterMap)
-    {
-        EmailService.sendEmail(parameterMap);
+    public static void sendEmail(String parameterMap) {
+        service.sendEmail(parameterMap);
     }
     
     /**
-    * @description Fetches the User records along with their Email Messages based on search string and other parameters
-    * @param parameterMap It is a stringified JSON of parameters required to fetch User records
-    * @return List of User records
+    * @description Fetches the EmailMessage records based on search string and other parameters
+    * @param parameterMap It is a stringified JSON of parameters required to fetch EmailMessage records
+    * @return List of EmailMessage records
     */
     @AuraEnabled
-    public static List<sObject> fetchEmailMessages(String parameterMap)
-    {
-        return EmailService.fetchEmailMessages(parameterMap);
+    public static List<sObject> fetchEmailMessages(String parameterMap) {
+        return service.fetchEmailMessages(parameterMap);
     }
 }

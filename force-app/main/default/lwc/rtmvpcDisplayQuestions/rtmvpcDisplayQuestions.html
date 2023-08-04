@@ -1,6 +1,6 @@
 <template>
 	<div class="slds-card" style="border: 1px solid rgb(201, 201, 201)">
-		<div class="slds-card__header slds-grid slds-m-bottom_none">
+		<div class="rdm-grey-bg slds-card__header slds-grid slds-m-bottom_none">
 			<header class="slds-media slds-media_center slds-has-flexi-truncate slds-p-around_medium">
 				<div class="slds-media__figure">
 					<lightning-icon icon-name="custom:custom61" size="small"></lightning-icon>
@@ -14,22 +14,28 @@
 				</div>
 				<div class="slds-no-flex">
 					<template if:true={tempStatus}>
-					<lightning-button-group>
-						<lightning-button variant="brand" label="New Question" icon-name="utility:add" title="New"
-						onclick={handleNewClick}></lightning-button>
-						<lightning-button label="Reorder Child Questions" onclick={cQuesReorderHandler}>
-						</lightning-button>
-					</lightning-button-group></template>
+						<lightning-button-group>
+							<lightning-button variant="brand" label="New Question" icon-name="utility:add" title="New"
+								onclick={handleNewClick}></lightning-button>
+							<template lwc:if={show.childReorderBtn}>
+								<lightning-button label="Reorder Conditional Questions" onclick={cQuesReorderHandler}>
+								</lightning-button>
+							</template>
+						</lightning-button-group>
+					</template>
 				</div>
 			</header>
 		</div>
 		<div>
 			<!-- <div class='rtm-button slds-border_top' style="height: 300px;"> -->
-			<div class="rtm-button slds-border_top">
-				<lightning-tree-grid class="rdq-tree-grid" key-field="Name" data={data} columns={gridcolumns} onrowaction={handleRowAction}
-					onrowselection={handleRowSelection} show-row-number-column wrap-text-max-lines="5" column-widths-mode="auto">
-				</lightning-tree-grid>
-			</div>
+			<template if:true={show.table}>
+				<div class="rtm-button slds-border_top">
+					<lightning-tree-grid class="rdq-tree-grid" key-field="Name" data={data} columns={gridcolumns}
+						onrowaction={handleRowAction} onrowselection={handleRowSelection} show-row-number-column
+						wrap-text-max-lines="5" column-widths-mode="auto">
+					</lightning-tree-grid>
+				</div>
+			</template>
 			<template if:true={viewQuestions}>
 				<c-rtmvpc-question-creation onhandleaftersave={handlesave} onhandlecancel={handleCancel}
 					template-id={tempId} question-id={questionId} section-name={sectionName} tempstatus={tempStatus}>

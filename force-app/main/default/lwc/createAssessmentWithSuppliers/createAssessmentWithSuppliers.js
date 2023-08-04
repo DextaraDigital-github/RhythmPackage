@@ -3,6 +3,7 @@ import { NavigationMixin } from 'lightning/navigation';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import addSuppliers from '@salesforce/apex/AssessmentController.sendAssessment';
 import getTemplateData from '@salesforce/apex/AssessmentController.getTemplateData';
+import fetchAssessmentTemplates from '@salesforce/apex/AssessmentController.fetchAssessmentTemplates';
 import getTodayDate from '@salesforce/apex/AssessmentController.getTodayDate';
 import errorLogRecord from '@salesforce/apex/AssessmentController.errorLogRecord';
 import TIME_ZONE from '@salesforce/i18n/timeZone';
@@ -26,14 +27,45 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
     locale = LOCALE_DATA;
     todayDate;
     templateStatus ='';
+    @track templateOptions = [];
 
     connectedCallback() {
         this.getTodayDate();
         this.fetchTemplateData();
+        this.fetchAssessmentTempData();
+    }
+    /* Fetches list of Assessment Templates from Apex */
+    fetchAssessmentTempData() {
+        fetchAssessmentTemplates({}).then(result => {
+            this.formatAssessmentTempData(result);
+        }).catch(error => {
+            this.configureToast('Error loading Templates', 'Please contact your Administrator.', 'error');
+        });
+    }
+    /* Formats the Assessment Template data fetched from Apex into required format so as to display as options in the combobox */
+    formatAssessmentTempData(result) {
+        this.templateOptions = [];
+        if(typeof result != 'undefined'){
+            result.forEach(template => {
+                this.templateId = (typeof this.templateId != 'undefined' && template.Id.includes(this.templateId))?template.Id:this.templateId;
+                this.templateOptions.push({ label: template.Name, value: template.Id, icon: 'custom:custom13' });
+            });
+        }
+    }
+
+    /* Displays toast message */
+    configureToast(_title, _message, _variant) {
+        const toast = new ShowToastEvent({
+            title: _title,
+            message: _message,
+            variant: _variant
+        });
+        this.dispatchEvent(toast);
     }
 
     handleChange(event){
-        this.templateId = event.target.value;
+        console.log(event.detail.value);
+        this.templateId = event.detail.value;
         this.fetchTemplateData();
     }
 
@@ -44,7 +76,7 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
                 this.todayDate = result;
             }
         })
-        .catch(error => {
+        .catch(() => {
            
         });
     }
@@ -93,6 +125,7 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
             let validatedData = this.validateData();
             if(validatedData.isSave){
                 let fields = event.detail.fields;
+                fields.Rhythm__Template__c = this.templateId;
                 fields = Object.assign( { 'sobjectType': 'Rhythm__Assessment__c'}, fields );
                 this.assessmentRecord = fields;
                 this.showNewAssessment = false;
@@ -102,8 +135,8 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
                 this.showNotification('Error',validatedData.message,'error');
             }
         }catch(e){
-           
-        }
+            
+        };
     }
 
     validateData(){
@@ -123,6 +156,10 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
         else if((typeof endDate !== 'undefined' && endDate !== null) && new Date(endDate) < new Date(startDate)){
             validatedDetails.isSave = false;
             validatedDetails.message = 'End Date of an Assessment Program cannot be before the Start Date'
+        }
+        if(typeof this.templateId === 'undefined' || this.templateId === null || (typeof this.templateId != 'undefined' && this.templateId != null && this.templateId.trim().length === 0)) {
+            validatedDetails.isSave = false;
+            validatedDetails.message = 'Template Name cannot be empty';
         }
         return validatedDetails;
     }

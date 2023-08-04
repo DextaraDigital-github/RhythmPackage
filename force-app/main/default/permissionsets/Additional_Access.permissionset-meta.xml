@@ -175,7 +175,7 @@
         <field>Response__c.AccountAssessmentRelation__c</field>
         <readable>true</readable>
     </fieldPermissions>
-   <fieldPermissions>
+    <fieldPermissions>
         <editable>true</editable>
         <field>Response__c.Assessment__c</field>
         <readable>true</readable>
@@ -258,8 +258,8 @@
     <hasActivationRequired>false</hasActivationRequired>
     <label>Additional Access</label>
     <objectPermissions>
-        <allowCreate>true</allowCreate>
-        <allowDelete>true</allowDelete>
+        <allowCreate>false</allowCreate>
+        <allowDelete>false</allowDelete>
         <allowEdit>true</allowEdit>
         <allowRead>true</allowRead>
         <modifyAllRecords>false</modifyAllRecords>

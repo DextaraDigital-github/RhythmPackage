@@ -13,7 +13,18 @@ public with sharing class TemplateTriggerHandler implements ITriggerHandler{
     * @param newList This is the new list of records.  
     */
     public void beforeInsert(List<sObject> newList) {
-        return;
+        Id userId = UserInfo.getUserId();
+        List<AccountTeamMember> teamRecordList =[SELECT Id,UserId,AccountId
+                                            FROM AccountTeamMember 
+                                            WHERE UserId=:userId
+                                            WITH SECURITY_ENFORCED
+                                            LIMIT 1];
+        system.debug('teamRecordList----->'+teamRecordList);
+        if(teamRecordList.isEmpty() == false){
+            for(Assessment_Template__c template:(List<Assessment_Template__c>)newList){
+                template.Owner__c = teamRecordList[0].AccountId;
+            }
+        }
     }
     
     /**

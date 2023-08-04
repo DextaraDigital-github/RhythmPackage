@@ -1,9 +1,9 @@
 import { LightningElement, api, track } from 'lwc';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { loadStyle } from 'lightning/platformResourceLoader';
-import rtmvpcChildQuestionReorderingStylesheet from '@salesforce/resourceUrl/rtmvpcChildQuestionReorderingStyleSheet';
-import fetchQuestions from '@salesforce/apex/QuestionAttributeResponseController.fetchQuestions';
-import updateQuestionsSequence from '@salesforce/apex/QuestionAttributeResponseController.updateQuestionsSequence';
+import componentStylesheet from '@salesforce/resourceUrl/ComponentStyleSheet';
+import fetchQuestions from '@salesforce/apex/QuestionController.fetchQuestions';
+import updateQuestionsSequence from '@salesforce/apex/QuestionController.updateQuestionsSequence';
 
 export default class RtmvpcChildQuestionReordering extends LightningElement {
     @api question;   //Stores the selected question
@@ -19,7 +19,7 @@ export default class RtmvpcChildQuestionReordering extends LightningElement {
     }
     renderedCallback() {
         Promise.all([
-            loadStyle(this, rtmvpcChildQuestionReorderingStylesheet)
+            loadStyle(this, componentStylesheet)
         ]);
         this.renderNavBar();
     }
@@ -64,7 +64,7 @@ export default class RtmvpcChildQuestionReordering extends LightningElement {
     /* Formats the questions data into the required format */
     formatQuestionsData(result) {
         this.responseMap = new Map();
-        this.responseList = (typeof this.question.Rhythm__OptionValueSet__c != 'undefined') ? this.question.Rhythm__OptionValueSet__c.split('\r\n') : [];
+        this.responseList = (typeof this.question.options != 'undefined') ? this.question.options.split('\r\n') : [];
         result.forEach(question => {
             let responseJson;
             if (!this.responseMap.has(question.Rhythm__Conditional_Response__c)) {

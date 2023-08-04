@@ -2,8 +2,8 @@
 	<lightning-card>
 		<lightning-layout multiple-rows="true">
 			<lightning-layout-item size="12" medium-device-size="5" style="border: solid 1px lightgrey;">
-				<div style="height:300px;" class="slds-scrollable">
-					<template if:true={getFilesFlag}>
+				<div style={heightStyle} class="slds-scrollable">
+					<template if:true={keyList}>
 						<table border="0" cellpadding="0" cellspacing="0" class="table tr">
 							<tr height="16" hidden>
 								<td colspan="16">
@@ -12,50 +12,80 @@
 								</td>
 								<td colspan="16">
 								</td>
+								<template if:false={disableFlag}>
+									<td colspan="16">
+									</td>
+								</template>
 							</tr>
 							<template for:each={keyList} for:item="item" for:index="index">
 								<tr height="50px" key={item.key}>
 									<!-- style="border: solid 2px lightgrey;" -->
-									<td colspan="16" data-id={item.key} title={item.url} onclick={filePreview}>
-										<lightning-icon icon-name="doctype:flash" alternative-text="File"
+									<td colspan="16">
+										<lightning-icon icon-name={item.icon} alternative-text="File"
 											class="slds-p-around_x-small">
 										</lightning-icon>
 									</td>
-									<td colspan="16" class="slds-p-around_x-small" data-id={item.key} title={item.url} onclick={filePreview}
+									<td colspan="16" class="slds-p-around_x-small"
 										style="overflow: auto;word-break: break-word;">
-										<p data-id={item.key} title={item.url} onclick={filePreview}>{item.value}</p>
+										<p>{item.value}</p>
 									</td>
+									<template if:true={item.preview}>
+										<td colspan="16">
+											<lightning-icon class="slds-p-around_x-small" icon-name="utility:preview"
+												size='x-small' data-id={item.key} title={item.url}
+												onclick={filePreview}>
+											</lightning-icon>
+										</td>
+									</template>
+									<template if:false={item.preview}>
+										<td colspan="16">
+										</td>
+									</template>
 									<td colspan="16">
 										<lightning-icon class="slds-p-around_x-small" icon-name="utility:download"
-											size='x-small' data-id={item.key} title={item.url} onclick={filePreview}>
+											size='x-small' data-id={item.key} title={item.url} onclick={handleDownload}>
 										</lightning-icon>
 									</td>
-									<td colspan="16">
-										<lightning-icon icon-name="utility:delete" size='x-small'
-											alternative-text="Delete" class="slds-p-around_x-small slds-m-left_xx-small"
-											key={item.key} name={item.key} title="Delete" onclick={handleDeletePopup}>
-										</lightning-icon>
-									</td>
+									<template if:false={disableFlag}>
+										<td colspan="16">
+											<lightning-icon icon-name="utility:delete" size='x-small'
+												alternative-text="Delete"
+												class="slds-p-around_x-small slds-m-left_xx-small" key={item.key}
+												name={item.key} title="Delete" onclick={handleDeletePopup}>
+											</lightning-icon>
+										</td>
+									</template>
 								</tr>
 							</template>
+
 						</table>
 					</template>
+					<template if:false={getFilesFlag}>
+						<div style="margin-top: 20%;">
+							<c-no-content-illustration content={noFilesContent}></c-no-content-illustration>
+						</div>
+					</template>
 				</div>
-				<div style="text-align:right;padding: 15px;">
-					<lightning-file-upload record-id={recordId} accept={acceptedFormats} name="fileUploader"
-						class="file-selector-large" title="Upload" onuploadfinished={handleUploadFinished} multiple>
-					</lightning-file-upload>
-				</div>
+				<template if:false={disableFlag}>
+					<div style="text-align:right;padding: 15px;">
+						<lightning-file-upload record-id={recordId} accept={acceptedFormats} name="fileUploader"
+							class="file-selector-large" title="Upload" onuploadfinished={handleUploadFinished} multiple>
+						</lightning-file-upload>
+					</div>
+				</template>
+
 			</lightning-layout-item>
 			<lightning-layout-item size="12" medium-device-size="7" padding="around-small"
 				style="border: solid 1px lightgrey;">
 				<div style="height:363px;" class="slds-scrollable">
 					<template if:false={showFrame}>
-						<img src={previewUrl} />
-                  </template>
-						<template if:true={showFrame}>
-							<iframe src={previewUrl} style="width: 100%; height: 800px"></iframe>
-						</template>
+						<div style="margin-top: 15%;">
+							<c-no-content-illustration content={noPreviewContent}></c-no-content-illustration>
+						</div>
+					</template>
+					<template if:true={showFrame}>
+						<iframe src={previewUrl} style="width: 100%; height: 800px"></iframe>
+					</template>
 				</div>
 			</lightning-layout-item>
 		</lightning-layout>

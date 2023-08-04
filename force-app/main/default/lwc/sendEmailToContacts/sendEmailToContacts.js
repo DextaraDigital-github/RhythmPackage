@@ -1,16 +1,21 @@
 import { LightningElement, api, track } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
-import { subscribe, unsubscribe } from 'lightning/empApi';
+// import { subscribe, unsubscribe } from 'lightning/empApi'; //PlatformEvent
 import fetchAccounts from '@salesforce/apex/EmailController.fetchAccounts';
 import fetchEmailtemplates from '@salesforce/apex/EmailController.fetchEmailtemplates';
 import sendEmail from '@salesforce/apex/EmailController.sendEmail';
+import getSignedURL from '@salesforce/apex/AWSS3Controller.getFileSignedUrl';
+import filesUpload from '@salesforce/apex/AWSS3Controller.uploadFiles';
+import getAuthentication from '@salesforce/apex/AWSS3Controller.getAuthenticationData';
+import awsjssdk from '@salesforce/resourceUrl/AWSJSSDK';
+import { loadScript } from 'lightning/platformResourceLoader';
 
 export default class SendEmailToContacts extends NavigationMixin(LightningElement) {
     @api source;
     @api assessmentId;   // Stores the assessment Id coming from Aura Component 
     @api assessmentName;   // Stores the assessment Name coming from Aura Component
-    @track show = { searchCount: 0, searchText: '', accSearchLoading: false, spinner: false, disableBtns: false };   // Stores values used for displaying, conditional rendering or etc.
+    @track show = { searchCount: 0, searchText: '', accSearchLoading: false, spinner: false, disableBtns: false, disableCancelBtn: false };   // Stores values used for displaying, conditional rendering or etc.
     @api pageProp = {};   // Stores the properties of each page in the Modal pop up
     @track currentPage;   // Stores data related to current page in the Modal pop up
     columnsList = [{ fieldName: 'Name', label: 'Name', sortable: true }];   // Columns to be displayed in the datatable
@@ -19,20 +24,224 @@ export default class SendEmailToContacts extends NavigationMixin(LightningElemen
     emailTemplatesData;   // Contains a list of Email Templates
     @api emailApi = {};
     @track email = { assessmentId: '', subject: '', body: '', isBuilderContent: false, limitProp: false, selectedAccountsCount: 0, selectedAccounts: [], templateId: 'null', hasCustomAttachments: false, hasCustomContents: false, attachmentsData: { attachments: [], contentDocuments: [], customContentDocuments: [], standardContentDocuments: [], deleteContentDocuments: [] } };   // Stores data regarding the email which is to be sent
-    subscription;
+    // subscription; //PlatformEvent
     trackSearchAccounts = { searchKey: '', allAccounts: [], selectedAccounts: [], isInitialized: false };
 
     /* Related to Database column sorting */
     defaultSortDirection = 'asc';
     sortDirection = 'asc';
     sortedBy;
+// S3 File Upload Code Starts
+ @api objectApiName;
+    @track accessKey;
+    @track secretKey;
+    @track region;
+    @track endpoint;
+    @track selectedFilesToUpload = [];
+    @track fileName;
+    @track file; //holding file instance
+    @track myFile;
+    @track fileType;//holding file type
+    @track fileReaderObj;
+    @track base64FileData;
+    @track s3;
+    @track keyList = [];
+    @track getFilesFlag = false;
+    @track renderFlag = true;
+    previewUrl;
+    keyString;
+    fileKey;
+    showDeleteModal = false;
+    showFrame = false;
+
+    //Accept File Formats
+    get acceptedFormats() {
+        return ['.pdf', '.png', '.jpg', '.jpeg', '.xlsx', '.xls', '.txt', '.docx', '.doc'];
+    }
+
+
+    renderedCallback() {
+        Promise.all([
+            loadScript(this, awsjssdk),
+        ])
+            .then(() => {
+                setTimeout(() => {
+                    this.configAWS();
+                }, 100);
+            });
+    }
+
+    //AWS configuration
+    configAWS() {
+        if (this.renderFlag === true) {
+            getAuthentication({})
+                .then(result => {
+                    if (result) {
+                        let metadataRecs = JSON.parse(JSON.stringify(result));
+                        metadataRecs && metadataRecs.forEach(rec => {
+                            (rec["DeveloperName"] === 'region') && (this.region = rec["Rhythm__Value__c"]);
+                            (rec["DeveloperName"] === 'accessKey') && (this.accessKey = rec["Rhythm__Value__c"]);
+                            (rec["DeveloperName"] === 'secretKey') && (this.secretKey = rec["Rhythm__Value__c"]);
+                            (rec["DeveloperName"] === 's3bucket') && (this.bucketName = rec["Rhythm__Value__c"]);
+                            (rec["DeveloperName"] === 'endpoint') && (this.endpoint = rec["Rhythm__Value__c"]);
+                        });
+                        const AWS = window.AWS;
+                        AWS.config.update({
+                            accessKeyId: this.accessKey,//Assigning access key id
+                            secretAccessKey: this.secretKey,//Assigning secret access key
+                            region_config: this.region
+                        });
+                        this.s3 = new AWS.S3({
+                            params: {
+                                Bucket: this.bucketName //Assigning S3 bucket name
+                            }
+                        });
+                        this.renderFlag = false;
+                        this.retrieveFilesFromS3();
+                    }
+                });
+        }
+        else {
+            this.retrieveFilesFromS3();
+        }
+    }
+
+    // Retrieve the files from S3 folder
+    async retrieveFilesFromS3() {
+        const folderName = this.objectApiName + '/' + this.recordId + '/';
+        this.s3.listObjects({ Bucket: this.bucketName, Prefix: folderName }, (err, data) => {
+            if (err) {
+                console.error(err);
+            } else {
+                const files = data.Contents;
+                let fileList = [];
+                this.keyList = [];
+                files && files.forEach(file => {
+                    const objectKey = file.Key;
+                    fileList.push({ key: objectKey, url: this.endpoint + '/' + objectKey, value: objectKey.substring(objectKey.lastIndexOf("/") + 1) });
+                });
+                this.keyList = fileList.reverse();
+                if (this.keyList.length != 0) {
+                    this.getFilesFlag = true;
+                }
+                else {
+                    this.getFilesFlag = false;
+                }
+            }
+        });
+    }
+
+    //Download the file from AWS S3
+    handleDownload(event) {
+        getSignedURL({
+            location: event.target.title,
+            file: event.currentTarget.dataset.id,
+            expires: 30
+        })
+            .then(result => {
+                if (result) {
+                    //this.previewUrl = result;
+                    window.open(result);
+                }
+            });
+    }
+
+    //Open Delete Modal Popup
+    handleDeletePopup(event) {
+        this.showDeleteModal = true;
+        this.fileKey = event.target.name;
+        this.keyString = this.fileKey.replace(this.endpoint + '/', '');
+    }
+
+    //Close Delete Modal Popup
+    handleCloseDelPopup() {
+        this.showDeleteModal = false;
+    }
+
+    //Delete File from AWS S3
+    handleDeleteFile() {
+        this.handleCloseDelPopup();
+        this.renderFlag = true;
+        this.configAWS();
+        const params = {
+            Bucket: this.bucketName,
+            Key: this.keyString
+        };
+        this.s3.deleteObject(params, (error, data) => {
+            if (data) {
+                this.showToastMessage('Deleted', this.fileKey.substring(this.fileKey.lastIndexOf("/") + 1) + ' - Deleted Successfully', 'success');
+                this.fileKey = '';
+                this.keyString = '';
+                this.previewUrl = '';
+                this.showFrame = false;
+            }
+        });
+    }
+
+
+    //Upload files to AWS after uploaded successfully to salesforce
+    handleUploadFinished() {
+        filesUpload({
+            recId: this.recordId, objectName: this.objectApiName, pathRecId:null
+        }).then(result => {
+            if (result) {
+                this.renderFlag = true;
+                this.showToastMessage('Uploaded', 'Uploaded Successfully', 'success');
+            }
+            else {
+                this.showToastMessage('Exceeded File Limit', 'The maximum file size you can upload is 10 MB', 'error');
+            }
+        })
+            .catch(error => {
+                window.console.log(error);
+            });
+    }
+
+    //Toast Message handler
+    async showToastMessage(title, message, variant) {
+        this.dispatchEvent(
+            new ShowToastEvent({
+                title: title,
+                message: message,
+                variant: variant,
+            }),
+        );
+        this.renderFlag = true;
+        this.configAWS();
+        eval("$A.get('e.force:refreshView').fire();");
+        //this.retrieveFilesFromS3();
+    }
+
+    //Preivew File
+    filePreview(event) {
+        getSignedURL({
+            location: event.target.title,
+            file: event.currentTarget.dataset.id,
+            expires: 30,
+            ContentType: 'image/png'
+        })
+            .then(result => {
+                if (result) {
+                    this.previewUrl = result;
+                    this.showFrame = true;
+                }
+            });
+    }
+    // S3 File Upload Code Ends 
 
     connectedCallback() {
+         Promise.all([
+            loadScript(this, awsjssdk),
+        ])
+            .then(() => {
+                this.configAWS();
+            });
         this.show.spinner = true;
         switch (this.source) {
             case 'rtmvpcRelatedEmails':
                 this.email = this.emailApi;
                 this.assessmentId = this.email.assessmentId;
+                this.columnsList = this.email.columnsList;
                 this.accountsData = this.email.accountsData;
                 this.show.searchCount = this.accountsData.length;
                 this.emailTemplatesOpt = this.email.emailTemplatesOpt;
@@ -45,14 +254,14 @@ export default class SendEmailToContacts extends NavigationMixin(LightningElemen
                 this.email.subject = this.assessmentName;
                 this.fetchAccountsData('');
                 this.fetchEmailTempsData();
-                this.subscribeToPlatformEvent('/event/SendEmailEvent__e');
+                // this.subscribeToPlatformEvent('/event/SendEmailEvent__e'); //PlatformEvent
             }
         }
     }
     disconnectedCallback() {
         this.show.spinner = false; this.accountsData = []; this.emailTemplatesOpt = [];
         this.assignPageProp(0);
-        this.unsubscribeToPlatformEvent();
+        // this.unsubscribeToPlatformEvent(); //PlatformEvent
     }
 
     /* Assigns values to conditionally render the pages on the modal */
@@ -65,9 +274,11 @@ export default class SendEmailToContacts extends NavigationMixin(LightningElemen
     }
     /* Assigns current page properties to restrict properties on UI to a particular page */
     assignCurrentPageProp(pageNumber) {
-        typeof this.pageProp != 'undefined' && typeof this.pageProp.pageNames != 'undefined' && this.pageProp.pageNames.forEach(page => {
-            this.pageProp.pageInfo[page.name].show = (this.pageProp.pageInfo[page.name].pageNo === pageNumber);
-        });
+        if(typeof this.pageProp != 'undefined' && typeof this.pageProp.pageNames != 'undefined'){
+            this.pageProp.pageNames.forEach(page => {
+                this.pageProp.pageInfo[page.name].show = (this.pageProp.pageInfo[page.name].pageNo === pageNumber);
+            });
+        }
         this.currentPage = this.pageProp.pageInfo[this.pageProp.pageNames[Number(pageNumber)].name];
     }
 
@@ -87,18 +298,18 @@ export default class SendEmailToContacts extends NavigationMixin(LightningElemen
             this.show.searchCount = this.accountsData.length;
             this.show.spinner = false;
             this.show.accSearchLoading = false;
-            console.log('fetchAccounts Data : ', this.accountsData);
-        }).catch(error => {
+        }).catch(() => {
             this.configureToast('Error loading Accounts', 'Please contact your Administrator.', 'error');
-            console.log('fetchAccounts Error : ', JSON.stringify(error));
-        })
+        });
     }
     /* Formats the Account data fetched from Apex into required format so as to display as options in the combobox */
     formatAccountsData(result) {
         let accData = [];
-        typeof result != 'undefined' && result.forEach(acc => {
-            accData.push({ Id: acc.Rhythm__Account__c, Name: acc.Rhythm__Account__r.Name });
-        });
+        if(typeof result != 'undefined'){
+            result.forEach(acc => {
+                accData.push({ Id: acc.Rhythm__Account__c, Name: acc.Rhythm__Account__r.Name });
+            });
+        }
         return accData;
     }
 
@@ -108,43 +319,41 @@ export default class SendEmailToContacts extends NavigationMixin(LightningElemen
             this.emailTemplatesData = JSON.parse(JSON.stringify(result));
             this.emailTemplatesData.push({ 'Id': 'null', 'Name': '--None--', Subject: this.assessmentName, Body: '' });
             this.emailTemplatesOpt = this.formatEmailTempsData(this.emailTemplatesData);
-            console.log('fetchEmailtemplates Data : ', this.emailTemplatesData);
-
-        }).catch(error => {
+        }).catch(() => {
             this.configureToast('Error loading Email Templates', 'Please contact your Administrator.', 'error');
-            console.log('fetchEmailtemplates Error : ', JSON.stringify(error));
         })
     }
     /* Formats the Email Template data fetched from Apex into required format so as to display as options in the combobox */
     formatEmailTempsData(result) {
         let emailTemplatesOpt = [];
-        typeof result != 'undefined' && result.forEach(emailtemp => {
-            emailTemplatesOpt.push({ label: emailtemp.Name, value: emailtemp.Id });
-        });
+        if(typeof result != 'undefined'){
+            result.forEach(emailtemp => {
+                emailTemplatesOpt.push({ label: emailtemp.Name, value: emailtemp.Id });
+            });
+        }
         return emailTemplatesOpt;
     }
 
-    /* Subscribes to Platform Event to capture the status of emails sent */
-    subscribeToPlatformEvent(channelName) {
+    /* Subscribes to Platform Event to capture the status of emails sent */ //PlatformEvent
+    /* subscribeToPlatformEvent(channelName) {
         let _this = this;
         const messageCallback = function (response) {
             if (response.data.payload.Rhythm__Source__c === 'SendEmailBatch status') {
-                console.log('subscribeToPlatformEvent response : ', response);
                 let status = JSON.parse(response.data.payload.Rhythm__Data__c);
-                if (status.success === _this.email.selectedAccounts.length || status.error === 0) {
+                if (status.success === _this.email.selectedAccountsCount) {
                     _this.configureToast('Success', 'Successfully sent emails to ' + status.success + ' Suppliers.', 'success');
                     _this.show.spinner = false;
                     _this.closeSendEmailHandler();
                 }
-                else if (status.success > 0 && status.error > 0) {
-                    _this.configureToast('Couldn\'t send email to all Suppliers', 'Succesfully sent to ' + status.success + ' Suppliers and couldn\'t send to ' + status.error + ' Suppliers.', 'info');
+                else if (status.success > 0 && (this.selectedAccountsCount-status.success) > 0) {
+                    _this.configureToast('Couldn\'t send email to all Suppliers', 'Succesfully sent to ' + status.success + ' Suppliers and couldn\'t send to ' + (this.selectedAccountsCount-status.success) + ' Suppliers.', 'info');
                     _this.show.spinner = false;
                     _this.closeSendEmailHandler();
                 }
                 else {
                     _this.configureToast('Couldn\'t send email', 'Please contact your Administrator.', 'error');
                     _this.show.spinner = false;
-                    this.show.disableBtns = false;
+                    this.show.disableCancelBtn = false;
                 }
             }
         };
@@ -154,21 +363,16 @@ export default class SendEmailToContacts extends NavigationMixin(LightningElemen
     }
     unsubscribeToPlatformEvent() {
         unsubscribe(this.subscription, () => { });
-    }
+    } */
 
     /* Displays toast message */
     configureToast(_title, _message, _variant) {
-        console.log('configureToast');
         const toast = new ShowToastEvent({
             title: _title,
             message: _message,
             variant: _variant
         });
         this.dispatchEvent(toast);
-    }
-    /* Displays a common error message */
-    commonErrorMessage() {
-        this.configureToast('Some error has occured', 'Please contact your Administrator', 'error');
     }
 
     /* Used to store the selected rows(accounts) in the datatable */
@@ -192,7 +396,6 @@ export default class SendEmailToContacts extends NavigationMixin(LightningElemen
             }
             this.email.selectedAccounts = selectedAccounts;
             this.email.selectedAccountsCount = this.email.selectedAccounts.length;
-            console.log('rowSelectionHandler this.email.selectedAccounts : ', selectedAccounts);
         }
     }
     /* Used to sort Data in datatable -- START*/
@@ -237,6 +440,7 @@ export default class SendEmailToContacts extends NavigationMixin(LightningElemen
     }
     /* Closes the pop up and navigates to the Assessment Record Page */
     closeSendEmailHandler() {
+        console.log('Hi');
         this[NavigationMixin.Navigate]({
             type: 'standard__recordPage',
             attributes: {
@@ -247,26 +451,28 @@ export default class SendEmailToContacts extends NavigationMixin(LightningElemen
         });
         eval("$A.get('e.force:refreshView').fire();");
     }
-    closeModalHandler()
-    {
-        const closemodal = new CustomEvent('closemodal',{});
+    /* Closes the pop up */
+    closeModalHandler() {
+        const closemodal = new CustomEvent('closemodal', {});
         this.dispatchEvent(closemodal);
     }
     /* Calls an Apex method to send an email to the Accounts selected */
     sendEmailHandler() {
-        if (this.email.subject.trim() != '' && this.email.body.trim() != '') {
+        if (this.email.subject.trim() !== '' && this.email.body.trim() !== '') {
             this.show.disableBtns = true;
+            this.show.disableCancelBtn = true;
             this.show.spinner = true;
             this.email.assessmentId = this.assessmentId;
             if (this.email.hasCustomAttachments) {
                 this.email.attachmentsData.contentDocuments = [...this.email.attachmentsData.customContentDocuments, ...this.email.attachmentsData.standardContentDocuments];   //If any standard attachment is removed, we make customAttachments to true and merge both the available standard and custom attachments as the template id wi;; be removed and custom subject and body will be used while sending email
             }
-            sendEmail({ parameterMap: JSON.stringify(this.email) }).then(result => {
-                console.log('sendEmail Data : ', result);
-            }).catch(error => {
-                this.commonErrorMessage();
-                this.show.disableBtns = false;
-                console.log('sendEmail Error : ', JSON.stringify(error));
+            sendEmail({ parameterMap: JSON.stringify(this.email) }).then(() => {
+                this.configureToast('Emails will be sent shortly', 'You will recieve an email with the status of the emails, shortly.', 'success');
+                this.show.spinner = false;
+                this.closeSendEmailHandler();
+            }).catch(() => {
+                this.configureToast('Some error has occured', 'Please contact your Administrator', 'error');
+                this.show.disableCancelBtn = true;
             });
         }
         else {
@@ -320,44 +526,45 @@ export default class SendEmailToContacts extends NavigationMixin(LightningElemen
                 break;
             }
         }
-        console.log('emTempChangeHandler this.email : ', this.email);
     }
     /* Prepares attachments JSON to display the attachments as pill conatiners on UI */
     emAddAttachments(attachments) {
-        typeof attachments != 'undefined' && attachments.forEach(attachment => {
-            let a = {};
-            a.type = "icon";
+        if(typeof attachments != 'undefined'){
+            attachments.forEach(attachment => {
+                let a = {};
+                a.type = "icon";
 
-            /* Executes for attachments existing with the email template */
-            if (typeof attachment.ContentDocument != 'undefined') {
-                a.label = attachment.ContentDocument.Title;
-                a.name = attachment.ContentDocumentId;
-                a.isStandardAttachment = true;
-                a.fileType = attachment.ContentDocument.FileType.toLowerCase();
-                this.email.attachmentsData.standardContentDocuments.push(a.name);
-            }
-            /* Executes for every new attachment uploaded by the customer */
-            else {
-                a.label = attachment.name.slice(0, attachment.name.lastIndexOf('.'));
-                a.name = attachment.documentId;
-                a.isStandardAttachment = false;
-                a.fileType = attachment.name.slice(attachment.name.lastIndexOf('.') + 1);
-                this.email.attachmentsData.customContentDocuments.push(a.name);
-                this.email.attachmentsData.deleteContentDocuments.push(a.name);
-            }
+                /* Executes for attachments existing with the email template */
+                if (typeof attachment.ContentDocument != 'undefined') {
+                    a.label = attachment.ContentDocument.Title;
+                    a.name = attachment.ContentDocumentId;
+                    a.isStandardAttachment = true;
+                    a.fileType = attachment.ContentDocument.FileType.toLowerCase();
+                    this.email.attachmentsData.standardContentDocuments.push(a.name);
+                }
+                /* Executes for every new attachment uploaded by the customer */
+                else {
+                    a.label = attachment.name.slice(0, attachment.name.lastIndexOf('.'));
+                    a.name = attachment.documentId;
+                    a.isStandardAttachment = false;
+                    a.fileType = attachment.name.slice(attachment.name.lastIndexOf('.') + 1);
+                    this.email.attachmentsData.customContentDocuments.push(a.name);
+                    this.email.attachmentsData.deleteContentDocuments.push(a.name);
+                }
 
-            switch (a.fileType) {
-                case 'png':
-                case 'jpg':
-                case 'jpeg': a.iconName = 'doctype:image'; break;
-                case 'docs': a.iconName = 'doctype:word'; break;
-                case 'pdf': a.iconName = 'doctype:pdf'; break;
-                case 'csv': a.iconName = 'doctype:csv'; break;
-                default: a.iconName = 'doctype:attachment'; break;
-            }
-            a.href = '/sfc/servlet.shepherd/document/download/' + attachment.ContentDocumentId + '?operationContext=S1'; //Creating a downloadable link
-            this.email.attachmentsData.attachments.push(a);
-        });
+                switch (a.fileType) {
+                    case 'png':
+                    case 'jpg':
+                    case 'jpeg': a.iconName = 'doctype:image'; break;
+                    case 'docs': a.iconName = 'doctype:word'; break;
+                    case 'pdf': a.iconName = 'doctype:pdf'; break;
+                    case 'csv': a.iconName = 'doctype:csv'; break;
+                    default: a.iconName = 'doctype:attachment'; break;
+                }
+                a.href = '/sfc/servlet.shepherd/document/download/' + attachment.ContentDocumentId + '?operationContext=S1'; //Creating a downloadable link
+                this.email.attachmentsData.attachments.push(a);
+            });
+        }
     }
 
     /* Handles the change in email's subject */
@@ -374,6 +581,7 @@ export default class SendEmailToContacts extends NavigationMixin(LightningElemen
     /* Handles the new attachment added i.e. adds this attachment to current previewing template */
     fileUploadHandler(event) {
         let uploadFiles = event.detail.files;   //fetches all the attachments uploaded
+        this.email.hasCustomContents = true;
         this.email.hasCustomAttachments = true;   //flags as true to indicate the apex class that there are custom attachments so that these attachments will be added to the mail along with the attachments existing with email template
         if (typeof uploadFiles != 'undefined' && uploadFiles.length > 0) {
             this.emAddAttachments(uploadFiles);   //prepares attachments json to display on the screen, contentdocumentjson to attach to the email

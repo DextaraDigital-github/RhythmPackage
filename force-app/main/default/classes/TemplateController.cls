@@ -7,6 +7,7 @@
 */
 public with sharing class TemplateController {
 
+    static TemplateService service = TemplateService.getInstance();
     /**
     * @description clone template and its related records.
     * @param templateId This is a record id of an Template.
@@ -15,15 +16,17 @@ public with sharing class TemplateController {
     @AuraEnabled
     public static ResultWrapper doClone(string templateId,SObject templateRecord){
         try{
-            ResultWrapper resWrap = TemplateService.cloneTemplate(templateId,templateRecord);
-            system.debug('resWrap------>'+resWrap);
+            ResultWrapper resWrap = service.cloneTemplate(templateId,templateRecord);
             return resWrap;
         }catch(exception e){
-            system.debug('doClone---->'+e.getMessage());
             string errorMsg = e.getMessage();
             throw new AuraHandledException(ErrorMsg);
         }
-        
+    }
+
+    @AuraEnabled
+    public static List<Assessment_Template__c> getTemplateRecord(string templateId){
+        return service.getTemplateRecord(templateId);
     }
 
     /**

@@ -1,5 +1,9 @@
 <template>
+
 	<template if:true={showcreateChild}>
+		<template if:true={loading}>
+		<lightning-spinner alternative-text="Loading" size="large"></lightning-spinner>
+	</template>
 		<section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="modal-heading-01"
 			class="slds-modal slds-fade-in-open slds-modal_small">
 			<div class="slds-modal__container">
@@ -16,7 +20,7 @@
 				</div>
 				<div class="slds-modal__content slds-scrollable_none" id="modal-content-id-1"
 					style="height: 100%; position: relative;">
-					<div class="slds-scrollable" style="height: 100%;">
+						<div class="slds-scrollable" style="height:calc(100% - 60px)">	
 						<template if:true={loadCmp}>
 							<div class="cqr-head slds-p-around_small slds-grid">
 								<div>1.&nbsp;</div>
@@ -25,11 +29,11 @@
 										{questionnaire.question}</p>
 								</div>
 							</div>
-							<div class="slds-p-top_x-small slds-p-left_large slds-p-right_large">
+							<div class="slds-p-top_x-small slds-p-horizontal_medium">
 								<lightning-layout multiple-rows>
 									<lightning-layout-item size="12" class="slds-p-left_medium slds-p-right_medium slds-p-bottom_x-small" small-device-size="12"
 										medium-device-size="12" large-device-size="12">
-										<lightning-combobox style="--slds-c-input-color-border: rgb(201, 201, 201);" name="Question Type" label="Response options"
+										<lightning-combobox style="--slds-c-input-color-border: rgb(201, 201, 201);" name="Question Type" label="Response Options"
 											value={questionnaire.Rhythm__Question_Type__c} options={options}
 											data-id="Response_Options" onchange={handleChange} required=true></lightning-combobox>
 									</lightning-layout-item>

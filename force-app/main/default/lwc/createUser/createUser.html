@@ -1,0 +1,11 @@
+<template>
+    <lightning-quick-action-panel header="Create User">
+        <div class="slds-align_absolute-center">
+            <p>Do you want to create a user for this contact?</p>
+        </div>
+        <div class="slds-align_absolute-center">
+            <lightning-button label="Cancel" title="Cancel" onclick={closeModal}></lightning-button>
+            <lightning-button variant="brand" label="Yes" title="Yes" onclick={handleCreate} class="slds-m-left_xx-small"></lightning-button>
+        </div>
+    </lightning-quick-action-panel>
+</template>

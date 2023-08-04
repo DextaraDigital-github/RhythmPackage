@@ -149,6 +149,7 @@
     <allowInChatterGroups>false</allowInChatterGroups>
     <compactLayoutAssignment>SYSTEM</compactLayoutAssignment>
     <deploymentStatus>Deployed</deploymentStatus>
+    <deprecated>false</deprecated>
     <enableActivities>true</enableActivities>
     <enableBulkApi>true</enableBulkApi>
     <enableFeeds>false</enableFeeds>
@@ -161,7 +162,7 @@
     <externalSharingModel>ControlledByParent</externalSharingModel>
     <label>Question</label>
     <nameField>
-        <displayFormat>Q-{0000}</displayFormat>
+        <displayFormat>Q-{000}</displayFormat>
         <label>Question Number</label>
         <trackHistory>false</trackHistory>
         <type>AutoNumber</type>

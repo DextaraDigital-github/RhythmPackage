@@ -1,5 +1,6 @@
 .slds-table_tree .slds-button:not(.slds-th__action-button) .rtm-button { margin-top: 0; border: 0px!important; }
 
+.rdm-grey-bg{ background-color: var(--slds-g-color-neutral-base-95,rgb(243, 243, 243)); }
 /* :host{
 	--slds-c-card-color-background: rgb(243,243,243);
 } */

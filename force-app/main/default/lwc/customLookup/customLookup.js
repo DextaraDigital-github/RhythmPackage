@@ -1,5 +1,5 @@
 import { LightningElement, track, api } from 'lwc';
-import getRecordsList from '@salesforce/apex/QuestionAttributeResponseSelector.getSections';
+import getRecordsList from '@salesforce/apex/SectionController.getSections';
 export default class SearchComponentLwc extends  LightningElement{
     @track lookupName='';
     @track lookupValuesList = [];

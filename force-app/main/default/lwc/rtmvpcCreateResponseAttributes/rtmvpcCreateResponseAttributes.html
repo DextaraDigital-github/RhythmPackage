@@ -6,9 +6,7 @@
 					<tr class="slds-line-height_reset">
 						<template for:each={tableheaders} for:item="tablehead">
 							<th key={tablehead}>
-								<center>
-									<span class="slds-p-left_xx-small slds-p-right_xx-small slds-line-clamp">{tablehead}</span>
-								</center>
+								<span class="slds-p-left_small slds-p-right_xx-small slds-line-clamp">{tablehead}</span>
 							</th>
 						</template>
 						<template if:false={isCheckbox}>
@@ -30,11 +28,19 @@
 												</lightning-combobox>
 											</template>
 											<template if:false={row.ispicklist}>
+												<template if:false={row.isNumber}>
 												<lightning-input class="input-box" variant="label-hidden" type="text"
 													key={row.Label} data-id={row.key} onchange={handleChange}
 													disabled={row.isEditable} value={row.rowlabel}
 													data-val={row.Label} onblur={handlefocus}>
+												</lightning-input></template>
+												<template if:true={row.isNumber}>
+													<lightning-input type="Number" class="input-box" variant="label-hidden"
+													key={row.Label} data-id={row.key} onchange={handleChange}
+													disabled={row.isEditable} value={row.rowlabel}
+													data-val={row.Label} onblur={handlefocus}>
 												</lightning-input>
+												</template>
 											</template>
 										</div>
 									</td>

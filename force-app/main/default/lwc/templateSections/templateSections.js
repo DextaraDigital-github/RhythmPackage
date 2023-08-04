@@ -31,6 +31,7 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
             type: 'text', sortable: true,
             fieldName: 'Name',
             label: 'Section Name',
+            wrapText: true
         },
         {
             type: 'number', sortable: true,
@@ -367,7 +368,9 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
     handleRefresh() {
         this.tempRecsLimit = this.recsLimit;
         getQuestionsList({ templateId: this.recordId }).then(data => {
-            this.questionsList = JSON.parse(JSON.stringify(data));
+            let questionData = JSON.parse(JSON.stringify(data));
+            let parent = questionData.filter(res => typeof res.Rhythm__Parent_Question__c === 'undefined');
+            this.questionsList = parent;
             getSectionRecsCount({ templateId: this.recordId, objName: this.objLabel }).then(secData => {
                 this.totalRecsCount = secData;
                 this.recsCount = secData;

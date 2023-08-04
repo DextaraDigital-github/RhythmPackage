@@ -2,9 +2,9 @@ import { LightningElement, track, api } from 'lwc';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { loadStyle } from 'lightning/platformResourceLoader';
 import componentStyleSheet from '@salesforce/resourceUrl/ComponentStyleSheet';
-import getQuestions from '@salesforce/apex/QuestionAttributeResponseSelector.getQuestions';
-import deleteQuestion from '@salesforce/apex/QuestionAttributeResponseService.deleteQuestion';
-import getTemplateRecord from '@salesforce/apex/TemplateSelector.getTemplateRecord';
+import getQuestions from '@salesforce/apex/QuestionController.getQuestions';
+import deleteQuestion from '@salesforce/apex/QuestionController.deleteQuestion';
+import getTemplateRecord from '@salesforce/apex/TemplateController.getTemplateRecord';
 import errorLogRecord from '@salesforce/apex/AssessmentController.errorLogRecord';
 
 const columns = [
@@ -23,9 +23,9 @@ const columns = [
     },
     { label: 'Question', fieldName: 'Rhythm__Question__c', wrapText: true },
     { label: 'Question Type', fieldName: 'Rhythm__Question_Type__c' },
-    { label: 'Response Value Set', fieldName: 'Rhythm__OptionValueSet__c' },
+    { label: 'Response Values', fieldName: 'Rhythm__OptionValueSet__c' },
     {
-        label: 'Add Child Question',
+        label: 'Add Conditional Question',
         type: "button-icon",
         typeAttributes: { iconName: { fieldName: 'priorityicon' }, disabled: { fieldName: 'isiconavailable' }, variant: 'bare', name: 'addchildquestion' }
     },
@@ -57,6 +57,7 @@ export default class RtmvpcDisplayQuestions extends LightningElement {
     @track show = { cQuesReorderModal: false };   //Conditionally render the modal popup where the child questions can sequenced 
     @track selectedRow;
     @track tempStatus = false;
+    @track show = { childReorderBtn: false, table: false };
 
     constructor() {
         super();
@@ -77,7 +78,7 @@ export default class RtmvpcDisplayQuestions extends LightningElement {
         });
         if (row['isMetCriteria'] === true) {
             actions.push({
-                'label': 'Add child question',
+                'label': 'Add Conditional Question',
                 'name': 'addchildquestion'
             });
         }
@@ -97,7 +98,7 @@ export default class RtmvpcDisplayQuestions extends LightningElement {
     }
     closeToastHandler() {
         this.showToast = false;
-        this.handleOnload();
+       
     }
     handleOnload() {
         getTemplateRecord({ templateId: this.recordId }).then(tempresult => {
@@ -108,27 +109,49 @@ export default class RtmvpcDisplayQuestions extends LightningElement {
             console.log('this.tempStatus = true',this.tempStatus );
             getQuestions({ templateId: this.recordId }).then(result => {
                 //this.data = result;
+                console.log('result',result);
                 let questionData = JSON.parse(JSON.stringify(result));
                 let children = questionData.filter(res => typeof res.Rhythm__Parent_Question__c !== 'undefined');
                 let parent = questionData.filter(res => typeof res.Rhythm__Parent_Question__c === 'undefined');
+                console.log('children',children);
+                console.log('parent',parent);
+                let pnumber =0;
+                let parentnumber;
                 parent.forEach(parentdata => {
                     let childlst = [];
+                    let snumber =0;
+                    let qnumber = (parentdata.Name).split('-');
+                    pnumber++;
+                    if(pnumber<10){
+                        parentnumber ='00'+pnumber;
+                    }
+                    else if(pnumber>=10 && pnumber <100){
+                        parentnumber ='0'+pnumber;
+                    }
+                    else{
+                        parentnumber = pnumber;
+                    }
+                    parentdata.Name = parentnumber;
+                    //parentdata.Name = qnumber[1];
                     children.forEach(child => {
                         if (parentdata.Id === child.Rhythm__Parent_Question__c) {
+                            snumber++;
                             console.log('child', child);
                             let x = '↳ [' + child.Rhythm__Conditional_Response__c + '] : ' + child.Rhythm__Question__c;
                             child.Rhythm__Question__c = x;
                             child['isMetCriteria'] = false;
                             child['priorityicon'] = '';
-                            child['isiconavailable'] = true;
+                            child['isiconavailable'] = true;  
+                            if(snumber<10){
+                                child.Name = parentnumber + '.0'+snumber;
+                            }
+                            else{
+                                child.Name  = parentnumber + '.'+snumber;
+                            }
+                            if(typeof child.Rhythm__OptionValueSet__c!=='undefined'){
+                               child.Rhythm__OptionValueSet__c= child.Rhythm__OptionValueSet__c.replaceAll('\r\n',', ');
+                            }
                             childlst.push(child);
-
-
-                            // parentdata['priorityicon'] = '';
-                            //parentdata['isiconavailable'] = true;
-
-                            //parentdata.Rhythm__Question__c = parentdata.Rhythm__Question__c + '\n';
-                            //parentdata.Rhythm__Question__c+= '==> (' + child.Rhythm__Conditional_Response__c +') : '+child.Rhythm__Question__c;
                         }
                         if (childlst.length > 0) {
                             console.log('childlst', childlst);
@@ -137,9 +160,12 @@ export default class RtmvpcDisplayQuestions extends LightningElement {
 
                     });
                     if (parentdata.Rhythm__Question_Type__c === 'Picklist' || parentdata.Rhythm__Question_Type__c === 'Radio'
-                        || parentdata.Rhythm__Question_Type__c === 'Picklist (Multi-Select)' || parentdata.Rhythm__Question_Type__c === 'Checkbox') {
+                        || parentdata.Rhythm__Question_Type__c === 'Checkbox') {
                         parentdata['isMetCriteria'] = true;
-                        parentdata['priorityicon'] = 'utility:new';
+                        parentdata.options=parentdata.Rhythm__OptionValueSet__c;
+                        parentdata.Rhythm__OptionValueSet__c = parentdata.Rhythm__OptionValueSet__c.replaceAll('\r\n',', ');
+                       
+                        parentdata['priorityicon'] = 'utility:record_create';
                         parentdata['isiconavailable'] = false;
                     }
                     else {
@@ -147,8 +173,14 @@ export default class RtmvpcDisplayQuestions extends LightningElement {
                         parentdata['priorityicon'] = ' ';
                         parentdata['isiconavailable'] = true;
                     }
+                   
+                    //parentdata.Rhythm__OptionValueSet__c = parentdata.Rhythm__OptionValueSet__c.replaceAll('\r\n',',');
                 });
                 this.data = parent;
+                if(typeof this.data != 'undefined' && this.data.length > 0)
+                {
+                    this.show.childReorderBtn = this.show.table = true;
+                }
                 console.log('this.data', this.data);
             }).catch(error => {
                 let errormap = {};
@@ -177,12 +209,14 @@ export default class RtmvpcDisplayQuestions extends LightningElement {
         if (typeof event.detail !== 'undefined') {
             this.viewQuestions = false;
             this.createNewQues = false;
+             this.handleOnload();
         }
     }
     handleClose(event) {
         console.log('Handle dispatch');
         if (typeof event.detail !== 'undefined') {
             this.createChildQues = false;
+             this.handleOnload();
         }
     }
     handleRowSelection(event) {
@@ -214,7 +248,7 @@ export default class RtmvpcDisplayQuestions extends LightningElement {
             }
             if (actionName === 'addchildquestion') {
                 if (row.Rhythm__Question_Type__c === 'Picklist' || row.Rhythm__Question_Type__c === 'Radio'
-                    || row.Rhythm__Question_Type__c === 'Picklist (Multi-Select)' || row.Rhythm__Question_Type__c === 'Checkbox') {
+                    || row.Rhythm__Question_Type__c === 'Checkbox') {
                     this.childQuesWrapper.questionId = row.Id;
                     this.childQuesWrapper.question = row.Rhythm__Question__c;
                     this.childQuesWrapper.sectionName = row.Rhythm__Section__r.Name;
@@ -225,7 +259,7 @@ export default class RtmvpcDisplayQuestions extends LightningElement {
                     this.createChildQues = true;
                 }
                 else {
-                    this.totastmessage = 'Child Question will be added for only Picklist, multi picklist and Radio type Questions';
+                    this.totastmessage = 'Child Question will be added for only Picklist and Radio type Questions';
                     this.success = false;
                     this.showToast = true;
                 }
@@ -235,9 +269,11 @@ export default class RtmvpcDisplayQuestions extends LightningElement {
                 this.questionId = row.Id;
                 let templateId = row.Rhythm__Assessment_Template__c;
                 deleteQuestion({ questionId: this.questionId, templateId: templateId }).then(result => {
-                    this.totastmessage = 'Question deleted successfully';
-                    this.success = true;
-                    this.showToast = true;
+                    // this.totastmessage = 'Question deleted successfully';
+                    // this.success = true;
+                    // this.showToast = true;
+                     this.configureToast('Success', 'Deleted Successfully ', 'success');
+                    this.handleOnload();
                 }).catch(error => {
                     let errormap = {};
                     errormap.componentName = 'RtmvpcDisplayQuestions';
@@ -256,7 +292,7 @@ export default class RtmvpcDisplayQuestions extends LightningElement {
                 this.viewQuestions = true;
             }
             else{
-                this.configureToast('Some Error has Occured', 'Can perform actions only when Template Status is New ', 'error');
+                this.configureToast('Some Error has Occured', 'Active Template cannot be edited', 'error');
             }
             
         }
@@ -268,11 +304,13 @@ export default class RtmvpcDisplayQuestions extends LightningElement {
             this.createChildQues = false;
             this.viewQuestions = false;
             this.createNewQues = false;
+            this.handleOnload();
         }
-        this.totastmessage = event.detail;
-        this.success = true;
-        this.showToast = true;
-        //this.handleOnload();
+        // this.totastmessage = event.detail;
+        // this.success = true;
+        // this.showToast = true;
+        this.configureToast('Success', event.detail, 'success');
+        
     }
 
     /* Configures and displays the toast message */

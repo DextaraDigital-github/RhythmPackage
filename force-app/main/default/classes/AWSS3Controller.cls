@@ -6,7 +6,10 @@
 * Last Modified Date: 11-07-2023
 */
 public with sharing class AWSS3Controller {  
-      
+    public static SecurityCheckController safe = new SecurityCheckController();//use singleton pattern
+    private static Savepoint sp;
+
+    static AWSS3Service service = AWSS3Service.getInstance();
     
     /**
 * @description get Authentication Data. 
@@ -36,7 +39,7 @@ public with sharing class AWSS3Controller {
         try {
             String signedURL;
             if(location != null && file != null && expires > 0) {
-                signedURL = AWSS3Service.getSignedURL(location, file, expires); 
+                signedURL = service.getSignedURL(location, file, expires); 
             }
             return signedURL;
         } catch(exception e) {
@@ -49,15 +52,17 @@ public with sharing class AWSS3Controller {
 * @description upload File from salesforce to S3.
 * @param recId This is the record Id.
 * @param objectName This is the object name of a record.
+* @param pathRecId This is the recordId.
+* @param deleteFlag This is the deleteFlag.
 * @return flag on uploaded successfully
 */ 
     @AuraEnabled
-    public static Boolean uploadFiles(Id recId, String objectName) {
+    public static Boolean uploadFiles(Id recId, String objectName,Id pathRecId,Boolean deleteFlag) {
         Boolean uploadedFlag = false;
         try {
             if(recId != null && objectName != null) {
-                 
-                uploadedFlag=AWSS3Service.uploadFiles(recId, objectName);
+                
+                uploadedFlag=service.uploadFiles(recId, objectName, pathRecId,deleteFlag);
             }
             return uploadedFlag;
         } catch(exception e) {
@@ -66,6 +71,73 @@ public with sharing class AWSS3Controller {
         }
     }
     
+    /**
+* @description uploadFilestoResponses.
+* @param fileResp
+* @return Id 
+*/ 
+    @AuraEnabled
+    public static Response__c createResponseforFileUpload(String fileResp) {
+        try{
+            Response__c respId;
+            Map<String,Object> filemap = (Map<String,Object>) JSON.deserializeUntyped(fileResp);
+            if(filemap.size() > 0) {
+                respId = service.createResponseforFileUpload(fileResp); 
+            }
+            return  respId;
+        }
+        catch(Exception e){
+            String errorMsg = e.getMessage();
+            throw new AuraHandledException(errorMsg);
+        }
+        
+    }
+    /**
+* @description saveActionRecord.
+* @param actionResponse
+* @return Id 
+*/
+    @AuraEnabled
+    public static Id saveActionRecord(List<SObject> actionResponse){
+        try{
+            Id actionRecordId;
+            if(actionResponse.size() > 0){
+                actionRecordId = service.saveActionRecord(actionResponse);
+            }
+            return actionRecordId; 
+        }catch(exception e){
+            String errorMsg = e.getMessage();
+            throw new AuraHandledException(errorMsg);
+        } 
+    }
+    /**
+* @description Get the details of the Template.
+* @param templateId This is a record id of an Template__c.
+*@return
+*/    
+    @AuraEnabled(Cacheable=true)
+    public static Boolean getTemplateDetails(String templateId) {
+        try {
+            Boolean hasStatusNew = true;
+            templateId = String.escapeSingleQuotes(templateId);
+            if(String.isNotBlank(templateId)) {
+                List<Assessment_Template__c> assessmentList=  [SELECT Status__c
+                                                                FROM Assessment_Template__c
+                                                                WHERE Id= :templateId
+                                                                WITH SECURITY_ENFORCED];
+                Assessment_Template__c assessmentTemp = (AssessmentList.size()==1)?AssessmentList[0]:null;
+                if(assessmentTemp  != null && assessmenttemp.Status__c.equalsIgnoreCase('New')){
+                    hasStatusNew = false;
+                }
+            }
+            return hasStatusNew;
+        }
+        catch(Exception e) {
+            String errorMsg = e.getMessage();
+            throw new AuraHandledException(ErrorMsg);
+        }
+    }
+
     /**
 * @description It is used to throw the exception
 */
