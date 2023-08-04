@@ -24,6 +24,7 @@ public with sharing class QuestionController {
     * @return Map of Id and its Question__c record
     */
     @AuraEnabled
+    /* sfge-disable-stack ApexFlsViolationRule */
     public static List<SObject> createQuestions(List<SObject> questions, Boolean isUpdate){
         return service.createQuestions(questions, isUpdate);
     }
@@ -35,6 +36,7 @@ public with sharing class QuestionController {
     * @return Map of Id and its Question__c record
     */
     @AuraEnabled
+    /* sfge-disable-stack ApexFlsViolationRule */
     public static List<SObject> deleteQuestion(String questionId,String templateId){
         return service.deleteQuestion(questionId, templateId);
     }

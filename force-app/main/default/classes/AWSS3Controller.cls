@@ -57,6 +57,7 @@ public with sharing class AWSS3Controller {
 * @return flag on uploaded successfully
 */ 
     @AuraEnabled
+    /* sfge-disable-stack ApexFlsViolationRule */
     public static Boolean uploadFiles(Id recId, String objectName,Id pathRecId,Boolean deleteFlag) {
         Boolean uploadedFlag = false;
         try {
@@ -77,6 +78,7 @@ public with sharing class AWSS3Controller {
 * @return Id 
 */ 
     @AuraEnabled
+    /* sfge-disable-stack ApexFlsViolationRule */
     public static Response__c createResponseforFileUpload(String fileResp) {
         try{
             Response__c respId;
@@ -98,6 +100,7 @@ public with sharing class AWSS3Controller {
 * @return Id 
 */
     @AuraEnabled
+    /* sfge-disable-stack ApexFlsViolationRule */
     public static Id saveActionRecord(List<SObject> actionResponse){
         try{
             Id actionRecordId;

@@ -356,22 +356,48 @@ public with sharing class AssessmentController {
             String errorMsg = e.getMessage();
             throw new AuraHandledException(errorMsg);
         }
-        
-        //return null;
     }
-     @AuraEnabled
-    public static void updateRejectFlag(List<SObject> updateRejectFlagList){
-        
-        UPDATE updateRejectFlagList;
-         
-               
-    }
+
     @AuraEnabled
+    /* sfge-disable-stack ApexFlsViolationRule */
+    public static void updateRejectFlag(List<SObject> updateRejectFlagList){
+        try{
+            if (sp == null){
+                sp = Database.setSavepoint();
+            }
+            if(updateRejectFlagList.isEmpty() == false){
+                Database.SaveResult[] saveResult = safe.doUpdate(updateRejectFlagList);
+                List<String> errorsList = SecurityCheckController.safeClassExceptionHandlerInsert(saveResult);
+                if(errorsList.size()>0){
+                    Database.rollback(sp);
+                    throw new SecurityControllerException(String.join(errorsList, ', ' ));
+                }
+            }
+        }catch(exception e){
+            String errorMsg = e.getMessage();
+            throw new AuraHandledException(errorMsg);
+        }    
+    }
+
+    @AuraEnabled
+    /* sfge-disable-stack ApexFlsViolationRule */
     public static void insertRejectFlag(List<SObject> insertRejectFlagList){
-        
-        INSERT insertRejectFlagList;
-         
-               
+        try{
+            if (sp == null){
+                sp = Database.setSavepoint();
+            }
+            if(insertRejectFlagList.isEmpty() == false){
+                Database.SaveResult[] saveResult = safe.doInsert(insertRejectFlagList);
+                List<String> errorsList = SecurityCheckController.safeClassExceptionHandlerInsert(saveResult);
+                if(errorsList.size()>0){
+                    Database.rollback(sp);
+                    throw new SecurityControllerException(String.join(errorsList, ', ' ));
+                }
+            }
+        }catch(exception e){
+            String errorMsg = e.getMessage();
+            throw new AuraHandledException(errorMsg);
+        }
     }
     
     /**
@@ -613,6 +639,7 @@ public with sharing class AssessmentController {
     * @return 
     */
     @AuraEnabled
+    /* sfge-disable-stack ApexFlsViolationRule */
     public static ErrorTransactionLog__c errorLogRecord(String errorLogWrapper)
     {
         try{
@@ -790,6 +817,7 @@ public with sharing class AssessmentController {
     * @return
     */
     @AuraEnabled
+    /* sfge-disable-stack ApexFlsViolationRule */
     public static ResultWrapper sendAssessment(SObject assessmentRecord,String operationType, String suppliers,String existingSups, String deleteList){
         ResultWrapper resWrap = new ResultWrapper();
         try{

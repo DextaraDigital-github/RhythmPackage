@@ -38,10 +38,10 @@ public with sharing class TemplateService{
         try{
             string templateName = string.valueOf(templateRecord.get('Name'));
             templateName = '\'%'+String.escapeSingleQuotes(templateName)+'%\'';
-            string query = 'SELECT Id'
-                        + ' FROM Assessment_Template__c'
-                        + ' WHERE Name LIKE '+templateName;
-            List<Assessment_Template__c> dupList = safe.doQuery(query);
+            List<Assessment_Template__c> dupList = [SELECT Id 
+                                                    FROM Assessment_Template__c
+                                                    WHERE Name LIKE:templateName
+                                                    WITH SECURITY_ENFORCED];
             if(dupList.isEmpty() == true){
                 if(string.isNotBlank(templateId)){
                     List<SObject> templateList = new List<sObject>();

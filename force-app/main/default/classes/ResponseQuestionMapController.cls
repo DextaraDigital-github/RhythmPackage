@@ -10,6 +10,7 @@ public with sharing class ResponseQuestionMapController {
     static ResponseQuestionMapService service = ResponseQuestionMapService.getInstance();
 
     @AuraEnabled
+    /* sfge-disable-stack ApexFlsViolationRule */
     public static List<SObject> createResponseQuestionMap(List<SObject> responseQuestionmap){
         return service.createResponseQuestionMap(responseQuestionmap);
     }

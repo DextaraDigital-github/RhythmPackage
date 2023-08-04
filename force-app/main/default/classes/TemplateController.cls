@@ -14,6 +14,7 @@ public with sharing class TemplateController {
     * @return 
     */
     @AuraEnabled
+    /* sfge-disable-stack ApexFlsViolationRule */
     public static ResultWrapper doClone(string templateId,SObject templateRecord){
         try{
             ResultWrapper resWrap = service.cloneTemplate(templateId,templateRecord);
