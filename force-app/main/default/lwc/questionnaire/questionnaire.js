@@ -918,6 +918,7 @@ export default class Questionnaire extends LightningElement {
             this.startAutoSave();
 
         }
+     
     }
 
     /*handleFileUpload method is used to store the uploaded attachments into response records */
@@ -931,6 +932,7 @@ export default class Questionnaire extends LightningElement {
             }
         }
         let filemap = {};
+        let respval='';
         filemap.responseId = responseId;
         filemap.fileBlob = this.fileResponseData.filedata;
         filemap.name = this.fileResponseData.name;
@@ -944,6 +946,7 @@ export default class Questionnaire extends LightningElement {
                     for (let j = 0; j < this.questionsAndAnswerss[i].questions.length; j++) {
                         if (this.questionsAndAnswerss[i].questions[j].Id === this.fileResponseData.questionId) {
                             this.uploadingFile = false;
+                            respval = this.questionsAndAnswerss[i].questions[j].value;
                             let filesdatastored = JSON.parse(result[0].Rhythm__Files__c);
                             let x = JSON.parse(JSON.stringify(filesdatastored[filesdatastored.length - 1]));
                             if (typeof this.questionsAndAnswerss[i].questions[j].Files__c === 'undefined') {
@@ -961,7 +964,15 @@ export default class Questionnaire extends LightningElement {
                     }
                 }
             }
-            let quesResponse = { "Id": result[0].Id, "questionType": this.fileResponseData.type, "value": '', "Files__c": result[0].Rhythm__Files__c, "Flag__c": this.fileResponseData.flag, "Conversation_History__c": this.fileResponseData.conversationHistory };
+            
+            for(const seckey of this.responseMap.keys()){
+               
+                if(seckey===this.fileResponseData.questionId){
+                    respval = this.responseMap.get(seckey);
+                   
+                }
+            }
+            let quesResponse = { "Id": result[0].Id, "questionType": this.fileResponseData.type, "value": respval, "Files__c": result[0].Rhythm__Files__c, "Flag__c": this.fileResponseData.flag, "Conversation_History__c": this.fileResponseData.conversationHistory };
             this.savedResponseMap.set(this.fileResponseData.questionId, quesResponse);
             this.responseMap.set(this.fileResponseData.questionId, quesResponse);
             this.uploadingFile = false;
@@ -1088,6 +1099,7 @@ export default class Questionnaire extends LightningElement {
 
     /* constructResponse is used to call an apex class to store the response */
     constructResponse(isSubmit) {
+        
         var isAssessmentValidated = false;
         var responseList = [];
         var questionsId = [];
@@ -1107,7 +1119,10 @@ export default class Questionnaire extends LightningElement {
             questionAnswer.questions.forEach(question => {
                 if (this.requiredQuestionList.includes(question.Id) &&
                     typeof question.value !== 'undefined') {
-                    if (typeof this.accountAssessmentStatus === 'undefined' || this.accountAssessmentStatus === 'New') {
+                    if (typeof this.accountAssessmentStatus === 'undefined' || this.accountAssessmentStatus === 'New' ||this.accountAssessmentStatus === 'Need More Information') {
+                        if(this.accountAssessmentStatus === 'Need More Information'){
+                            this.responseMap.set(question.Id,question.value);
+                        }
                         let index = this.requiredQuestionList.indexOf(question.Id);
                         this.requiredQuestionList.splice(index, 1);
                     }
@@ -1215,6 +1230,7 @@ export default class Questionnaire extends LightningElement {
         this.questionsAndAnswerss.forEach(questionAnswer => {
             //This loop is to iterate over the Questions for a particular sections in the wrapper.
             questionAnswer.questions.forEach(question => {
+
                 if (questionsId.includes(question.Id)) {
                     if (typeof question.Rhythm__Flag__c !== 'undefined') {
                         flagmap[question.Id] = question.Rhythm__Flag__c;
@@ -1277,6 +1293,7 @@ export default class Questionnaire extends LightningElement {
                 }
             });
         });
+    
         for (const seckey of this.responseMap.keys()) {
             let reponse = { 'sobjectType': 'Rhythm__Response__c' };
             reponse.Rhythm__AccountAssessmentRelation__c = this.accountassessmentid;
@@ -1336,6 +1353,9 @@ export default class Questionnaire extends LightningElement {
             this.success = false;
             this.totastmessage = 'Please fill Mandatory questions ';
         }
+        else{
+            isAssessmentValidated = false;
+        }
         if (isAssessmentValidated === false) {
             this.showToast = true;
             this.success = true;
@@ -1352,6 +1372,7 @@ export default class Questionnaire extends LightningElement {
                 }
             }
             else {
+           
                 if (isSubmit) {
                     responseQueryMap.status = 'Submitted';
                     this.showButtons.Save_Submit = false;
