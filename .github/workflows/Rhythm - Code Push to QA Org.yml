@@ -4,7 +4,9 @@ name: Rhythm - Code Push to QA Org
 # Definition when the workflow should run
 
 on:
-  push:
+  pull_request_target:
+    types:
+      - closed
     branches:
       - qa
                 
