@@ -4,12 +4,10 @@ name: Rhythm - Code Push to QA Org
 # Definition when the workflow should run
 
 on:
-  pull_request:
-    types:
-      - closed
-       branches:
-      
-           
+  push:
+    branches:
+      - qa
+                
 # Jobs to be executed
 
 jobs:
