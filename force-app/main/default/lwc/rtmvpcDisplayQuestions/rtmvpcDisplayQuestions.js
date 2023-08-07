@@ -354,7 +354,7 @@ export default class RtmvpcDisplayQuestions extends LightningElement {
                 // this.childQuestions = this.data.filter(question => (question.Id === this.selectedRows[0].Id))[0]._children;
             }
             else {
-                this.configureToast('No child questions to reorder', 'Selected question doesn\'t have any child questions to reorder.', 'error');
+                this.configureToast('No conditional questions to reorder', 'Selected question doesn\'t have any conditional questions to reorder.', 'error');
             }
         }
     }

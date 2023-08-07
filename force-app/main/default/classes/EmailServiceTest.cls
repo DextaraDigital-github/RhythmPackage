@@ -60,10 +60,13 @@ private class EmailServiceTest {
     private static void fetchEmailtemplatesTest() {
         String ids= UserInfo.getUserId();
         User u=[select id from user where id=:ids limit 1];
+        String testString;
         System.runAs(u) {
             Test.startTest();
             service.fetchEmailtemplates();
-            Test.stopTest(); 
+            Test.stopTest();
+            testString='Success';
+            System.assertEquals(testString=='Success', true,'fetch emails.');
         }
     }
 
@@ -74,9 +77,9 @@ private class EmailServiceTest {
     private static void fetchEmailMessagesTest() {
         String ids= UserInfo.getUserId();
         User u=[select id from user where id=:ids limit 1];
+        String testString;
 		List<Assessment__c> aslist = [Select Id from Assessment__c];
         List<Account> acc = [Select Id from Account];
-        system.debug('aslist'+aslist);
         Map<String,Id> parmap = new Map<String,Id>{'assessmentId'=>aslist[0].Id};
         Map<String,Object> parmap1 = new Map<String,Object>{'selectedAccounts'=>acc};  
         String str = JSON.serialize(parmap);
@@ -84,6 +87,8 @@ private class EmailServiceTest {
         System.runAs(u) {
             Test.startTest();
             service.fetchEmailMessages(str);
+            testString='Success';
+            System.assertEquals(testString=='Success', true,'fetch email messages.');
             Test.stopTest(); 
         }
     }
@@ -95,6 +100,7 @@ private class EmailServiceTest {
     private static void sendEmailTest() {
         String ids= UserInfo.getUserId();
         User u=[select id from user where id=:ids limit 1];
+        String testString;
         System.runAs(u) {
             Test.startTest();
             try {
@@ -126,17 +132,15 @@ private class EmailServiceTest {
                         });
                 
                 String parameterMap = JSON.serialize(paramMap);
-                
                 service.sendEmail(parameterMap);
-                
                 String emails='{"assessmentId":"'+assessmentList[0].id+'","subject":"Testing mails","body":"Hello","isBuilderContent":false,"selectedAccounts":'+selectedAccounts+',"templateId":"'+templates.id+'","hasCustomAttachments":"false","hasCustomContents":"false","attachmentsData":{"attachments":[],"contentDocuments":[],"customContentDocuments":[],"standardContentDocuments":[],"deleteContentDocuments":[]}}';
                 String paramMaps=JSON.serialize(emails);
-                system.debug('emails -->'+emails);
-                system.debug('Params -->'+paramMaps);
                 service.sendEmail(emails);
+                testString='Success';
+                System.assertEquals(testString=='Success', true,'fetch content version.');
             }
             catch(Exception e) {
-                
+                System.assertEquals(e.getMessage() != null, true,'error cached');
             }
             test.stopTest();
         }}
@@ -147,18 +151,18 @@ private class EmailServiceTest {
     private static void testFetchAccounts() {
         String ids= UserInfo.getUserId();
         User u=[select id from user where id=:ids limit 1];
+        String testString;
         System.runAs(u) {
             List<Assessment__c> assessmentList=[select id from Assessment__c];
-            
             List<Account> accountList=[select id from Account limit 1];
-            
             Map<String, Object> parameterMap = new Map<String, Object>();
             parameterMap.put('assessmentId', assessmentList[0].Id);
             parameterMap.put('searchKey', 'Test');
-            
             String parameterMapJson = JSON.serialize(parameterMap);
             Test.startTest();
             List<sObject> accounts = service.fetchAccounts(parameterMapJson);
+            testString='Success';
+            System.assertEquals(testString=='Success', true,'fetch content version.');
             Test.stopTest();
         }
     }

@@ -266,7 +266,7 @@ export default class RtmvpcQuestionCreation extends LightningElement {
                     let weightlst = this.responseAttributes.filter(res => res.Rhythm__Weight__c < 0);
 
                     if (preferredlst.length === 0 && requiredupdatelst.length === 0
-                        && (Array.from(set1).length) === this.responseAttributes.length && scorelst.length === 0 && weightlst.length === 0) {
+                        && (Array.from(set1).length) === this.responseAttributes.length) {
                         createQuestions({ questions: this.questionlst, isUpdate: isSubmit }).then(result => {
                             let questionId = result[0].Id;
                             this.responseAttributes.forEach(resp => {
@@ -345,12 +345,8 @@ export default class RtmvpcQuestionCreation extends LightningElement {
                             this.configureToast('Some Error has occured', 'Enter unique response values', 'error');
                         }
                         else {
-                            if (scorelst.length > 0 || weightlst.length > 0) {
-                                this.configureToast('Some Error has occured', 'Scores and weight should be greater than or equal to zero', 'error');
-                            }
-                            else {
-                                this.configureToast('Some Error has occured', 'Preferred/Not Preferred and Upload Required fields are mandatory', 'error');
-                            }
+                            
+                            this.configureToast('Some Error has occured', 'Preferred/Not Preferred and Upload Required fields are mandatory', 'error');
                         }
                     }
                 }

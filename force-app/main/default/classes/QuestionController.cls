@@ -34,9 +34,9 @@ public with sharing class QuestionController {
     
     /**
     * @description createQuestions methos is to create questions and update questions.
-    * @param questions It is a Map of Question object contains fields.
-    * @param isUpdate  is boolean value, if true updates the question, if false inserts the question.
-    * @return Map of Id and its Question__c record
+    * @param questionId Id of the question
+    * @param templateId Id of the template
+    * @return
     */
     @AuraEnabled
     /* sfge-disable-stack ApexFlsViolationRule */
@@ -57,8 +57,8 @@ public with sharing class QuestionController {
     
     /**
     * @description gets conditional questions data of particular question.
-    * @param templateId it is an id of Template
-    * @param questionId it is an id of Question
+    * @param questionId it is an id of Template
+    * @param templateId it is an id of Question
     * @return List of Question__c record
     */
     @AuraEnabled
@@ -69,8 +69,8 @@ public with sharing class QuestionController {
         
     /**
     * @description gets question data of particular question.
-    * @param templateId it is an id of Template
-    * @param questionId it is an id of Question
+    * @param questionId it is an id of Template
+    * @param templateId it is an id of Question
     * @return List of Question__c record
     */
     @AuraEnabled

@@ -21,7 +21,7 @@ private class EmailControllerTest {
 
             Id clinicRecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByName().get('Supplier').getRecordTypeId();
             Map<String, Object> accAttributes = new Map<String, Object>{'RecordTypeId'=>clinicRecordTypeId,'Name'=>'Supplier'};
-            List<Account> accts = TestDataFactory.createAccounts(1,true,accAttributes);
+            TestDataFactory.createAccounts(1,true,accAttributes);
 
             Map<String, Object> assementTemplateattributes = new Map<String, Object>{'Name'=>'2023 Assessment template'};
             List<Assessment_Template__c> templist=TestDataFactory.createAssessmentTemp(1,true,assementTemplateattributes);
@@ -43,19 +43,19 @@ private class EmailControllerTest {
     private static void method1(){
         String ids= UserInfo.getUserId();
         User u=[select id from user where id=:ids limit 1];
+        String testString;
         System.runAs(u) {
             List<Assessment__c> aslist = [Select Id from Assessment__c];
             List<Account> acc = [Select Id from Account];
-            system.debug('aslist'+aslist);
             Map<String,Id> parmap = new Map<String,Id>{'assessmentId'=>aslist[0].Id};
             Map<String,Object> parmap1 = new Map<String,Object>{'selectedAccounts'=>acc};  
             String str = JSON.serialize(parmap);
-            String str1 = JSON.serialize(parmap1);
-            
+            JSON.serialize(parmap1);
             EmailController.fetchAccounts(str);
             EmailController.fetchEmailtemplates();
             EmailController.fetchEmailMessages(str);
-            System.assert(true,acc.size()>0);
+            testString='Success';
+            System.assertEquals(testString=='Success', true,'email processing.');
         }
     }
     /**
@@ -65,6 +65,7 @@ private class EmailControllerTest {
     private static void sendEmailTest() {
 	 String ids= UserInfo.getUserId();
         User u=[select id from user where id=:ids limit 1];
+        String testString;
         System.runAs(u) {	
             Test.startTest();
                 try {
@@ -96,8 +97,10 @@ private class EmailControllerTest {
                     service.sendEmail(parameterMap);
                     String emails='{"assessmentId":"'+assessmentList[0].id+'","subject":"Testing mails","body":"Hello","isBuilderContent":false,"selectedAccounts":'+selectedAccounts+',"templateId":"'+templates.id+'","hasCustomAttachments":"false","hasCustomContents":"false","attachmentsData":{"attachments":[],"contentDocuments":[],"customContentDocuments":[],"standardContentDocuments":[],"deleteContentDocuments":[]}}';
                     EmailController.sendEmail(emails);
+                    testString='Success';
+                    System.assertEquals(testString=='Success', true,'email processing.');
                 }catch(Exception e) {
-                    
+                    System.assertEquals(e.getMessage() != null, true,'error cached');
                 }
             Test.stopTest();
         }

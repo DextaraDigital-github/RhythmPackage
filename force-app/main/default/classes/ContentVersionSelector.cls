@@ -13,7 +13,8 @@ public with sharing class ContentVersionSelector {
 
     private static ContentVersionSelector selector = null; //private static instance of the class
     /**
-    * @description Singleton Design Pattern 
+    * @description Singleton Design Pattern
+    * @return
     */
     public static ContentVersionSelector getInstance(){
            if(selector == null){

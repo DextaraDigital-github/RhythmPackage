@@ -9,8 +9,8 @@ public with sharing class AccountAssessmentRelationSelector {
     public static SecurityCheckController safe = new SecurityCheckController();   //Implementing singleton pattern
     public static List<ErrorTransactionLog__c> errorList;   //Stores list of ErrorTransactionLog__c records to store errors
     public static ErrorTransactionLog__c errorRec;   //Used for creating an instance for ErrorTransactionLog__c to log/store an error
-
     private static AccountAssessmentRelationSelector selector = null; //private static instance of the class
+    
     /**
     * @description Singleton Design Pattern
     * @return

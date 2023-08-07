@@ -50,7 +50,7 @@ public with sharing class QuestionAttributeResponseController {
     }
       /**
     * @description gets al Response Attribute Records based on  Response_Attribute__c Ids
-    * @param questionlst is a list of Response_Attribute__c id. 
+    * @param respAttrId is a list of Response_Attribute__c id. 
     * @return List of Response_Attribute__c records
     */
     @AuraEnabled

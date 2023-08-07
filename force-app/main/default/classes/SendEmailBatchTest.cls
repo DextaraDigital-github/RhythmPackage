@@ -93,11 +93,7 @@ private class SendEmailBatchTest {
                     'deleteContentDocuments'=> new List<Object>()
                     });
             Test.startTest();
-        //Messaging.SingleEmailMessage email = new Messaging.SingleEmailMessage();
-          //  email.setHtmlBody((String)paramMap.get('body'));
-        //system.assert(false, email.getHtmlBody());
-        System.debug('templateId'+paramMap.get('templateId'));
-            SendEmailBatch emailtest = new SendEmailBatch(paramMap);
+            SendEmailBatch emailtest = new SendEmailBatch(JSON.serialize(paramMap));
         Id jobid = Database.executeBatch(emailtest);
         Test.stopTest();
     }

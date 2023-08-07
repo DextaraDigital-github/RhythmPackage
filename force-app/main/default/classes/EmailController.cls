@@ -6,8 +6,8 @@
 * Last Modified Date : 
 */
 public with sharing class EmailController {
-     
     static EmailService service = EmailService.getInstance();
+    
     /**
     * @description Fetches the Account records based on search string and other parameters
     * @param parameterMap It is a stringified JSON of parameters required to fetch AccountAssessmentRelation records
@@ -33,10 +33,10 @@ public with sharing class EmailController {
     */
     @AuraEnabled
     public static void sendEmail(String parameterMap) {
-        try{
+        try {
             service.sendEmail(parameterMap);
-        }catch(Exception e){
-            string errorMsg = e.getMessage();
+        } catch(Exception e) {
+            String errorMsg = e.getMessage();
             throw new AuraHandledException(ErrorMsg);
         }
     }

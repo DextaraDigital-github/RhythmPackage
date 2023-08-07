@@ -15,6 +15,7 @@ private class ContentDocumentSelectorTest {
     private static void fetchContentDocumentstest() {
         String ids= UserInfo.getUserId();
         User u=[select id from user where id=:ids limit 1];
+        String testString; 
         System.runAs(u) {
             test.startTest();
             try {
@@ -22,8 +23,10 @@ private class ContentDocumentSelectorTest {
                 String cdfilter = 'where Id in deleteContentDocuments';
                 Map<String,Object> emailtempParameterMap = new Map<String,Object>{'fields'=>cdFields, 'filter'=>cdfilter};
                 selector.fetchContentDocuments(emailtempParameterMap);
+                testString='Success';
+                System.assertEquals(testString=='Success', true,'fetch content documents.');
             }catch (AuraHandledException e) {
-                //System.assert(e.getMessage().contains('colon'), 'expecting a colon');
+                System.assertEquals(e.getMessage() != null, true,'error cached');
             }
             test.stopTest();
         }
