@@ -17,7 +17,7 @@ export default class SendEmail extends NavigationMixin(LightningElement) {
     @track columns = [{ fieldName: 'Name', label: 'Name', sortable: true }];
     @track pagesData;   // Contains page navigations
     @track pagesList;   // Contains list of page Names to avoid looping wherever necessary
-    @track show = { spinner: false, recSearchKey: '', recSearchCount: { value: 0, show: false }, recSearchLoading: false };   // Conditonally renders/displays data on UI
+    @track show = { spinner: false, showAttachments: false, recSearchKey: '', recSearchCount: { value: 0, show: false }, recSearchLoading: false };   // Conditonally renders/displays data on UI
     @track currentPage;   // Contains current page details of the modal popup
     @track email = { whatId: '', subject: '', body: '', isBuilderContent: false, selectedRecipientsCount: 0, selectedRecipients: [], selectedRecipientsData: {}, templateId: '', hasCustomContents: false, attachmentsData: { attachments: [], contentDocuments: [], deleteContentDocuments: [] } };   // Stores data regarding the email which is to be sent
     @track trackSearchRecipients = { searchKey: '', allRecipients: [], selectedRecipients: [] };
@@ -111,7 +111,7 @@ export default class SendEmail extends NavigationMixin(LightningElement) {
                 else {
                     this.getFilesFlag = false;
                 }
-                 this.keyList && this.keyList.forEach(rec => {
+                this.keyList && this.keyList.forEach(rec => {
                     rec.icon = ((rec).type === 'png') ? 'doctype:image' :
                         ((rec).type === 'pdf') ? 'doctype:pdf' :
                             ((rec).type === 'jpg') ? 'doctype:image' :
@@ -121,6 +121,9 @@ export default class SendEmail extends NavigationMixin(LightningElement) {
                                             ((rec).type === 'txt') ? 'doctype:txt' :
                                                 ((rec).type === 'docx' || (rec).type === 'doc') ? 'doctype:word' : 'doctype:flash';
                 });
+                if(typeof this.keyList != 'undefined' && this.keyList.length > 0) {
+                    this.show.showAttachments = true;
+                }
             }
         });
     }
@@ -178,6 +181,11 @@ export default class SendEmail extends NavigationMixin(LightningElement) {
     initializeAttributes() {
         this.assignPagesData();
         this.email.subject = this.whatName;
+        this.trackSearchRecipients.searchKey;
+        this.trackSearchRecipients.selectedRecipients = [];
+        this.show.recSearchKey = '';
+        this.show.recSearchCount = { value: 0, show: false };
+        this.show.recSearchLoading = false;
     }
     assignPagesData() {
         if (JSON.parse(JSON.stringify(this.isReadOnly))) {
@@ -335,6 +343,8 @@ export default class SendEmail extends NavigationMixin(LightningElement) {
             this.createRecipientsMap();
             sendEmail({ parameterMap: JSON.stringify(this.email) }).then(() => {
                 this.configureToast('Sending Emails', 'Emails will be sent to the selected Suppliers shortly.', 'success');
+                this.email = { whatId: '', subject: '', body: '', isBuilderContent: false, selectedRecipientsCount: 0, selectedRecipients: [], selectedRecipientsData: {}, templateId: '', hasCustomContents: false, attachmentsData: { attachments: [], contentDocuments: [], deleteContentDocuments: [] } };   // Stores data regarding the email which is to be sent
+                this.initializeAttributes();
                 this.show.spinner = false;
                 this.currentPage.footerButtons.next.disabled = this.currentPage.footerButtons.cancel.disabled = this.currentPage.footerButtons.previous.disabled = false;
                 this.cancelModalHandler();
@@ -353,6 +363,7 @@ export default class SendEmail extends NavigationMixin(LightningElement) {
             }
         }
     }
+    /* Creates a map to access recipients data easily */
     createRecipientsMap() {
         let _selectedRecipientsMap = {};
         this.recipientsDataTemp.filter(rec1 => { return this.email.selectedRecipients.includes(rec1.Id) }).forEach(rec2 => {

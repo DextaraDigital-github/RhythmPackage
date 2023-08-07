@@ -55,7 +55,7 @@ global with sharing class ActionItemExpiryBatch implements Database.Batchable<sO
                 }
             }
             if(userIds.isEmpty() == false){
-                List<Messaging.SendEmailResult> sendmails=SendEmail.send('Action Item','Action Item has Expired',userIds);
+                SendEmail.send('Action Item','Action Item has Expired',userIds);
             }
         }catch(exception e){
             ErrorTransactionLog__c errorRec = new ErrorTransactionLog__c();

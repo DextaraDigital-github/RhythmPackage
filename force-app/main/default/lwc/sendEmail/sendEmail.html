@@ -13,7 +13,8 @@
 								</h1>
 							</center>
 						</div>
-						<div class="slds-col slds-large-size_4-of-12 slds-p-horizontal_x-small slds-medium-size_1-of-1 slds-size_1-of-1">
+						<div
+							class="slds-col slds-large-size_4-of-12 slds-p-horizontal_x-small slds-medium-size_1-of-1 slds-size_1-of-1">
 							<!-- Modal Footer for navigation between pages -->
 							<template if:true={isReadOnly}>
 								<lightning-button-group class="slds-float_right">
@@ -165,17 +166,17 @@
 											</template>
 										</template>
 										<template if:true={isReadOnly}>
-											<template if:true={keyList}>
+											<template if:true={show.showAttachments}>
 												<div class="slds-form-element__label">Attachments</div>
-												<template for:each={keyList} for:item="item" for:index="index">
-													<div key={item}>
-														<lightning-pill icon-name={item.icon} label={item.value}
+												<div class="slds-grid slds-wrap">
+													<template for:each={keyList} for:item="item" for:index="index">
+														<lightning-pill class="slds-m-right_xx-small slds-m-bottom_xx-small" icon-name={item.icon} label={item.value}
 															data-id={item.key} data-title={item.url}
-															onclick={handleDownload}>
+															onclick={handleDownload} key={item}>
 															<lightning-icon icon-name={item.icon}></lightning-icon>
 														</lightning-pill>
-													</div>
-												</template>
+													</template>
+												</div>
 											</template>
 										</template>
 									</div>

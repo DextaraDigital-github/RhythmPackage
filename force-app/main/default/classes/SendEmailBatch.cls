@@ -47,7 +47,7 @@ public with sharing class SendEmailBatch implements Database.batchable<sObject>,
     * @param bc Context of the Batch class
     * @return List of User records
     */
-    public Iterable<sObject> start(Database.BatchableContext bc) {       
+    public Database.QueryLocator start(Database.BatchableContext bc) {       
         /* Fetching User records to whom the email should be sent */
         String userFilter = ' WHERE Email!=null AND Contact.Primary_Contact__c = true AND Contact.Email != null AND Contact.AccountId IN (\'' + String.join(email.selectedRecipients,'\',\'') + '\') ';
         String query = ' SELECT Id, Email, ContactId, Contact.AccountId, Contact.Account.Name FROM User ' + userFilter;
@@ -146,6 +146,16 @@ public with sharing class SendEmailBatch implements Database.batchable<sObject>,
                 email.userEmrMap.remove(result.geterrors()[0].getTargetObjectId());
                 email.userEmailMap.remove(result.geterrors()[0].getTargetObjectId());
             }
+        }
+        
+        SendEmailEvent__e event = new SendEmailEvent__e();
+        event.Source__c = 'Refresh Emails';
+        event.Type__c = 'RefreshEmails';
+        try {
+            EventBus.publish(event);
+        }
+        catch(Exception e) {
+            throw new AuraHandledException(e.getMessage());   //Throws an exception
         }
     }
     

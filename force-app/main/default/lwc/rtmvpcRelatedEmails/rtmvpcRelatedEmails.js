@@ -3,6 +3,7 @@ import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { loadStyle } from 'lightning/platformResourceLoader';
 import fetchEmailMessages from '@salesforce/apex/EmailController.fetchEmailMessages';
 import ComponentStylesheet from '@salesforce/resourceUrl/ComponentStyleSheet';
+import { subscribe, unsubscribe } from 'lightning/empApi';
 
 export default class RtmvpcRelatedEmails extends LightningElement {
     @api recordId;
@@ -15,15 +16,35 @@ export default class RtmvpcRelatedEmails extends LightningElement {
     @track selectedEmail = {};
     @track pageProp = {};
     emailsDataMap;
+    subscription;
 
     connectedCallback() {
         this.fetchEmailMsgsData();
+        this.subscribeToPlatformEvent('/event/SendEmailEvent__e');
     }
     renderedCallback() {
         Promise.all([
             loadStyle(this, ComponentStylesheet)
         ]);
     }
+
+    /* Subscribes to Platform Event to capture the status of emails sent */
+    subscribeToPlatformEvent(channelName) {
+        let _this = this;
+        const messageCallback = function (response) {
+            if (response.data.payload.Rhythm__Source__c === 'Refresh Emails' && response.data.payload.Rhythm__Type__c === 'RefreshEmails') {
+                console.log('Hi');
+                _this.fetchEmailMsgsData();
+            }
+        };
+        subscribe(channelName, -1, messageCallback).then((response) => {
+            this.subscription = response;
+        });
+    }
+    unsubscribeToPlatformEvent() {
+        unsubscribe(this.subscription, () => { });
+    }
+
     /*fetches EmailMessages along with Users */
     fetchEmailMsgsData() {
         let _parameterMap = JSON.stringify({ assessmentId: this.recordId });
@@ -123,5 +144,11 @@ export default class RtmvpcRelatedEmails extends LightningElement {
             this.selectedEmail.selectedRecipientsCount = this.selectedEmail.selectedRecipients.length;
         }
         this.template.querySelectorAll('c-send-email')[0].send();
+    }
+
+    /* Refreshed the data in the datatable */
+    refreshDataHandler() {
+        console.log('Hi');
+        this.fetchEmailMsgsData();
     }
 }
