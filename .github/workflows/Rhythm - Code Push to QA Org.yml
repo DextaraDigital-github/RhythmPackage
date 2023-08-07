@@ -39,7 +39,7 @@ jobs:
         echo The PR was merged 
           
  validate:
-    name: Scratchorg creation and package installation
+    name: Org Authentication and Validation
     needs: [environment-setup]
     runs-on: ubuntu-latest
     # if: github.event == 'push'
