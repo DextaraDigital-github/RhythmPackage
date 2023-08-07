@@ -1272,7 +1272,7 @@ export default class Questionnaire extends LightningElement {
                     if (typeof question.Files__c !== 'undefined') {
                         filesmap[question.Id] = question.Files__c;
                     }
-                    if (typeof question.value != 'undefined') {
+                    if (typeof question.value != 'undefined' && question.value != '') {
                         if (question.isEmail === true && !(question.value.match(/^\w+([\\.-]?\w+)*@\w+([\\.-]?\w+)*(\.\w{2,3})+$/))) {
                             isAssessmentValidated = true;
                             this.showspinner = false;

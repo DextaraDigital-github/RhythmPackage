@@ -166,6 +166,8 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
                         flagresponse = !(res.Rhythm__Flag__c);
                     }
                 })
+              
+                
             }
             this.chatterMap.questionId = quesId;
             this.chatterMap.accountType = 'vendor';
@@ -204,6 +206,16 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
        
          const selectedEvent = new CustomEvent('uploadfile', {
                 detail: this.uploadMap
+            });
+            // Dispatches the event.
+            this.dispatchEvent(selectedEvent);
+
+    }
+    handleChildUpload(event){
+        console.log('child',this.uploadMap);
+         const selectedEvent = new CustomEvent('uploadfile', {
+                bubbles:true,
+                detail: event.detail
             });
             // Dispatches the event.
             this.dispatchEvent(selectedEvent);

@@ -635,7 +635,7 @@
 									onselectchange={handleConversationHistory} responses={childquestion.questions}
 									onactionchange={handleActionChange} key={childquestion.isdisplay}
 									ongetdata={handleFileRecord} onhandleonload={handleFileRecord}
-									conditionaval={childquestion.optionValue} recid={recordId}
+									conditionaval={childquestion.optionValue} recid={recordId} onuploadfile={handleChildUpload}
 									accountassessmentid={accountassessmentid} qtype={questionary.type}
 									onremovequeshighlight={removehighlightHandler} onvaluechange={handlechildchange}
 									onrejectchange={handleRejectButton} timeline={timeline}
