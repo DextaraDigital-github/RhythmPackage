@@ -8,6 +8,7 @@
 public with sharing class SendEmailBatch implements Database.batchable<sObject>, Database.Stateful {
     public SecurityCheckController safe;
     public EmailWrapper email;
+    List<failedEmailsWrapper> failedEmailsMapList;
 
     static ContentDocumentSelector selector = ContentDocumentSelector.getInstance();
     static ContentVersionSelector cvSelector = ContentVersionSelector.getInstance();
@@ -25,6 +26,7 @@ public with sharing class SendEmailBatch implements Database.batchable<sObject>,
         this.email.accUserMap = new Map<Id,User>();   // Stores AccountId and respective primary contact's User record
         this.email.userEmailMap = new Map<Id,String>();   // Stores UserId and respective Email
         this.email.userEmrMap = new Map<Id,EmailMessageRelation>();   // Stores UserId and respective EmailMessageRelation record
+        this.failedEmailsMapList = new List<failedEmailsWrapper>();   // Stores list of recipient data to whom the emails weren't sent
         this.safe = new SecurityCheckController();
         
         /* If the Email should be sent using an Email Template */
@@ -166,14 +168,13 @@ public with sharing class SendEmailBatch implements Database.batchable<sObject>,
         emailMsg.MessageDate = DateTime.now();
         emailMsg.EmailTemplateId = email.templateId;
        	
-        String htmlBody = '';
         /* Capturing Failed Emails to store on EmailMessage */
-        FailedEmailsWrapper failedEmailsMap = new FailedEmailsWrapper();   // Stores UserId and respective Email
-        List<FailedEmailsWrapper> failedEmailsMapList = new List<FailedEmailsWrapper>();
+        String htmlBody = '';
         Map<String,Object> selectedRecipientsMap = (Map<String,Object>)JSON.deserializeUntyped(email.selectedRecipientsData);
         for(Id accId: email.selectedRecipients) {
+            failedEmailsWrapper failedEmailsMap = new failedEmailsWrapper();   // Stores UserId and respective Email
             Map<String,Object> selectedRecipient = (Map<String,Object>)JSON.deserializeUntyped(JSON.serialize(selectedRecipientsMap.get(String.valueOf(accId))));
-        	if(!email.accUserMap.containsKey(accId)) {    // Storing 'No Email' against accountId which is not in accUserMap as the account might not have a primary contact, account's primary contact or the primary contact's user might not have an email
+            if(!email.accUserMap.containsKey(accId)) {    // Storing 'No Email' against accountId which is not in accUserMap as the account might not have a primary contact, account's primary contact or the primary contact's user might not have an email
             	failedEmailsMap.Id = accId;
                 failedEmailsMap.Name = (String)selectedRecipient.get('Name');
                 failedEmailsMap.Email = 'No Email';
