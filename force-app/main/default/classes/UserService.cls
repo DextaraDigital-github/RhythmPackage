@@ -12,7 +12,8 @@ public with sharing class UserService {
     private static UserService service = null; //private static instance of the class
     
     /**
-    * @description Singleton Design Pattern 
+    * @description Singleton Design Pattern
+     * @return
     */
     public static UserService getInstance(){
            if(service == null){

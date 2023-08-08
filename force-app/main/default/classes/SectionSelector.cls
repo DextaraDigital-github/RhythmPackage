@@ -13,6 +13,7 @@ public with sharing class SectionSelector {
     
     /**
     * @description Singleton Design Pattern 
+    * @return
     */
     public static SectionSelector getInstance(){
            if(selector == null){
@@ -38,7 +39,12 @@ public with sharing class SectionSelector {
         return sectionsList;
     }
 
-    // RED FOR NO COMMENTS
+   /**
+    * @description To get sections related to template.
+    * @param templateId It is template id.
+    * @param sectionName Name of the section.
+    * @return
+    */
     public List<Sobject> getSections(String templateId, String sectionName){
         sectionName = '\'%'+sectionName+'%\'';
         try{

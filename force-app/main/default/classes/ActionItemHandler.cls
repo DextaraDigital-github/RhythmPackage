@@ -18,7 +18,7 @@ public with sharing class ActionItemHandler implements ITriggerHandler{
         for(Action__c aar:(List<Action__c>)newList) {
              userIds.add(aar.Assigned_To__c);
         }
-        List<Messaging.SendEmailResult> sendmails=SendEmail.send('Action Item','Action Item has Created',userIds);
+        SendEmail.send('Action Item','Action Item has Created',userIds);
         return;
     }
 
@@ -49,7 +49,7 @@ public with sharing class ActionItemHandler implements ITriggerHandler{
          for(Action__c aar:(List<Action__c>)newList) {
              userIds.add(aar.Assigned_To__c);
         }
-        List<Messaging.SendEmailResult> sendmails=SendEmail.send('Action Item','Action Item has Updated',userIds);
+        SendEmail.send('Action Item','Action Item has Updated',userIds);
       }
 
     /**
@@ -73,7 +73,7 @@ public with sharing class ActionItemHandler implements ITriggerHandler{
         for(Action__c aar:(List<Action__c>)oldList) {
             userIds.add(aar.Assigned_To__c);
         }
-        List<Messaging.SendEmailResult> sendmails=SendEmail.send('Action Item','Action Item has Updated',userIds);
+        SendEmail.send('Action Item','Action Item has Updated',userIds);
     }
 
      /**

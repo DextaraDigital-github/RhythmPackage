@@ -48,20 +48,35 @@ public with sharing class SendEmail {
         return null;
     }
      
+     /**
+    * @description To notify the user for CAPA.
+    * @param actionData action record data.
+    * @param body body of the email.
+    * @param recipientsIds set of receipients.
+    */
      public static void notifyUsers(Map<string,object> actionData, String body, Set<String> recipientsIds) {
         Messaging.CustomNotification notification = new Messaging.CustomNotification();
-         string subject=(String)actionData.get('Name');
-         string recordid=(string)actionData.get('Id');
-         string targetId=(string)actionData.get('targetId');
+        string subject=(String)actionData.get('Name');
+        string recordid=(string)actionData.get('Id');
+        string targetId=(string)actionData.get('targetId');
         notification.setTitle(subject);
         notification.setBody(body);
-         notification.setNotificationTypeId(targetId);
-         notification.setTargetId(recordid);
+        notification.setNotificationTypeId(targetId);
+        notification.setTargetId(recordid);
         try {
             notification.send(recipientsIds);
         }
         catch (Exception e) {
-            System.debug('Problem sending notification: ' + e.getMessage());
+            errorList = new List<ErrorTransactionLog__c>();
+            errorRec = new ErrorTransactionLog__c();
+            errorRec.Class_Name__c = 'SendEmail';
+            errorRec.Error_Stack_Trace__c = e.getStackTraceString();
+            errorRec.Name = 'Error while creating User records';
+            errorRec.LWC_Component_Name__c = '';
+            errorRec.Method_Name__c = 'notifyUsers';
+            errorList.add(errorRec);
+            safe.doInsert(errorList);
+            throw new AuraHandledException(e.getMessage());   //Throws an exception                
         }
     }
 }

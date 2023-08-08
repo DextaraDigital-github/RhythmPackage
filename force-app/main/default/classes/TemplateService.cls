@@ -20,6 +20,7 @@ public with sharing class TemplateService{
     
     /**
     * @description Singleton Design Pattern 
+    * @return 
     */
     public static TemplateService getInstance(){
            if(service == null){
@@ -31,6 +32,7 @@ public with sharing class TemplateService{
     /**
     * @description To Clone the Template and its related records.
     * @param templateId This is a record id of an Template.
+    * @param SObject template data to create new record.
     * @return 
     */
     public TemplateController.ResultWrapper cloneTemplate(string templateId,SObject templateRecord){
@@ -278,6 +280,11 @@ public with sharing class TemplateService{
         }
     }
 
+    /**
+    * @description To get the template record data.
+    * @param templateId This is a record id of an Template.
+    * @return 
+    */
     public List<Assessment_Template__c> getTemplateRecord(string templateId){
         return tempSelector.getTemplateRecord(templateId);
     }

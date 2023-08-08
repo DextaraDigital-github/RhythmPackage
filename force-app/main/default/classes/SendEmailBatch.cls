@@ -231,7 +231,7 @@ public with sharing class SendEmailBatch implements Database.batchable<sObject>,
             List<String> cdFields = new List<String>{'Id'};
             String cdFilter = ' WHERE Id IN (\'' + String.join(email.attachmentsData.deleteContentDocuments,'\',\'') + '\') ';
             Map<String,Object> cdParameterMap = new Map<String,Object>{'fields'=>cdFields, 'filter'=>cdFilter};
-            List<ContentDocument> cdList = selector.fetchContentDocuments(cdParameterMap).values();
+            selector.fetchContentDocuments(cdParameterMap).values();
         }
         
         /* Sending a status report of the email to all the user who has sent the mails */
@@ -241,10 +241,13 @@ public with sharing class SendEmailBatch implements Database.batchable<sObject>,
             singleEmail.setHtmlBody('<div>Hello&nbsp;<strong>' + UserInfo.getName() + '</strong>,</div><div><p>Delivery has failed to the ' + (email.selectedRecipients.size() - email.success) + ' recipient(s) for the email with Subject, <strong>' + email.subject + '</strong>.</p></div><div><ol type="1">' + htmlBody + '</ol></div><div><p><a href="' + URL.getSalesforceBaseUrl().toExternalForm() + '/lightning/r/Rhythm__Assessment__c/' + email.whatId + '/view">Click here</a>&nbsp;to view the status of the email.</p></div>');
         	singleEmail.setTargetObjectId(UserInfo.getUserId());
             singleEmail.setSaveAsActivity(false);
-            List<Messaging.SendEmailResult> results = Messaging.sendEmail(new Messaging.SingleEmailMessage[]{singleEmail});
+            Messaging.sendEmail(new Messaging.SingleEmailMessage[]{singleEmail});
         }
     }
     
+    /**
+    * @description Email Wrapper Class.
+    */
     public class EmailWrapper {
         public Id whatId;
         public Id templateId;
@@ -263,13 +266,21 @@ public with sharing class SendEmailBatch implements Database.batchable<sObject>,
         public Map<Id,EmailMessageRelation> userEmrMap;   // Stores UserId and respective EmailMessageRelation record
         public List<EmailMessage> emailMsgList;   // Stores List of EmailMessages to insert
     }
+
+    /**
+    * @description Attachment Wrapper Class.
+    */
     public class AttachmentsDataWrapper {
         public List<Id> contentDocuments;
         public List<Id> deleteContentDocuments;
     }
+
+    /**
+    * @description Failed Wrapper Class.
+    */
     public class FailedEmailsWrapper {
-        public Id Id;
-        public String Name;
-        public String Email;
+        public Id id;
+        public String name;
+        public String email;
     }
 }

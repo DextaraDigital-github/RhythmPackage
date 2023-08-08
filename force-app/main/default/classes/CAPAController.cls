@@ -19,7 +19,9 @@ public with sharing class CAPAController {
     }
 
     /**
-    * @description This method is used to save the response.
+    * @description To save the action record.
+    * @param actionResponse action record data.
+    * @param isUpdate boolean to check the dml type.
     */
     @AuraEnabled
     /* sfge-disable-stack ApexFlsViolationRule */
@@ -28,8 +30,9 @@ public with sharing class CAPAController {
     }
 
     /**
-    * @description This method is to delete the action data.
-    * @return
+    * @description To detele the action record.
+    * @param questionId question record id.
+    * @param accountAssessmentId response record id.
     */
     @AuraEnabled
      /* sfge-disable-stack ApexFlsViolationRule */
@@ -39,7 +42,8 @@ public with sharing class CAPAController {
     }
     
     /**
-    * @description This method is to get the list of records.
+    * @description To get the action records related to particular user.
+    * @param userName logged in user's username.
     * @return
     */
     @AuraEnabled
@@ -49,7 +53,8 @@ public with sharing class CAPAController {
     }
     
     /**
-    * @description This method is to get the action response
+    * @description To get the action records related to a question and response record.
+    * @param actionResponse Map with action related data.
     * @return
     */
     @AuraEnabled
@@ -59,7 +64,8 @@ public with sharing class CAPAController {
     }
     
     /**
-    * @description This method is to get the action records.
+    * @description To get the action records related to a response record.
+    * @param accountAssessment response data.
     * @return
     */
     @AuraEnabled
@@ -69,7 +75,7 @@ public with sharing class CAPAController {
     }
 
     /**
-    * @description This method is to get the action records.
+    * @description To get the action records.
     * @return
     */
     @AuraEnabled
@@ -78,8 +84,9 @@ public with sharing class CAPAController {
         return actionItemRecords;
     }
     
-    /**
-    * @description This method is to get the selected action record.
+     /**
+    * @description To get the selected action record.
+    * @param actionid action record id.
     * @return
     */
     @AuraEnabled
@@ -89,7 +96,10 @@ public with sharing class CAPAController {
     }
 
     /**
-    * @description This method is to send email.
+    * @description To send capa notification.
+    * @param subject subject of the email.
+    * @param body body of the email.
+    * @param userList list of users to send emails.
     */
     @AuraEnabled
     public static void send(String subject, String body, List<Id> userList){
@@ -97,7 +107,10 @@ public with sharing class CAPAController {
     }
 
     /**
-    * @description This method is to notify users.
+    * @description To notify the user for CAPA.
+    * @param actionData action record data.
+    * @param body body of the email.
+    * @param userList list of users to send emails.
     */
     @AuraEnabled
     public static void notifyUsers(Map<string,object> actionData, String body, List<Id> userList){

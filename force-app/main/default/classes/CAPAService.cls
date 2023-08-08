@@ -85,6 +85,7 @@ public with sharing class CAPAService {
     * @description To detele the action record.
     * @param questionId question record id.
     * @param accountAssessmentId response record id.
+    * @return
     */
     public List<Action__c> deleteActionData(string questionId, string accountAssessmentId){
         List<Action__c> deleteData=selector.deleteActionData(questionId,accountAssessmentId);
@@ -165,6 +166,9 @@ public with sharing class CAPAService {
 
     /**
     * @description To notify the user for CAPA.
+    * @param actionData action record data.
+    * @param body body of the email.
+    * @param userList list of users to send emails.
     */
     public void notifyUsers(Map<string,object> actionData, String body, List<Id> userList){
         Object targetId = selector.notifyUsers();

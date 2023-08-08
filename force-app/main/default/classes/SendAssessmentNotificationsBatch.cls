@@ -125,6 +125,9 @@ global with sharing class SendAssessmentNotificationsBatch implements Database.B
         // execute any post-processing operations
         return;
     }
+    /**
+    * @description It is used to throw the exception
+    */
     public class SecurityControllerException extends Exception{
     }
 }

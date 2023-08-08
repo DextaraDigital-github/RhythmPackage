@@ -11,6 +11,7 @@ public with sharing class SectionController {
     /**
     * @description To get sections related to template.
     * @param templateId It is template id.
+    * @param sectionName Name of the section.
     * @return
     */
     @AuraEnabled

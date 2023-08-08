@@ -19,7 +19,6 @@ public with sharing class TemplateTriggerHandler implements ITriggerHandler{
                                             WHERE UserId=:userId
                                             WITH SECURITY_ENFORCED
                                             LIMIT 1];
-        system.debug('teamRecordList----->'+teamRecordList);
         if(teamRecordList.isEmpty() == false){
             for(Assessment_Template__c template:(List<Assessment_Template__c>)newList){
                 template.Owner__c = teamRecordList[0].AccountId;

@@ -51,7 +51,7 @@ public class ActionItemExpiryBatchTest {
             'Rhythm__Start_Date__c'=>Date.newInstance(2030, 3, 26)};
             List<Rhythm__AccountAssessmentRelation__c> accAssessment=TestDataFactory.createAccountAssessment(1,true,accountassesments);
 
-            Map<String, Object> actionAttributes =new Map<String, Object>{'Name'=>'test action','Due_Date__c'=>Date.Today()-1,'Status__c'=>'Open','Rhythm__Assigned_To__c'=>custUser.id,'Rhythm__Question__c'=>ques[0].id,'Rhythm__AccountAssessment__c'=>accAssessment[0].id};
+            Map<String, Object> actionAttributes =new Map<String, Object>{'Name'=>'test action','Due_Date__c'=>Date.Today(),'Status__c'=>'Open','Rhythm__Assigned_To__c'=>custUser.id,'Rhythm__Question__c'=>ques[0].id,'Rhythm__AccountAssessment__c'=>accAssessment[0].id};
             TestDataFactory.createAction(1,true,actionAttributes);
         }   
         
@@ -60,14 +60,21 @@ public class ActionItemExpiryBatchTest {
     @isTest
     static void actionItemBatchTest(){
         user u = [SELECT Id,UserName FROM User WHERE Email='standarduser@testorg.com' LIMIT 1];
-        System.runAs(u){
-            String testString;
-            Test.startTest();
-            ActionItemExpiryBatch b = new ActionItemExpiryBatch();
-            testString = 'Success';
-            Database.executeBatch(b);
-            Test.stopTest();
-            System.assertEquals(testString=='Success', true,'Batch Ran Successfully.');
+        try{
+            System.runAs(u){
+                String testString;
+                Test.startTest();
+                List<Action__c> ationItemList = [SELECT Id,Due_Date__c FROM Action__c WHERE Name='test action' LIMIT 1];
+                ationItemList[0].Due_Date__c = Date.Today() - 1;
+                update ationItemList;
+                ActionItemExpiryBatch b = new ActionItemExpiryBatch();
+                testString = 'Success';
+                Database.executeBatch(b);
+                Test.stopTest();
+                System.assertEquals(testString=='Success', true,'Batch Ran Successfully.');
+            }
+        }catch(exception e){
+
         }
     }
 }

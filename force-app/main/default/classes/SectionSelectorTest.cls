@@ -27,7 +27,7 @@ public class SectionSelectorTest {
             Map<String, Object> questionAttributes = new Map<String, Object>{'Rhythm__Assessment_Template__c'=>templist[0].Id,
                 'Rhythm__Question__c'=>'What is the feedback for service?','Rhythm__Question_Type__c'=>'Picklist','Rhythm__Required__c'=>True,
                 'Rhythm__Section__c'=>seclist[0].Id,'Rhythm__OptionValueSet__c'=>'Yes\r\nNo'};
-            List<Question__c> ques =TestDataFactory.createQuestion(1,true,questionAttributes);
+           TestDataFactory.createQuestion(1,true,questionAttributes);
             
         } 
     }
@@ -52,7 +52,7 @@ public class SectionSelectorTest {
         System.runAs(u){
             Test.startTest();
             testString = 'Success';
-            List<Section__c> seclst =selector.getSections(tempId,sec[0].Name);
+            selector.getSections(tempId,sec[0].Name);
             Test.stopTest();
             System.assertEquals(testString=='Success', true,'Sections retrieved successfully');
         } 

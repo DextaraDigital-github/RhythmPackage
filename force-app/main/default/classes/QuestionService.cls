@@ -69,7 +69,7 @@ public with sharing class QuestionService {
     }
     /**
     * @description createQuestions methos is to create questions and update questions.
-    * @param questions It is a Map of Question object contains fields.
+    * @param questionId It is a Map of Question object contains fields.
     * @param templateId  This is the templateId
     * @return Map of Id and its Question__c record
     */

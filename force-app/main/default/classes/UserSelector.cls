@@ -13,6 +13,7 @@ public with sharing class UserSelector {
     private static UserSelector selector = null; //private static instance of the class
     /**
     * @description Singleton Design Pattern 
+    * @return 
     */
     public static UserSelector getInstance(){
         if(selector == null){
