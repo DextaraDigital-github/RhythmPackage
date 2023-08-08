@@ -9,8 +9,6 @@ on:
       - qa
     types:
       - closed
-    branches-ignore:
-      - development
                 
 # Jobs to be executed
 
