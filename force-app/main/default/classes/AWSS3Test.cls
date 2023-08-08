@@ -8,7 +8,7 @@
 @isTest
 private class AWSS3Test {
     static AWSS3Service service = AWSS3Service.getInstance();
-    static AWSS3Service qService = AWSS3Service.getInstance();
+    static AWSS3ServiceQueueable qService = AWSS3ServiceQueueable.getInstance();
     
     /**
 * @description
