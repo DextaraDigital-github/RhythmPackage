@@ -1,11 +1,3 @@
-/*
-* Component Name    : rtmvpcRenderQuestionTemplate
-* Developer         : Sai Koushik Nimmaturi and Reethika Velpula           
-* Created Date      : 
-* Description       : This component is used for loading the question template based on the sections and save the responses
-* Last Modified Date: 
-* Secondary Contributors: 08/06/2023(Sri Kushal Reddy Nomula)
-*/
 import { LightningElement, api, track } from 'lwc';
 import getSupplierAssessmentList from '@salesforce/apex/AssessmentController.getSupplierAssessmentList';
 import getQuestionsList from '@salesforce/apex/AssessmentController.getQuestionsList';
@@ -28,6 +20,8 @@ import awsjssdk from '@salesforce/resourceUrl/AWSJSSDK';
 import { loadScript } from 'lightning/platformResourceLoader';
 import getAuthentication from '@salesforce/apex/AWSS3Controller.getAuthenticationData';
 import getSignedURL from '@salesforce/apex/AWSS3Controller.getFileSignedUrl';
+import deleteCapa from '@salesforce/apex/CAPAController.deleteCapa';
+import deleteResponse from '@salesforce/apex/AssessmentController.deleteResponse';
 export default class Questionnaire extends LightningElement {
     @track showButtons = {
         Summary: false,
@@ -117,9 +111,9 @@ export default class Questionnaire extends LightningElement {
     @track selectedActionList = [];
     layoutItemSize = 4;
     @track fileData;
+    @track saveBool = false;
 
     @api handleGetRespRecord(event) {
-        console.log('handleFileOnload', event.detail);
         this.handleOnload();
     }
 
@@ -173,9 +167,8 @@ export default class Questionnaire extends LightningElement {
         }
     }
     /*displayCloseIcon is used to remove the delete icon when CAPA form is deleted. This method is called from its parent
-       Component (AssessmentDetail) */
+    Component (AssessmentDetail) */
     @api displayCloseIcon(deleteData) {
-        console.log('deletdata', deleteData);
         this.questionsAndAnswerss.forEach(questionAnswer => {
             questionAnswer.questions.forEach(question => {
                 if (question.Id === deleteData.Rhythm__Question__c) {
@@ -282,8 +275,6 @@ export default class Questionnaire extends LightningElement {
                     const objectKey = file.Key;
                     let fileName = objectKey.substring(objectKey.lastIndexOf("/") + 1);
                     let fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1);
-                    console.log('fileName--->', fileName);
-                    console.log('fileExtension--->', fileExtension);
                     if (fileExtension === 'doc' || fileExtension === 'docx' || fileExtension === 'xls' || fileExtension === 'xlsx') {
                         fileList.push({ type: fileExtension, preview: false, key: objectKey, url: this.endpoint + '/' + objectKey, value: fileName.substring(fileName.indexOf("_") + 1) });
                     }
@@ -330,6 +321,7 @@ export default class Questionnaire extends LightningElement {
 
     /* handleOnload is used to get Sections data and corresponding Questions data and Responses data on onload */
     handleOnload() {
+        this.saveBool = false;
         let isCustomerPortal = (typeof this.recordId !== 'undefined' && typeof this.objectApiName !== 'undefined');
         if (isCustomerPortal) {
             this.assessment = this.recordId;
@@ -454,7 +446,6 @@ export default class Questionnaire extends LightningElement {
                                         //this.showButtons.Section_Navigation.value = this.section;
                                     }
                                     this.constructQuestionsAndAnswers(this.questionsList);
-                                    console.log('this.questionsAndAnswers', this.questionsAndAnswerss);
                                     //This loop is to give the Qustion number for all the Questions
                                     this.questionsList.forEach(questionWrap => {
                                         let sequence = 0;
@@ -537,17 +528,8 @@ export default class Questionnaire extends LightningElement {
                     questionResult.forEach(query => {
                         allQuesId.push(query.Id);
                     });
-                    console.log('questionResult-->', questionResult);
-                    const resQuestType = questionResult.filter(query => query.Rhythm__Question_Type__c === 'Picklist' || query.Rhythm__Question_Type__c === 'Radio'
-                        || query.Rhythm__Question_Type__c === 'Checkbox' || query.Rhythm__Question_Type__c === 'Picklist (Multi-Select)');
-                    const ques = questionResult.filter(query => query.Rhythm__Question_Type__c !== 'Picklist' && query.Rhythm__Question_Type__c !== 'Radio'
-                        && query.Rhythm__Question_Type__c !== 'Checkbox' && query.Rhythm__Question_Type__c !== 'Picklist (Multi-Select)');
-                    console.log('resQuestType', resQuestType);
-                    console.log('ques', ques);
 
                     getQuestionRespAttributes({ questionlst: allQuesId }).then(respAttr => {
-                        console.log('getQuestionRespAttributes', respAttr);
-                        console.log('getQuestionRespAttributes', respAttr);
                         this.constructMultilevelhierarchy(resultMap, this.savedResponseMap, respAttr);
                         let count = 0;
                         let sectionsList = [];
@@ -557,7 +539,6 @@ export default class Questionnaire extends LightningElement {
                             count++;
                         }
                         this.constructQuestionsAndAnswers(this.questionsList);
-                        console.log('this.questionsAndAnswers', this.questionsAndAnswerss);
 
                         //This loop is to give the Qustion number for all the Questions. 
                         this.questionsList.forEach(questionWrap => {
@@ -645,8 +626,6 @@ export default class Questionnaire extends LightningElement {
                             }
                         });
                         getQuestionRespAttributes({ questionlst: allQuesId }).then(respAttr => {
-                            console.log('getQuestionRespAttributes', respAttr);
-                            console.log('getQuestionRespAttributes', respAttr);
                             this.constructMultilevelhierarchy(resultMap, this.savedResponseMap, respAttr);
                             let count = 0;
                             let sectionsList = [];
@@ -734,6 +713,7 @@ export default class Questionnaire extends LightningElement {
             });
             this.showspinner = false;
         }
+
     }
     handleuploadFile(event) {
         const selectedEvent = new CustomEvent('uploadfile', {
@@ -856,6 +836,46 @@ export default class Questionnaire extends LightningElement {
                         if (question.Children.length > 0) {
                             //This loop is to iterate over the Child Questions for a particular sections and Questions in the wrapper.
                             question.Children.forEach(subquestion => {
+                                subquestion.questions.forEach(childquestion => {
+                                    if (subquestion.isdisplay === true) {
+                                        if (childquestion.saveActionForm || childquestion.rejectButton || childquestion.showUpload || childquestion.Rhythm__Flag__c) {
+                                            var capaMap = {};
+                                            var capaQuestionId = [];
+                                            var rejectedQuestionId = [];
+                                            if (childquestion.saveActionForm) {
+                                                capaQuestionId.push(childquestion.Id);
+
+                                            }
+                                            if (childquestion.rejectButton || childquestion.showUpload || childquestion.Rhythm__Flag__c) {
+                                                rejectedQuestionId.push(childquestion.Id)
+                                            }
+                                            capaMap.capaquestionId = capaQuestionId;
+                                            capaMap.responsequestionId = rejectedQuestionId;
+                                            capaMap.accountassessmentId = this.assessment;
+                                            if (capaQuestionId.length > 0) {
+                                                deleteCapa({ deletedata: capaMap }).then(() => {
+                                                    childquestion.saveActionForm = false;
+                                                    this.showToast = true;
+                                                    this.success = true;
+                                                    this.ishideToast = true;
+                                                    this.totastmessage = 'Attachments and CAPAs added to the Conditional questions are deleted'
+
+                                                })
+                                            }
+                                            if (rejectedQuestionId.length > 0) {
+                                                deleteResponse({ deletedata: capaMap }).then(() => {
+                                                    childquestion.rejectButton = false;
+                                                    childquestion.needData = false;
+                                                    childquestion.showUpload = false;
+                                                    childquestion.Rhythm__Flag__c = false;
+
+                                                })
+                                            }
+                                        }
+
+                                    }
+
+                                })
                                 if (subquestion.optionValue === question.value) {
                                     subquestion.isdisplay = true;
                                     question.showUpload = (subquestion.uploadrequired === 'Yes' || subquestion.uploadrequired === 'Optional') ? true : false;
@@ -866,6 +886,15 @@ export default class Questionnaire extends LightningElement {
                                     })
                                 }
                                 else {
+                                    if (question.type === 'Picklist (Multi-Select)') {
+                                        question.showUpload = false;
+                                        let lst = JSON.parse(question.value);
+                                        if (lst.includes(subquestion.optionValue)) {
+                                            if ((subquestion.uploadrequired === 'Yes' || subquestion.uploadrequired === 'Optional')) {
+                                                question.showUpload = true;
+                                            }
+                                        }
+                                    }
                                     subquestion.isdisplay = false;
                                 }
                             });
@@ -882,6 +911,13 @@ export default class Questionnaire extends LightningElement {
                                         }
                                         else {
                                             ques.value = this.questionresponseafterchange.option;
+                                        }
+                                        if (ques.Children.length > 0) {
+                                            ques.Children.forEach(respAttr => {
+                                                if (respAttr.optionValue === ques.value) {
+                                                    ques.showUpload = (respAttr.uploadrequired === 'Yes') ? true : false;
+                                                }
+                                            })
                                         }
                                     }
                                     else {
@@ -910,6 +946,7 @@ export default class Questionnaire extends LightningElement {
                 });
             });
             this.responseMap.set(this.questionresponseafterchange.questionId, this.questionresponseafterchange.option);
+            this.ishideToast = false;
             this.isAutoSave = true;
             this.startAutoSave();
         }
@@ -931,60 +968,7 @@ export default class Questionnaire extends LightningElement {
         filemap.name = this.fileResponseData.name;
         filemap.quesId = this.fileResponseData.questionId;
         filemap.assessmentId = this.accountassessmentid;
-        /*Apex method is used to store the uploaded attachments into response records */
-        uploadFile({ fileResp: JSON.stringify(filemap) }).then(result => {
-            this.template.querySelectorAll('c-rtmvpc-render-question-template')[0].getShowUploadStatus();
-            for (let i = 0; i < this.questionsAndAnswerss.length; i++) {
-                if (this.questionsAndAnswerss[i].sectionId === this.fileResponseData.sectionId) {
-                    for (let j = 0; j < this.questionsAndAnswerss[i].questions.length; j++) {
-                        if (this.questionsAndAnswerss[i].questions[j].Id === this.fileResponseData.questionId) {
-                            this.uploadingFile = false;
-                            let filesdatastored = JSON.parse(result[0].Rhythm__Files__c);
-                            let x = JSON.parse(JSON.stringify(filesdatastored[filesdatastored.length - 1]));
-                            if (typeof this.questionsAndAnswerss[i].questions[j].Files__c === 'undefined') {
-                                let fileresponsedatalst = [];
-                                fileresponsedatalst.push(x);
-                                this.questionsAndAnswerss[i].questions[j].Files__c = fileresponsedatalst;
-                            }
-                            else {
-                                let fileresponsedatalst = JSON.parse(JSON.stringify(this.questionsAndAnswerss[i].questions[j].Files__c));
-                                fileresponsedatalst.push(x);
-                                this.questionsAndAnswerss[i].questions[j].Files__c = fileresponsedatalst;
-                            }
-                            break;
-                        }
-                        if (this.questionsAndAnswerss[i].questions[j].Children.length > 0) {
-                            this.questionsAndAnswerss[i].questions[j].Children.forEach(conditionalQuestion => {
-                                if (conditionalQuestion.isdisplay) {
-                                    conditionalQuestion.questions.forEach(subquestion => {
-                                        if (subquestion.Id === this.fileResponseData.questionId) {
-                                            this.uploadingFile = false;
-                                            let filesdatastored = JSON.parse(result[0].Rhythm__Files__c);
-                                            let x = JSON.parse(JSON.stringify(filesdatastored[filesdatastored.length - 1]));
-                                            if (typeof subquestion.Files__c === 'undefined') {
-                                                let fileresponsedatalst = [];
-                                                fileresponsedatalst.push(x);
-                                                subquestion.Files__c = fileresponsedatalst;
-                                            }
-                                            else {
-                                                let fileresponsedatalst = JSON.parse(JSON.stringify(subquestion.Files__c));
-                                                fileresponsedatalst.push(x);
-                                                subquestion.Files__c = fileresponsedatalst;
-                                            }
-                                        }
-                                    })
-                                }
-                            })
-                        }
-                    }
-                }
-            }
-            let quesResponse = { "Id": result[0].Id, "questionType": this.fileResponseData.type, "value": '', "Files__c": result[0].Rhythm__Files__c, "Flag__c": this.fileResponseData.flag, "Conversation_History__c": this.fileResponseData.conversationHistory };
-            this.savedResponseMap.set(this.fileResponseData.questionId, quesResponse);
-            this.responseMap.set(this.fileResponseData.questionId, quesResponse);
-            this.uploadingFile = false;
-            this.handleOnload();
-        });
+
     }
 
     /* handledeletefile method is used to store the uploaded attachments into response records  */
@@ -994,43 +978,7 @@ export default class Questionnaire extends LightningElement {
         deletefile.accountAssessmentId = this.accountassessmentid;
         deletefile.questionId = deletefileData.questionId;
         deletefile.name = deletefileData.name;
-        deleteFileAttachment({ deleteMap: JSON.stringify(deletefile) }).then(() => {
-            //This loop is to iterate over the sections in the wrapper.
-            for (let i = 0; i < this.questionsAndAnswerss.length; i++) {
-                if (this.questionsAndAnswerss[i].sectionId === deletefileData.sectionId) {
-                    ////This loop is to iterate over the Questions for a particular sections in the wrapper.
-                    for (let j = 0; j < this.questionsAndAnswerss[i].questions.length; j++) {
-                        if (this.questionsAndAnswerss[i].questions[j].Id === deletefileData.questionId &&
-                            typeof this.questionsAndAnswerss[i].questions[j].Files__c !== 'undefined') {
-                            ////This loop is to iterate over the Files Questions for a particular sections and Questions in the wrapper.
-                            for (let k = 0; k < this.questionsAndAnswerss[i].questions[j].Files__c.length; k++) {
-                                if (this.questionsAndAnswerss[i].questions[j].Files__c[k].name === deletefileData.name) {
-                                    this.questionsAndAnswerss[i].questions[j].Files__c.splice(k, 1);
-                                    break;
-                                }
-                            }
-                        }
-                        if (this.questionsAndAnswerss[i].questions[j].Children.length > 0) {
-                            this.questionsAndAnswerss[i].questions[j].Children.forEach(conditionalQuestion => {
-                                if (conditionalQuestion.isdisplay) {
-                                    conditionalQuestion.questions.forEach(subquestion => {
-                                        if (subquestion.Id === deletefileData.questionId &&
-                                            typeof subquestion.Files__c !== 'undefined') {
-                                            for (let k = 0; k < subquestion.Files__c.length; k++) {
-                                                if (subquestion.Files__c[k].name === deletefileData.name) {
-                                                    subquestion.Files__c.splice(k, 1);
-                                                    break;
-                                                }
-                                            }
-                                        }
-                                    });
-                                }
-                            });
-                        }
-                    }
-                }
-            }
-        });
+
     }
     /* This method is used to display the only flageed Questions and All the Questions based on selection */
     @api
@@ -1090,7 +1038,6 @@ export default class Questionnaire extends LightningElement {
         };
         return question;
     }
-
     /*handleSave method is used to save the responses for particular question */
     handleSave() {
         this.ishideToast = true;
@@ -1128,6 +1075,8 @@ export default class Questionnaire extends LightningElement {
         var flagmap = {};
         var filesmap = {};
         var responseIdlist = [];
+        let questionCount = 0;
+        let responseCount = 0;
         var tabledata = '<table><thead>';
         tabledata += '<tr><th>Section</th><th>Question</th><th>Responses</th><th>No.of File Attachments</th><th>Response History</th></tr>';
         tabledata += '</thead><tbody>';
@@ -1178,12 +1127,17 @@ export default class Questionnaire extends LightningElement {
                     rowdata = rowdata + '<tr><td>' + questionAnswer.section + '</td>';
                     if (typeof question.snumber !== 'undefined' && typeof question.question !== 'undefined') {
                         rowdata = rowdata + '<td>' + question.snumber + ' ' + question.question + '</td>';
+                        questionCount++;
                     }
                     else {
                         rowdata = rowdata + '<td></td>';
                     }
                     if (typeof question.value !== 'undefined') {
                         rowdata = rowdata + '<td>' + question.value + '</td>';
+                        if (question.value !== '') {
+                            responseCount++;
+                        }
+
                     }
                     else {
                         rowdata = rowdata + '<td></td>';
@@ -1213,12 +1167,17 @@ export default class Questionnaire extends LightningElement {
                             conditionalQuestion.questions.forEach(subquestion => {
                                 if (typeof subquestion.snumber !== 'undefined' && typeof subquestion.subquestion !== 'undefined') {
                                     rowdata = rowdata + '<td>' + subquestion.snumber + ' ' + subquestion.question + '</td>';
+                                    questionCount++;
                                 }
                                 else {
                                     rowdata = rowdata + '<td></td>';
                                 }
                                 if (typeof subquestion.value !== 'undefined') {
                                     rowdata = rowdata + '<td>' + subquestion.value + '</td>';
+                                    if (subquestion.value !== '') {
+                                        responseCount++;
+                                    }
+
                                 }
                                 else {
                                     rowdata = rowdata + '<td></td>';
@@ -1381,6 +1340,7 @@ export default class Questionnaire extends LightningElement {
             responseQueryMap.accountId = this.accid;
             responseQueryMap.assesmentId = this.assessment;
             responseQueryMap.accountassessmentid = this.accountassessmentid;
+           responseQueryMap.percentage = Math.floor(Number(responsesCount/questionsCount)*100)+'';
             if (this.assessmentStatus !== 'Need More Information') {
                 if (isSubmit) {
                     responseQueryMap.status = 'Submitted';
@@ -1521,7 +1481,6 @@ export default class Questionnaire extends LightningElement {
                     this.showcustomerbuttons = true;
                     this.timeline.forEach(res => {
                         if (res.status === 'Need More Information') {
-                            console.log('needdata');
                             quTemp.needData = true;
                             quTemp.capaAction = true;
                             quTemp.customerFlag = true;
@@ -1735,8 +1694,6 @@ export default class Questionnaire extends LightningElement {
 
     // constructMultilevelhierarchy method is used to construct nested questions wrapper, based on condition of having parentQuestionId
     constructMultilevelhierarchy(queryResults, savedResp, respAttr) {
-        console.log('queryResults', queryResults);
-        console.log('constructMultilevelhierarchy respAttr', respAttr);
         const children = queryResults.filter(result => typeof result.Rhythm__Parent_Question__c !== 'undefined');
         const parent = queryResults.filter(result => typeof result.Rhythm__Parent_Question__c === 'undefined');
         const resQuestType = queryResults.filter(query => query.Rhythm__Question_Type__c === 'Picklist' || query.Rhythm__Question_Type__c === 'Radio'
@@ -1759,15 +1716,14 @@ export default class Questionnaire extends LightningElement {
         });
         if (resQuestType.length > 0) {
             resQuestType.forEach(parentdata => {
-                if (!childQueslst.includes(parentdata.Id)) {
-                    console.log('Into if');
+                //if (!childQueslst.includes(parentdata.Id)) {
+                const hierarchyObj = this.constructWrapperConditionalQuestion(parentdata, savedResp);
+                this.createChildHierarchy(children, hierarchyObj, savedResp, respAttr);
+                this.hierarchy.push(hierarchyObj);
+                /*} else {
                     const hierarchyObj = this.constructWrapperConditionalQuestion(parentdata, savedResp);
-                    this.createChildHierarchy(children, hierarchyObj, savedResp, respAttr);
                     this.hierarchy.push(hierarchyObj);
-                } else {
-                    const hierarchyObj = this.constructWrapperConditionalQuestion(parentdata, savedResp);
-                    this.hierarchy.push(hierarchyObj);
-                }
+                }*/
             });
         }
 
@@ -1776,11 +1732,25 @@ export default class Questionnaire extends LightningElement {
     createChildHierarchy(queryResults, parentObj, savedResp, respAttr) {
         const child = queryResults.filter(result =>
             result['Rhythm__Parent_Question__c'] === parentObj.Id);
+        respAttr.forEach(resp => {
+            if (parentObj.type === 'Checkbox' && parentObj.Id === resp.Rhythm__QuestionId__c) {
+                if (resp.Rhythm__Response_value__c === 'true') {
+                    resp.Rhythm__Response_value__c = true;
+                }
+                else {
+                    resp.Rhythm__Response_value__c = false;
+                }
+            }
+        });
         if (child.length > 0) {
             child.forEach(childdata => {
                 const childObj = this.constructWrapperConditionalQuestion(childdata, savedResp);
                 this.childQuestionList.push(childObj.Id);
                 this.parentQuestionList.push(parentObj.Id);
+                if (childObj.type === 'Radio' || childObj.type === 'Picklist (Multi-Select)' || childObj.type === 'Checkbox' ||
+                    childObj.type === 'Picklist') {
+                    this.createChildHierarchy(queryResults, childObj, savedResp, respAttr);
+                }
                 if (parentObj.type === 'Checkbox') {
                     if (childObj.conditional === 'true') {
                         childObj.conditional = true;
@@ -1789,12 +1759,13 @@ export default class Questionnaire extends LightningElement {
                         childObj.conditional = false;
                     }
                 }
+
                 if (parentObj.value === childObj.conditional) {
                     let key = parentObj.question + '-' + parentObj.value;
                     this.questionsvaluemap[key] = childObj;
                     let childmp = {};
                     respAttr.forEach(resp => {
-                        if (resp.Rhythm__Response_value__c === parentObj.value) {
+                        if (resp.Rhythm__Response_value__c === parentObj.value && resp.Rhythm__QuestionId__c === parentObj.Id) {
                             childmp.respAttrId = resp.Id;
                             childmp.uploadrequired = resp.Rhythm__Upload_Required__c;
                             childmp.ispreffered = resp.Rhythm__preferred_Not_preferred__c;
@@ -1826,7 +1797,7 @@ export default class Questionnaire extends LightningElement {
                     else {
                         let childmp = {};
                         respAttr.forEach(resp => {
-                            if (resp.Rhythm__Response_value__c === childObj.conditional) {
+                            if (resp.Rhythm__Response_value__c === childObj.conditional && resp.Rhythm__QuestionId__c === parentObj.Id) {
                                 childmp.respAttrId = resp.Id;
                                 childmp.uploadrequired = resp.Rhythm__Upload_Required__c;
                                 childmp.ispreffered = resp.Rhythm__preferred_Not_preferred__c;
@@ -1864,7 +1835,7 @@ export default class Questionnaire extends LightningElement {
                         else {
                             let childmp = {};
                             respAttr.forEach(resp => {
-                                if (resp.Rhythm__Response_value__c === childObj.conditional) {
+                                if (resp.Rhythm__Response_value__c === childObj.conditional && resp.Rhythm__QuestionId__c === parentObj.Id) {
                                     childmp.respAttrId = resp.Id;
                                     childmp.uploadrequired = resp.Rhythm__Upload_Required__c;
                                     childmp.ispreffered = resp.Rhythm__preferred_Not_preferred__c;
@@ -1883,7 +1854,7 @@ export default class Questionnaire extends LightningElement {
                     else {
                         let childmp = {};
                         respAttr.forEach(resp => {
-                            if (resp.Rhythm__Response_value__c === childObj.conditional) {
+                            if (resp.Rhythm__Response_value__c === childObj.conditional && resp.Rhythm__QuestionId__c === parentObj.Id) {
                                 childmp.respAttrId = resp.Id;
                                 childmp.uploadrequired = resp.Rhythm__Upload_Required__c;
                                 childmp.ispreffered = resp.Rhythm__preferred_Not_preferred__c;
@@ -1915,9 +1886,9 @@ export default class Questionnaire extends LightningElement {
                     childmp.isdisplay = false;
                     childmp.questions = [];
                     childlst.push(childmp);
-                } 
-            }); 
-            parentObj.Children = childlst;    
+                }
+            });
+            parentObj.Children = childlst;
         }
     }
 
@@ -1935,6 +1906,11 @@ export default class Questionnaire extends LightningElement {
                     this.showFollowButton = false;
                 }
                 question.Children.forEach(conditionalQuestion => {
+                    if (question.Rhythm__Flag__c === true && question.Id === this.showChat.questionId) {
+                        this.showToast = true;
+                        this.success = false;
+                        this.totastmessage = 'Flagging the question will make the response editable, Attachments and CAPAs added to the Conditional questions will be deleted when the response is changed';
+                    }
                     if (conditionalQuestion.isdisplay) {
                         conditionalQuestion.questions.forEach(subquestion => {
                             if (subquestion.Id === this.showChat.questionId && typeof this.showChat.responseflag !== 'undefined') {
@@ -1949,6 +1925,7 @@ export default class Questionnaire extends LightningElement {
             })
         })
         this.handleselectedaction();
+        this.handleSaveCustomer();
         const selectedChat = new CustomEvent('selectconversation', {
             detail: { chat: this.showChat, actionData: this.selectedActionList, file: this.fileData }
         });
@@ -1957,7 +1934,7 @@ export default class Questionnaire extends LightningElement {
 
     handleReject(event) {
         let rejectedMap = event.detail;
-        let bool = false;
+        this.saveBool = false;
         this.questionsAndAnswerss.forEach(questionAnswer => {
             questionAnswer.questions.forEach(question => {
                 if (question.Id === rejectedMap.questionId && typeof rejectedMap.rejectResponse !== 'undefined') {
@@ -1971,13 +1948,11 @@ export default class Questionnaire extends LightningElement {
                         if (conditionalQuestion.isdisplay) {
                             conditionalQuestion.questions.forEach(subQuestion => {
                                 if (subQuestion.Id === rejectedMap.questionId && typeof rejectedMap.rejectResponse !== 'undefined') {
-                                    console.log('sampledata123');
-                                    bool = true;
+                                    //bool = true;
                                     subQuestion.rejectButton = rejectedMap.rejectResponse;
                                 }
                                 if (subQuestion.Id === rejectedMap.questionId && typeof rejectedMap.needData !== 'undefined') {
-                                    console.log('sampledata123');
-                                    bool = true;
+                                    // bool = true;
                                     subQuestion.needData = rejectedMap.needData;
                                 }
                             });
@@ -1986,6 +1961,8 @@ export default class Questionnaire extends LightningElement {
                 }
             })
         });
+        this.saveBool = true;
+        this.handleSaveCustomer();
     }
 
     handleActionResponse(event) {
@@ -2147,11 +2124,11 @@ export default class Questionnaire extends LightningElement {
                                     flagMap.sobjectType = 'Rhythm__Response__c';
                                     flagMap.Rhythm__Question__c = subQuestion.Id;
                                     if (question.rejectButton) {
-                                        rejectFlagMap.Rhythm__Rejected__c = true;
-                                        rejectFlagMap.Rhythm__Flag__c = false;
+                                        flagMap.Rhythm__Rejected__c = true;
+                                        flagMap.Rhythm__Flag__c = false;
                                     }
                                     else {
-                                        rejectFlagMap.Rhythm__Rejected__c = subQuestion.rejectButton;
+                                        flagMap.Rhythm__Rejected__c = subQuestion.rejectButton;
                                         flagMap.Rhythm__Flag__c = subQuestion.Rhythm__Flag__c;
                                     }
                                     flagMap.Rhythm__Is_Latest_Response__c = true;
@@ -2172,7 +2149,10 @@ export default class Questionnaire extends LightningElement {
             insertRejectFlag({ insertRejectFlagList: insertRejectFlagList, accountAssessment: this.recordId }).then({
             })
         }
-        this.handleOnload();
+        if (this.saveBool === false) {
+            this.handleOnload();
+        }
+        this.saveBool = false;
     }
     submitReviewResponse() {
         this.handleSubmitReviewCustomer();
@@ -2184,7 +2164,7 @@ export default class Questionnaire extends LightningElement {
         this.isCustomerModalPopup = false;
     }
     /* The Apex method is to update the AccountAssessmentStatus to 'Need More Information or Review Completed 
-  based on the flags on customer portal */
+based on the flags on customer portal */
     handleSubmitCustomer() {
         let param = {};
         let boolflag = false;
@@ -2253,7 +2233,7 @@ export default class Questionnaire extends LightningElement {
     }
     handleSubmitReviewCustomer() {
         let param = {};
-        this.isCustomerModalPopup = true;
+        this.isCustomerModalPopup = false;
         this.showcustomerbuttons = false;
         this.showSaveAndSubmit = false;
         param.assessmentStatus = 'Review Completed';

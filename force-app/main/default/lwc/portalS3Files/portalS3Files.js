@@ -3,6 +3,7 @@ import getSignedURL from '@salesforce/apex/AWSS3Controller.getFileSignedUrl';
 import filesUpload from '@salesforce/apex/AWSS3Controller.uploadFiles';
 import getAuthentication from '@salesforce/apex/AWSS3Controller.getAuthenticationData';
 import awsjssdk from '@salesforce/resourceUrl/AWSJSSDK';
+import Id from '@salesforce/user/Id';
 import { loadScript } from 'lightning/platformResourceLoader';
 import createResponseforFileUpload from '@salesforce/apex/AWSS3Controller.createResponseforFileUpload';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
@@ -10,6 +11,7 @@ import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 export default class AWSS3FileOperations extends LightningElement {
     @api assessmentRecId;
     @api recId;
+    @track userId = Id;
     @api isdisabled;
     @api questionId;
     @api objectName;
@@ -114,14 +116,18 @@ export default class AWSS3FileOperations extends LightningElement {
                 let fileList = [];
                 this.keyList = [];
                 files && files.forEach(file => {
-                    const objectKey = file.Key;
-                    let fileName = objectKey.substring(objectKey.lastIndexOf("/") + 1);
-                    let fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1);
-                    if (fileExtension === 'doc' || fileExtension === 'docx' || fileExtension === 'xls' || fileExtension === 'xlsx') {
-                        fileList.push({ type: fileExtension, preview: false, key: objectKey, url: this.endpoint + '/' + objectKey, value: fileName });
-                    }
-                    else {
-                        fileList.push({ type: fileExtension, preview: true, key: objectKey, url: this.endpoint + '/' + objectKey, value: fileName });
+                    let checkFile = file.Key.split('/')
+                    if (checkFile[checkFile.length - 1] != null && checkFile[checkFile.length - 1] != '') {
+
+                        const objectKey = file.Key;
+                        let fileName = objectKey.substring(objectKey.lastIndexOf("/") + 1);
+                        let fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1);
+                        if (fileExtension === 'doc' || fileExtension === 'docx' || fileExtension === 'xls' || fileExtension === 'xlsx') {
+                            fileList.push({ type: fileExtension, preview: false, key: objectKey, url: this.endpoint + '/' + objectKey, value: fileName });
+                        }
+                        else {
+                            fileList.push({ type: fileExtension, preview: true, key: objectKey, url: this.endpoint + '/' + objectKey, value: fileName });
+                        }
                     }
                 });
                 this.keyList = fileList.reverse();
@@ -163,9 +169,14 @@ export default class AWSS3FileOperations extends LightningElement {
 
     //Open Delete Modal Popup
     handleDeletePopup(event) {
-        this.showDeleteModal = true;
         this.fileKey = event.target.name;
         this.keyString = this.fileKey.replace(this.endpoint + '/', '');
+        if (this.keyString.includes(this.userId)) {
+            this.showDeleteModal = true;
+        }
+        else {
+            this.showToastMessage('No Delete Access', 'You do not have right access', 'error');
+        }
     }
 
     //Close Delete Modal Popup
@@ -206,7 +217,7 @@ export default class AWSS3FileOperations extends LightningElement {
                 if (rec) {
                     this.responseRecId = rec.Id;
                     filesUpload({
-                        recId: this.fileRecordID, objectName: this.objectName, pathRecId: this.responseRecId, deleteFlag: true
+                        recId: this.fileRecordID, objectName: this.objectName, pathRecId: this.responseRecId, deleteFlag: true, userId: this.userId
                     }).then(result => {
                         if (result) {
                             this.renderFlag = true;
@@ -231,7 +242,7 @@ export default class AWSS3FileOperations extends LightningElement {
         }
         else {
             filesUpload({
-                recId: this.fileRecordID, objectName: this.objectName, pathRecId: this.responseRecId, deleteFlag: true
+                recId: this.fileRecordID, objectName: this.objectName, pathRecId: this.responseRecId, deleteFlag: true, userId: this.userId
             }).then(result => {
                 if (result) {
                     this.renderFlag = true;

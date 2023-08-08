@@ -1,8 +1,10 @@
 <template>
 	<div class="rtmvpc-card slds-p-around_medium">
 		<div class="c-container">
-			<lightning-button variant="base" label="Details" data-label="Details" onclick={handleDetailClick}></lightning-button>
-			<lightning-button variant="base" label="Files" data-label="Files"   onclick={handleDetailClick}></lightning-button>
+			<lightning-tabset>
+			<lightning-tab variant="base" label="Details" value="Details" onactive={handleDetailClick}></lightning-tab>
+			<lightning-tab variant="base" label="Files" value="Files"   onactive={handleDetailClick}></lightning-tab>
+			</lightning-tabset>
 			<template if:false={showForm}>
 			<lightning-layout multiple-rows>
 				<template if:true={showToast}>

@@ -8,6 +8,8 @@
 @isTest
 private class AWSS3Test {
     static AWSS3Service service = AWSS3Service.getInstance();
+    static AWSS3Service qService = AWSS3Service.getInstance();
+    
     /**
 * @description
 */
@@ -43,26 +45,33 @@ private class AWSS3Test {
             Map<String,Object> response = new Map<String,Object>{'Question__c'=>qus[0].Id,'AccountAssessmentRelation__c'=>accAssmt[0].Id,
                 'Is_Latest_Response__c'=>True};
                     TestDataFactory.createResponse(1,true,response);
+            Action__c act=new Action__c();
+            act.Rhythm__AccountAssessment__c=accAssmt[0].Id;
+            act.Rhythm__Question__c=qus[0].Id;
+            act.Rhythm__Supplier__c=accts[0].id;
+            act.Assigned_To__c=custUser.Id;
+            insert act;
+            ContentVersion testContentVersion = new ContentVersion();
+            testContentVersion.Title = 'Test Document';
+            testContentVersion.PathOnClient = 'test_document.pdf'; 
+            testContentVersion.VersionData = Blob.valueOf('a'.repeat(5242880)); 
+            insert testContentVersion;
+            
+            ContentVersion testContentVersion1 = new ContentVersion();
+            testContentVersion1.Title = 'Test Document';
+            testContentVersion1.PathOnClient = 'test_document.pdf'; 
+            testContentVersion1.VersionData = Blob.valueOf('a'); 
+            insert testContentVersion1;
+            
+            ContentDocument testContentDocument = new ContentDocument();
+            testContentDocument.Id = testContentVersion.ContentDocumentId; 
+            ContentDocumentLink testContentDocumentLink = new ContentDocumentLink();
+            testContentDocumentLink.ContentDocumentId = [SELECT ContentDocumentId FROM ContentVersion WHERE Id = :testContentVersion.Id][0].ContentDocumentId;
+            testContentDocumentLink.LinkedEntityId = accts[0].Id;
+            insert testContentDocumentLink;
+            
         }   
         
-        ContentVersion testContentVersion = new ContentVersion();
-        testContentVersion.Title = 'Test Document';
-        testContentVersion.PathOnClient = 'test_document.pdf'; 
-        testContentVersion.VersionData = Blob.valueOf('a'.repeat(5242880)); 
-        insert testContentVersion;
-        
-        ContentVersion testContentVersion1 = new ContentVersion();
-        testContentVersion1.Title = 'Test Document';
-        testContentVersion1.PathOnClient = 'test_document.pdf'; 
-        testContentVersion1.VersionData = Blob.valueOf('a'); 
-        insert testContentVersion1;
-        
-        ContentDocument testContentDocument = new ContentDocument();
-        testContentDocument.Id = testContentVersion.ContentDocumentId; 
-        ContentDocumentLink testContentDocumentLink = new ContentDocumentLink();
-        testContentDocumentLink.ContentDocumentId = [SELECT ContentDocumentId FROM ContentVersion WHERE Id = :testContentVersion.Id][0].ContentDocumentId;
-        testContentDocumentLink.LinkedEntityId = accts[0].Id;
-        insert testContentDocumentLink;
         
         
     }
@@ -95,12 +104,16 @@ private class AWSS3Test {
 */
     @isTest
     private  static void testGetFileSignedUrl() {
-        Test.startTest();
-        String result = AWSS3Controller.getFileSignedUrl('location', 'file', 60);
+        String ids= UserInfo.getUserId();
+        User u=[select id from user where id=:ids limit 1];
+        System.runAs(u) {
+            Test.startTest();
+            String result = AWSS3Controller.getFileSignedUrl('location', 'file', 60);
         service.convertToHex('01','test');
         service.uriEncode('01*',true);
-        Test.stopTest();
-        System.assertEquals(result, result, 'Assert Failed');
+            Test.stopTest();
+            System.assertEquals(result, result, 'Assert Failed');
+        }
     }
     /**
 * @description
@@ -129,6 +142,7 @@ private class AWSS3Test {
         String ids= UserInfo.getUserId();
         User u=[select id from user where id=:ids limit 1];
         System.runAs(u) {
+            List<Account> acc = [Select Id,Name from Account];
             List<Response__c> resp=[Select id,Question__c,AccountAssessmentRelation__c  from Response__c];
             delete resp;
             List<Rhythm__AccountAssessmentRelation__c> asslist=[select Id,Account__c, Assessment__c from Rhythm__AccountAssessmentRelation__c LIMIT 1];
@@ -136,7 +150,7 @@ private class AWSS3Test {
             Map<String,Object> filemap = new Map<String,Object>();
             filemap.put('assessmentId', resp[0].AccountAssessmentRelation__c);
             filemap.put('quesId', resp[0].Question__c);
-            
+            AWSS3Controller.uploadFiles(acc[0].Id, 'Account', null, true, u.id);
             AWSS3Controller.createResponseforFileUpload (JSON.serialize(filemap));
             Test.stopTest();
             System.assertEquals(1,asslist.size(),'Assert Failed');
@@ -153,7 +167,27 @@ private class AWSS3Test {
         System.runAs(u) {
             List<Account> acc = [Select Id,Name from Account];
             Test.startTest();
-            AWSS3Controller.uploadFiles(acc[0].Id, 'Account', null, false);
+            AWSS3Controller.uploadFiles(acc[0].Id, 'Account', null, false, u.id);
+            service.convertToHex('c','test');
+            Test.stopTest();
+            System.assertEquals(1,acc.size(),'Assert Failed');
+        }
+    }
+    @isTest
+    private  static void testAwsuploadFiles() {
+        String ids= UserInfo.getUserId();
+        User u=[select id from user where id=:ids limit 1];
+        System.runAs(u) {
+            List<Account> acc = [Select Id,Name from Account];
+            List<ContentDocumentLink> condocList= [SELECT ContentDocumentId,LinkedEntityId FROM ContentDocumentLink WHERE LinkedEntityId =:acc[0].id];
+            List<ContentVersion>  versionData= [SELECT Id, Title, FileExtension, ContentDocumentId, VersionData FROM ContentVersion WHERE ContentDocumentId =:condocList[0].ContentDocumentId];
+            
+            Test.startTest();
+            qService.recId = acc[0].Id;
+            qService.objectName = 'EmailMessage';
+            qService.pathRecId = null;
+            qService.deleteFlag = true;
+            qService.contVerIds = new Set<Id>{versionData[0].id};            
             service.convertToHex('c','test');
             Test.stopTest();
             System.assertEquals(1,acc.size(),'Assert Failed');

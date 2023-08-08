@@ -24,7 +24,7 @@ export default class RtmvpcAssessments extends NavigationMixin(LightningElement)
                             { label: 'Target Completion Date', fieldName: 'Rhythm__End_Date__c',type:'date' },
                             { label: 'Assessment Status', fieldName: 'Rhythm__Status__c'},
                             { label: '#Additional Requests',fieldName:'Rhythm__Follow_Up_Requests__c'},
-                            { label: '% Completed',fieldName:'Rhythm__Completed__c', type:'progressBar' },
+                            { label: '% Completed',fieldName:'Rhythm__Response_Percentage__c', type:'progressBar' },
                         ]; 
  /* connectedCallback is used to get accountAssessment data based on the account Id */
     connectedCallback(){

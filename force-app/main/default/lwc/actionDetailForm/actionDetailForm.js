@@ -91,7 +91,7 @@ export default class ActionDetailForm extends LightningElement {
     this.showToast = event.detail.showModal;
   }
   handleDetailClick(event) {
-    var label = event.currentTarget.dataset.label;
+    var label = event.target.value;
     if (label === 'Files') {
       this.showForm = true;
     }

@@ -9,10 +9,24 @@ public class AWSS3ServiceQueueable implements Queueable, Database.AllowsCallouts
     public static SecurityCheckController safe = new SecurityCheckController();//use singleton pattern
     private static Savepoint sp;
     public Id recId;
+    public Id userId;
     public Id pathRecId;
     public Boolean deleteFlag;
     public String objectName;
     public Set<Id> contVerIds;
+
+    private static AWSS3ServiceQueueable service = null; //private static instance of the class
+    
+    /**
+    * @description Singleton Design Pattern
+    * @return
+    */
+    public static AWSS3ServiceQueueable getInstance(){
+            if(service == null){
+                service = new AWSS3ServiceQueueable();
+            }
+        return service;
+    }
     
     
     /**
@@ -28,12 +42,12 @@ public class AWSS3ServiceQueueable implements Queueable, Database.AllowsCallouts
             if( recId != null && objectName != null) {
                 List<ContentDocumentLink> condocList= [SELECT ContentDocumentId,LinkedEntityId FROM ContentDocumentLink WHERE LinkedEntityId =:recId];
                 if(condocList.size() > 0 || contVerIds.size() > 0) {
-                        if(condocList.size() > 0) { 
-                            for(ContentDocumentLink condoc:condocList) {
-                                contDocIds.add(condoc.ContentDocumentId);
-                            }
-                            versionData= [SELECT Id, Title, FileExtension, ContentDocumentId, VersionData FROM ContentVersion WHERE ContentDocumentId IN:contDocIds];
+                    if(condocList.size() > 0) { 
+                        for(ContentDocumentLink condoc:condocList) {
+                            contDocIds.add(condoc.ContentDocumentId);
                         }
+                        versionData= [SELECT Id, Title, FileExtension, ContentDocumentId, VersionData FROM ContentVersion WHERE ContentDocumentId IN:contDocIds];
+                    }
                     else if(contVerIds.size() > 0) {
                         versionData= [SELECT Id, Title, FileExtension, ContentDocumentId, VersionData FROM ContentVersion WHERE Id IN:contVerIds];
                     }
@@ -44,10 +58,13 @@ public class AWSS3ServiceQueueable implements Queueable, Database.AllowsCallouts
                             AWSS3Service putAttachment = new AWSS3Service();
                             putAttachment.recordId = recId;
                             if(pathRecId == null) {
-                                putAttachment.folderName='/'+objectName+'/'+recId;
+                                putAttachment.folderName='/'+ objectName +'/'+ recId ;
                             }
                             else {
                                 putAttachment.folderName='/'+objectName+'/'+pathRecId;  
+                            }
+                            if(userId != null) {
+                                putAttachment.folderName= putAttachment.folderName + '/' + userId;
                             }
                             putAttachment.versionData=conver;
                             String name = conver.Title.substringBeforeLast('.');

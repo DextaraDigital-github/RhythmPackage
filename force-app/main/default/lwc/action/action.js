@@ -11,10 +11,12 @@ import filesUpload from '@salesforce/apex/AWSS3Controller.uploadFiles';
 import saveActionRecord from '@salesforce/apex/AWSS3Controller.saveActionRecord';
 import getAuthentication from '@salesforce/apex/AWSS3Controller.getAuthenticationData';
 import awsjssdk from '@salesforce/resourceUrl/AWSJSSDK';
+import Id from '@salesforce/user/Id';
 import { loadScript } from 'lightning/platformResourceLoader';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 export default class Action extends LightningElement {
   @track pickListNames = [];
+  @track userId = Id;
   @api showresponse;
   @track questionId;
   @track accountAssessmentId;
@@ -33,7 +35,7 @@ export default class Action extends LightningElement {
   @track updateData;
   @track isSupplier;
   @track isSave = false;
-  @track showAction=false;
+  @track showAction = false;
 
   @track lookupLabel = ['Ownership', 'Assigned To'];
   @track options = [{ label: 'Open', value: 'Open' },
@@ -129,41 +131,44 @@ export default class Action extends LightningElement {
   retrieveFilesFromS3() {
     const folderName = this.objectApiName + '/' + this.responseMap.Id + '/';
     this.s3.listObjects({ Bucket: this.bucketName, Prefix: folderName }, (err, data) => {
-       if (err) {
-                console.error(err);
-            } else {
-                const files = data.Contents;
-                let fileList = [];
-                this.keyList = [];
-                files && files.forEach(file => {
-                    const objectKey = file.Key;
-                    let fileName = objectKey.substring(objectKey.lastIndexOf("/") + 1);
-                    let fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1);
-                    if (fileExtension === 'doc' || fileExtension === 'docx' || fileExtension === 'xls' || fileExtension === 'xlsx') {
-                        fileList.push({ type: fileExtension, preview: false, key: objectKey, url: this.endpoint + '/' + objectKey, value: fileName.substring(fileName.indexOf("_") + 1) });
-                    }
-                    else {
-                        fileList.push({ type: fileExtension, preview: true, key: objectKey, url: this.endpoint + '/' + objectKey, value: fileName.substring(fileName.indexOf("_") + 1) });
-                    }
-                });
-                this.keyList = fileList.reverse();
-                if (this.keyList.length > 0) {
-                    this.getFilesFlag = true;
-                }
-                else {
-                    this.getFilesFlag = false;
-                }
-                this.keyList && this.keyList.forEach(rec => {
-                    rec.icon = ((rec).type === 'png') ? 'doctype:image' :
-                        ((rec).type === 'pdf') ? 'doctype:pdf' :
-                            ((rec).type === 'jpg') ? 'doctype:image' :
-                                ((rec).type === 'jpeg') ? 'doctype:image' :
-                                    ((rec).type === 'xlsx') ? 'doctype:excel' :
-                                        ((rec).type === 'xls') ? 'doctype:excel' :
-                                            ((rec).type === 'txt') ? 'doctype:txt' :
-                                                ((rec).type === 'docx' || (rec).type === 'doc') ? 'doctype:word' : 'doctype:flash';
-                });
+      if (err) {
+        console.error(err);
+      } else {
+        const files = data.Contents;
+        let fileList = [];
+        this.keyList = [];
+        files && files.forEach(file => {
+          let checkFile = file.Key.split('/')
+          if (checkFile[checkFile.length - 1] != null && checkFile[checkFile.length - 1] != '') {
+            const objectKey = file.Key;
+            let fileName = objectKey.substring(objectKey.lastIndexOf("/") + 1);
+            let fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1);
+            if (fileExtension === 'doc' || fileExtension === 'docx' || fileExtension === 'xls' || fileExtension === 'xlsx') {
+              fileList.push({ type: fileExtension, preview: false, key: objectKey, url: this.endpoint + '/' + objectKey, value: fileName.substring(fileName.indexOf("_") + 1) });
             }
+            else {
+              fileList.push({ type: fileExtension, preview: true, key: objectKey, url: this.endpoint + '/' + objectKey, value: fileName.substring(fileName.indexOf("_") + 1) });
+            }
+          }
+        });
+        this.keyList = fileList.reverse();
+        if (this.keyList.length > 0) {
+          this.getFilesFlag = true;
+        }
+        else {
+          this.getFilesFlag = false;
+        }
+        this.keyList && this.keyList.forEach(rec => {
+          rec.icon = ((rec).type === 'png') ? 'doctype:image' :
+            ((rec).type === 'pdf') ? 'doctype:pdf' :
+              ((rec).type === 'jpg') ? 'doctype:image' :
+                ((rec).type === 'jpeg') ? 'doctype:image' :
+                  ((rec).type === 'xlsx') ? 'doctype:excel' :
+                    ((rec).type === 'xls') ? 'doctype:excel' :
+                      ((rec).type === 'txt') ? 'doctype:txt' :
+                        ((rec).type === 'docx' || (rec).type === 'doc') ? 'doctype:word' : 'doctype:flash';
+        });
+      }
     });
   }
   //Download the file from AWS S3
@@ -181,9 +186,14 @@ export default class Action extends LightningElement {
   }
   //Open Delete Modal Popup
   handleDeletePopup(event) {
-    this.showDeleteModal = true;
     this.fileKey = event.target.name;
     this.keyString = this.fileKey.replace(this.endpoint + '/', '');
+    if (this.keyString.includes(this.userId)) {
+      this.showDeleteModal = true;
+    }
+    else {
+      this.showToastMessage('No Delete Access', 'You do not have right access', 'error');
+    }
   }
   //Close Delete Modal Popup
   handleCloseDelPopup() {
@@ -212,7 +222,7 @@ export default class Action extends LightningElement {
   handleUploadFinished() {
     if (this.responseMap.Id != null) {
       filesUpload({
-        recId: this.accountAssessmentId, objectName: this.objectApiName, pathRecId: this.responseMap.Id, deleteFlag:true
+        recId: this.accountAssessmentId, objectName: this.objectApiName, pathRecId: this.responseMap.Id, deleteFlag: true, userId: this.userId
       }).then(result => {
         if (result) {
           this.renderFlag = true;
@@ -237,7 +247,7 @@ export default class Action extends LightningElement {
       saveActionRecord({ actionResponse: actionResp }).then((res) => {
         this.responseMap.Id = res;
         filesUpload({
-          recId: this.accountAssessmentId, objectName: this.objectApiName, pathRecId: res, deleteFlag:true
+          recId: this.accountAssessmentId, objectName: this.objectApiName, pathRecId: res, deleteFlag: true, userId: this.userId
         }).then(result => {
           if (result) {
             this.showCustom = true;
@@ -262,7 +272,7 @@ export default class Action extends LightningElement {
       });
     }
   }
-  
+
   //Toast Message handler
   async showToastMessage(title, message, variant) {
     this.dispatchEvent(
@@ -303,7 +313,7 @@ export default class Action extends LightningElement {
         this.pickListNames.push(obj);
       }
       this.onloadPicklist = this.pickListNames;
-      console.log('picklist',this.onloadPicklist);
+      console.log('picklist', this.onloadPicklist);
     } else if (error) {
       let errormap = {};
       errormap.componentName = 'Action';
@@ -315,17 +325,18 @@ export default class Action extends LightningElement {
   }
 
   @api displayForm(response) {
-    this.showAction=false;
+    this.showAction = true;
+     this.isSupplier = response[0].isSupplier;
     console.log('jjj', response);
-    if(typeof response ==='undefined'){
-      this.showAction=true;
+    if (typeof response !== 'undefined' && this.isSupplier !== true) {
+      this.showAction = false;
     }
-   
+    console.log('acton',this.showAction);
     this.updateData = response;
     this.showForm = true;
     this.showCustom = false;
     this.showUpdate = false;
-    this.isSupplier = response[0].isSupplier;
+   
     if (this.isSupplier) {
       this.isSave = false;
     }
@@ -336,13 +347,13 @@ export default class Action extends LightningElement {
     this.accountAssessmentId = response[0].Rhythm__AccountAssessment__c;
     //this.isSupplier=response[0].isSupplier;
     this.accountName = response[0].accountName;
-    this.relatedRecordName=response[0].relatedRecordName;
+    this.relatedRecordName = response[0].relatedRecordName;
     this.responseMap = {};
     this.resultdata = {};
     this.onloadPicklist.forEach(res => {
-      if(res.key ==='Rhythm__Status__c'){
-      this.optionsData=JSON.parse(JSON.stringify(res.options));
-      console.log('options',this.optionsData);
+      if (res.key === 'Rhythm__Status__c') {
+        this.optionsData = JSON.parse(JSON.stringify(res.options));
+        console.log('options', this.optionsData);
       }
       if (typeof res.onLoadValue !== 'undefined') {
         res.onLoadValue = '';
@@ -351,11 +362,12 @@ export default class Action extends LightningElement {
 
     getActionResponse({ actionResponse: response[0] }).then((result) => {
       if (typeof result != 'undefined' && result.length > 0) {
+        
         console.log('samp', result);
         this.resultdata = result[0];
         this.showUpdate = true;
         this.showCustom = true;
-        this.showAction=false;
+        this.showAction = false;
         this.showPicklist = true;
         this.responseMap.Id = result[0].Id;
         if (typeof result[0].Name !== 'undefined') {
@@ -372,7 +384,7 @@ export default class Action extends LightningElement {
         }
         if (typeof result[0].Rhythm__Related_Record__c !== 'undefined') {
           this.responseMap.Rhythm__Related_Record__c = result[0].Rhythm__Related_Record__c;
-           //this.responseMap.Rhythm__Related_Record__Name=response[0].Rhythm__Related_Record__Name;
+          //this.responseMap.Rhythm__Related_Record__Name=response[0].Rhythm__Related_Record__Name;
         }
         if (typeof result[0].Rhythm__Supplier__c !== 'undefined') {
           this.responseMap.Rhythm__Supplier__c = result[0].Rhythm__Supplier__c;
@@ -383,19 +395,19 @@ export default class Action extends LightningElement {
             || typeof result[0].Rhythm__Priority__c !== 'undefined') {
             let keydata = res.key;
             res.onLoadValue = result[0][keydata];
-            if(res.onLoadValue === 'Open' || res.onLoadValue ==='Closed'){
-            if (res.onLoadValue === 'Closed') {
-              this.isSave = true;
+            if (res.onLoadValue === 'Open' || res.onLoadValue === 'Closed') {
+              if (res.onLoadValue === 'Closed') {
+                this.isSave = true;
+              }
+              res.options = JSON.parse(JSON.stringify(this.optionsData));
             }
-            res.options=JSON.parse(JSON.stringify(this.optionsData));
-            }
-            if(res.onLoadValue === 'Expired'){
-              let optionMap={};
-              optionMap.label='Expired';
-              optionMap.value='Expired';
+            if (res.onLoadValue === 'Expired') {
+              let optionMap = {};
+              optionMap.label = 'Expired';
+              optionMap.value = 'Expired';
               res.options.push(optionMap);
-              this.options= res.options;
-              console.log('reethika',res.options);
+              this.options = res.options;
+              console.log('reethika', res.options);
               this.isSave = true;
             }
             this.responseMap[keydata] = result[0][keydata];
@@ -408,16 +420,15 @@ export default class Action extends LightningElement {
           this.responseMap.Rhythm__Ownership__c = result[0].Rhythm__Ownership__c;
         }
         this.saveActionResponse = this.responseMap;
-        console.log('reposnedata',this.responseMap.Rhythm__Status__c);
+        console.log('reposnedata', this.responseMap.Rhythm__Status__c);
         this.showresponse = [];
         this.showresponse.push(this.saveActionResponse);
       }
       else {
-         if(this.isSupplier === true)
-        {
-          this.showAction=true;
+        if (this.isSupplier === true) {
+          this.showAction = true;
         }
-        
+
         let userMap = {};
         this.showCustom = true;
         this.showUpdate = false;
@@ -431,7 +442,7 @@ export default class Action extends LightningElement {
         this.saveActionResponse.Rhythm__Assigned_To__c = response[0].assignedToId;
         this.saveActionResponse.Rhythm__Ownership__c = response[0].ownershipId;
         //this.responseMap.Rhythm__Related_Record__Name=response[0].Rhythm__Related_Record__Name;
-       // console.log('jjjfk',this.responseMap.Rhythm__Related_Record__Name);
+        // console.log('jjjfk',this.responseMap.Rhythm__Related_Record__Name);
         this.onloadPicklist.forEach(res => {
           if (res.key === 'Rhythm__Related_module__c') {
             res.onLoadValue = 'Assessments';
@@ -508,14 +519,14 @@ export default class Action extends LightningElement {
     this.saveActionResponse[name] = changedData;
     this.showresponse = [];
     this.showresponse.push(this.saveActionResponse);
-    console.log('changeddata',changedData);
-    if(name === 'Rhythm__Status__c'){
-     this.onloadPicklist.forEach(res => {
-              console.log('res.options');
-              if(res.key ==='Rhythm__Status__c'){
-               res.options=JSON.parse(JSON.stringify(this.optionsData));
-              }
-            });
+    console.log('changeddata', changedData);
+    if (name === 'Rhythm__Status__c') {
+      this.onloadPicklist.forEach(res => {
+        console.log('res.options');
+        if (res.key === 'Rhythm__Status__c') {
+          res.options = JSON.parse(JSON.stringify(this.optionsData));
+        }
+      });
     }
   }
   handleSelectedValue(event) {
@@ -564,7 +575,7 @@ export default class Action extends LightningElement {
             }).catch(error => {
               console.log('ggfgf', error);
             });
-           
+
             if (this.saveActionResponse.Rhythm__Status__c === 'Closed' && this.isSupplier === true) {
               this.showToast = true;
               this.success = true;
@@ -582,8 +593,8 @@ export default class Action extends LightningElement {
         })
           .catch((error) => {
             let errormap = {};
-             this.showToast = true;
-             this.success = false;
+            this.showToast = true;
+            this.success = false;
             this.totastmessage = 'Due date cannot be set to a past date';
             errormap.componentName = 'Action';
             errormap.methodName = 'saveActionResponse';

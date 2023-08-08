@@ -101,6 +101,7 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
                           })                   
                         }
                         else{
+                            console.log('sampledata');
                             rejectMap.needData = !(res.needData);
                         }
                     }

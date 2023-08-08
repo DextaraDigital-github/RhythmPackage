@@ -90,6 +90,7 @@ export default class RtmvpcQuestionCreation extends LightningElement {
     }
     handleOnLoad() {
         this.questionWrapper.Rhythm__Question__c = '';
+        console.log('this.assessmentTemplate',this.assessmentTemplate);
         if (typeof this.assessmentTemplate !== 'undefined') {
             this.createQues = true;
         }
@@ -97,6 +98,7 @@ export default class RtmvpcQuestionCreation extends LightningElement {
             /* 
             This method is used to get Questions data in Onload.
             */
+            this.assessmentTemplate = this.templateId;
             getQuestionsData({ questionId: this.questionId, templateId: this.templateId }).then(result => {
                 this.questionWrapper['Id'] = result[0].Id;
                 this.questionWrapper.Rhythm__Question__c = result[0].Rhythm__Question__c;
@@ -194,6 +196,7 @@ export default class RtmvpcQuestionCreation extends LightningElement {
         This method method is used to Select the sections value (custom lookup).
     */
     handleSelectedValue(event) {
+        console.log('In update',event.detail);
         this.questionWrapper['Rhythm__Section__c'] = event.detail;
         if (typeof this.assessmentTemplate !== 'undefined') {
             this.questionWrapper['Rhythm__Assessment_Template__c'] = this.assessmentTemplate;

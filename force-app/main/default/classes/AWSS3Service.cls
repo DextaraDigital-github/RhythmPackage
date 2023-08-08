@@ -201,7 +201,7 @@ public with sharing class AWSS3Service extends AWS {
 * @param deleteFlag This is the deleteFlag.
 * @return flag on uploaded successfully
 */ 
-    public Boolean uploadFiles(Id recId, String objectName, Id pathRecId,Boolean deleteFlag) {
+    public Boolean uploadFiles(Id recId, String objectName, Id pathRecId,Boolean deleteFlag, Id userId) {
         Boolean uploadedFlag = false;
         List<Id> contDocIds = new List<Id>();
         List<String> errorList = new List<String>();
@@ -240,6 +240,7 @@ public with sharing class AWSS3Service extends AWS {
                 if(uploadedFlag == true) {
                     AWSS3ServiceQueueable awsQu=new AWSS3ServiceQueueable();
                     awsQu.recId = recId;
+                    awsQu.userId = userId;
                     awsQu.objectName = objectName;
                     awsQu.pathRecId = pathRecId;
                     awsQu.deleteFlag = deleteFlag;

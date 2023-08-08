@@ -58,12 +58,12 @@ public with sharing class AWSS3Controller {
 */ 
     @AuraEnabled
     /* sfge-disable-stack ApexFlsViolationRule */
-    public static Boolean uploadFiles(Id recId, String objectName,Id pathRecId,Boolean deleteFlag) {
+    public static Boolean uploadFiles(Id recId, String objectName,Id pathRecId,Boolean deleteFlag, Id userId) {
         Boolean uploadedFlag = false;
         try {
-            if(recId != null && objectName != null) {
+            if(recId != null && objectName != null && userId != null) {
                 
-                uploadedFlag=service.uploadFiles(recId, objectName, pathRecId,deleteFlag);
+                uploadedFlag=service.uploadFiles(recId, objectName, pathRecId, deleteFlag, userId);
             }
             return uploadedFlag;
         } catch(exception e) {
