@@ -5,6 +5,7 @@ name: Rhythm - Code Push to QA Org
 
 on:
   pull_request:
+    
     branches:
       - qa
     types:
@@ -21,8 +22,9 @@ jobs:
     steps:
     
       # Checkout the source code
-      - name: 'Checkout source code'
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
         
       # Cache node_modules to speed up the process
       - name: Setup Node Environment
@@ -53,8 +55,9 @@ jobs:
             ./sfdx-cli/install
             
     # Run Salesforce CLI Scanner For Security checks
-      - name: 'Check for SFDX Update'
-        run: sfdx update
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
         
     # Install Salesforce SFDX Scanner
       - name: 'Install Salesforce SFDX Scanner'
