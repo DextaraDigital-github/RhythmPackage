@@ -105,7 +105,7 @@ public with sharing class AssessmentController {
             if(!assessment.isEmpty()){
                 assessment[0].Status__c =(String)queryMap.get('status');
                 assessment[0].PdfConvertor__c =(String)queryMap.get('pdfContnet');
-                 assessment[0].Response_Percentage__c = (Decimal)queryMap.get('percentage');
+               //assessment[0].Response_Percentage__c = (Decimal)queryMap.get('percentage');
                 if((String)queryMap.get('status')=='Submitted'){
                     assessment[0].Submission_Date__c = DateTime.now();
                    
@@ -431,7 +431,7 @@ public with sharing class AssessmentController {
         try{
             String query = 'SELECT Id,IsDeleted,Name,Account__c,Assessment__c,Assessment__r.name,'
                         +'Assessment__r.Status__c,Assessment__r.Customer_Review__c,Assessment__r.Number_of_Questions__c,'
-                        +'Assessment__r.CreatedBy.Name,Status__c,Response_Percentage__c,End_Date__c,Completed__c,Follow_Up_Requests__c,Assessment__r.Template__c'
+                        +'Assessment__r.CreatedBy.Name,Status__c,End_Date__c,Completed__c,Follow_Up_Requests__c,Assessment__r.Template__c'
                         +' FROM AccountAssessmentRelation__c'
                         +' WHERE Status__c !=\'Cancel\''
                         +' AND Account__c=\'' + String.escapeSingleQuotes(accountId) + '\''
