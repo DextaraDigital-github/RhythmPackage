@@ -4,9 +4,7 @@ import getQuestionsList from '@salesforce/apex/AssessmentController.getQuestions
 import getSupplierResponseList from '@salesforce/apex/AssessmentController.getSupplierResponseList';
 import createSupplierResponse from '@salesforce/apex/AssessmentController.createSupplierResponse';
 import errorLogRecord from '@salesforce/apex/AssessmentController.errorLogRecord';
-import uploadFile from '@salesforce/apex/AssessmentController.uploadFile';
 import updateAccountAssessmentStatus from '@salesforce/apex/AssessmentController.updateAccountAssessmentStatus';
-import deleteFileAttachment from '@salesforce/apex/AssessmentController.deleteFileAttachment';
 import getAccountAssessmentRecordData from '@salesforce/apex/AssessmentController.getAccountAssessmentRecordData';
 import getQuestionRespAttributes from '@salesforce/apex/QuestionAttributeResponseController.getQuestionRespAttributes';
 import insertRejectFlag from '@salesforce/apex/AssessmentController.insertRejectFlag';
@@ -461,7 +459,6 @@ export default class Questionnaire extends LightningElement {
                                     this.questionsList.forEach(questionWrap => {
                                         let sequence = 0;
                                         questionWrap.questions.forEach(question => {
-
                                             question.snumber = ++sequence;
                                             //This loop is to give all the number for all children Questions.
                                             question.Children.forEach(childQuestion => {
@@ -472,9 +469,9 @@ export default class Questionnaire extends LightningElement {
                                                 childQuestion.questions.forEach(ques => {
                                                     if (ques.Children.length > 0) {
                                                         ques.Children.forEach(respAttr => {
-                                                           if(respAttr.isdisplay){
-                                                             ques.showUpload = (respAttr.uploadrequired === 'Yes' || respAttr.uploadrequired === 'Optional') ? true : false;
-                                                        }
+                                                            if (respAttr.isdisplay) {
+                                                                ques.showUpload = (respAttr.uploadrequired === 'Yes' || respAttr.uploadrequired === 'Optional') ? true : false;
+                                                            }
                                                         })
                                                     }
                                                     ques.snumber = sequence + '.' + (++childsequence);
@@ -691,6 +688,9 @@ export default class Questionnaire extends LightningElement {
                                             let childsequence = 0;
                                             if (childQuestion.isdisplay) {
                                                 question.showUpload = (childQuestion.uploadrequired === 'Yes' || childQuestion.uploadrequired === 'Optional') ? true : false;
+                                                if (childQuestion.uploadrequired === 'Yes') {
+                                                    this.requiredFilesLst.push(question.Id);
+                                                }
                                             }
                                             childQuestion.questions.forEach(ques => {
                                                 if (childQuestion.isdisplay && ques.required) {
@@ -698,8 +698,11 @@ export default class Questionnaire extends LightningElement {
                                                 }
                                                 if (ques.Children.length > 0) {
                                                     ques.Children.forEach(respAttr => {
-                                                        if(respAttr.isdisplay){
-                                                             ques.showUpload = (respAttr.uploadrequired === 'Yes' || respAttr.uploadrequired === 'Optional') ? true : false;
+                                                        if (respAttr.isdisplay) {
+                                                            ques.showUpload = (respAttr.uploadrequired === 'Yes' || respAttr.uploadrequired === 'Optional') ? true : false;
+                                                            if (respAttr.uploadrequired === 'Yes') {
+                                                                this.requiredFilesLst.push(question.Id);
+                                                            }
                                                         }
                                                     })
                                                 }
@@ -713,7 +716,7 @@ export default class Questionnaire extends LightningElement {
                             });
                             this.loading = false;
                             this.filterQuestionsAndAnswers = JSON.parse(JSON.stringify(this.questionsAndAnswerss));
-                            console.log('this.questionsAndAnswers handleonload', this.questionsAndAnswerss);
+
                         }).catch(error => {
                             let errormap = {};
                             errormap.componentName = 'Questionnaire';
@@ -890,7 +893,6 @@ export default class Questionnaire extends LightningElement {
                                             var rejectedQuestionId = [];
                                             if (childquestion.saveActionForm) {
                                                 capaQuestionId.push(childquestion.Id);
-
                                             }
                                             if (childquestion.rejectButton || childquestion.showUpload || childquestion.Rhythm__Flag__c) {
                                                 rejectedQuestionId.push(childquestion.Id)
