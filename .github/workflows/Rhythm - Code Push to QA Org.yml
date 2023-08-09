@@ -14,13 +14,6 @@ on:
 
 jobs:
 
- if_merged:
-    if: github.event.pull_request.merged == true
-    runs-on: ubuntu-latest
-    steps:
-    - run: |
-        echo The PR was merged
-
  environment-setup:
     name: environment-setup
     runs-on: ubuntu-latest
@@ -36,6 +29,13 @@ jobs:
         uses: actions/setup-node@v2-beta
         with:
           node-version: '12'
+	  
+ if_merged:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+    - run: |
+        echo The PR was merged
           
  validate:
   name: Org Authentication and Validation
@@ -44,22 +44,22 @@ jobs:
 	# if: github.event == 'push'
   steps:    
 # Install Salesforce CLI
-  - name: 'Install Salesforce CLI'
-    run: |
-     wget https://developer.salesforce.com/media/salesforce-cli/sfdx-linux-amd64.tar.xz
-     mkdir sfdx-cli
-     tar xJf sfdx-linux-amd64.tar.xz -C sfdx-cli --strip-components 1
-     ./sfdx-cli/install
+   - name: 'Install Salesforce CLI'
+     run: |
+      wget https://developer.salesforce.com/media/salesforce-cli/sfdx-linux-amd64.tar.xz
+      mkdir sfdx-cli
+      tar xJf sfdx-linux-amd64.tar.xz -C sfdx-cli --strip-components 1
+      ./sfdx-cli/install
 	        
 # Install Salesforce SFDX Scanner
-  - name: 'Install Salesforce SFDX Scanner'
-    run: sfdx plugins:install @salesforce/sfdx-scanner
+   - name: 'Install Salesforce SFDX Scanner'
+     run: sfdx plugins:install @salesforce/sfdx-scanner
 	
 # Connect with Salesforce ORG
-  - name: 'Connect with Salesforce ORG'
-    working-directory: .github/jwt/
-    run: sfdx auth:jwt:grant --clientid ${{secrets.QA_CONSUMERKEY}} --jwtkeyfile server.key --username ${{secrets.QA_USERNAME}} -d --instanceurl ${{secrets.QA_LOGINURL}}
+   - name: 'Connect with Salesforce ORG'
+     working-directory: .github/jwt/
+     run: sfdx auth:jwt:grant --clientid ${{secrets.QA_CONSUMERKEY}} --jwtkeyfile server.key --username ${{secrets.QA_USERNAME}} -d --instanceurl ${{secrets.QA_LOGINURL}}
 	
 # Code Push to Scratch org
-  - name: 'code push'
-    run: sfdx force:source:push --targetusername=${{secrets.QA_USERNAME}} --wait 20 -f --loglevel debug
+   - name: 'code push'
+     run: sfdx force:source:push --targetusername=${{secrets.QA_USERNAME}} --wait 20 -f --loglevel debug
