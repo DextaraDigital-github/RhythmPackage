@@ -28,7 +28,7 @@ jobs:
       - name: Setup Node Environment
         uses: actions/setup-node@v2-beta
         with:
-          node-version: '12'
+         node-version: '12'
 	  
  if_merged:
     if: github.event.pull_request.merged == true
