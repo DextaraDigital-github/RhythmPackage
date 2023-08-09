@@ -446,6 +446,7 @@ export default class Questionnaire extends LightningElement {
                                         //this.showButtons.Section_Navigation.value = this.section;
                                     }
                                     this.constructQuestionsAndAnswers(this.questionsList);
+                                    console.log('this.questionsAndAnswers', this.questionsAndAnswerss);
                                     //This loop is to give the Qustion number for all the Questions
                                     this.questionsList.forEach(questionWrap => {
                                         let sequence = 0;
@@ -555,6 +556,7 @@ export default class Questionnaire extends LightningElement {
                                 });
                             })
                             questionWrap.responsesPercentage = Math.floor((Number(questionWrap.numberOfResponses) / Number(questionWrap.numberOfQuestions)) * 100);
+                            console.log('this.questionsAndAnswers', this.questionsAndAnswerss);
                         });
                     }).catch(error => {
                         let errormap = {};
@@ -678,6 +680,7 @@ export default class Questionnaire extends LightningElement {
                             });
                             this.loading = false;
                             this.filterQuestionsAndAnswers = JSON.parse(JSON.stringify(this.questionsAndAnswerss));
+                            console.log('this.questionsAndAnswers handleonload', this.questionsAndAnswerss);
                         }).catch(error => {
                             let errormap = {};
                             errormap.componentName = 'Questionnaire';
@@ -858,7 +861,7 @@ export default class Questionnaire extends LightningElement {
                                                     this.showToast = true;
                                                     this.success = true;
                                                     this.ishideToast = true;
-                                                    this.totastmessage = 'Attachments and CAPAs added to the Conditional questions are deleted'
+                                                    this.totastmessage = 'Attachments and CAPAs added to the Conditional questions are deleted';
 
                                                 })
                                             }
@@ -877,9 +880,11 @@ export default class Questionnaire extends LightningElement {
 
                                 })
                                 if (subquestion.optionValue === question.value) {
+                                   
                                     subquestion.isdisplay = true;
                                     question.showUpload = (subquestion.uploadrequired === 'Yes' || subquestion.uploadrequired === 'Optional') ? true : false;
                                     subquestion.questions.forEach(ques => {
+                                         ques.isEditable=false;
                                         if (ques.required) {
                                             this.requiredQuestionList.push(ques.Id);
                                         }
@@ -889,6 +894,7 @@ export default class Questionnaire extends LightningElement {
                                     if (question.type === 'Picklist (Multi-Select)') {
                                         question.showUpload = false;
                                         let lst = JSON.parse(question.value);
+                                        console.log('Multi-Select', lst);
                                         if (lst.includes(subquestion.optionValue)) {
                                             if ((subquestion.uploadrequired === 'Yes' || subquestion.uploadrequired === 'Optional')) {
                                                 question.showUpload = true;
@@ -948,6 +954,7 @@ export default class Questionnaire extends LightningElement {
             this.responseMap.set(this.questionresponseafterchange.questionId, this.questionresponseafterchange.option);
             this.ishideToast = false;
             this.isAutoSave = true;
+            console.log('this.questionsAndAnswerss', this.questionsAndAnswerss);
             this.startAutoSave();
         }
     }
@@ -1340,7 +1347,9 @@ export default class Questionnaire extends LightningElement {
             responseQueryMap.accountId = this.accid;
             responseQueryMap.assesmentId = this.assessment;
             responseQueryMap.accountassessmentid = this.accountassessmentid;
-           responseQueryMap.percentage = Math.floor(Number(responsesCount/questionsCount)*100)+'';
+            console.log('responseCount', responseCount);
+            console.log('questionCount', questionCount);
+           responseQueryMap.percentage = Math.floor(Number(responseCount/questionCount)*100);
             if (this.assessmentStatus !== 'Need More Information') {
                 if (isSubmit) {
                     responseQueryMap.status = 'Submitted';
@@ -1742,6 +1751,7 @@ export default class Questionnaire extends LightningElement {
                 }
             }
         });
+        console.log('queryResults', queryResults);
         if (child.length > 0) {
             child.forEach(childdata => {
                 const childObj = this.constructWrapperConditionalQuestion(childdata, savedResp);
@@ -1777,6 +1787,8 @@ export default class Questionnaire extends LightningElement {
                     let bool = false;
                     let childlst = JSON.parse(JSON.stringify(parentObj.Children));
                     if (childlst.length > 0) {
+                        console.log('childlst', childlst);
+                        console.log('childObj', childObj);
                         childlst.forEach(lst => {
                             if (lst.optionValue === childObj.conditional) {
                                 lst.questions.push(childObj);
@@ -1787,6 +1799,7 @@ export default class Questionnaire extends LightningElement {
                             parentObj.Children = childlst;
                         }
                         else {
+                            console.log('else', childlst, ',childObj', childObj);
                             childmp.optionValue = childObj.conditional;
                             let lst = [];
                             lst.push(childObj);
@@ -1796,6 +1809,9 @@ export default class Questionnaire extends LightningElement {
                     }
                     else {
                         let childmp = {};
+                        console.log('respAttr', respAttr);
+                        console.log('childObj', childObj);
+                        console.log('parentObj', parentObj);
                         respAttr.forEach(resp => {
                             if (resp.Rhythm__Response_value__c === childObj.conditional && resp.Rhythm__QuestionId__c === parentObj.Id) {
                                 childmp.respAttrId = resp.Id;
@@ -1810,6 +1826,7 @@ export default class Questionnaire extends LightningElement {
                         let lst = [];
                         lst.push(childObj);
                         childmp.questions = lst;
+                        console.log('childmp', childmp);
                         parentObj.Children.push(childmp);
                     }
                 }
@@ -2233,7 +2250,7 @@ based on the flags on customer portal */
     }
     handleSubmitReviewCustomer() {
         let param = {};
-        this.isCustomerModalPopup = false;
+        this.isCustomerModalPopup = true;
         this.showcustomerbuttons = false;
         this.showSaveAndSubmit = false;
         param.assessmentStatus = 'Review Completed';
