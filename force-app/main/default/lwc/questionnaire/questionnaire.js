@@ -108,16 +108,16 @@ export default class Questionnaire extends LightningElement {
     isAutoSave = false;
     countAutoSave = 0;
     ishideToast = true;
-    requiredFilesLst=[];
+    requiredFilesLst = [];
     @track selectedActionList = [];
     layoutItemSize = 4;
     @track fileData;
     @track saveBool = false;
 
     @api handleGetRespRecord(quesid) {
-        if(!Array.isArray(quesid) && this.requiredFilesLst.includes(quesid)){
+        if (!Array.isArray(quesid) && this.requiredFilesLst.includes(quesid)) {
             let index = this.requiredFilesLst.indexOf(quesid);
-            this.requiredFilesLst.splice(index,1); 
+            this.requiredFilesLst.splice(index, 1);
         }
         this.handleOnload();
     }
@@ -375,8 +375,8 @@ export default class Questionnaire extends LightningElement {
         this.questionsList = [];
         this.sectionidslist = [];
         let sectionName = {};
-        this.questions=[];
-        this.questionsAndAnswerss=[];
+        this.questions = [];
+        this.questionsAndAnswerss = [];
         if (this.isTemplate) {
             this.isSupplier = false;
             if (this.objectApiName === 'Rhythm__AccountAssessmentRelation__c') {
@@ -470,6 +470,13 @@ export default class Questionnaire extends LightningElement {
                                                     question.showUpload = (childQuestion.uploadrequired === 'Yes' || childQuestion.uploadrequired === 'Optional') ? true : false;
                                                 }
                                                 childQuestion.questions.forEach(ques => {
+                                                    if (ques.Children.length > 0) {
+                                                        ques.Children.forEach(respAttr => {
+                                                           if(respAttr.isdisplay){
+                                                             ques.showUpload = (respAttr.uploadrequired === 'Yes' || respAttr.uploadrequired === 'Optional') ? true : false;
+                                                        }
+                                                        })
+                                                    }
                                                     ques.snumber = sequence + '.' + (++childsequence);
                                                 });
                                             });
@@ -689,6 +696,13 @@ export default class Questionnaire extends LightningElement {
                                                 if (childQuestion.isdisplay && ques.required) {
                                                     this.requiredQuestionList.push(ques.Id);
                                                 }
+                                                if (ques.Children.length > 0) {
+                                                    ques.Children.forEach(respAttr => {
+                                                        if(respAttr.isdisplay){
+                                                             ques.showUpload = (respAttr.uploadrequired === 'Yes' || respAttr.uploadrequired === 'Optional') ? true : false;
+                                                        }
+                                                    })
+                                                }
                                                 ques.snumber = sequence + '.' + (++childsequence);
                                             });
                                         });
@@ -894,11 +908,11 @@ export default class Questionnaire extends LightningElement {
 
                                                 })
                                             }
+                                            console.log('rejected', rejectedQuestionId);
                                             if (rejectedQuestionId.length > 0) {
                                                 deleteResponse({ deletedata: capaMap }).then(() => {
                                                     childquestion.rejectButton = false;
                                                     childquestion.needData = false;
-                                                    childquestion.showUpload = false;
                                                     childquestion.Rhythm__Flag__c = false;
 
                                                 })
@@ -909,10 +923,9 @@ export default class Questionnaire extends LightningElement {
 
                                 })
                                 if (subquestion.optionValue === question.value) {
-
                                     subquestion.isdisplay = true;
                                     question.showUpload = (subquestion.uploadrequired === 'Yes' || subquestion.uploadrequired === 'Optional') ? true : false;
-                                    if(subquestion.uploadrequired === 'Yes'){
+                                    if (subquestion.uploadrequired === 'Yes') {
                                         this.requiredFilesLst.push(question.Id);
                                     }
                                     subquestion.questions.forEach(ques => {
@@ -924,12 +937,13 @@ export default class Questionnaire extends LightningElement {
                                 }
                                 else {
                                     if (question.type === 'Picklist (Multi-Select)') {
-                                        question.showUpload = false;
                                         let lst = JSON.parse(question.value);
-                                        console.log('Multi-Select', lst);
                                         if (lst.includes(subquestion.optionValue)) {
                                             if ((subquestion.uploadrequired === 'Yes' || subquestion.uploadrequired === 'Optional')) {
                                                 question.showUpload = true;
+                                                if (subquestion.uploadrequired === 'Yes') {
+                                                    this.requiredFilesLst.push(question.Id);
+                                                }
                                             }
                                         }
                                     }
@@ -940,10 +954,12 @@ export default class Questionnaire extends LightningElement {
                     }
                     else {
                         if (this.questionresponseafterchange.parent === question.Id) {
+
                             //This loop is to iterate over the Child Questions for a particular sections and Questions in the wrapper.
                             question.Children.forEach(subquestion => {
                                 subquestion.questions.forEach(ques => {
-                                    if (subquestion.Id === this.questionresponseafterchange.questionId) {
+                                    if (ques.Id === this.questionresponseafterchange.questionId) {
+
                                         if (Array.isArray(this.questionresponseafterchange.option)) {
                                             ques.value = JSON.stringify(this.questionresponseafterchange.option);
                                         }
@@ -953,7 +969,21 @@ export default class Questionnaire extends LightningElement {
                                         if (ques.Children.length > 0) {
                                             ques.Children.forEach(respAttr => {
                                                 if (respAttr.optionValue === ques.value) {
-                                                    ques.showUpload = (respAttr.uploadrequired === 'Yes') ? true : false;
+                                                    ques.showUpload = (respAttr.uploadrequired === 'Yes' || respAttr.uploadrequired === 'Optional') ? true : false;
+                                                    if (respAttr.uploadrequired === 'Yes') {
+                                                        this.requiredFilesLst.push(question.Id);
+                                                    }
+                                                }
+                                                if (ques.type === 'Picklist (Multi-Select)') {
+                                                    let lst = JSON.parse(ques.value);
+                                                    if (lst.includes(subquestion.optionValue)) {
+                                                        if ((respAttr.uploadrequired === 'Yes' || respAttr.uploadrequired === 'Optional')) {
+                                                            ques.showUpload = true;
+                                                            if (respAttr.uploadrequired === 'Yes') {
+                                                                this.requiredFilesLst.push(question.Id);
+                                                            }
+                                                        }
+                                                    }
                                                 }
                                             })
                                         }
@@ -1173,7 +1203,7 @@ export default class Questionnaire extends LightningElement {
                     }
                     if (typeof question.value !== 'undefined') {
                         rowdata = rowdata + '<td>' + question.value + '</td>';
-                        if (question.value !== '' || question.value!=null) {
+                        if (question.value !== '' && question.value != null) {
                             responseCount++;
                         }
                     }
@@ -1203,7 +1233,7 @@ export default class Questionnaire extends LightningElement {
                         if (conditionalQuestion.isdisplay) {
                             rowdata = rowdata + '<tr>';
                             conditionalQuestion.questions.forEach(subquestion => {
-                                if (typeof subquestion.snumber !== 'undefined' && typeof subquestion.subquestion !== 'undefined') {
+                                if (typeof subquestion.snumber !== 'undefined' && typeof subquestion.question !== 'undefined') {
                                     rowdata = rowdata + '<td>' + subquestion.snumber + ' ' + subquestion.question + '</td>';
                                     questionCount++;
                                 }
@@ -1212,7 +1242,7 @@ export default class Questionnaire extends LightningElement {
                                 }
                                 if (typeof subquestion.value !== 'undefined') {
                                     rowdata = rowdata + '<td>' + subquestion.value + '</td>';
-                                    if (subquestion.value !== '' || subquestion.value!=null) {
+                                    if (subquestion.value !== '' && subquestion.value != null) {
                                         responseCount++;
                                     }
 
@@ -1297,7 +1327,7 @@ export default class Questionnaire extends LightningElement {
                                     if (typeof subQuestion.Files__c !== 'undefined') {
                                         filesmap[subQuestion.Id] = subQuestion.Files__c;
                                     }
-                                    if (typeof subQuestion.value != 'undefined') {
+                                    if (typeof subQuestion.value !== 'undefined') {
                                         if (subQuestion.isEmail === true && !(subQuestion.value.match(/^\w+([\\.-]?\w+)*@\w+([\\.-]?\w+)*(\.\w{2,3})+$/))) {
                                             isAssessmentValidated = true;
                                             this.showspinner = false;
@@ -1364,14 +1394,14 @@ export default class Questionnaire extends LightningElement {
             }
             responseList.push(reponse);
         }
-        if (isSubmit && (this.requiredQuestionList.length > 0 || this.requiredFilesLst.length>0)) {
+        if (isSubmit && (this.requiredQuestionList.length > 0 || this.requiredFilesLst.length > 0)) {
             isAssessmentValidated = true;
             this.showspinner = false;
             this.showToast = true;
             this.success = false;
             this.totastmessage = 'Please fill Mandatory questions ';
-            if(this.requiredFilesLst.length>0){
-                this.totastmessage ='Please upload required file.'
+            if (this.requiredFilesLst.length > 0) {
+                this.totastmessage = 'Please upload required file.'
             }
         }
 
@@ -1382,6 +1412,8 @@ export default class Questionnaire extends LightningElement {
             responseQueryMap.accountId = this.accid;
             responseQueryMap.assesmentId = this.assessment;
             responseQueryMap.accountassessmentid = this.accountassessmentid;
+            console.log('responseCount', responseCount);
+            console.log('questionCount', questionCount);
             responseQueryMap.percentage = Math.floor(Number(responseCount / questionCount) * 100);
             if (this.assessmentStatus !== 'Need More Information') {
                 if (isSubmit) {
@@ -1957,10 +1989,12 @@ export default class Questionnaire extends LightningElement {
                     this.showFollowButton = false;
                 }
                 question.Children.forEach(conditionalQuestion => {
-                    if (question.Rhythm__Flag__c === true && question.Id === this.showChat.questionId) {
-                        this.showToast = true;
-                        this.success = false;
-                        this.totastmessage = 'Flagging the question will make the response editable, Attachments and CAPAs added to the Conditional questions will be deleted when the response is changed';
+                    if (conditionalQuestion.questions.length > 0) {
+                        if (question.Rhythm__Flag__c === true && question.Id === this.showChat.questionId) {
+                            this.showToast = true;
+                            this.success = false;
+                            this.totastmessage = 'Flagging the question will make the response editable, Attachments and CAPAs added to the Conditional questions will be deleted when the response is changed';
+                        }
                     }
                     if (conditionalQuestion.isdisplay) {
                         conditionalQuestion.questions.forEach(subquestion => {
