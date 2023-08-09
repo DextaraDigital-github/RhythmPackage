@@ -15,7 +15,7 @@ global with sharing class ActionItemExpiryBatch implements Database.Batchable<sO
     */
     global Database.QueryLocator start(Database.BatchableContext bc){
         Date todayDate= Date.Today();
-        string query = 'SELECT Id,Status__c,Assigned_To__c,Ownership__c FROM Action__c WHERE Due_Date__c <: todayDate AND Status__c !=\'Expired\' WITH SECURITY_ENFORCED';
+        string query = 'SELECT Id,Status__c,Assigned_To__c,Ownership__c FROM Action__c WHERE Due_Date__c <: todayDate AND Status__c =\'Open\' WITH SECURITY_ENFORCED';
         return Database.getQueryLocator(query);
     }
      /**
