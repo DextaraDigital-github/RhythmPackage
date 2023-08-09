@@ -446,7 +446,9 @@ export default class Questionnaire extends LightningElement {
                                         //this.showButtons.Section_Navigation.value = this.section;
                                     }
                                     this.constructQuestionsAndAnswers(this.questionsList);
-                                    console.log('this.questionsAndAnswers', this.questionsAndAnswerss);
+                                    this.questionsList.forEach(questionWrap => {
+                                        questionWrap.questions = questionWrap.questions.sort(this.compare_sort);
+                                    });
                                     //This loop is to give the Qustion number for all the Questions
                                     this.questionsList.forEach(questionWrap => {
                                         let sequence = 0;
@@ -540,7 +542,9 @@ export default class Questionnaire extends LightningElement {
                             count++;
                         }
                         this.constructQuestionsAndAnswers(this.questionsList);
-
+                        this.questionsList.forEach(questionWrap => {
+                            questionWrap.questions = questionWrap.questions.sort(this.compare_sort);
+                        });
                         //This loop is to give the Qustion number for all the Questions. 
                         this.questionsList.forEach(questionWrap => {
                             let sequence = 0;
@@ -653,6 +657,9 @@ export default class Questionnaire extends LightningElement {
                                 this.showButtons.Section_Navigation.options = sectionsList;
                             }
                             this.constructQuestionsAndAnswers(this.questionsList);
+                            this.questionsList.forEach(questionWrap => {
+                                questionWrap.questions = questionWrap.questions.sort(this.compare_sort);
+                            });
                             this.questionsAndAnswerss.forEach(questionWrap => {
                                 let sequence = 0;
                                 questionWrap.questions.forEach(question => {
@@ -2273,5 +2280,15 @@ based on the flags on customer portal */
         this.showToast = true;
         this.success = true;
         this.totastmessage = 'The Assessment Status is updated to  ' + param.assessmentStatus + ' successfuly.';
+    }
+
+    compare_sort(a, b) {
+        if (a.sequenceNumber < b.sequenceNumber) {
+            return -1;
+        } else if (a.sequenceNumber > b.sequenceNumber) {
+            return 1;
+        } else {
+            return 0;
+        }
     }
 }
