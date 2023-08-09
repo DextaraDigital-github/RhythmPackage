@@ -2250,7 +2250,7 @@ based on the flags on customer portal */
     }
     handleSubmitReviewCustomer() {
         let param = {};
-        this.isCustomerModalPopup = true;
+        this.isCustomerModalPopup = false;
         this.showcustomerbuttons = false;
         this.showSaveAndSubmit = false;
         param.assessmentStatus = 'Review Completed';
