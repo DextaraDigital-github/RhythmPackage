@@ -367,7 +367,7 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
         this.showCapaForm=false;
         this.objectApiName=event.detail.objectApiName;
         this.isdisabled=(event.detail.isEditable==="true")?true : false;
-        console.log('isdisable', this.isdisabled);
+        console.log('isdisable', event.detail);
         this.responseId=event.detail.response;
         this.showUpload=(event.detail.showUpload==="true")?true : false;
         this.recid=event.detail.recid;
@@ -376,6 +376,7 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
     }
     handleOnLoad(event)
     {
+        console.log('filemap',event.detail);
          this.template.querySelectorAll('c-questionnaire')[0].handleGetRespRecord(event.detail);
     }
     handleSelectedChat(){

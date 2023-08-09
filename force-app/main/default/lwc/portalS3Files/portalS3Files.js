@@ -247,6 +247,11 @@ export default class AWSS3FileOperations extends LightningElement {
                 if (result) {
                     this.renderFlag = true;
                     this.showToastMessage('Uploaded', 'Uploaded Successfully', 'success');
+                    const selectedEvent = new CustomEvent('getdata', {
+                                detail: this.questionId
+                    });
+                    // Dispatches the event.
+                    this.dispatchEvent(selectedEvent);
                 }
                 else {
                     this.showToastMessage('Exceeded File Limit', 'The maximum file size you can upload is 10 MB', 'error');

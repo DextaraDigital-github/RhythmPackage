@@ -43,7 +43,7 @@ public with sharing class AssessmentController {
         try{
             String query = 'SELECT Id,Name,Section__c,Question_Type__c,'
                           +'Required__c,Default_Value__c,Conditional_Response__c,'
-                          +'OptionValueSet__c,Question__c,Requires_File_Upload__c,'
+                          +'OptionValueSet__c,Question_Sequence_Number__c,Question__c,Requires_File_Upload__c,'
                           +'Parent_Question__c,HelpText__c,Section__r.Name,Section__r.Id,Assessment_Template__c'
                           +' FROM Question__c'
                           +' WHERE Assessment_Template__c =\'' + String.escapeSingleQuotes(templateId) + '\''
