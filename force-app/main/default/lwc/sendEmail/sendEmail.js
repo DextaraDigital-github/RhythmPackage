@@ -19,7 +19,7 @@ export default class SendEmail extends NavigationMixin(LightningElement) {
     @track pagesList;   // Contains list of page Names to avoid looping wherever necessary
     @track show = { spinner: false, showAttachments: false, recSearchKey: '', recSearchCount: { value: 0, show: false }, recSearchLoading: false };   // Conditonally renders/displays data on UI
     @track currentPage;   // Contains current page details of the modal popup
-    @track email = { whatId: '', subject: '', body: '', isBuilderContent: false, selectedRecipientsCount: 0, selectedRecipients: [], selectedRecipientsData: {}, templateId: '', hasCustomContents: false, attachmentsData: { attachments: [], contentDocuments: [], deleteContentDocuments: [] } };   // Stores data regarding the email which is to be sent
+    @track email = { whatId: '', subject: '', body: '', isBuilderContent: false, selectedRecipientsCount: 0, selectedRecipients: [], selectedRecipientsData: '', templateId: '', hasCustomContents: false, attachmentsData: { attachments: [], contentDocuments: [], deleteContentDocuments: [] } };   // Stores data regarding the email which is to be sent
     @track trackSearchRecipients = { searchKey: '', allRecipients: [], selectedRecipients: [] };
     @api isReadOnly = false;
 
@@ -206,7 +206,7 @@ export default class SendEmail extends NavigationMixin(LightningElement) {
                     }
                 }
             }
-            this.columns = [{ fieldName: 'Name', label: 'Name', sortable: true }, { fieldName: 'Email', label: 'Email', sortable: true }, { fieldName: 'Email Status', label: 'Status', sortable: true }]
+            this.columns = [{ fieldName: 'name', label: 'Name', sortable: true }, { fieldName: 'email', label: 'Email', sortable: true }, { fieldName: 'status', label: 'Email Status', sortable: true }]
         }
         else {
             this.pagesList = ['chooseRecipients', 'composeEmail'];
@@ -343,7 +343,7 @@ export default class SendEmail extends NavigationMixin(LightningElement) {
             this.createRecipientsMap();
             sendEmail({ parameterMap: JSON.stringify(this.email) }).then(() => {
                 this.configureToast('Sending Emails', 'Emails will be sent to the selected Suppliers shortly.', 'success');
-                this.email = { whatId: '', subject: '', body: '', isBuilderContent: false, selectedRecipientsCount: 0, selectedRecipients: [], selectedRecipientsData: {}, templateId: '', hasCustomContents: false, attachmentsData: { attachments: [], contentDocuments: [], deleteContentDocuments: [] } };   // Stores data regarding the email which is to be sent
+                this.email = { whatId: '', subject: '', body: '', isBuilderContent: false, selectedRecipientsCount: 0, selectedRecipients: [], selectedRecipientsData: '', templateId: '', hasCustomContents: false, attachmentsData: { attachments: [], contentDocuments: [], deleteContentDocuments: [] } };   // Stores data regarding the email which is to be sent
                 this.initializeAttributes();
                 this.show.spinner = false;
                 this.currentPage.footerButtons.next.disabled = this.currentPage.footerButtons.cancel.disabled = this.currentPage.footerButtons.previous.disabled = false;
@@ -365,11 +365,11 @@ export default class SendEmail extends NavigationMixin(LightningElement) {
     }
     /* Creates a map to access recipients data easily */
     createRecipientsMap() {
-        let _selectedRecipientsMap = {};
+        let _selectedRecipientsJson = {};
         this.recipientsDataTemp.filter(rec1 => { return this.email.selectedRecipients.includes(rec1.Id) }).forEach(rec2 => {
-            _selectedRecipientsMap[rec2.Id] = rec2;
+            _selectedRecipientsJson[rec2.Id] = rec2;
         });
-        this.email.selectedRecipientsData = JSON.stringify(_selectedRecipientsMap);
+        this.email.selectedRecipientsData = JSON.stringify(_selectedRecipientsJson);
     }
 
     /* Handles the search functionality where the data is fetched from Apex based on the text entered in search box */

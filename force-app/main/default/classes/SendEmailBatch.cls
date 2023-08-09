@@ -243,6 +243,16 @@ public with sharing class SendEmailBatch implements Database.batchable<sObject>,
             singleEmail.setSaveAsActivity(false);
             Messaging.sendEmail(new Messaging.SingleEmailMessage[]{singleEmail});
         }
+        
+        SendEmailEvent__e event = new SendEmailEvent__e();
+        event.Source__c = 'Refresh Emails';
+        event.Type__c = 'RefreshEmails';
+        try {
+            EventBus.publish(event);
+        }
+        catch(Exception e) {
+            throw new AuraHandledException(e.getMessage());   //Throws an exception
+        }
     }
     
     /**

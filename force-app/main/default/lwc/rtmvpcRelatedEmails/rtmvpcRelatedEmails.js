@@ -83,7 +83,7 @@ export default class RtmvpcRelatedEmails extends LightningElement {
                             emailJson.failedRecipientsCount = 0;
                             if (emailJson.recipientsData !== 'undefined' && emailJson.recipientsData.length > 0) {
                                 emailJson.recipientsData.forEach(rec => {
-                                    rec.Status = 'Sent';
+                                    rec.status = 'Failed';
                                 });
                                 emailJson.failedRecipientsCount = emailJson.recipientsData.length;
                             }
@@ -92,7 +92,7 @@ export default class RtmvpcRelatedEmails extends LightningElement {
                             emailJson = emailMap.get(email.EmailMessageId);
                         }
                         if (typeof user.Contact != 'undefined' && typeof user.Contact.AccountId != 'undefined' && typeof user.Contact.Account != 'undefined' && typeof user.Contact.Account.Name != 'undefined') {
-                            emailJson.recipientsData.push({ Id: user.Contact.AccountId, Name: user.Contact.Account.Name, Email: user.Email, Status: 'Sent' });
+                            emailJson.recipientsData.push({ id: user.Contact.AccountId, name: user.Contact.Account.Name, email: user.Email, status: 'Sent' });
                             emailMap.set(email.EmailMessageId, emailJson);
                         }
                     });
@@ -148,7 +148,6 @@ export default class RtmvpcRelatedEmails extends LightningElement {
 
     /* Refreshed the data in the datatable */
     refreshDataHandler() {
-        console.log('Hi');
         this.fetchEmailMsgsData();
     }
 }
