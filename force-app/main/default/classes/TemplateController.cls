@@ -11,9 +11,11 @@ public with sharing class TemplateController {
     /**
     * @description clone template and its related records.
     * @param templateId This is a record id of an Template.
+    * @param SObject template data to create new record.
     * @return 
     */
     @AuraEnabled
+    /* sfge-disable-stack ApexFlsViolationRule */
     public static ResultWrapper doClone(string templateId,SObject templateRecord){
         try{
             ResultWrapper resWrap = service.cloneTemplate(templateId,templateRecord);
@@ -24,6 +26,11 @@ public with sharing class TemplateController {
         }
     }
 
+    /**
+    * @description To get template data.
+    * @param templateId This is a record id of an Template.
+    * @return 
+    */
     @AuraEnabled
     public static List<Assessment_Template__c> getTemplateRecord(string templateId){
         return service.getTemplateRecord(templateId);

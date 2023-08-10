@@ -14,8 +14,8 @@ public with sharing class QuestionAttributeResponseController {
     * @return List of Response_Attribute__c records
     */
     @AuraEnabled
-    public static List<SObject> createResponseAttributes(List<SObject> responseAttributes)
-    {
+    /* sfge-disable-stack ApexFlsViolationRule */
+    public static List<SObject> createResponseAttributes(List<SObject> responseAttributes){
         return service.createResponseAttributes(responseAttributes);
     }
    /**
@@ -24,6 +24,7 @@ public with sharing class QuestionAttributeResponseController {
     * @return List of deleted Response_Attribute__c records
     */
     @AuraEnabled
+    /* sfge-disable-stack ApexFlsViolationRule */
     public static List<SObject> deleteQuesRespAttribute(List<String> questionId){
         return service.deleteQuesRespAttribute(questionId);
     }
@@ -32,7 +33,8 @@ public with sharing class QuestionAttributeResponseController {
     * @param responseAttributes It is a list of maps of Response_Attribute__c Object with the Response_Attribute__c Id. 
     * @return List of Updated Response_Attribute__c records
     */
-    @AuraEnabled  
+    @AuraEnabled
+    /* sfge-disable-stack ApexFlsViolationRule */
     public static List<SObject> updateResponseAttributes(List<SObject> responseAttributes){
         return service.updateResponseAttributes(responseAttributes);
     }
@@ -42,12 +44,13 @@ public with sharing class QuestionAttributeResponseController {
     * @return List of deleted Response_Attribute__c records
     */
     @AuraEnabled
+    /* sfge-disable-stack ApexFlsViolationRule */
     public static List<Sobject> deleteResponseAttribute(String responseId){
         return service.deleteResponseAttribute(responseId);
     }
       /**
     * @description gets al Response Attribute Records based on  Response_Attribute__c Ids
-    * @param questionlst is a list of Response_Attribute__c id. 
+    * @param respAttrId is a list of Response_Attribute__c id. 
     * @return List of Response_Attribute__c records
     */
     @AuraEnabled

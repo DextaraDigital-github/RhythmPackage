@@ -22,6 +22,11 @@
 								<div class="slds-col slds-text-align_right slds-size_1-of-1 ">
 									<div class="slds-grid slds-wrap slds-grid_align-end slds-gutters_x-small">
 										<div class="slds-col"></div>
+											<div class="slds-p-left_small">
+											<lightning-button-icon icon-name="utility:refresh" style="font-size: small;color: white;"
+												onclick={handleRefresh} alternative-text="Refresh" title="Refresh">
+											</lightning-button-icon>
+										</div>
 										<template if:true={disableButtons}>
 											<div class="slds-p-left_small">
 												<lightning-button slds-button_neutral

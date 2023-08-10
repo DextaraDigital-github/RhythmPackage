@@ -77,6 +77,10 @@ global with sharing class AssessmentExpiryNotificationBatch implements Database.
     global void finish(Database.BatchableContext bc){
         return;
     }
+    
+    /**
+    * @description It is used to throw the exception
+    */
     public class SecurityControllerException extends Exception{
     }
 }

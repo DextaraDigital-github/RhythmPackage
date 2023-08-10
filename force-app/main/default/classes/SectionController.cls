@@ -8,6 +8,12 @@
 public with sharing class SectionController {
     static SectionService service = SectionService.getInstance();
 
+    /**
+    * @description To get sections related to template.
+    * @param templateId It is template id.
+    * @param sectionName Name of the section.
+    * @return
+    */
     @AuraEnabled
     public static List<SObject> getSections(String templateId, String sectionName){
         return service.getSections(templateId,sectionName);

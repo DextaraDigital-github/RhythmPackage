@@ -1,5 +1,7 @@
 <template>
-
+<div class="cad-sec_vcontainer2_2" style="height:calc(100% - 0px);">
+			<div class="slds-scrollable_y" style="max-height:calc(100% - 40px); --slds-c-input-color-border: rgb(187 187 187);">
+			
 	<div class="card mb-4">
 		<div class="">
 			<div class="profile-log-switch">
@@ -8,8 +10,8 @@
 
 						<div class=" slds-grid slds-wrap" style="border-bottom:1px solid #f1f1f1;">
 							<lightning-file-upload record-id={fileRecordID} accept={acceptedFormats} name="fileUploader"
-								class="file-selector-large" title="Upload" onuploadfinished={handleUploadFinished}
-								disabled={isdisabled} multiple>
+								class="file-selector-large" title="Upload" onuploadfinished={handleUploadFinished} disabled={isdisabled}
+								 multiple>
 							</lightning-file-upload>
 						</div>
 						<br/>
@@ -23,10 +25,12 @@
 										<a data-id={item.key} title={item.url} onclick={handleDownload}>{item.value}</a>
 									</div>
 									<div class="slds-col">
+										<template if:false={isdisabled}>
 										<lightning-icon style="margin-top: 10px;" icon-name="utility:delete"
 											size='x-small' alternative-text="Delete" class="slds-m-left_xx-small"
-											key={item.key} name={item.key} title="Delete" onclick={handleDeletePopup}>
+											key={item.key} name={item.key} title="Delete" onclick={handleDeletePopup} >
 										</lightning-icon>
+										</template>
 									</div>
 								</div>
 							</div>
@@ -66,4 +70,6 @@
 		</div>
 		<div class="slds-backdrop slds-backdrop_open"></div>
 	</template>
+			</div>
+</div>
 </template>

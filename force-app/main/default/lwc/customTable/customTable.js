@@ -366,8 +366,8 @@ export default class CustomTable extends LightningElement {
                         }
                         recArray.push(recJson);
                         if (this.showProgressBar === "true") {
-                            if (typeof relatedListRecords[i].Rhythm__Completed__c !== 'undefined') {
-                                recDetails.progressBarValue = relatedListRecords[i].Rhythm__Completed__c;
+                            if (typeof relatedListRecords[i].Rhythm__Response_Percentage__c !== 'undefined') {
+                                recDetails.progressBarValue = relatedListRecords[i].Rhythm__Response_Percentage__c +'%';
                             }
                         }
                         console.log('Rdata',relatedListRecords[i]);

@@ -27,7 +27,5 @@
 			</div>
 		</template>
 	</div>
-	<template lwc:if={modal.emailRecord.show}>
-		<c-send-email-to-contacts source="rtmvpcRelatedEmails" email-api={selectedEmail} page-prop={pageProp} onclosemodal={closeModalHandler}></c-send-email-to-contacts>
-	</template>
+	<c-send-email email-data={selectedEmail} what-id={selectedEmail.whatId} what-name={selectedEmail.whatName} recipients={selectedEmail.recipientsData} is-read-only="true"></c-send-email>
 </template>

@@ -14,6 +14,7 @@ public with sharing class TemplateSelector {
     
     /**
     * @description Singleton Design Pattern 
+    * @return
     */
     public static TemplateSelector getInstance(){
            if(selector == null){

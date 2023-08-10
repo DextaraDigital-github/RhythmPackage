@@ -20,6 +20,7 @@ public with sharing class TemplateService{
     
     /**
     * @description Singleton Design Pattern 
+    * @return 
     */
     public static TemplateService getInstance(){
            if(service == null){
@@ -31,6 +32,7 @@ public with sharing class TemplateService{
     /**
     * @description To Clone the Template and its related records.
     * @param templateId This is a record id of an Template.
+    * @param SObject template data to create new record.
     * @return 
     */
     public TemplateController.ResultWrapper cloneTemplate(string templateId,SObject templateRecord){
@@ -38,10 +40,10 @@ public with sharing class TemplateService{
         try{
             string templateName = string.valueOf(templateRecord.get('Name'));
             templateName = '\'%'+String.escapeSingleQuotes(templateName)+'%\'';
-            string query = 'SELECT Id'
-                        + ' FROM Assessment_Template__c'
-                        + ' WHERE Name LIKE '+templateName;
-            List<Assessment_Template__c> dupList = safe.doQuery(query);
+            List<Assessment_Template__c> dupList = [SELECT Id 
+                                                    FROM Assessment_Template__c
+                                                    WHERE Name LIKE:templateName
+                                                    WITH SECURITY_ENFORCED];
             if(dupList.isEmpty() == true){
                 if(string.isNotBlank(templateId)){
                     List<SObject> templateList = new List<sObject>();
@@ -278,6 +280,11 @@ public with sharing class TemplateService{
         }
     }
 
+    /**
+    * @description To get the template record data.
+    * @param templateId This is a record id of an Template.
+    * @return 
+    */
     public List<Assessment_Template__c> getTemplateRecord(string templateId){
         return tempSelector.getTemplateRecord(templateId);
     }

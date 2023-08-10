@@ -6,6 +6,7 @@ import getQuestionsList from '@salesforce/apex/AssessmentTemplateController.getQ
 import getSectionRecsCount from '@salesforce/apex/AssessmentTemplateController.getRecordsCount';
 import deleteRecords from '@salesforce/apex/AssessmentTemplateController.deleteRecords';
 import getTemplateDetails from '@salesforce/apex/AssessmentTemplateController.getTemplateDetails';
+import { refreshApex } from '@salesforce/apex';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { NavigationMixin } from 'lightning/navigation';
 import CUS_STYLES from '@salesforce/resourceUrl/rtmcpcsldscustomstyles';
@@ -70,11 +71,14 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
     selectedReorderValues = [];
     reorderType = '';
     reorderHeaderName = '';
+    @track wiredRecsData;
+
     //End: Reorder Columns
 
     //Get Template Status Details
     @wire(getTemplateDetails, { templateId: '$recordId' })
     getRecs(result) {
+        this.wiredRecsData = result;
         this.disableButtons = result.data;
         if (this.disableButtons === false) {
             this.columns = [...this.sectionColumns].filter(col => col.type !== 'action');
@@ -366,6 +370,7 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
 
     // To Get Refresh the Records Data
     handleRefresh() {
+        refreshApex(this.wiredRecsData);
         this.tempRecsLimit = this.recsLimit;
         getQuestionsList({ templateId: this.recordId }).then(data => {
             let questionData = JSON.parse(JSON.stringify(data));
@@ -386,11 +391,11 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
     connectedCallback() {
         this.handleRefresh();
         Promise.all([
-            loadStyle(this,CUS_STYLES),
+            loadStyle(this, CUS_STYLES),
         ]).then(() => {
         })
-        .catch(error => {
-        });
+            .catch(error => {
+            });
     }
 
     //getting section records 

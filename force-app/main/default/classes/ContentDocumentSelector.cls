@@ -12,7 +12,8 @@ public with sharing class ContentDocumentSelector {
 
     private static ContentDocumentSelector selector = null; //private static instance of the class
     /**
-    * @description Singleton Design Pattern 
+    * @description Singleton Design Pattern
+    * @return
     */
     public static ContentDocumentSelector getInstance(){
            if(selector == null){

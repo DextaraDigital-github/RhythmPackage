@@ -99,7 +99,7 @@
 												record-id={recordId} accid={assaccId} onselectconversation={chatHistory}
 												onshowsummary={showsummaryHandler}
 												account-assessment-status={accountAssessmentStatus}
-												onupdatetimeline={handleupdatetimeline}
+												onupdatetimeline={handleupdatetimeline} onuploadfile={handleFileData}
 												onexpandcollapse={handleExpandCollapse}
 												accountassessmentid={accountassessmentid} template-id={tempId}
 												onselectaction={handleAction} ontimelinehandle={handleTimeLine}>
@@ -126,7 +126,7 @@
 								</lightning-button-icon>
 								<lightning-button-icon class="cad_actions slds-float_right slds-is-absolute"
 									style="right:60px;top:3px;" size="small" icon-name="utility:attach"
-									onclick={openReview}>
+									onclick={handleSelectedFile}>
 								</lightning-button-icon>
 								<lightning-button-icon class="cad_actions slds-float_right slds-is-absolute "
 									style="right:90px;top:3px;border-radius:0px" size="small" icon-name="utility:comments"
@@ -138,13 +138,23 @@
 										
 										<template if:true={openReviewComments}>
 											<c-rtmvpc-assessment-chatter chattermap={showChat}
-												onchatconversation={handleChat} recordid={customerId}>
+												onchatconversation={handleChat} recordid={customerId} timeline={assessmentTimeline}>
 											</c-rtmvpc-assessment-chatter>
 										</template>
 										<template if:true={showCapaForm}>
 											<c-action showresponse={showResponseForm} oncloseform={closeForm}
 												onremovedeleteicon={handleDeleteIcon}>
 											</c-action>
+										</template>
+										<template if:true={openRightFile}>
+											<template if:true={showUpload}>
+											<c-portal-s3-files object-name={objectApiName}
+												isdisabled = {isdisabled}
+												response-rec-id={responseId} ongetdata={handleOnLoad}
+												assessment-rec-id={accountassessmentFileId} rec-id={recid}
+												question-id={questionId}>
+											</c-portal-s3-files>
+											</template>
 										</template>
 
 						</div>

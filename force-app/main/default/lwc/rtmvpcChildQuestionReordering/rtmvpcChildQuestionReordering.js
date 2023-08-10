@@ -14,7 +14,6 @@ export default class RtmvpcChildQuestionReordering extends LightningElement {
     @track questionsData = [];   //Stores a list of value-label pair of each question
 
     connectedCallback() {
-        // this.question = { Id: 'a0H8F000002eyTsUAI', Name: 'Test' };   //Testing purpose only
         this.fetchQuestionsData();
     }
     renderedCallback() {
@@ -26,9 +25,9 @@ export default class RtmvpcChildQuestionReordering extends LightningElement {
 
     /* Renders the UI to make the indicate the active response in the navigation item with WHITE background-color */
     renderNavBar() {
-        if (typeof this.activeResponse != undefined) {
+        if (typeof this.activeResponse !== undefined) {
             let navItems = this.template.querySelectorAll('[data-name="response"]');
-            if (typeof navItems != 'undefined' && navItems.length > 0) {
+            if (typeof navItems !== 'undefined' && navItems.length > 0) {
                 this.responseList.forEach(navItem => {
                     this.template.querySelectorAll('[data-response="' + navItem + '"]')[0].classList.remove('slds-is-active');
                 });
@@ -41,7 +40,7 @@ export default class RtmvpcChildQuestionReordering extends LightningElement {
     fetchQuestionsData() {
         let _parameterMap = JSON.stringify({ assessmentId: this.question.Id });
         fetchQuestions({ parameterMap: _parameterMap }).then(result => {
-            if (result.toString() != 'null') {
+            if (result.toString() !== 'null') {
                 this.refreshQuestionsData(result);
             }
             else {
@@ -57,14 +56,14 @@ export default class RtmvpcChildQuestionReordering extends LightningElement {
     /* Initializes the required parameters and fetches the questions to get updated data */
     refreshQuestionsData(result) {
         this.formatQuestionsData(result);   //Creates responseMap for easy fetching of questions and responseList for displaying the responses on the screen
-        this.activeResponse = (typeof this.activeResponse != 'undefined') ? this.activeResponse : this.responseList[0];   //Stores the active response name
+        this.activeResponse = (typeof this.activeResponse !== 'undefined') ? this.activeResponse : this.responseList[0];   //Stores the active response name
         this.questionsData = this.responseMap.get(this.activeResponse);   //Fetches the questions list of the active response
         this.show.spinner = false;
     }
     /* Formats the questions data into the required format */
     formatQuestionsData(result) {
         this.responseMap = new Map();
-        this.responseList = (typeof this.question.options != 'undefined') ? this.question.options.split('\r\n') : [];
+        this.responseList = (typeof this.question.options !== 'undefined') ? this.question.options.split('\r\n') : [];
         result.forEach(question => {
             let responseJson;
             if (!this.responseMap.has(question.Rhythm__Conditional_Response__c)) {
@@ -107,7 +106,7 @@ export default class RtmvpcChildQuestionReordering extends LightningElement {
         this.show.saveBtn = false;
         let _parameterMap = JSON.stringify({ questionIdList: this.questionsData.questionValues, questionId: this.question.Id });
         updateQuestionsSequence({ parameterMap: _parameterMap }).then(result => {
-            if (result.toString() != 'null') {
+            if (result.toString() !== 'null') {
                 this.configureToast('Sequence Saved Successfully', 'Sequence for Conditional Questions of ' + this.activeResponse + ' reponse is saved.', 'success');
                 this.refreshQuestionsData(result);
             }

@@ -52,7 +52,6 @@ public with sharing class TestDataFactory{
                 }
             }
         } catch(Exception e){
-			system.debug('createRecords Exception --->'+e);
             throw new AuraHandledException(e.getMessage());
         }
         return records;
@@ -220,6 +219,13 @@ public with sharing class TestDataFactory{
         return createRecords(qlist,true,attributes);
     }
     
+    /**
+    * @description To create Response Attribute records.
+    * @param numToInsert This is a number of records to insert.  
+    * @param doInsert This is boolean value whether to insert record or not.
+    * @param attributes This is a map which contain record data to insert.
+    * @return
+    */
     public static List<Response_Attribute__c> createResponseAttributes(Integer numToInsert, Boolean doInsert,Map<String, Object> attributes){
         List<Response_Attribute__c> qlist = new List<Response_Attribute__c>();
         for(Integer i=0; i< numToInsert; i++){
@@ -228,7 +234,15 @@ public with sharing class TestDataFactory{
         }
         return createRecords(qlist,true,attributes);
     }
- 	    public static List<Response_Question_Map__c> createResponseQuestionMap(Integer numToInsert, Boolean doInsert,Map<String, Object> attributes){
+
+    /**
+    * @description To create Response Question Map records.
+    * @param numToInsert This is a number of records to insert.  
+    * @param doInsert This is boolean value whether to insert record or not.
+    * @param attributes This is a map which contain record data to insert.
+    * @return
+    */
+ 	public static List<Response_Question_Map__c> createResponseQuestionMap(Integer numToInsert, Boolean doInsert,Map<String, Object> attributes){
         List<Response_Question_Map__c> qlist = new List<Response_Question_Map__c>();
         for(Integer i=0; i< numToInsert; i++){
         Response_Question_Map__c q = new Response_Question_Map__c();

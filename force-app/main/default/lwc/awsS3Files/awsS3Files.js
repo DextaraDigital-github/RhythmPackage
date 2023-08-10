@@ -4,12 +4,14 @@ import filesUpload from '@salesforce/apex/AWSS3Controller.uploadFiles';
 import getAuthentication from '@salesforce/apex/AWSS3Controller.getAuthenticationData';
 import awsjssdk from '@salesforce/resourceUrl/AWSJSSDK';
 import getTemplateDetails from '@salesforce/apex/AWSS3Controller.getTemplateDetails';
+import Id from '@salesforce/user/Id';
 import { loadScript } from 'lightning/platformResourceLoader';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 
 export default class AWSS3FileOperations extends LightningElement {
     @api recordId;
     @api objectApiName;
+    @track userId = Id;
     @track accessKey;
     @track secretKey;
     @track region;
@@ -34,6 +36,8 @@ export default class AWSS3FileOperations extends LightningElement {
     showFrame = false;
     noFilesContent = 'No Files Uploaded...';
     noPreviewContent = 'No Preview Content...';
+    @api showUpload;
+    @api isupload;
 
     //Accept File Formats
     get acceptedFormats() {
@@ -51,8 +55,15 @@ export default class AWSS3FileOperations extends LightningElement {
                 });
         }
         else if (this.objectApiName === 'Rhythm__Action__c') {
-            this.disableFlag = true;
-            this.heightStyle = 'height:387px;';
+            if (!this.showUpload === true) {
+                this.disableFlag = true;
+                this.heightStyle = 'height:387px;';
+            }
+            else {
+                //this.disableFlag = false;
+                console.log('this.disableflag', this.isupload);
+                this.disableFlag = !(this.isupload);
+            }
         }
         else {
             this.disableFlag = false;
@@ -119,18 +130,23 @@ export default class AWSS3FileOperations extends LightningElement {
             if (err) {
                 console.error(err);
             } else {
+
                 const files = data.Contents;
                 let fileList = [];
                 this.keyList = [];
                 files && files.forEach(file => {
-                    const objectKey = file.Key;
-                    let fileName = objectKey.substring(objectKey.lastIndexOf("/") + 1);
-                    let fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1);
-                    if (fileExtension === 'doc' || fileExtension === 'docx' || fileExtension === 'xls' || fileExtension === 'xlsx') {
-                        fileList.push({ type: fileExtension, preview: false, key: objectKey, url: this.endpoint + '/' + objectKey, value: fileName.substring(fileName.indexOf("_") + 1) });
-                    }
-                    else {
-                        fileList.push({ type: fileExtension, preview: true, key: objectKey, url: this.endpoint + '/' + objectKey, value: fileName.substring(fileName.indexOf("_") + 1) });
+                    let checkFile = file.Key.split('/')
+                    if (checkFile[checkFile.length - 1] != null && checkFile[checkFile.length - 1] != '') {
+
+                        const objectKey = file.Key;
+                        let fileName = objectKey.substring(objectKey.lastIndexOf("/") + 1);
+                        let fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1);
+                        if (fileExtension === 'doc' || fileExtension === 'docx' || fileExtension === 'xls' || fileExtension === 'xlsx') {
+                            fileList.push({ type: fileExtension, preview: false, key: objectKey, url: this.endpoint + '/' + objectKey, value: fileName.substring(fileName.indexOf("_") + 1) });
+                        }
+                        else {
+                            fileList.push({ type: fileExtension, preview: true, key: objectKey, url: this.endpoint + '/' + objectKey, value: fileName.substring(fileName.indexOf("_") + 1) });
+                        }
                     }
                 });
                 this.keyList = fileList.reverse();
@@ -171,9 +187,14 @@ export default class AWSS3FileOperations extends LightningElement {
 
     //Open Delete Modal Popup
     handleDeletePopup(event) {
-        this.showDeleteModal = true;
         this.fileKey = event.target.name;
         this.keyString = this.fileKey.replace(this.endpoint + '/', '');
+        if (this.keyString.includes(this.userId)) {
+            this.showDeleteModal = true;
+        }
+        else {
+            this.showToastMessage('No Delete Access', 'You do not have access to delete this file', 'error');
+        }
     }
 
     //Close Delete Modal Popup
@@ -206,7 +227,7 @@ export default class AWSS3FileOperations extends LightningElement {
     //Upload files to AWS after uploaded successfully to salesforce
     handleUploadFinished() {
         filesUpload({
-            recId: this.recordId, objectName: this.objectApiName, pathRecId: null, deleteFlag: true
+            recId: this.recordId, objectName: this.objectApiName, pathRecId: null, deleteFlag: true, userId: this.userId
         }).then(result => {
             if (result) {
                 this.renderFlag = true;
@@ -232,7 +253,7 @@ export default class AWSS3FileOperations extends LightningElement {
         );
         this.renderFlag = true;
         this.configAWS();
-        eval("$A.get('e.force:refreshView').fire();");
+        //eval("$A.get('e.force:refreshView').fire();");
     }
 
     //Preivew File

@@ -8,19 +8,6 @@
 public with sharing class AWSS3Service extends AWS {
     public static SecurityCheckController safe = new SecurityCheckController();//use singleton pattern
     private static Savepoint sp;
-
-    private static AWSS3Service serviceClasa = null; //private static instance of the class
-    
-    /**
-    * @description Singleton Design Pattern 
-    */
-    public static AWSS3Service getInstance(){
-            if(serviceClasa == null){
-                serviceClasa = new AWSS3Service();
-            }
-        return serviceClasa;
-    }
-    
     public String fileName;
     public String folderName;
     public Blob fileBody;
@@ -29,10 +16,23 @@ public with sharing class AWSS3Service extends AWS {
     public HttpResponse res;
     public ContentVersion versionData;
     public static HttpRequest req;
+
+    private static AWSS3Service serviceClasa = null; //private static instance of the class
     
     /**
-* @description init method used for initialize the AWS signature and upload file.
-*/ 
+    * @description Singleton Design Pattern
+    * @return
+    */
+    public static AWSS3Service getInstance(){
+            if(serviceClasa == null){
+                serviceClasa = new AWSS3Service();
+            }
+        return serviceClasa;
+    }
+    
+    /**
+    * @description init method used for initialize the AWS signature and upload file.
+    */ 
     public override void init() {
         Map<String, String> s3Map = new Map<String, String>();
         List<s3configuration__mdt> s3List = s3configuration__mdt.getAll().values();
@@ -201,7 +201,7 @@ public with sharing class AWSS3Service extends AWS {
 * @param deleteFlag This is the deleteFlag.
 * @return flag on uploaded successfully
 */ 
-    public Boolean uploadFiles(Id recId, String objectName, Id pathRecId,Boolean deleteFlag) {
+    public Boolean uploadFiles(Id recId, String objectName, Id pathRecId,Boolean deleteFlag, Id userId) {
         Boolean uploadedFlag = false;
         List<Id> contDocIds = new List<Id>();
         List<String> errorList = new List<String>();
@@ -240,6 +240,7 @@ public with sharing class AWSS3Service extends AWS {
                 if(uploadedFlag == true) {
                     AWSS3ServiceQueueable awsQu=new AWSS3ServiceQueueable();
                     awsQu.recId = recId;
+                    awsQu.userId = userId;
                     awsQu.objectName = objectName;
                     awsQu.pathRecId = pathRecId;
                     awsQu.deleteFlag = deleteFlag;
@@ -374,10 +375,35 @@ public with sharing class AWSS3Service extends AWS {
         }
         
     }
+
+
+    /**
+    * @description update Files count.
+    * @param responseId This is a record id of an Response.
+    * @param filesCount
+    *@return
+    */
+    public void updateRespFilesCount(String responseId, Integer filesCount) {
+        try {
+            List<Response__c> srList = new List<Response__c>();
+            List<String> errorList = new List<String>();
+            if(String.isNotBlank(responseId) && filesCount > 0) {
+                Response__c res=new Response__c();
+                res.Id= responseId;
+                res.Files__c = String.valueOf(filesCount);
+                srList.add(res);
+                Database.SaveResult[] saveResult = safe.doUpdate(srList);
+            }
+        }
+        catch(Exception e) {
+            String errorMsg = e.getMessage();
+            throw new AuraHandledException(ErrorMsg);
+        }
+    }
   
     /**
-* @description It is used to throw the exception
-*/
+    * @description It is used to throw the exception
+    */
     public class SecurityControllerException extends Exception{
     }
 }

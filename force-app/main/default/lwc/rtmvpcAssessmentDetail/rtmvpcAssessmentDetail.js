@@ -53,7 +53,16 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
     @track showCapaForm=false;
     @track openReviewComments=false;
     @track actionData;
+    @track fileData;
     @track selectedchatData;
+    @track accountassessmentFileId;
+    @track questionId;
+    @track recid;
+    @track responseId;
+    @track showUpload=false;
+    @track isdisabled=false;
+    @track objectApiName;
+    @track openRightFile=false;
 
     connectedCallback() {
         this.customerId = this.recordId;
@@ -178,6 +187,7 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
                                         case "In Review": statustrack.classlist = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_pending'; break;
                                         case "Accepted": statustrack.classlist = 'cad-timeline_slidebase cad-timeline_vendor cad-timeline_submited'; break;
                                         case "Need More Information": statustrack.classlist = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_rejected'; break;
+                                        case "Cancel":statustrack.classlist = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_rejected'; break;
                                         case "Review Completed": statustrack.classlist = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_reviewcompleted'; break;
                                         default : console.log('default');
                                     }
@@ -313,12 +323,15 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
          //this.showCapaForm=event.detail.showCapaForm;
          this.openReviewComments= this.showChat.openReviewComments;
          this.showCapaForm=false;
+         this.openRightFile=false;
 
         console.log('chatter',this.showChat);
         this.showChat.accountassessmentId = this.accountassessmentid;
         this.showData = this.showChat.openChat;
         this.showconverstion = this.showChat.disableSendButton;
         this.actionData = event.detail.actionData;
+        this.selectedchatData=event.detail.chat;
+        this.fileData=event.detail.file;
         this.assessmentTimeline.forEach(res=>{
             if(res.status === 'In Review'){
                this.actionData[0].ownershipId=res.id;
@@ -329,7 +342,7 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
                 this.actionData[0].assignedToName=res.name;
             }
         })
-        console.log('sample',this.actionData);
+        console.log('sample',this.fileData);
          setTimeout(()=>{
             console.log('chatter===>',this.template.querySelectorAll('c-rtmvpc-assessment-chatter'));
             this.template.querySelectorAll('c-rtmvpc-assessment-chatter')[0].displayConversation(this.showChat);
@@ -341,17 +354,51 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
     {
         this.openReviewComments=false;
         this.showCapaForm=true;
+        this.openRightFile=false;
          setTimeout(()=>{
              this.template.querySelectorAll('c-action')[0].displayForm(this.actionData);
         },300);
 
     }
+    handleFileData(event)
+    {
+        this.openRightFile=true;
+        this.openReviewComments=false;
+        this.showCapaForm=false;
+        this.objectApiName=event.detail.objectApiName;
+        this.isdisabled=(event.detail.isEditable==="true")?true : false;
+        console.log('isdisable', event.detail);
+        this.responseId=event.detail.response;
+        this.showUpload=(event.detail.showUpload==="true")?true : false;
+        this.recid=event.detail.recid;
+        this.questionId=event.detail.questionId;
+        this.accountassessmentFileId=event.detail.accountassessmentid;
+    }
+    handleOnLoad(event)
+    {
+        console.log('filemap',event.detail);
+         this.template.querySelectorAll('c-questionnaire')[0].handleGetRespRecord(event.detail);
+    }
     handleSelectedChat(){
         this.openReviewComments=true;
         this.showCapaForm=false;
+        this.openRightFile=false;
          setTimeout(()=>{
           this.template.querySelectorAll('c-rtmvpc-assessment-chatter')[0].displayConversation(this.selectedchatData);
         },300);
+    }
+    handleSelectedFile(){
+        console.log('this.filedata',this.fileData);
+        this.openRightFile=true;
+        this.openReviewComments=false;
+        this.showCapaForm=false;
+        this.objectApiName=this.fileData.objectApiName;
+        this.isdisabled=(this.fileData.isEditable==="true")?true : false;       
+        this.responseId=this.fileData.response;
+        this.showUpload=(this.fileData.showUpload==="true")?true : false;
+        this.recid=this.fileData.recid;
+        this.questionId=this.fileData.questionId;
+        this.accountassessmentFileId=this.fileData.accountassessmentid;
     }
 
     showsummaryHandler() {
@@ -542,7 +589,20 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
        }
     }
 
-    handleupdatetimeline() {
+    handleupdatetimeline(event) {
+        let filesdata=event.detail;
+        console.log('filesdata',filesdata);
+        if(filesdata.files){
+        this.template.querySelector('c-portal-s3-files').handleFilesdata(filesdata);
+        }
+        if(typeof filesdata.data!=='undefined'){
+            const selectedEvent = new CustomEvent('handlepdfcsv', {
+                        detail: filesdata
+                    });
+                    this.dispatchEvent(selectedEvent);
+                    this.handleOnload();
+        }
+
         this.handleTimeLine();
     }
 }

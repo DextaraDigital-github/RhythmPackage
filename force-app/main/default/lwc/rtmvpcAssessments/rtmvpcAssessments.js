@@ -1,116 +1,116 @@
-import { LightningElement, api,track,wire} from 'lwc';
+import { LightningElement, api, track, wire } from 'lwc';
 import getAccountId from '@salesforce/apex/AssessmentController.getAccountId';
 import getAssessmentJunctionRecords from '@salesforce/apex/AssessmentController.getAssessmentJunctionRecords';
 import errorLogRecord from '@salesforce/apex/AssessmentController.errorLogRecord';
 import getQuestionsList from '@salesforce/apex/AssessmentController.getQuestionsList'; //To fetch all the Questions from the Assessment_Template__c Id from the Supplier_Assessment__c record
 import getSupplierResponseList from '@salesforce/apex/AssessmentController.getSupplierResponseList'; //To fetch all the Supplier_Response__c records related to the Supplier_Assessment__c record
 import getSupplierAssessmentList from '@salesforce/apex/AssessmentController.getSupplierAssessmentList'; //To fetch the Assessment_Template__c Id from the Supplier_Assessment__c record
-import { CurrentPageReference,NavigationMixin } from 'lightning/navigation';
+import { CurrentPageReference, NavigationMixin } from 'lightning/navigation';
 export default class RtmvpcAssessments extends NavigationMixin(LightningElement) {
-    
-@track recList= [];
-@track accId;
-@track assessmentId;
-@track accountassessmentId;
-@track pageSize = 15;
-@track show = {grid: false, survey: false};
-@track fieldsList=[];
-@track finalSection;
-@track savedResponseMap=new Map();
-@track objName='Rhythm__Assessment__c';
-@track urlId;
-@api tablefieldList =  [
-                            { label: 'Assessment Name', fieldName: 'Name' },
-                            { label: 'Target Completion Date', fieldName: 'Rhythm__End_Date__c',type:'date' },
-                            { label: 'Assessment Status', fieldName: 'Rhythm__Status__c'},
-                            { label: '#Additional Requests',fieldName:'Rhythm__Follow_Up_Requests__c'},
-                            { label: '% Completed',fieldName:'Rhythm__Completed__c', type:'progressBar' },
-                        ]; 
- /* connectedCallback is used to get accountAssessment data based on the account Id */
-    connectedCallback(){
+
+    @track recList = [];
+    @track accId;
+    @track assessmentId;
+    @track accountassessmentId;
+    @track pageSize = 15;
+    @track show = { grid: false, survey: false };
+    @track fieldsList = [];
+    @track finalSection;
+    @track savedResponseMap = new Map();
+    @track objName = 'Rhythm__Assessment__c';
+    @track urlId;
+    @track questiondataMap;
+    @api tablefieldList = [
+        { label: 'Assessment Name', fieldName: 'Name' },
+        { label: 'Target Completion Date', fieldName: 'Rhythm__End_Date__c', type: 'date' },
+        { label: 'Assessment Status', fieldName: 'Rhythm__Status__c' },
+        { label: '#Additional Requests', fieldName: 'Rhythm__Follow_Up_Requests__c' },
+        { label: '% Completed', fieldName: 'Rhythm__Response_Percentage__c', type: 'progressBar' },
+    ];
+    /* connectedCallback is used to get accountAssessment data based on the account Id */
+    connectedCallback() {
         this.fieldsList = [];
-        if(this.tablefieldList && this.tablefieldList.length >0){
+        if (this.tablefieldList && this.tablefieldList.length > 0) {
             this.tablefieldList.forEach(tabList => {
                 this.fieldsList.push(this.objName + '.' + tabList.fieldName);
             })
-        }   
-        getAccountId({}).then((result) => {
-         this.accId = result;
-         this.fetchingRecords(); 
-      });
-    
-    }  
- @wire(CurrentPageReference)
-    getStateParameters(currentPageReference) {
-       if (currentPageReference) {
-          this.urlId = currentPageReference.state?.Rhythm__AccountAssessmentRelation__c;
-       }
-    }
-   
-  /* fetchingRecords is used to get accountAssessment data based on the account Id and URL navigation */  
-    fetchingRecords(){
-        getAssessmentJunctionRecords({ accountId: this.accId}).then(result=>{
-        this.recList = result;
-        this.show.grid=true;
-        if( this.urlId !=null && typeof this.urlId !='undefined')
-        {
-            this.accountassessmentId=this.urlId;        
-            this.show.survey = true;
-              this.show.grid=false;
         }
-        // let win=window.location.search;
-        // if(win && win.includes('=')){
-        //     let x=win.split('=');
-        //    if(x[0] ==='?Rhythm__AccountAssessmentRelation__c')
-        //    {
-        //        this.accountassessmentId=x[1];        
-        //       this.show.survey = true;
-        //        this.show.grid=false;
-        //    }
-        // }
-        
-        });         
+        getAccountId({}).then((result) => {
+            this.accId = result;
+            this.fetchingRecords();
+        });
+
+    }
+    @wire(CurrentPageReference)
+    getStateParameters(currentPageReference) {
+        if (currentPageReference) {
+            this.urlId = currentPageReference.state?.Rhythm__AccountAssessmentRelation__c;
+        }
     }
 
-  /* openSurveyHandler is used to hide the custom table component and display assessment detail component */
-    openSurveyHandler(event){
+    /* fetchingRecords is used to get accountAssessment data based on the account Id and URL navigation */
+    fetchingRecords() {
+        getAssessmentJunctionRecords({ accountId: this.accId }).then(result => {
+            this.recList = result;
+            this.show.grid = true;
+            if (this.urlId != null && typeof this.urlId != 'undefined') {
+                this.accountassessmentId = this.urlId;
+                this.show.survey = true;
+                this.show.grid = false;
+            }
+            // let win=window.location.search;
+            // if(win && win.includes('=')){
+            //     let x=win.split('=');
+            //    if(x[0] ==='?Rhythm__AccountAssessmentRelation__c')
+            //    {
+            //        this.accountassessmentId=x[1];        
+            //       this.show.survey = true;
+            //        this.show.grid=false;
+            //    }
+            // }
+
+        });
+    }
+
+    /* openSurveyHandler is used to hide the custom table component and display assessment detail component */
+    openSurveyHandler(event) {
         this.show.grid = false;
         this.accountassessmentId = event.detail.accountassessmentId;
         this.show.survey = true;
-         const pageRef = {
-    type: 'comm__namedPage',
-    attributes: {
-      name: 'Home' // Replace with your community page name
-    },
-    state: {
-      // Define your parameters here
-      Rhythm__AccountAssessmentRelation__c:this.accountassessmentId 
-    }
-  };
-  // Navigate to the community page
-  this[NavigationMixin.Navigate](pageRef);
+        const pageRef = {
+            type: 'comm__namedPage',
+            attributes: {
+                name: 'Home' // Replace with your community page name
+            },
+            state: {
+                // Define your parameters here
+                Rhythm__AccountAssessmentRelation__c: this.accountassessmentId
+            }
+        };
+        // Navigate to the community page
+        this[NavigationMixin.Navigate](pageRef);
     }
 
- /* backClickHandler is used to show the custom table component and hide the assessment detail component when clicked on back button */
-    backClickHandler(){
-         this.fetchingRecords(); 
+    /* backClickHandler is used to show the custom table component and hide the assessment detail component when clicked on back button */
+    backClickHandler() {
+        this.fetchingRecords();
         this.show.survey = false;
         this.assessmentId = undefined;
         this.show.grid = true;
-         const pageRef = {
-    type: 'comm__namedPage',
-    attributes: {
-      name: 'Home' // Replace with your community page name
-    }
-   
-  };
-  // Navigate to the community page
-  this[NavigationMixin.Navigate](pageRef);
-    
+        const pageRef = {
+            type: 'comm__namedPage',
+            attributes: {
+                name: 'Home' // Replace with your community page name
+            }
+
+        };
+        // Navigate to the community page
+        this[NavigationMixin.Navigate](pageRef);
+
     }
 
-/* exportRowAsCsvHandler is used to generate assessment data in the csv format. It is being called from its child component customtable by 
-   dispatching an event */
+    /* exportRowAsCsvHandler is used to generate assessment data in the csv format. It is being called from its child component customtable by 
+       dispatching an event */
     exportRowAsCsvHandler(event) {
         var assessmentId = event.detail.value;
         /* getSupplierAssessmentList apex method is used to get account assessment data */
@@ -145,7 +145,7 @@ export default class RtmvpcAssessments extends NavigationMixin(LightningElement)
                                 }
                                 this.finalSection.get(key)[i].conversationHistory = tempstr;
                             }
-                            if (typeof this.finalSection.get(key)[i].files !== "undefined" 
+                            if (typeof this.finalSection.get(key)[i].files !== "undefined"
                                 && this.isJsonString(this.finalSection.get(key)[i].files)) {
                                 this.finalSection.get(key)[i].files = JSON.parse(this.finalSection.get(key)[i].files).length;
                             }
@@ -157,35 +157,35 @@ export default class RtmvpcAssessments extends NavigationMixin(LightningElement)
                     let blob = new Blob([str], { type: 'text/plain' });
                     let url = window.URL.createObjectURL(blob);
                     let atag = document.createElement('a');
-                    atag.setAttribute('href', url);
-                    atag.setAttribute('download', resultData[0].Rhythm__Assessment__r.Name + '.csv');
-                    atag.click();
+                    //    atag.setAttribute('href', url);
+                    //    atag.setAttribute('download', resultData[0].Rhythm__Assessment__r.Name + '.csv');
+                    //     atag.click();
                 }).catch(error => {
-                   var errormap = {};
-                        errormap.componentName = 'RtmvpcAssessments';
-                        errormap.methodName = 'getSupplierResponseList';
-                        errormap.className = 'AssessmentController';
-                        errormap.errorData = error.message;
-                        errorLogRecord({ errorLogWrapper: JSON.stringify(errormap) }).then(() => {
-                        });
+                    var errormap = {};
+                    errormap.componentName = 'RtmvpcAssessments';
+                    errormap.methodName = 'getSupplierResponseList';
+                    errormap.className = 'AssessmentController';
+                    errormap.errorData = error.message;
+                    errorLogRecord({ errorLogWrapper: JSON.stringify(errormap) }).then(() => {
+                    });
                 })
             }).catch(error => {
                 var errormap = {};
-                        errormap.componentName = 'RtmvpcAssessments';
-                        errormap.methodName = 'getQuestionsList';
-                        errormap.className = 'AssessmentController';
-                        errormap.errorData = error.message;
-                        errorLogRecord({ errorLogWrapper: JSON.stringify(errormap) }).then(() => {
-                        });
+                errormap.componentName = 'RtmvpcAssessments';
+                errormap.methodName = 'getQuestionsList';
+                errormap.className = 'AssessmentController';
+                errormap.errorData = error.message;
+                errorLogRecord({ errorLogWrapper: JSON.stringify(errormap) }).then(() => {
+                });
             })
         }).catch(error => {
-          var errormap = {};
-                        errormap.componentName = 'RtmvpcAssessments';
-                        errormap.methodName = 'getSupplierAssessmentList';
-                        errormap.className = 'AssessmentController';
-                        errormap.errorData = error.message;
-                        errorLogRecord({ errorLogWrapper: JSON.stringify(errormap) }).then(() => {
-                        });
+            var errormap = {};
+            errormap.componentName = 'RtmvpcAssessments';
+            errormap.methodName = 'getSupplierAssessmentList';
+            errormap.className = 'AssessmentController';
+            errormap.errorData = error.message;
+            errorLogRecord({ errorLogWrapper: JSON.stringify(errormap) }).then(() => {
+            });
         })
     }
 
@@ -196,10 +196,10 @@ export default class RtmvpcAssessments extends NavigationMixin(LightningElement)
         /* getSupplierAssessmentList apex method is used to get account assessment data */
         getSupplierAssessmentList({ assessmentId: x }).then(resultData => {
             var assessmentTemplateId = resultData[0].Rhythm__Assessment__r.Rhythm__Template__c;
-             /* getQuestionsList is used to get the questions based on the template Id */
+            /* getQuestionsList is used to get the questions based on the template Id */
             getQuestionsList({ templateId: assessmentTemplateId }).then(result => {
                 var resultMap = result;
-                 /* getSupplierResponseList is used to get all latest responses for the questions in the account assessment */
+                /* getSupplierResponseList is used to get all latest responses for the questions in the account assessment */
                 getSupplierResponseList({ assessmentId: x }).then(suppRespResult => {
                     suppRespResult.forEach(qres => {
                         var savedResponseList = new Map();
@@ -239,7 +239,7 @@ export default class RtmvpcAssessments extends NavigationMixin(LightningElement)
                             }
                             tableHtml += '<td class="align-to-top">' + (i + 1) + '.</td><td>' + this.finalSection.get(key)[i].question + '</td><td>' + this.finalSection.get(key)[i].value + '</td><td> ' + this.finalSection.get(key)[i].conversationHistory + '</td><td> ' + this.finalSection.get(key)[i].files + '</td></tr>';
                         }
-                        
+
                         tableHtml += '<tr><td></td><td></td><td></td><td></td></tr>';
                     }
                     tableHtml += '</tbody></table>';
@@ -253,30 +253,30 @@ export default class RtmvpcAssessments extends NavigationMixin(LightningElement)
                     win.close();
                 }).catch(error => {
                     var errormap = {};
-                        errormap.componentName = 'RtmvpcAssessments';
-                        errormap.methodName = 'getSupplierResponseList';
-                        errormap.className = 'AssessmentController';
-                        errormap.errorData = error.message;
-                        errorLogRecord({ errorLogWrapper: JSON.stringify(errormap) }).then(() => {
-                        });
+                    errormap.componentName = 'RtmvpcAssessments';
+                    errormap.methodName = 'getSupplierResponseList';
+                    errormap.className = 'AssessmentController';
+                    errormap.errorData = error.message;
+                    errorLogRecord({ errorLogWrapper: JSON.stringify(errormap) }).then(() => {
+                    });
                 })
             }).catch(error => {
                 var errormap = {};
-                        errormap.componentName = 'RtmvpcAssessments';
-                        errormap.methodName = 'getQuestionsList';
-                        errormap.className = 'AssessmentController';
-                        errormap.errorData = error.message;
-                        errorLogRecord({ errorLogWrapper: JSON.stringify(errormap) }).then(() => {
-                        });
+                errormap.componentName = 'RtmvpcAssessments';
+                errormap.methodName = 'getQuestionsList';
+                errormap.className = 'AssessmentController';
+                errormap.errorData = error.message;
+                errorLogRecord({ errorLogWrapper: JSON.stringify(errormap) }).then(() => {
+                });
             })
         }).catch(error => {
             var errormap = {};
-                        errormap.componentName = 'RtmvpcAssessments';
-                        errormap.methodName = 'getSupplierAssessmentList';
-                        errormap.className = 'AssessmentController';
-                        errormap.errorData = error.message;
-                        errorLogRecord({ errorLogWrapper: JSON.stringify(errormap) }).then(() => {
-                        });
+            errormap.componentName = 'RtmvpcAssessments';
+            errormap.methodName = 'getSupplierAssessmentList';
+            errormap.className = 'AssessmentController';
+            errormap.errorData = error.message;
+            errorLogRecord({ errorLogWrapper: JSON.stringify(errormap) }).then(() => {
+            });
         })
     }
 
@@ -295,6 +295,8 @@ export default class RtmvpcAssessments extends NavigationMixin(LightningElement)
             var quTemp = {};
             quTemp.questionId = qu.Id;
             quTemp.question = qu.Rhythm__Question__c;
+            quTemp.rhythm__Conditional_Response__c = qu.Rhythm__Conditional_Response__c;
+            quTemp.rhythm__Parent_Question__c = qu.Rhythm__Parent_Question__c;
             if (qu.Rhythm__Required__c === true) {
                 quTemp.question = qu.Rhythm__Question__c + '*';
             }
@@ -313,6 +315,104 @@ export default class RtmvpcAssessments extends NavigationMixin(LightningElement)
                 quTemp.files = savedResp.get(quTemp.questionId).get('files');
             }
         });
+        console.log('questionMap123', questionMap);
+        for (let key of questionMap) {
+            console.log('key', key);
+            for (let key1 in key) {
+                console.log('key12', key1);
+                var questiondata = questionMap.get(key1);
+                console.log('key1', questiondata);
+
+            }
+
+            for (let i = 0; i < questiondata.length; i++) {
+                for (let j = i; j < questiondata.length; j++) {
+                    if (typeof questiondata[j].rhythm__Parent_Question__c != 'undefined') {
+                        if (questiondata[i].Id === questiondata[j].rhythm__Parent_Question__c && questiondata[i].value === questiondata[j].rhythm__Conditional_Response__c) {
+
+                        }
+                        else {
+                            console.log('questiondata123', questiondata);
+                            questiondata.splice(j, 1);
+                            console.log('questiondata', questiondata);
+
+                        }
+                    }
+                }
+            }
+        }
+        console.log('questionmap', questionMap);
         return questionMap;
+
+    }
+    handlepdfcsv(event) {
+        this.questionsAndAnswerss.forEach(questionWrap => {
+            let questionlst = [];
+            questionWrap.questions.forEach(ques => {
+                let quesWrap = {};
+                quesWrap.questionId = ques.Id;
+                quesWrap.question = ques.question;
+                quesWrap.snumber = ques.snumber;
+                quesWrap.value = ques.value;
+                quesWrap.conversationHistory = ques.Rhythm__Conversation_History__c;
+                if (typeof ques.Files__c !== 'undefined') {
+                    quesWrap.files = ques.Files__c;
+                }
+                questionlst.push(quesWrap);
+                if (ques.Children.length > 0) {
+                    ques.Children.forEach(respAttr => {
+                        if (respAttr.isdisplay) {
+                            respAttr.questions.forEach(childQues => {
+                                quesWrap = {};
+                                quesWrap.questionId = childQues.Id;
+                                quesWrap.question = childQues.question;
+                                quesWrap.snumber = childQues.snumber;
+                                quesWrap.value = childQues.value;
+                                quesWrap.conversationHistory = childQues.Rhythm__Conversation_History__c;
+                                if (typeof childQues.Files__c !== 'undefined') {
+                                    quesWrap.files = childQues.Files__c;
+                                }
+                                questionlst.push(quesWrap);
+                            });
+                        }
+                    });
+                }
+            });
+            console.log('questionlst',questionlst);
+            questionmap[questionWrap.section] = questionlst;
+        });
+       
+        //finalQuestionlst.push(questionmap);
+        console.log('finalQuestionlst',questionmap);
+         this.questiondataMap=questionmap;
+
+        //   for (const key of  this.questiondataMap.keys()) {
+        //                 for (let i = 0; i <  this.questiondataMap.get(key).length; i++) {
+        //                     if (typeof  this.questiondataMap.get(key)[i].conversationHistory !== "undefined"
+        //                         && this.isJsonString( this.questiondataMap.get(key)[i].conversationHistory)) {
+        //                         let tempstr = '';
+        //                         let convHistory = JSON.parse( this.questiondataMap.get(key)[i].conversationHistory);
+        //                         for (let j = 0; j < convHistory.length; j++) {
+        //                             tempstr = tempstr + convHistory[j].Name + ':' + convHistory[j].Text + '\n';
+        //                         }
+        //                          this.questiondataMap.get(key)[i].conversationHistory = tempstr;
+        //                     }
+        //                     if (typeof  this.questiondataMap.get(key)[i].files !== "undefined"
+        //                         && this.isJsonString( this.questiondataMap.get(key)[i].files)) {
+        //                          this.questiondataMap.get(key)[i].files = JSON.parse( this.questiondataMap.get(key)[i].files).length;
+        //                     }
+        //                     str += '"' + key + '","' + (i + 1) + '. ' +  this.questiondataMap.get(key)[i].question + '","' +  this.questiondataMap.get(key)[i].value + '","' +  this.questiondataMap.get(key)[i].conversationHistory + '","' + this.questiondataMap.get(key)[i].files + '"\n';
+        //                 }
+        //                 str += '\n';
+        //             }
+        //             str = str.replaceAll('undefined', '').replaceAll('null', '');
+        //             let blob = new Blob([str], { type: 'text/plain' });
+        //             let url = window.URL.createObjectURL(blob);
+        //             let atag = document.createElement('a');
+        //                atag.setAttribute('href', url);
+        //                atag.setAttribute('download', resultData[0].Rhythm__Assessment__r.Name + '.csv');
+        //                 atag.click();
+
+
     }
 }

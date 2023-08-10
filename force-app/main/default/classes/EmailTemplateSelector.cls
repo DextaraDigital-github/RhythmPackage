@@ -12,7 +12,8 @@ public with sharing class EmailTemplateSelector {
 
     private static EmailTemplateSelector selector = null; //private static instance of the class
     /**
-    * @description Singleton Design Pattern 
+    * @description Singleton Design Pattern
+    * @return
     */
     public static EmailTemplateSelector getInstance(){
            if(selector == null){

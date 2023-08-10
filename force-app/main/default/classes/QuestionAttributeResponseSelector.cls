@@ -12,7 +12,8 @@ public with sharing class QuestionAttributeResponseSelector {
     private static QuestionAttributeResponseSelector selector = null; //private static instance of the class
 
     /**
-    * @description Singleton Design Pattern 
+    * @description Singleton Design Pattern
+    * @return
     */
     public static QuestionAttributeResponseSelector getInstance(){
            if(selector == null){
@@ -59,7 +60,7 @@ public with sharing class QuestionAttributeResponseSelector {
     }
  	 /**
     * @description gets al Response Attribute Records based on  Response_Attribute__c Ids
-    * @param questionlst is a list of Response_Attribute__c id. 
+    * @param respAttrId is a list of Response_Attribute__c id. 
     * @return List of Response_Attribute__c records
     */
     public List<SObject> getQuesRespAttribute(List<String> respAttrId){
@@ -76,7 +77,7 @@ public with sharing class QuestionAttributeResponseSelector {
         }
     }
 	
-	 /**
+	/**
     * @description gets al Response Attribute Records based on  Question__c Id
     * @param questionlst is a list of Question__c id. 
     * @return List of Response_Attribute__c records
@@ -93,7 +94,13 @@ public with sharing class QuestionAttributeResponseSelector {
             throw new AuraHandledException(e.getMessage());
         }
     }
+    
 
+    /**
+    * @description gets all Response Attribute Records based on  Question__c Id
+    * @param questionIdsMap map of questionids
+    * @return List of Response_Attribute__c records
+    */
     public List<Response_Attribute__c> getRespAttforQuestion(Map<Id,Id> questionIdsMap){
         List<Response_Attribute__c> resAttList = [SELECT Id,QuestionId__c,Name,
                                     preferred_Not_preferred__c,Response_value__c,

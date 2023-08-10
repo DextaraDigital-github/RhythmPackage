@@ -24,6 +24,7 @@ export default class RtmvpcAssessmentChatter extends LightningElement {
    @api recordid;
    @track responseWrapper = {};
    @track showData = false;
+   @api timeline;
 
    @api
    displayConversation(chatmap) {
@@ -52,6 +53,16 @@ export default class RtmvpcAssessmentChatter extends LightningElement {
          this.responseWrapper.accountassessmentId = this.accountassessmentId;
       }
       this.newResponse = [];
+      let bool = false;
+      console.log('timeline',this.timeline);
+      this.timeline.forEach(item=>{
+         if(item.status==='In Review'){
+            bool = true;
+         }
+      });
+      if(bool){
+         this.showData = true;
+      }
       this.handleGetChatterResponse();
    }
 
@@ -159,7 +170,16 @@ export default class RtmvpcAssessmentChatter extends LightningElement {
             this.callChatterResponse(this.newResponse);
          }
          this.responseList = this.newResponse;
+        // this.showData = true;
+        let bool=false;
+         this.timeline.forEach(item=>{
+         if(item.status==='In Review'){
+            bool = true;
+         }
+      });
+      if(bool){
          this.showData = true;
+      }
          this.showResponse = true;
          this.newChat = '';
          this.chatDataMap.conversationHistory = JSON.stringify(this.responseList);

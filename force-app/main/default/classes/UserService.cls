@@ -12,7 +12,8 @@ public with sharing class UserService {
     private static UserService service = null; //private static instance of the class
     
     /**
-    * @description Singleton Design Pattern 
+    * @description Singleton Design Pattern
+     * @return
     */
     public static UserService getInstance(){
            if(service == null){
@@ -43,7 +44,6 @@ public with sharing class UserService {
                                     LIMIT 1];
                                     
             string aliasName = contactRecord.FirstName.substring(0,1)+contactRecord.LastName.substring(0,3);
-            system.debug('aliasName------>'+aliasName);
             User userRecord = new User();
             userRecord.Username = contactRecord.Email;
             userRecord.FirstName = contactRecord.FirstName;
@@ -56,7 +56,6 @@ public with sharing class UserService {
             userRecord.ProfileId = standardPlatformProfileId;
             userRecord.LanguageLocaleKey = 'en_US';
             userList.add(userRecord);
-
             if (sp == null){
                 sp = Database.setSavepoint();
             }
