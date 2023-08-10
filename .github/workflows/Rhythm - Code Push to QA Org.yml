@@ -60,6 +60,10 @@ jobs:
       - name: 'Install Salesforce SFDX Scanner'
         run: sfdx plugins:install @salesforce/sfdx-scanner
 
+    # Checkout the source code
+      - name: 'Checkout source code'
+        uses: actions/checkout@v2 
+
     # Connect with Salesforce ORG
       - name: 'Connect with Salesforce ORG'
         working-directory: .github/jwt/
