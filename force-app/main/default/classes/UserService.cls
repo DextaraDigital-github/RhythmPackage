@@ -42,11 +42,19 @@ public with sharing class UserService {
                                     WHERE Id=:contactId
                                     WITH SECURITY_ENFORCED
                                     LIMIT 1];
-                                    
-            string aliasName = contactRecord.FirstName.substring(0,1)+contactRecord.LastName.substring(0,3);
+            string fName = '';
+            string aliasName = '';
+            if(String.isNotBlank(contactRecord.FirstName)){
+                fName = contactRecord.FirstName.substring(0,1);
+            }
+            if(String.isNotBlank(fName)){
+                aliasName = fName+contactRecord.LastName.substring(0,3);
+            }else{
+                aliasName = fName+contactRecord.LastName.substring(0,4);
+            }
             User userRecord = new User();
             userRecord.Username = contactRecord.Email;
-            userRecord.FirstName = contactRecord.FirstName;
+            userRecord.FirstName = fName;
             userRecord.LastName = contactRecord.LastName;
             userRecord.Alias = aliasName;
             userRecord.Email = contactRecord.Email;
@@ -71,7 +79,7 @@ public with sharing class UserService {
             }
             if(string.isNotBlank(userId)){
                 set<Id> usersId = new set<Id>{userId};
-                TestDataFactory.assignPermissionSetToUsers(usersId);
+                assignPermissionSetToUsers(usersId);
                 List<AccountTeamMember> teamsList = new List<AccountTeamMember>();
                 AccountTeamMember teamMem =new AccountTeamMember();
                 teamMem.AccountId = contactRecord.accountId;
@@ -100,6 +108,32 @@ public with sharing class UserService {
             resWrap.message = e.getMessage();
         }
         return resWrap;
+    }
+
+    /**
+    * @description AssignPermissionSetToUsers method is used to assign permission sets.
+    * @param usersId set of userids.
+    */
+    @future
+    public static void assignPermissionSetToUsers (Set<Id> usersId) {
+        List<PermissionSetAssignment> permissionSetList = new List<PermissionSetAssignment>();
+        List<PermissionSet> permissionstobeassigned = [SELECT Id, Label FROM PermissionSet WHERE Name IN ('Customer_Access','Additional_Access') WITH SECURITY_ENFORCED];
+        for (User u : [Select Id, Name FROM User Where Id IN : usersId WITH SECURITY_ENFORCED]){
+            for(PermissionSet ps : permissionstobeassigned){
+                PermissionSetAssignment psa = new PermissionSetAssignment ();
+                    psa.PermissionSetId = ps.Id; 
+                    psa.AssigneeId = u.Id;
+                permissionSetList.add(psa);
+            }
+        }
+
+        Savepoint sp = Database.setSavepoint();
+        Database.UpsertResult[] srList1 = safe.doUpsert(permissionSetList);
+        List<String> errorList = SecurityCheckController.safeClassExceptionHandlerUpsert(srList1);
+        if(errorList.size()>0){
+            Database.rollback(sp);
+            throw new SecurityControllerException(String.join( errorList, ', ' ));
+        }
     }
 
     /**

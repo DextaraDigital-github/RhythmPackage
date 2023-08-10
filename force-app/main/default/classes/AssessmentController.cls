@@ -894,52 +894,128 @@ public with sharing class AssessmentController {
     */
     public static void sendEmails(Set<Id> recordIdsSet, String source){
         try{
+            List<ErrorTransactionLog__c> errorList = new List<ErrorTransactionLog__c>();
             Configuration__mdt siteData = Configuration__mdt.getInstance('Site_URL');
             List<Messaging.SingleEmailMessage> emailMessagesList = new List<Messaging.SingleEmailMessage>();
-            String assRelQuery = 'SELECT Id,Account__c,Account__r.Name,Account__r.Email__c,Assessment__c'
-                                   +' FROM AccountAssessmentRelation__c'
-                                   +' WHERE ID IN:recordIdsSet';
-            Map<String, Object> bindVariables = new Map<String, Object>{'recordIdsSet' => recordIdsSet};
-            List<AccountAssessmentRelation__c> assRlnsList = safe.doQueryWithBinds(assRelQuery,bindVariables);
-            if(assRlnsList.isEmpty() == false && string.isBlank(source)){
-                for(AccountAssessmentRelation__c assRelRec:assRlnsList){
-                    if(string.isNotBlank(assRelRec.Account__r.Email__c) && siteData != null){
-                        Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
-                        List<String> sendTo = new List<String>();
-                        sendTo.add(assRelRec.Account__r.Email__c);
-                        mail.setToAddresses(sendTo);
-                        mail.setSubject('Sample Survey');
-                        String body = '<html><body>'+
-                            '<br><br>'+'Dear '+assRelRec.Account__r.Name+
-                            '<br><br>'+'we’d like to complete a short survey.'+
-                            '<br><br><a href='+siteData.Site_URL__c+assRelRec.Id+'>Take the survey now.</a>'+
-                            '<br><br>'+'Kind regards,'+
-                            '<br>'+'Rhythm';
-                        mail.setHtmlBody(body);
-                        emailMessagesList.add(mail);
+            List<AccountAssessmentRelation__c> assRlnsList= [SELECT Id,Account__c,Account__r.Name,
+                                                            Account__r.Email__c,Assessment__r.End_Date__c,Assessment__c,Assessment__r.Name
+                                                            FROM AccountAssessmentRelation__c
+                                                            WHERE ID IN:recordIdsSet
+                                                            WITH SECURITY_ENFORCED];
+            Set<Id> acctIds = new Set<Id>();
+            set<string> emailIds = new set<string>();
+            Map<string,Id> emailAccMap = new Map<string,Id>();
+            Map<Id,List<User>> accUserMap = new Map<Id,List<User>>();
+            for(AccountAssessmentRelation__c ar:assRlnsList ){
+                if(string.isNotBlank(ar.Account__c)){
+                    acctIds.add(ar.Account__c);
+                }
+            }
+            
+            if(acctIds.isEmpty() == false){
+                for(Contact con:[SELECT Id,AccountId,Email FROM Contact WHERE AccountId IN:acctIds AND Primary_Contact__c=true WITH SECURITY_ENFORCED]){
+                    if(string.isNotBlank(con.Email)){
+                        emailIds.add(con.Email);
+                        emailAccMap.put(con.Email,con.AccountId);
                     }
                 }
-            }else if(assRlnsList.isEmpty() == false){
-                for(AccountAssessmentRelation__c assRelRec:assRlnsList){
-                    if(string.isNotBlank(assRelRec.Account__r.Email__c) && siteData != null){
-                        Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
-                        List<String> sendTo = new List<String>();
-                        sendTo.add(assRelRec.Account__r.Email__c);
-                        mail.setToAddresses(sendTo);
-                        mail.setSubject('Updates on the Assessment');
-                        String body = '<html><body>'+
-                            '<br><br>'+'Dear '+assRelRec.Account__r.Name+
-                            '<br><br>'+'There are few comments on the responses submitted.'+
-                            '<br><br><a href='+siteData.Site_URL__c+assRelRec.Id+'>Click Here</a>'+
-                            '<br><br>'+'Kind regards,'+
-                            '<br>'+'Rhythm';
-                        mail.setHtmlBody(body);
-                        emailMessagesList.add(mail);
+            }
+            if(emailIds.isEmpty() == false){
+                for(User us:[SELECT Id,Name,Email FROM User WHERE Email IN:emailIds WITH SECURITY_ENFORCED]){
+                    if(emailAccMap.containsKey(us.Email)){
+                        Id accId = emailAccMap.get(us.Email);
+                        if(accUserMap.containsKey(accId)){
+                            List<User> tempList = accUserMap.get(accId);
+                            tempList.add(us);
+                            accUserMap.put(accId,tempList);
+                        }else{
+                            List<User> tempList = new List<User>{us};
+                            accUserMap.put(accId,tempList);
+                        }
+                    }
+                }
+            }
+            if(assRlnsList.isEmpty() == false && accUserMap.isEmpty() == false && siteData != null){
+                if(string.isBlank(source)){
+                    for(AccountAssessmentRelation__c assRelRec:assRlnsList){
+                        if(accUserMap.containsKey(assRelRec.Account__c)){
+                            for(User uRec:accUserMap.get(assRelRec.Account__c)){
+                                Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
+                                String subject = 'New Assessment assigned - '+assRelRec.Assessment__r.Name;
+                                String body = '<html><body>'+
+                                    '<br><br>'+'Dear '+uRec.Name+','+
+                                    '<br><br>'+'A new Assessment has been assigned to you, please take out some time and complete it before the due date.'+
+                                    '<br><br>To access the Assessment click on this <a href='+siteData.Site_URL__c+assRelRec.Id+'>Link</a> and log in with your username and password.'+
+                                    '<br><br>'+'Thanks,'+
+                                    '<br>'+UserInfo.getName();
+                                mail.setSubject(subject);
+                                mail.setTreatTargetObjectAsRecipient(true);
+                                mail.setTargetObjectId(uRec.Id);
+                                mail.setHtmlBody(body);
+                                mail.setSaveAsActivity(false);
+                                emailMessagesList.add(mail);
+                            }
+                        }
+                    }
+                }else if(source.equalsIgnoreCase('FUR')){
+                    for(AccountAssessmentRelation__c assRelRec:assRlnsList){
+                        if(accUserMap.containsKey(assRelRec.Account__c)){
+                            for(User uRec:accUserMap.get(assRelRec.Account__c)){
+                                Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
+                                String subject = 'Need Attention - '+assRelRec.Assessment__r.Name;
+                                String body = '<html><body>'+
+                                    '<br><br>'+'Dear '+uRec.Name+','+
+                                    '<br><br>'+'Thank you for submitting the assessment, it has been reviewed and some of the questions need your attention.'+
+                                    '<br><br>To access the Assessment click on this <a href='+siteData.Site_URL__c+assRelRec.Id+'>Link</a> and log in with your username and password.'+
+                                    '<br><br>'+'Thanks,'+
+                                    '<br>'+UserInfo.getName();
+                                mail.setSubject(subject);
+                                mail.setTreatTargetObjectAsRecipient(true);
+                                mail.setTargetObjectId(uRec.Id);
+                                mail.setHtmlBody(body);
+                                mail.setSaveAsActivity(false);
+                                emailMessagesList.add(mail);
+                            }
+                        }
+                    }
+                }else if(source.equalsIgnoreCase('ExpiryNotification')){
+                    for(AccountAssessmentRelation__c assRelRec:assRlnsList){
+                        if(accUserMap.containsKey(assRelRec.Account__c)){
+                            for(User uRec:accUserMap.get(assRelRec.Account__c)){
+                                Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
+                                String subject = 'Due Date remainder for '+assRelRec.Assessment__r.Name;
+                                String body = '<html><body>'+
+                                    '<br><br>'+'Dear '+uRec.Name+','+
+                                    '<br><br>'+'The deadline for completing your Assessment is '+assRelRec.Assessment__r.End_Date__c+'. This is a reminder to make sure you’ve finished the Assessment by then.'+
+                                    '<br><br>To access the Assessment click on this <a href='+siteData.Site_URL__c+assRelRec.Id+'>Link</a> and log in with your username and password.'+
+                                    '<br><br>'+'Thanks,'+
+                                    '<br>'+UserInfo.getName();
+                                mail.setSubject(subject);
+                                mail.setTreatTargetObjectAsRecipient(true);
+                                mail.setTargetObjectId(uRec.Id);
+                                mail.setHtmlBody(body);
+                                mail.setSaveAsActivity(false);
+                                emailMessagesList.add(mail);
+                            }
+                        }
                     }
                 }
             }
             if(emailMessagesList.isEmpty() == false){
-                Messaging.sendEmail(emailMessagesList);
+                List<Messaging.SendEmailResult> emailResults = Messaging.sendEmail(emailMessagesList);
+                for(Messaging.SendEmailResult result :emailResults) {   
+                    List<Messaging.SendEmailError> errors = result.getErrors();                                 
+                    if(!result.IsSuccess() && errors.size() > 0){
+                        Messaging.SendEmailError err = errors[0];
+                        ErrorTransactionLog__c errorRec = new ErrorTransactionLog__c();
+                        errorRec.Class_Name__c = 'AssessmentController';
+                        errorRec.Error_Stack_Trace__c = err.getMessage();
+                        errorRec.Name = 'Error Record';
+                        errorRec.LWC_Component_Name__c = '';
+                        errorRec.Method_Name__c = 'SendEmails';
+                        errorList.add(errorRec);
+                    }
+                }
             }
         }catch(exception e){
             String errorMsg = e.getMessage();
@@ -955,6 +1031,7 @@ public with sharing class AssessmentController {
     * @return
     */
     @AuraEnabled
+    /* sfge-disable-stack ApexFlsViolationRule */
     public static ResultWrapper updateAssessmentSuppliers(string assessmentId){
         ResultWrapper resWrap = new ResultWrapper();
         try{

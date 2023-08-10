@@ -155,7 +155,7 @@
 									<div class="slds-col">
 										<template if:false={isReadOnly}>
 											<lightning-file-upload name="uploadAttachment" label="Attachments"
-												accept=".png,.csv,.pdf" onuploadfinished={fileUploadHandler} multiple>
+												accept=".png,.csv,.pdf,.jpg,.jpeg,.xlsx,.xls,.txt,.docx,.doc" onuploadfinished={fileUploadHandler} multiple>
 											</lightning-file-upload>
 											<template lwc:if={email.attachmentsData}>
 												<div class="slds-m-top_x-small">

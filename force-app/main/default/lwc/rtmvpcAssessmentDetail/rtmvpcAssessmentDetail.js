@@ -48,10 +48,10 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
     @api detaileddata;
     @track showrejectquestions = true;
     @track showResponseForm;
-    @track showCapaForm=false;
+    @track showCapaForm = false;
     @track showResponseForm;
-    @track showCapaForm=false;
-    @track openReviewComments=false;
+    @track showCapaForm = false;
+    @track openReviewComments = false;
     @track actionData;
     @track fileData;
     @track selectedchatData;
@@ -59,26 +59,25 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
     @track questionId;
     @track recid;
     @track responseId;
-    @track showUpload=false;
-    @track isdisabled=false;
+    @track showUpload = false;
+    @track isdisabled = false;
     @track objectApiName;
-    @track openRightFile=false;
+    @track openRightFile = false;
 
     connectedCallback() {
         this.customerId = this.recordId;
         this.showconverstion = false;
         this.assaccId = this.accountid;
-        if(this.templateId != undefined){
+        if (this.templateId != undefined) {
             this.tempId = this.templateId;
         }
-        console.log('detaileddata------>',this.detaileddata);
-        console.log('assaccId------>',this.assaccId);
-        console.log('TADId------>',this.tempId);
+        console.log('detaileddata------>', this.detaileddata);
+        console.log('assaccId------>', this.assaccId);
+        console.log('TADId------>', this.tempId);
         /* To get the username */
         this.handleTimeLine();
     }
-      handleDeleteIcon(event)
-    {
+    handleDeleteIcon(event) {
         this.template.querySelectorAll('c-Questionnaire')[0].removeDeleteButton(event.detail);
     }
 
@@ -106,119 +105,116 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
             }
             /* */
             getAccountAssessmentRecordData({ assrecordId: accountAssessmentRecord }).then(asmtResult => {
-                    if(this.isRecordPage){
-                        this.assessid = asmtResult[0].Rhythm__Assessment__r.Id;
-                    }else{
-                        this.assesstid = this.accountassessmentid ;
-                    }
-                    if(asmtResult && asmtResult.length > 0){
-                        asmtResult.forEach(accAssessment => {
-                            if (typeof accAssessment.Rhythm__Assessment__c !== 'undefined' && typeof accAssessment.Rhythm__Assessment__r.Id !== 'undefined') {
-                                //if (accAssessment.Rhythm__Assessment__r.Id === this.assessid) {
-                                    if (typeof accAssessment.Rhythm__Status__c !== 'undefined') {
-                                        this.statusassessment = accAssessment.Rhythm__Status__c;
-                                        this.accountAssessmentStatus = this.statusassessment;
-                                        // if (this.statusassessment === 'Need More Information' || this.statusassessment === 'Review Completed') {
-                                        //     this.showstatus = true;
-                                        // }
-                                        this.assessmentName = accAssessment.Rhythm__Assessment__r.Name;
-                                        if (typeof accAssessment.Rhythm__Start_Date__c !== 'undefined') {
-                                            let statustrack = {};
-                                            let dateformat = accAssessment.Rhythm__Start_Date__c;
-                                            let dateformats = months[Number(dateformat.split('-')[1]) - 1] + '-' + dateformat.split('-')[2] + '-' + dateformat.split('-')[0];
-                                            statustrack.date = dateformats + ' 00:00:00';
-                                            statustrack.status = 'Start Date';
-                                            statustrack.classlist = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_default';
-                                            statustrack.name = accAssessment.Rhythm__Assessment__r.Rhythm__CreatedUser__c;
-                                            this.assessmentTimeline.push(statustrack);
-                                        }
-                                        else {
-                                            let statustrack = {};
-                                            if (typeof accAssessment.CreatedDate !== 'undefined') {
-                                                let date = accAssessment.Rhythm__Assessment__r.CreatedDate.split('T');
-                                                let time = date[1].split('.');
-                                                let dateformat = date[0];
-                                                let dateformats = months[Number(dateformat.split('-')[1]) - 1] + '-' + dateformat.split('-')[2] + '-' + dateformat.split('-')[0];
-                                                statustrack.date = dateformats + ' ' + time[0];
-                                                statustrack.status = 'Start Date';
-                                                statustrack.classlist = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_default';
-                                                statustrack.name = accAssessment.Rhythm__Assessment__r.Rhythm__CreatedUser__c;
-                                                this.assessmentTimeline.push(statustrack);
-                                            }
-
-                                        }
-                                        if (typeof accAssessment.Rhythm__End_Date__c !== 'undefined') {
-                                            let statustrack = {};
-                                            let dateformat = accAssessment.Rhythm__End_Date__c;
-                                            let dateformats = months[Number(dateformat.split('-')[1]) - 1] + '-' + dateformat.split('-')[2] + '-' + dateformat.split('-')[0];
-                                            statustrack.date = '(Due date ' + dateformats + ')';
-                                            this.endDate = statustrack.date;
-                                            statustrack.status = 'End Date';
-                                            statustrack.classlist = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_default';
-                                            statustrack.name = accAssessment.Rhythm__Assessment__r.Rhythm__CreatedUser__c;
-                                            //this.assessmentTimeline.push(statustrack);
-                                        }
-                                    }
-                                }
-                        // }
-                        })
-                    }
-                    /* To get the assessment tracking history to update on timeline*/
-                    getAssessmentStatus({ assessmentId: accountAssessmentRecord, objectName:'AccountAssessmentRelation__c' }).then(statusResult => {
-                        var assessmentStatus = statusResult;
-                        if (typeof statusResult !== 'undefined') {   
-                            if(assessmentStatus  && assessmentStatus!==null){
-                            assessmentStatus.forEach(assessStatus => {
-                                if(assessStatus.Rhythm__Object_Field_Name__c === 'Rhythm__Status__c')
-                                {
-                                let statustrack = {};
-                                if (typeof assessStatus.Rhythm__Object_Field_Value__c !== 'undefined') {
-                                    let date = assessStatus.CreatedDate.split('T');
-                                    let dateformat = date[0];
-                                    let time = date[1].split('.');
+                if (this.isRecordPage) {
+                    this.assessid = asmtResult[0].Rhythm__Assessment__r.Id;
+                } else {
+                    this.assesstid = this.accountassessmentid;
+                }
+                if (asmtResult && asmtResult.length > 0) {
+                    asmtResult.forEach(accAssessment => {
+                        if (typeof accAssessment.Rhythm__Assessment__c !== 'undefined' && typeof accAssessment.Rhythm__Assessment__r.Id !== 'undefined') {
+                            //if (accAssessment.Rhythm__Assessment__r.Id === this.assessid) {
+                            if (typeof accAssessment.Rhythm__Status__c !== 'undefined') {
+                                this.statusassessment = accAssessment.Rhythm__Status__c;
+                                this.accountAssessmentStatus = this.statusassessment;
+                                // if (this.statusassessment === 'Need More Information' || this.statusassessment === 'Review Completed') {
+                                //     this.showstatus = true;
+                                // }
+                                this.assessmentName = accAssessment.Rhythm__Assessment__r.Name;
+                                if (typeof accAssessment.Rhythm__Start_Date__c !== 'undefined') {
+                                    let statustrack = {};
+                                    let dateformat = accAssessment.Rhythm__Start_Date__c;
                                     let dateformats = months[Number(dateformat.split('-')[1]) - 1] + '-' + dateformat.split('-')[2] + '-' + dateformat.split('-')[0];
-                                    statustrack.date = dateformats + ' ' + time[0];
-                                    statustrack.status =assessStatus.Rhythm__Object_Field_Value__c;
-                                    
-                                    switch (assessStatus.Rhythm__Object_Field_Value__c) {
-                                        case "New": statustrack.classlist = 'cad-timeline_slidebase cad-timeline_vendor cad-timeline_submited'; break;
-                                        case "In Progress": statustrack.classlist = 'cad-timeline_slidebase cad-timeline_vendor cad-timeline_pending'; break;
-                                        case "Submitted": statustrack.classlist = 'cad-timeline_slidebase cad-timeline_vendor cad-timeline_submited'; break;
-                                        case "In Review": statustrack.classlist = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_pending'; break;
-                                        case "Accepted": statustrack.classlist = 'cad-timeline_slidebase cad-timeline_vendor cad-timeline_submited'; break;
-                                        case "Need More Information": statustrack.classlist = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_rejected'; break;
-                                        case "Cancel":statustrack.classlist = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_rejected'; break;
-                                        case "Review Completed": statustrack.classlist = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_reviewcompleted'; break;
-                                        default : console.log('default');
+                                    statustrack.date = dateformats + ' 00:00:00';
+                                    statustrack.status = 'Start Date';
+                                    statustrack.classlist = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_default';
+                                    statustrack.name = accAssessment.Rhythm__Assessment__r.Rhythm__CreatedUser__c;
+                                    this.assessmentTimeline.push(statustrack);
+                                }
+                                else {
+                                    let statustrack = {};
+                                    if (typeof accAssessment.CreatedDate !== 'undefined') {
+                                        let date = accAssessment.Rhythm__Assessment__r.CreatedDate.split('T');
+                                        let time = date[1].split('.');
+                                        let dateformat = date[0];
+                                        let dateformats = months[Number(dateformat.split('-')[1]) - 1] + '-' + dateformat.split('-')[2] + '-' + dateformat.split('-')[0];
+                                        statustrack.date = dateformats + ' ' + time[0];
+                                        statustrack.status = 'Start Date';
+                                        statustrack.classlist = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_default';
+                                        statustrack.name = accAssessment.Rhythm__Assessment__r.Rhythm__CreatedUser__c;
+                                        this.assessmentTimeline.push(statustrack);
                                     }
-                                    if (typeof assessStatus.Rhythm__Activity_User__c !== 'undefined') {
-                                        statustrack.name = assessStatus.Rhythm__Activity_User__c;
-                                        statustrack.id= assessStatus.Rhythm__ActivityUserId__c;
-                                    }
-                                       this.assessmentTimeline.push(statustrack);
+
+                                }
+                                if (typeof accAssessment.Rhythm__End_Date__c !== 'undefined') {
+                                    let statustrack = {};
+                                    let dateformat = accAssessment.Rhythm__End_Date__c;
+                                    let dateformats = months[Number(dateformat.split('-')[1]) - 1] + '-' + dateformat.split('-')[2] + '-' + dateformat.split('-')[0];
+                                    statustrack.date = '(Due date ' + dateformats + ')';
+                                    this.endDate = statustrack.date;
+                                    statustrack.status = 'End Date';
+                                    statustrack.classlist = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_default';
+                                    statustrack.name = accAssessment.Rhythm__Assessment__r.Rhythm__CreatedUser__c;
+                                    //this.assessmentTimeline.push(statustrack);
                                 }
                             }
-                        })       
-                        if(this.accountAssessmentStatus==='Need More Information')
-                        {
-                            this.showflagquestions = false;
                         }
-                        if(this.accountAssessmentStatus!=='New')
-                        {
-                            this.showdownloadIcon= true;
-                        }
-                        if (this.assessmentTimeline.length > 1) {
-                            let relocate = this.assessmentTimeline.splice(0, 1);
-                            this.assessmentTimeline.push(relocate[0]);
-                        }
-                        this.showSections = true;
-                         this.handleFilter();
+                        // }
+                    })
+                }
+                /* To get the assessment tracking history to update on timeline*/
+                getAssessmentStatus({ assessmentId: accountAssessmentRecord, objectName: 'AccountAssessmentRelation__c' }).then(statusResult => {
+                    var assessmentStatus = statusResult;
+                    if (typeof statusResult !== 'undefined') {
+                        if (assessmentStatus && assessmentStatus !== null) {
+                            assessmentStatus.forEach(assessStatus => {
+                                if (assessStatus.Rhythm__Object_Field_Name__c === 'Rhythm__Status__c') {
+                                    let statustrack = {};
+                                    if (typeof assessStatus.Rhythm__Object_Field_Value__c !== 'undefined') {
+                                        let date = assessStatus.CreatedDate.split('T');
+                                        let dateformat = date[0];
+                                        let time = date[1].split('.');
+                                        let dateformats = months[Number(dateformat.split('-')[1]) - 1] + '-' + dateformat.split('-')[2] + '-' + dateformat.split('-')[0];
+                                        statustrack.date = dateformats + ' ' + time[0];
+                                        statustrack.status = assessStatus.Rhythm__Object_Field_Value__c;
+
+                                        switch (assessStatus.Rhythm__Object_Field_Value__c) {
+                                            case "New": statustrack.classlist = 'cad-timeline_slidebase cad-timeline_vendor cad-timeline_submited'; break;
+                                            case "In Progress": statustrack.classlist = 'cad-timeline_slidebase cad-timeline_vendor cad-timeline_pending'; break;
+                                            case "Submitted": statustrack.classlist = 'cad-timeline_slidebase cad-timeline_vendor cad-timeline_submited'; break;
+                                            case "In Review": statustrack.classlist = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_pending'; break;
+                                            case "Accepted": statustrack.classlist = 'cad-timeline_slidebase cad-timeline_vendor cad-timeline_submited'; break;
+                                            case "Need More Information": statustrack.classlist = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_rejected'; break;
+                                            case "Cancel": statustrack.classlist = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_rejected'; break;
+                                            case "Review Completed": statustrack.classlist = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_reviewcompleted'; break;
+                                            default: console.log('default');
+                                        }
+                                        if (typeof assessStatus.Rhythm__Activity_User__c !== 'undefined') {
+                                            statustrack.name = assessStatus.Rhythm__Activity_User__c;
+                                            statustrack.id = assessStatus.Rhythm__ActivityUserId__c;
+                                        }
+                                        this.assessmentTimeline.push(statustrack);
+                                    }
+                                }
+                            })
+                            if (this.accountAssessmentStatus === 'Need More Information') {
+                                this.showflagquestions = false;
                             }
+                            if (this.accountAssessmentStatus !== 'New') {
+                                this.showdownloadIcon = true;
+                            }
+                            if (this.assessmentTimeline.length > 1) {
+                                let relocate = this.assessmentTimeline.splice(0, 1);
+                                this.assessmentTimeline.push(relocate[0]);
+                            }
+                            this.showSections = true;
+                            this.handleFilter();
                         }
-                    }).catch(error => {
-                        errorLogRecord({ componentName: 'RtmvpcAssessmentChatter', methodName: 'getChatterResponse', className: 'AssessmentController', errorData: error.message }).then(() => {
-                        });
+                    }
+                }).catch(error => {
+                    errorLogRecord({ componentName: 'RtmvpcAssessmentChatter', methodName: 'getChatterResponse', className: 'AssessmentController', errorData: error.message }).then(() => {
                     });
+                });
 
             }).catch(error => {
                 errorLogRecord({ componentName: 'RtmvpcAssessmentChatter', methodName: 'getChatterResponse', className: 'AssessmentController', errorData: error.message }).then(() => {
@@ -226,20 +222,19 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
             });
         });
 
-        
+
     }
-     handleFilter()
-    {
-          if (this.objectApiName === 'Rhythm__AccountAssessmentRelation__c'){
-            this.assessmentTimeline.forEach(res=>{
-                if(res.status === 'In Review' ){
+    handleFilter() {
+        if (this.objectApiName === 'Rhythm__AccountAssessmentRelation__c') {
+            this.assessmentTimeline.forEach(res => {
+                if (res.status === 'In Review') {
                     this.showstatus = true;
                 }
             })
         }
-        else{
-             this.assessmentTimeline.forEach(res=>{
-                if(res.status === 'Need More Information'){
+        else {
+            this.assessmentTimeline.forEach(res => {
+                if (res.status === 'Need More Information') {
                     this.showstatus = true;
                 }
             })
@@ -259,42 +254,40 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
         this.template.querySelector('c-Questionnaire').handleFilterFlag(isLowerFlag);
 
     }
-     handleRejectChange(){
-         
+    handleRejectChange() {
+
         this.template.querySelector('c-Questionnaire').handleFilterRejected();
 
     }
-    handleAction(event)
-    {
-        console.log('hhh',event.detail);
-        this.showResponseForm=event.detail.action;
-        this.showCapaForm=this.showResponseForm[0].showCapaForm;
-        this.openReviewComments=false;
-        this.selectedchatData=event.detail.chat;
-        console.log('sample',  this.showResponseForm,this.openReviewComments);
-        this.assessmentTimeline.forEach(res=>{
-            if(res.status === 'In Review'){
-               this.showResponseForm[0].ownershipId=res.id;
-               this.showResponseForm[0].ownershipName=res.name;
+    handleAction(event) {
+        console.log('hhh', event.detail);
+        this.showResponseForm = event.detail.action;
+        this.showCapaForm = this.showResponseForm[0].showCapaForm;
+        this.openReviewComments = false;
+        this.selectedchatData = event.detail.chat;
+        console.log('sample', this.showResponseForm, this.openReviewComments);
+        this.assessmentTimeline.forEach(res => {
+            if (res.status === 'In Review') {
+                this.showResponseForm[0].ownershipId = res.id;
+                this.showResponseForm[0].ownershipName = res.name;
             }
-            else if(res.status ==='Submitted'){
-                this.showResponseForm[0].assignedToId=res.id;
-                this.showResponseForm[0].assignedToName=res.name;
+            else if (res.status === 'Submitted') {
+                this.showResponseForm[0].assignedToId = res.id;
+                this.showResponseForm[0].assignedToName = res.name;
             }
         })
-         setTimeout(()=>{
-             this.template.querySelectorAll('c-action')[0].displayForm(this.showResponseForm);
-        },500);
-       
+        setTimeout(() => {
+            this.template.querySelectorAll('c-action')[0].displayForm(this.showResponseForm);
+        }, 500);
+
     }
     // emptyFormData(event){
-        
+
     //     this.template.querySelectorAll('c-action')[0].emptyForm(event.detail);
     // }
-    closeForm(event)
-    {
-         let deletedataform=event.detail;
-          this.template.querySelectorAll('c-questionnaire')[0].displayCloseIcon(deletedataform);
+    closeForm(event) {
+        let deletedataform = event.detail;
+        this.template.querySelectorAll('c-questionnaire')[0].displayCloseIcon(deletedataform);
     }
 
     /*handleLeftButtonClick used to display records on page1*/
@@ -320,85 +313,82 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
     /* chatHistory is used to get the question id, assessment id and flag boolean from the child component (Questionnaire) and pass it to the child component(AssessmentChatter)*/
     chatHistory(event) {
         this.showChat = event.detail.chat;
-         //this.showCapaForm=event.detail.showCapaForm;
-         this.openReviewComments= this.showChat.openReviewComments;
-         this.showCapaForm=false;
-         this.openRightFile=false;
+        //this.showCapaForm=event.detail.showCapaForm;
+        this.openReviewComments = this.showChat.openReviewComments;
+        this.showCapaForm = false;
+        this.openRightFile = false;
 
-        console.log('chatter',this.showChat);
+        console.log('chatter', this.showChat);
         this.showChat.accountassessmentId = this.accountassessmentid;
         this.showData = this.showChat.openChat;
         this.showconverstion = this.showChat.disableSendButton;
         this.actionData = event.detail.actionData;
-        this.selectedchatData=event.detail.chat;
-        this.fileData=event.detail.file;
-        this.assessmentTimeline.forEach(res=>{
-            if(res.status === 'In Review'){
-               this.actionData[0].ownershipId=res.id;
-               this.actionData[0].ownershipName=res.name;
+        this.selectedchatData = event.detail.chat;
+        this.fileData = event.detail.file;
+        this.assessmentTimeline.forEach(res => {
+            if (res.status === 'In Review') {
+                this.actionData[0].ownershipId = res.id;
+                this.actionData[0].ownershipName = res.name;
             }
-            else if(res.status ==='Submitted'){
-                this.actionData[0].assignedToId=res.id;
-                this.actionData[0].assignedToName=res.name;
+            else if (res.status === 'Submitted') {
+                this.actionData[0].assignedToId = res.id;
+                this.actionData[0].assignedToName = res.name;
             }
         })
-        console.log('sample',this.fileData);
-         setTimeout(()=>{
-            console.log('chatter===>',this.template.querySelectorAll('c-rtmvpc-assessment-chatter'));
+        console.log('sample', this.fileData);
+        setTimeout(() => {
+            console.log('chatter===>', this.template.querySelectorAll('c-rtmvpc-assessment-chatter'));
             this.template.querySelectorAll('c-rtmvpc-assessment-chatter')[0].displayConversation(this.showChat);
-        },300);
-        
+        }, 300);
+
 
     }
-    handleSelectedAction()
-    {
-        this.openReviewComments=false;
-        this.showCapaForm=true;
-        this.openRightFile=false;
-         setTimeout(()=>{
-             this.template.querySelectorAll('c-action')[0].displayForm(this.actionData);
-        },300);
+    handleSelectedAction() {
+        this.openReviewComments = false;
+        this.showCapaForm = true;
+        this.openRightFile = false;
+        setTimeout(() => {
+            this.template.querySelectorAll('c-action')[0].displayForm(this.actionData);
+        }, 300);
 
     }
-    handleFileData(event)
-    {
-        this.openRightFile=true;
-        this.openReviewComments=false;
-        this.showCapaForm=false;
-        this.objectApiName=event.detail.objectApiName;
-        this.isdisabled=(event.detail.isEditable==="true")?true : false;
+    handleFileData(event) {
+        this.openRightFile = true;
+        this.openReviewComments = false;
+        this.showCapaForm = false;
+        this.objectApiName = event.detail.objectApiName;
+        this.isdisabled = (event.detail.isEditable === "true") ? true : false;
         console.log('isdisable', event.detail);
-        this.responseId=event.detail.response;
-        this.showUpload=(event.detail.showUpload==="true")?true : false;
-        this.recid=event.detail.recid;
-        this.questionId=event.detail.questionId;
-        this.accountassessmentFileId=event.detail.accountassessmentid;
+        this.responseId = event.detail.response;
+        this.showUpload = (event.detail.showUpload === "true") ? true : false;
+        this.recid = event.detail.recid;
+        this.questionId = event.detail.questionId;
+        this.accountassessmentFileId = event.detail.accountassessmentid;
     }
-    handleOnLoad(event)
-    {
-        console.log('filemap',event.detail);
-         this.template.querySelectorAll('c-questionnaire')[0].handleGetRespRecord(event.detail);
+    handleOnLoad(event) {
+        console.log('filemap', event.detail);
+        this.template.querySelectorAll('c-questionnaire')[0].handleGetRespRecord(event.detail);
     }
-    handleSelectedChat(){
-        this.openReviewComments=true;
-        this.showCapaForm=false;
-        this.openRightFile=false;
-         setTimeout(()=>{
-          this.template.querySelectorAll('c-rtmvpc-assessment-chatter')[0].displayConversation(this.selectedchatData);
-        },300);
+    handleSelectedChat() {
+        this.openReviewComments = true;
+        this.showCapaForm = false;
+        this.openRightFile = false;
+        setTimeout(() => {
+            this.template.querySelectorAll('c-rtmvpc-assessment-chatter')[0].displayConversation(this.selectedchatData);
+        }, 300);
     }
-    handleSelectedFile(){
-        console.log('this.filedata',this.fileData);
-        this.openRightFile=true;
-        this.openReviewComments=false;
-        this.showCapaForm=false;
-        this.objectApiName=this.fileData.objectApiName;
-        this.isdisabled=(this.fileData.isEditable==="true")?true : false;       
-        this.responseId=this.fileData.response;
-        this.showUpload=(this.fileData.showUpload==="true")?true : false;
-        this.recid=this.fileData.recid;
-        this.questionId=this.fileData.questionId;
-        this.accountassessmentFileId=this.fileData.accountassessmentid;
+    handleSelectedFile() {
+        console.log('this.filedata', this.fileData);
+        this.openRightFile = true;
+        this.openReviewComments = false;
+        this.showCapaForm = false;
+        this.objectApiName = this.fileData.objectApiName;
+        this.isdisabled = (this.fileData.isEditable === "true") ? true : false;
+        this.responseId = this.fileData.response;
+        this.showUpload = (this.fileData.showUpload === "true") ? true : false;
+        this.recid = this.fileData.recid;
+        this.questionId = this.fileData.questionId;
+        this.accountassessmentFileId = this.fileData.accountassessmentid;
     }
 
     showsummaryHandler() {
@@ -412,9 +402,9 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
     }
 
     handleExportCSV() {
-         if (this.recordId !== null && typeof this.recordId !== 'undefined') {
-                this.accountassessmentid=this.recordId;
-            }
+        if (this.recordId !== null && typeof this.recordId !== 'undefined') {
+            this.accountassessmentid = this.recordId;
+        }
         getSupplierAssessmentList({ assessmentId: this.accountassessmentid }).then(resultData => {
             var assessmentTemplateId = resultData[0].Rhythm__Assessment__r.Rhythm__Template__c;
             getQuestionsList({ templateId: assessmentTemplateId }).then(result => {
@@ -494,7 +484,7 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
             } else {
                 questionMap.set(qu.Rhythm__Section__r.Name, [quTemp]);
             }
-            if (typeof (savedResp.get(quTemp.questionId)) !== 'undefined' 
+            if (typeof (savedResp.get(quTemp.questionId)) !== 'undefined'
                 && savedResp.get(quTemp.questionId).conversationHistory === 'undefined') {
                 quTemp.value = savedResp.get(quTemp.questionId).get('value');
             }
@@ -509,100 +499,94 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
     }
 
     handleExportPDF() {
-       if (this.recordId !== null && typeof this.recordId !== 'undefined')
-       {
-        let pageurl = window.location.href;
-        if(typeof this.recordId!='undefined'){
-            let baseurl = pageurl.split('.com')[0] +'.com/apex/RenderAsPdf?id='+this.recordId;
-            window.open(baseurl);
-        }else{
-            let baseurl = pageurl.split('.com')[0] +'.com/apex/RenderAsPdf?id='+this.accountassessmentid;
-            window.open(baseurl);
+        if (this.recordId !== null && typeof this.recordId !== 'undefined') {
+            let pageurl = window.location.href;
+            if (typeof this.recordId != 'undefined') {
+                let baseurl = pageurl.split('.com')[0] + '.com/apex/RenderAsPdf?id=' + this.recordId;
+                window.open(baseurl);
+            } else {
+                let baseurl = pageurl.split('.com')[0] + '.com/apex/RenderAsPdf?id=' + this.accountassessmentid;
+                window.open(baseurl);
+            }
         }
-       }
-       else{
-           getSupplierAssessmentList({ assessmentId:  this.accountassessmentid }).then(resultData => {
-            var assessmentTemplateId = resultData[0].Rhythm__Assessment__r.Rhythm__Template__c;
-            getQuestionsList({ templateId: assessmentTemplateId }).then(result => {
-                var resultMap = result;
-                getSupplierResponseList({ assessmentId:  this.accountassessmentid }).then(suppRespresult => {
-                    suppRespresult.forEach(qres => {
-                        var savedResponseList = new Map();
-                        savedResponseList.set('value', qres.Rhythm__Response__c);
-                        if (('Rhythm__Conversation_History__c' in qres)) {
-                            savedResponseList.set('history', (qres.Rhythm__Conversation_History__c));
-                        }
-                        if (('Rhythm__Files__c' in qres)) {
-                            savedResponseList.set('files', (qres.Rhythm__Files__c));
-                        }
-                        this.savedResponseMap.set(qres.Rhythm__Question__c, savedResponseList);
-                    });
-                    this.finalSection = this.constructWrapper(resultMap, this.savedResponseMap);
-                    let tableHtml = '<table><thead><tr>';
-                    tableHtml += '<th>Section</th><th colspan="2">Question</th><th>Response</th><th>ConversationHistory</th><th>NumberOfAttachments</th>';
-                    tableHtml += '</tr></thead><tbody>';
-                    let count = 0;
-                    for (const key of this.finalSection.keys()) {
-                        count += 1;
-                        if (count % 2 === 0) {
-                            tableHtml += '<tr><td class="evenLeftTd" rowspan=' + this.finalSection.get(key).length + '>' + key + '</td>';
-                        }
-                        else {
-                            tableHtml += '<tr><td class="oddLeftTd" rowspan=' + this.finalSection.get(key).length + '>' + key + '</td>';
-                        }
-                        for (let i = 0; i < this.finalSection.get(key).length; i++) {
-                            if (typeof this.finalSection.get(key)[i].conversationHistory != "undefined" && this.isJsonString(this.finalSection.get(key)[i].conversationHistory)) {
-                                let str = '';
-                                for (let j = 0; j < JSON.parse(this.finalSection.get(key)[i].conversationHistory).length; j++) {
-                                    str = str + JSON.parse(this.finalSection.get(key)[i].conversationHistory)[j].Name + ':' + JSON.parse(this.finalSection.get(key)[i].conversationHistory)[j].Text + '\n';
+        else {
+            getSupplierAssessmentList({ assessmentId: this.accountassessmentid }).then(resultData => {
+                var assessmentTemplateId = resultData[0].Rhythm__Assessment__r.Rhythm__Template__c;
+                getQuestionsList({ templateId: assessmentTemplateId }).then(result => {
+                    var resultMap = result;
+                    getSupplierResponseList({ assessmentId: this.accountassessmentid }).then(suppRespresult => {
+                        suppRespresult.forEach(qres => {
+                            var savedResponseList = new Map();
+                            savedResponseList.set('value', qres.Rhythm__Response__c);
+                            if (('Rhythm__Conversation_History__c' in qres)) {
+                                savedResponseList.set('history', (qres.Rhythm__Conversation_History__c));
+                            }
+                            if (('Rhythm__Files__c' in qres)) {
+                                savedResponseList.set('files', (qres.Rhythm__Files__c));
+                            }
+                            this.savedResponseMap.set(qres.Rhythm__Question__c, savedResponseList);
+                        });
+                        this.finalSection = this.constructWrapper(resultMap, this.savedResponseMap);
+                        let tableHtml = '<table><thead><tr>';
+                        tableHtml += '<th>Section</th><th colspan="2">Question</th><th>Response</th><th>ConversationHistory</th><th>NumberOfAttachments</th>';
+                        tableHtml += '</tr></thead><tbody>';
+                        let count = 0;
+                        for (const key of this.finalSection.keys()) {
+                            count += 1;
+                            if (count % 2 === 0) {
+                                tableHtml += '<tr><td class="evenLeftTd" rowspan=' + this.finalSection.get(key).length + '>' + key + '</td>';
+                            }
+                            else {
+                                tableHtml += '<tr><td class="oddLeftTd" rowspan=' + this.finalSection.get(key).length + '>' + key + '</td>';
+                            }
+                            for (let i = 0; i < this.finalSection.get(key).length; i++) {
+                                if (typeof this.finalSection.get(key)[i].conversationHistory != "undefined" && this.isJsonString(this.finalSection.get(key)[i].conversationHistory)) {
+                                    let str = '';
+                                    for (let j = 0; j < JSON.parse(this.finalSection.get(key)[i].conversationHistory).length; j++) {
+                                        str = str + JSON.parse(this.finalSection.get(key)[i].conversationHistory)[j].Name + ':' + JSON.parse(this.finalSection.get(key)[i].conversationHistory)[j].Text + '\n';
+                                    }
+                                    this.finalSection.get(key)[i].conversationHistory = str;
                                 }
-                                this.finalSection.get(key)[i].conversationHistory = str;
+                                if (typeof this.finalSection.get(key)[i].files != "undefined" && this.isJsonString(this.finalSection.get(key)[i].files)) {
+                                    this.finalSection.get(key)[i].files = JSON.parse(this.finalSection.get(key)[i].files).length;
+                                }
+                                tableHtml += '<td class="align-to-top">' + (i + 1) + '.</td><td>' + this.finalSection.get(key)[i].question + '</td><td>' + this.finalSection.get(key)[i].value + '</td><td> ' + this.finalSection.get(key)[i].conversationHistory + '</td><td> ' + this.finalSection.get(key)[i].files + '</td></tr>';
                             }
-                            if (typeof this.finalSection.get(key)[i].files != "undefined" && this.isJsonString(this.finalSection.get(key)[i].files)) {
-                                this.finalSection.get(key)[i].files = JSON.parse(this.finalSection.get(key)[i].files).length;
-                            }
-                            tableHtml += '<td class="align-to-top">' + (i + 1) + '.</td><td>' + this.finalSection.get(key)[i].question + '</td><td>' + this.finalSection.get(key)[i].value + '</td><td> ' + this.finalSection.get(key)[i].conversationHistory + '</td><td> ' + this.finalSection.get(key)[i].files + '</td></tr>';
+                            tableHtml += '<tr><td></td><td></td><td></td><td></td></tr>';
                         }
-                        tableHtml += '<tr><td></td><td></td><td></td><td></td></tr>';
-                    }
-                    tableHtml += '</tbody></table>';
-                    let win = window.open('', '', 'width=' + (window.innerWidth * 0.9) + ',height=' + (window.innerHeight * 0.9) + ',location=no, top=' + (window.innerHeight * 0.1) + ', left=' + (window.innerWidth * 0.1));
-                    let style = '<style>@media print { * {-webkit-print-color-adjust:exact;}}} @page{ margin: 0px;} *{margin: 0px; padding: 0px; height: 0px; font-family: Source Sans Pro, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif !important;} .headerDiv{width: 100%; height: 56px; padding: 20px; background-color: #03314d;} .headerText{font-size: 40px; color: white; font-weight: bold} .tableDiv{padding: 20px;} table {border-collapse:collapse; font-size: 14px;} table td, th{ padding: 4px;} table tr:nth-child(odd) td {background-color: #F9F9F9;} .oddLeftTd{background-color: #E9E9E9 !important;} .evenLeftTd{background-color: #F1F1F1 !important;} table th{ border: 1px solid #E9E9E9; background-color:#B5BEC58F} table { page-break-inside:auto; } tr { page-break-inside:avoid; page-break-after:auto; } .align-to-top{ vertical-align: top; }</style>';
-                    win.document.getElementsByTagName('head')[0].innerHTML += style;
-                    win.document.getElementsByTagName('body')[0].innerHTML += '<div class="headerDiv slds-p-around_small"><span class="headerText">Rhythm</span></div><br/>';
-                    tableHtml = tableHtml.replaceAll('undefined', '').replaceAll('null', '');
-                    win.document.getElementsByTagName('body')[0].innerHTML += '<div class="tableDiv slds-p-around_medium">' + tableHtml + '</div>';
-                    win.print();
-                    win.close();
+                        tableHtml += '</tbody></table>';
+                        let win = window.open('', '', 'width=' + (window.innerWidth * 0.9) + ',height=' + (window.innerHeight * 0.9) + ',location=no, top=' + (window.innerHeight * 0.1) + ', left=' + (window.innerWidth * 0.1));
+                        let style = '<style>@media print { * {-webkit-print-color-adjust:exact;}}} @page{ margin: 0px;} *{margin: 0px; padding: 0px; height: 0px; font-family: Source Sans Pro, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif !important;} .headerDiv{width: 100%; height: 56px; padding: 20px; background-color: #03314d;} .headerText{font-size: 40px; color: white; font-weight: bold} .tableDiv{padding: 20px;} table {border-collapse:collapse; font-size: 14px;} table td, th{ padding: 4px;} table tr:nth-child(odd) td {background-color: #F9F9F9;} .oddLeftTd{background-color: #E9E9E9 !important;} .evenLeftTd{background-color: #F1F1F1 !important;} table th{ border: 1px solid #E9E9E9; background-color:#B5BEC58F} table { page-break-inside:auto; } tr { page-break-inside:avoid; page-break-after:auto; } .align-to-top{ vertical-align: top; }</style>';
+                        win.document.getElementsByTagName('head')[0].innerHTML += style;
+                        win.document.getElementsByTagName('body')[0].innerHTML += '<div class="headerDiv slds-p-around_small"><span class="headerText">Rhythm</span></div><br/>';
+                        tableHtml = tableHtml.replaceAll('undefined', '').replaceAll('null', '');
+                        win.document.getElementsByTagName('body')[0].innerHTML += '<div class="tableDiv slds-p-around_medium">' + tableHtml + '</div>';
+                        win.print();
+                        win.close();
+                    }).catch(error => {
+                        errorLogRecord({ componentName: 'CustomTable', methodName: 'getSupplierResponseList', className: 'AssessmentController', errorData: error.message }).then(() => {
+                        });
+                    })
                 }).catch(error => {
-                    errorLogRecord({ componentName: 'CustomTable', methodName: 'getSupplierResponseList', className: 'AssessmentController', errorData: error.message }).then(() => {
+                    errorLogRecord({ componentName: 'CustomTable', methodName: 'getQuestionsList', className: 'AssessmentController', errorData: error.message }).then(() => {
                     });
                 })
             }).catch(error => {
-                errorLogRecord({ componentName: 'CustomTable', methodName: 'getQuestionsList', className: 'AssessmentController', errorData: error.message }).then(() => {
+                errorLogRecord({ componentName: 'CustomTable', methodName: 'getSupplierAssessmentList', className: 'AssessmentController', errorData: error.message }).then(() => {
                 });
             })
-        }).catch(error => {
-            errorLogRecord({ componentName: 'CustomTable', methodName: 'getSupplierAssessmentList', className: 'AssessmentController', errorData: error.message }).then(() => {
-            });
-        })
-       }
+        }
     }
 
     handleupdatetimeline(event) {
-        let filesdata=event.detail;
-        console.log('filesdata',filesdata);
-        if(filesdata.files){
-        this.template.querySelector('c-portal-s3-files').handleFilesdata(filesdata);
-        }
-        if(typeof filesdata.data!=='undefined'){
-            const selectedEvent = new CustomEvent('handlepdfcsv', {
-                        detail: filesdata
-                    });
-                    this.dispatchEvent(selectedEvent);
-                    this.handleOnload();
-        }
-
+        let filesdata = event.detail;
         this.handleTimeLine();
+        if (typeof filesdata.data !== 'undefined') {
+            const selectedEvent = new CustomEvent('handlepdfcsv', {
+                detail: filesdata
+            });
+            this.dispatchEvent(selectedEvent);
+            this.handleOnload();
+        }
     }
 }
