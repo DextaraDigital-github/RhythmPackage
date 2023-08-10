@@ -193,7 +193,7 @@ export default class AWSS3FileOperations extends LightningElement {
             this.showDeleteModal = true;
         }
         else {
-            this.showToastMessage('No Delete Access', 'You do not have right access', 'error');
+            this.showToastMessage('No Delete Access', 'You do not have access to delete this file', 'error');
         }
     }
 

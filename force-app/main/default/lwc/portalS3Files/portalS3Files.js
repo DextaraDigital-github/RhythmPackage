@@ -6,6 +6,7 @@ import awsjssdk from '@salesforce/resourceUrl/AWSJSSDK';
 import Id from '@salesforce/user/Id';
 import { loadScript } from 'lightning/platformResourceLoader';
 import createResponseforFileUpload from '@salesforce/apex/AWSS3Controller.createResponseforFileUpload';
+import updateRespFilesCount from '@salesforce/apex/AWSS3Controller.updateRespFilesCount';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 
 export default class AWSS3FileOperations extends LightningElement {
@@ -43,9 +44,12 @@ export default class AWSS3FileOperations extends LightningElement {
     get acceptedFormats() {
         return ['.pdf', '.png', '.jpg', '.jpeg', '.xlsx', '.xls', '.txt', '.docx', '.doc'];
     }
-
+    @api handleFilesdata(filesdata) {
+        this.isdisabled = true;
+    }
     connectedCallback() {
         console.log(this.responseRecId);
+        console.log('isdisabled', this.isdisabled);
         if ((this.recId === null || this.recId === undefined) && this.assessmentRecId != null) {
             this.fileRecordID = this.assessmentRecId;
         }
@@ -175,7 +179,7 @@ export default class AWSS3FileOperations extends LightningElement {
             this.showDeleteModal = true;
         }
         else {
-            this.showToastMessage('No Delete Access', 'You do not have right access', 'error');
+            this.showToastMessage('No Delete Access', 'You do not have access to delete this file', 'error');
         }
     }
 
@@ -195,11 +199,16 @@ export default class AWSS3FileOperations extends LightningElement {
         };
         this.s3.deleteObject(params, (error, data) => {
             if (data) {
-                this.showToastMessage('Deleted', this.fileKey.substring(this.fileKey.lastIndexOf("/") + 1) + ' - Deleted Successfully', 'success');
-                this.fileKey = '';
-                this.keyString = '';
-                this.previewUrl = '';
-                this.showFrame = false;
+                updateRespFilesCount({
+                    responseId: this.responseRecId,
+                    filesCount: this.keyList.length - 1
+                }).then(reco => {
+                    this.showToastMessage('Deleted', this.fileKey.substring(this.fileKey.lastIndexOf("/") + 1) + ' - Deleted Successfully', 'success');
+                    this.fileKey = '';
+                    this.keyString = '';
+                    this.previewUrl = '';
+                    this.showFrame = false;
+                });
             }
         });
     }
@@ -221,12 +230,18 @@ export default class AWSS3FileOperations extends LightningElement {
                     }).then(result => {
                         if (result) {
                             this.renderFlag = true;
-                            this.showToastMessage('Uploaded', 'Uploaded Successfully', 'success');
-                            const selectedEvent = new CustomEvent('getdata', {
-                                detail: rec
+                            updateRespFilesCount({
+                                responseId: this.responseRecId,
+                                filesCount: this.keyList.length + 1
+                            }).then(reco => {
+                                this.showToastMessage('Uploaded', 'Uploaded Successfully', 'success');
+                                const selectedEvent = new CustomEvent('getdata', {
+                                    detail: rec
+                                });
+                                // Dispatches the event.
+                                this.dispatchEvent(selectedEvent);
                             });
-                            // Dispatches the event.
-                            this.dispatchEvent(selectedEvent);
+
                         }
                         else {
                             this.showToastMessage('Exceeded File Limit', 'The maximum file size you can upload is 10 MB', 'error');
@@ -245,13 +260,18 @@ export default class AWSS3FileOperations extends LightningElement {
                 recId: this.fileRecordID, objectName: this.objectName, pathRecId: this.responseRecId, deleteFlag: true, userId: this.userId
             }).then(result => {
                 if (result) {
-                    this.renderFlag = true;
-                    this.showToastMessage('Uploaded', 'Uploaded Successfully', 'success');
-                    const selectedEvent = new CustomEvent('getdata', {
-                                detail: this.questionId
+                    updateRespFilesCount({
+                        responseId: this.responseRecId,
+                        filesCount: this.keyList.length + 1
+                    }).then(reco => {
+                        this.renderFlag = true;
+                        this.showToastMessage('Uploaded', 'Uploaded Successfully', 'success');
+                        const selectedEvent = new CustomEvent('getdata', {
+                            detail: this.questionId
+                        });
+                        // Dispatches the event.
+                        this.dispatchEvent(selectedEvent);
                     });
-                    // Dispatches the event.
-                    this.dispatchEvent(selectedEvent);
                 }
                 else {
                     this.showToastMessage('Exceeded File Limit', 'The maximum file size you can upload is 10 MB', 'error');

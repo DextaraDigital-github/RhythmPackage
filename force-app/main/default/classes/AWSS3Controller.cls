@@ -142,6 +142,25 @@ public with sharing class AWSS3Controller {
     }
 
     /**
+    * @description update Files count.
+    * @param responseId This is a record id of an Response.
+    * @param filesCount
+    *@return
+    */    
+    @AuraEnabled
+    public static void updateRespFilesCount(String responseId, Integer filesCount) {
+        try {
+            if(String.isNotBlank(responseId) && filesCount > 0) {
+                service.updateRespFilesCount(responseId, filesCount);
+            }
+        }
+        catch(Exception e) {
+            String errorMsg = e.getMessage();
+            throw new AuraHandledException(ErrorMsg);
+        }
+    }
+
+    /**
 * @description It is used to throw the exception
 */
     public class SecurityControllerException extends Exception{

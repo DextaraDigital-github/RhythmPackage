@@ -589,7 +589,20 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
        }
     }
 
-    handleupdatetimeline() {
+    handleupdatetimeline(event) {
+        let filesdata=event.detail;
+        console.log('filesdata',filesdata);
+        if(filesdata.files){
+        this.template.querySelector('c-portal-s3-files').handleFilesdata(filesdata);
+        }
+        if(typeof filesdata.data!=='undefined'){
+            const selectedEvent = new CustomEvent('handlepdfcsv', {
+                        detail: filesdata
+                    });
+                    this.dispatchEvent(selectedEvent);
+                    this.handleOnload();
+        }
+
         this.handleTimeLine();
     }
 }

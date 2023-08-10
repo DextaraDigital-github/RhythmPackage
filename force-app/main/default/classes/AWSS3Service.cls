@@ -375,10 +375,35 @@ public with sharing class AWSS3Service extends AWS {
         }
         
     }
+
+
+    /**
+    * @description update Files count.
+    * @param responseId This is a record id of an Response.
+    * @param filesCount
+    *@return
+    */
+    public void updateRespFilesCount(String responseId, Integer filesCount) {
+        try {
+            List<Response__c> srList = new List<Response__c>();
+            List<String> errorList = new List<String>();
+            if(String.isNotBlank(responseId) && filesCount > 0) {
+                Response__c res=new Response__c();
+                res.Id= responseId;
+                res.Files__c = String.valueOf(filesCount);
+                srList.add(res);
+                Database.SaveResult[] saveResult = safe.doUpdate(srList);
+            }
+        }
+        catch(Exception e) {
+            String errorMsg = e.getMessage();
+            throw new AuraHandledException(ErrorMsg);
+        }
+    }
   
     /**
-* @description It is used to throw the exception
-*/
+    * @description It is used to throw the exception
+    */
     public class SecurityControllerException extends Exception{
     }
 }

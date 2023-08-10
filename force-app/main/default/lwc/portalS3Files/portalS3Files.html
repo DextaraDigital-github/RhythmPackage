@@ -25,10 +25,12 @@
 										<a data-id={item.key} title={item.url} onclick={handleDownload}>{item.value}</a>
 									</div>
 									<div class="slds-col">
+										<template if:false={isdisabled}>
 										<lightning-icon style="margin-top: 10px;" icon-name="utility:delete"
 											size='x-small' alternative-text="Delete" class="slds-m-left_xx-small"
-											key={item.key} name={item.key} title="Delete" onclick={handleDeletePopup}>
+											key={item.key} name={item.key} title="Delete" onclick={handleDeletePopup} >
 										</lightning-icon>
+										</template>
 									</div>
 								</div>
 							</div>
