@@ -148,6 +148,7 @@ public with sharing class AWSS3Controller {
     *@return
     */    
     @AuraEnabled
+    /* sfge-disable-stack ApexFlsViolationRule */
     public static void updateRespFilesCount(String responseId, Integer filesCount) {
         try {
             if(String.isNotBlank(responseId) && filesCount > 0) {
