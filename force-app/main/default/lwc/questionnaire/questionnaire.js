@@ -474,7 +474,7 @@ export default class Questionnaire extends LightningElement {
                                                                 if (respAttr.isdisplay && ques.type !== 'Picklist (Multi-Select)') {
                                                                     ques.showUpload = (respAttr.uploadrequired === 'Yes' || respAttr.uploadrequired === 'Optional') ? true : false;
                                                                 }
-                                                                if (ques.type !== 'Picklist (Multi-Select)') {
+                                                                if (ques.type === 'Picklist (Multi-Select)') {
                                                                     let lst = JSON.parse(ques.value);
                                                                     if (lst.includes(respAttr.optionValue)) {
                                                                         if ((respAttr.uploadrequired === 'Yes' || respAttr.uploadrequired === 'Optional')) {
@@ -717,7 +717,7 @@ export default class Questionnaire extends LightningElement {
                                                                 }
                                                             }
                                                         }
-                                                        if (ques.type !== 'Picklist (Multi-Select)') {
+                                                        if (ques.type === 'Picklist (Multi-Select)') {
                                                             let lst = JSON.parse(ques.value);
                                                             if (lst.includes(respAttr.optionValue)) {
                                                                 if ((respAttr.uploadrequired === 'Yes' || respAttr.uploadrequired === 'Optional')) {
