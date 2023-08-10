@@ -121,6 +121,33 @@ public with sharing class CAPAService {
         }      
         SendEmail.notifyUsers(actionData,body,userdata);  
     }
+     
+    public List<Action__c> deleteCapa(Map<string,object> deletedata){
+        List<Object> lst = (List<Object>)deletedata.get('capaquestionId');
+        System.debug('lst'+lst);
+        List<string> questionId= new List<String>();
+        for(Integer i=0;i<lst.size();i++){
+         questionId.add(String.valueOf(lst[i]));   
+        }
+         string accountAssessmentid=(string)deletedata.get('accountassessmentId');
+        List<Action__c> deleteDataContent=selector.deleteCapa(questionId,accountAssessmentid);
+        System.debug('deleteDataContent koushik'+deleteDataContent);
+        try{
+            if(deleteDataContent.isEmpty() == false){
+                
+                List<Database.DeleteResult> deleteResult = safe.doDelete(deleteDataContent);
+                List<String> errorList = SecurityCheckController.safeClassExceptionHandlerDelete(deleteResult);
+                if(errorList.size()>0){
+                    Database.rollback(sp);
+                    throw new SecurityControllerException(String.join( errorList, ', ' ));
+                }
+            }
+            return deleteDataContent;
+        }catch(exception e){
+            String errorMsg = e.getMessage();
+            throw new AuraHandledException(errorMsg);
+        }
+    }
     
     /**
     * @description It is used to throw the exception

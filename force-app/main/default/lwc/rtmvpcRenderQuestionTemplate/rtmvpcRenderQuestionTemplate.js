@@ -17,6 +17,7 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
     @track showUploadProgress;
     @api assessmentid;
     @track checkedLabel;
+    @api qtype;
     @api accountassessment;
     @track objectApiName='Rhythm__Response__c';
     @api sectionid;
@@ -30,9 +31,19 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
      @api showicon;
     @api timeline;
     @track conditionaldisplay= false;
+    @track uploadMap={};
     connectedCallback() {
-        if(typeof this.conditionaval!=='undefined'){
+        console.log('qtype',this.qtype);
+        if(typeof this.conditionaval!=='undefined' && typeof this.qtype!=='undefined'){
             this.conditionaldisplay = true;
+            if(this.qtype==='Checkbox'){
+                if(this.conditionaval===true){
+                    this.conditionaval ='Checked';
+                }
+                else{
+                    this.conditionaval ='Unchecked';
+                }
+            }
         }
         console.log('isSupplier',this.issupplier);
         console.log('accountassessmentid',this.accountassessmentid);
@@ -72,8 +83,8 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
     handleReject(event){
         console.log('handleReject===>');
         console.log('koushik',this.responses);
-        var quesId = event.currentTarget.dataset.label;
-        var label= event.target.label;
+        var quesId = event.currentTarget.dataset.id;
+        var label= event.currentTarget.dataset.label;
         var rejectMap={};
         rejectMap.questionId=quesId;
         if(!this.issupplier){
@@ -90,6 +101,7 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
                           })                   
                         }
                         else{
+                            console.log('sampledata');
                             rejectMap.needData = !(res.needData);
                         }
                     }
@@ -132,7 +144,7 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
                 detail: actionMap
             });
             // Dispatches the event.
-            this.dispatchEvent(selectedEvent);
+        this.dispatchEvent(selectedEvent);
 
     }
     handleActionChange(event){
@@ -155,6 +167,8 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
                         flagresponse = !(res.Rhythm__Flag__c);
                     }
                 })
+              
+                
             }
             this.chatterMap.questionId = quesId;
             this.chatterMap.accountType = 'vendor';
@@ -173,6 +187,40 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
             });
             this.dispatchEvent(selectedEvent);
         }
+    }
+    handleuploadfile()
+    {
+        this.uploadMap={};
+        this.uploadMap.objectApiName=this.objectApiName;
+        this.uploadMap.recid=this.recid;
+        this.uploadMap.accountassessmentid=this.accountassessmentid;
+
+    }
+    handleupload(event)
+    {
+        this.handleuploadfile();
+        this.uploadMap.questionId=event.currentTarget.dataset.id;       
+        this.uploadMap.isEditable=event.currentTarget.dataset.disable;
+        this.uploadMap.response=event.currentTarget.dataset.response;
+        this.uploadMap.showUpload=event.currentTarget.dataset.showupload;
+        console.log('showupload',this.uploadMap.showUpload);
+       
+         const selectedEvent = new CustomEvent('uploadfile', {
+                detail: this.uploadMap
+            });
+            // Dispatches the event.
+            this.dispatchEvent(selectedEvent);
+
+    }
+    handleChildUpload(event){
+        console.log('child',this.uploadMap);
+         const selectedEvent = new CustomEvent('uploadfile', {
+                bubbles:true,
+                detail: event.detail
+            });
+            // Dispatches the event.
+            this.dispatchEvent(selectedEvent);
+
     }
     handlecustomerFlag(event)
     {
@@ -386,8 +434,13 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
         }
         this.chatterMap.questionId = quesId;
          this.chatterMap.openReviewComments=true;
+        this.handleuploadfile();
+        this.uploadMap.questionId=event.currentTarget.dataset.id;       
+        this.uploadMap.isEditable=event.currentTarget.dataset.disable;
+        this.uploadMap.response=event.currentTarget.dataset.response;
+        this.uploadMap.showUpload=event.currentTarget.dataset.showupload;
         const selectedEvent = new CustomEvent('selectchange', {
-            detail: this.chatterMap
+            detail: {chat:this.chatterMap,file:this.uploadMap}
         });
         // Dispatches the event.
         this.dispatchEvent(selectedEvent);

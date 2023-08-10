@@ -268,8 +268,7 @@ public with sharing class AssessmentTemplateController {
                     drchildList=safe.doDelete(questionList);
                 }
                 else {
-                    questionList = [SELECT Id from Question__c where Id IN:recIdList];
-                    
+                    questionList = [SELECT Id from Question__c where Id IN:recIdList WITH SECURITY_ENFORCED];
                 }
                 if(questionList.isEmpty() == false) {
                     drchildList=safe.doDelete(questionList);

@@ -38,17 +38,17 @@ public class TemplateControllerTest {
             Map<String, Object> respAttributes2 = new Map<String, Object>{'Rhythm__preferred_Not_preferred__c'=>'Preferred',
             'Rhythm__QuestionId__c'=>ques[0].Id,'Rhythm__Response_value__c'=>'No','Rhythm__Score__c'=>5,
             'Rhythm__Weight__c'=>10,'Rhythm__Upload_Required__c'=>'Yes'};
-            List<Response_Attribute__c> resp2 =TestDataFactory.createResponseAttributes(1,true,respAttributes2);
+            TestDataFactory.createResponseAttributes(1,true,respAttributes2);
 
             Map<String, Object> childquestionAttributes = new Map<String, Object>{'Rhythm__Assessment_Template__c'=>templist[0].Id,
             'Rhythm__Question__c'=>'What is the feedback for service?','Rhythm__Question_Type__c'=>'Text','Rhythm__Required__c'=>True,
             'Rhythm__Section__c'=>seclist[0].Id,'Rhythm__Parent_Question__c'=>ques[0].Id};
-            List<Question__c> ques2 =TestDataFactory.createQuestion(1,true,childquestionAttributes);
+            TestDataFactory.createQuestion(1,true,childquestionAttributes);
 
 
             Map<String, Object> questionResponeMapattr = new Map<String, Object>{'Rhythm__QuestionId__c'=>ques[0].Id,
             'Rhythm__ResponseAttributeId__c'=>resp[0].Id};
-            List<Response_Question_Map__c> quesResplst =TestDataFactory.createResponseQuestionMap(1,true,questionResponeMapattr);
+           TestDataFactory.createResponseQuestionMap(1,true,questionResponeMapattr);
             }   
     }
     @isTest
@@ -66,7 +66,7 @@ public class TemplateControllerTest {
         lst.add(obj);
         System.runAs(u){
             Test.startTest();
-            List<Sobject> resmap = rqsService.createResponseQuestionMap(lst);
+           rqsService.createResponseQuestionMap(lst);
             Object seclst =TemplateController.doClone(sec[0].Id,temp);
             Test.stopTest();
            System.assertEquals(seclst!=null, true,'Response Attribute Deleted successfully');
@@ -75,15 +75,13 @@ public class TemplateControllerTest {
     @isTest
     static void wrapperTest(){
         user u = [SELECT Id,UserName FROM User WHERE Email='standarduser@testorg.com' LIMIT 1];
-        List<Assessment_Template__c> sec =[SELECT id,name,Status__c FROM Assessment_Template__c];
-        
         System.runAs(u){
             Test.startTest();
             TemplateController.ResultWrapper wrapper = new TemplateController.ResultWrapper();
        		wrapper.isSuccess = true;
         	wrapper.message = 'Test Message';
         	wrapper.errorCode = '123';
-        	wrapper.recordId = '0010A00000abcde';
+        	wrapper.recordId = 'sampleRecord';
             Test.stopTest();
            System.assertEquals(true, wrapper.isSuccess, 'isSuccess should be true');
         } 
@@ -91,7 +89,6 @@ public class TemplateControllerTest {
     @isTest
     static void fetchQuestionsTest(){
         user u = [SELECT Id,UserName FROM User WHERE Email='standarduser@testorg.com' LIMIT 1];
-        List<Assessment_Template__c> sec =[SELECT id,name,Status__c FROM Assessment_Template__c];
         map<string,Object> mp = new map<string,object>();
         mp.put('fields',new List<String>{'id','name'});
         mp.put('filter','');

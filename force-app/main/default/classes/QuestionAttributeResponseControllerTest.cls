@@ -35,7 +35,7 @@ public class QuestionAttributeResponseControllerTest {
             Map<String, Object> respAttributes = new Map<String, Object>{'Rhythm__preferred_Not_preferred__c'=>'Preferred',
             'Rhythm__QuestionId__c'=>ques[0].Id,'Rhythm__Response_value__c'=>'Yes','Rhythm__Score__c'=>5,
             'Rhythm__Weight__c'=>10,'Rhythm__Upload_Required__c'=>'Yes'};
-            List<Response_Attribute__c> resp =TestDataFactory.createResponseAttributes(1,true,respAttributes);
+            TestDataFactory.createResponseAttributes(1,true,respAttributes);
         }
     }
 
@@ -43,9 +43,6 @@ public class QuestionAttributeResponseControllerTest {
     static void createResponseAttributesTest(){
         user u = [SELECT Id,UserName FROM User WHERE Email='standarduser@testorg.com' LIMIT 1];
         List<Question__c> ques = [SELECT id,Assessment_Template__c,Section__c from Question__c];
-        Map<String, Object> respAttributes = new Map<String, Object>{'Rhythm__preferred_Not_preferred__c'=>'Preferred',
-                'Rhythm__QuestionId__c'=>ques[0].Id,'Rhythm__Response_value__c'=>'Yes','Rhythm__Score__c'=>5,
-                'Rhythm__Weight__c'=>10,'Rhythm__Upload_Required__c'=>'Yes'};
         Response_Attribute__c quesAtr = new Response_Attribute__c();
         quesAtr.preferred_Not_preferred__c ='Preferred';
         quesAtr.QuestionId__c = ques[0].Id;
@@ -65,13 +62,11 @@ public class QuestionAttributeResponseControllerTest {
     @isTest
     static void updateResponseAttributesTest(){
         user u = [SELECT Id,UserName FROM User WHERE Email='standarduser@testorg.com' LIMIT 1];
-        List<Question__c> ques = [SELECT id,Assessment_Template__c,Section__c from Question__c];
         List<Response_Attribute__c> responseAttrlst = [SELECT id,preferred_Not_preferred__c,QuestionId__c,Response_value__c,
                                         Score__c,Upload_Required__c FROM Response_Attribute__c];
         System.runAs(u){
            Test.startTest();
             responseAttrlst[0].Rhythm__Score__c =8;
-           //List<SObject> qType = QuestionAttributeResponseController.createResponseAttributes(responseAttrlst);
             List<SObject> respType = QuestionAttributeResponseController.updateResponseAttributes(responseAttrlst);
            Test.stopTest();
            System.assertEquals(respType.size()>0, true,'Response Attribute Updated successfully');
@@ -86,7 +81,7 @@ public class QuestionAttributeResponseControllerTest {
            Test.startTest();
           
             List<SObject> respType = QuestionAttributeResponseController.deleteResponseAttribute(responseAttrlst[0].Id);
-            List<SObject> respType1 = QuestionAttributeResponseController.deleteResponseAttribute(null);
+            QuestionAttributeResponseController.deleteResponseAttribute(null);
            Test.stopTest();
            System.assertEquals(respType.size()>0, true,'Response Attribute Deleted successfully');
         }
@@ -100,7 +95,6 @@ public class QuestionAttributeResponseControllerTest {
         System.runAs(u){
            Test.startTest();
             List<SObject> respType = QuestionAttributeResponseController.deleteQuesRespAttribute(quesLst);
-             //List<SObject> respType1 = QuestionAttributeResponseController.deleteQuesRespAttribute();
            Test.stopTest();
            System.assertEquals(respType.size()>0, true,'Response Attribute Deleted successfully');
         }
@@ -113,11 +107,10 @@ public class QuestionAttributeResponseControllerTest {
         List<String> resplst = new List<String>();
         resplst.add(responseAttrlst[0].Id);
         System.runAs(u){
-           Test.startTest();
+            Test.startTest();
             List<SObject> respType = QuestionAttributeResponseController.getQuesRespAttribute(resplst);
-            //List<SObject> respType1 = QuestionAttributeResponseController.getQuesRespAttribute(null);
-           Test.stopTest();
-           System.assertEquals(respType.size()>0, true,'Response Attribute Fetched successfully');
+            Test.stopTest();
+            System.assertEquals(respType.size()>0, true,'Response Attribute Fetched successfully');
         }
     }
     @isTest
@@ -127,11 +120,10 @@ public class QuestionAttributeResponseControllerTest {
         List<String> quesLst = new List<String>();
         quesLst.add(ques[0].Id);
         System.runAs(u){
-           Test.startTest();
+            Test.startTest();
             List<SObject> respType = QuestionAttributeResponseController.getQuestionRespAttributes(quesLst);
-            //List<SObject> respType1 = QuestionAttributeResponseController.getQuestionRespAttributes(null);
-           Test.stopTest();
-           System.assertEquals(respType.size()>0, true,'Response Attribute Deleted successfully');
+            Test.stopTest();
+            System.assertEquals(respType.size()>0, true,'Response Attribute Deleted successfully');
         }
     }
     @isTest
@@ -159,9 +151,9 @@ public class QuestionAttributeResponseControllerTest {
         System.runAs(u){
             Test.startTest();
             List<Sobject> resmap = rqmService.createResponseQuestionMap(lst);
-            List<SObject> getresmap = rqmSelector.getQuestionResponseMap(queslst);
+            rqmSelector.getQuestionResponseMap(queslst);
             Test.stopTest();
-             System.assertEquals(resmap!=null, true,'Response Question Map Created successfully');
+            System.assertEquals(resmap!=null, true,'Response Question Map Created successfully');
         }
     }
 	 @isTest

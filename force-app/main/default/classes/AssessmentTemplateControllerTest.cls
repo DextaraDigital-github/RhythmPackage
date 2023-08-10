@@ -20,7 +20,7 @@ private class AssessmentTemplateControllerTest {
 
             Id clinicRecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByName().get('Supplier').getRecordTypeId();
             Map<String, Object> accAttributes = new Map<String, Object>{'RecordTypeId'=>clinicRecordTypeId,'Name'=>'Supplier'};
-            List<Account> accts = TestDataFactory.createAccounts(1,true,accAttributes);
+            TestDataFactory.createAccounts(1,true,accAttributes);
 
             Map<String, Object> assementTemplateattributes = new Map<String, Object>{'Name'=>'2023 Assessment template'};
             List<Assessment_Template__c> templist=TestDataFactory.createAssessmentTemp(1,true,assementTemplateattributes);
@@ -30,9 +30,6 @@ private class AssessmentTemplateControllerTest {
             'Rhythm__Question__c'=>'What is the feedback for service?','Rhythm__Question_Type__c'=>'Text','Rhythm__Required__c'=>True,
             'Rhythm__Section__c'=>seclist[0].Id};
             TestDataFactory.createQuestion(1,true,questionAttributes);
-            Map<String, Object> assessmentattributes = new Map<String, Object>{'Template__c'=>templist[0].Id,
-            'Name'=>'Assessment 2023','Rhythm__Status__c'=>'New','Rhythm__Number_of_Questions__c'=>10};
-
         }
     }
     /**

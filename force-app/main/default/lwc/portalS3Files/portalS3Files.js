@@ -3,13 +3,16 @@ import getSignedURL from '@salesforce/apex/AWSS3Controller.getFileSignedUrl';
 import filesUpload from '@salesforce/apex/AWSS3Controller.uploadFiles';
 import getAuthentication from '@salesforce/apex/AWSS3Controller.getAuthenticationData';
 import awsjssdk from '@salesforce/resourceUrl/AWSJSSDK';
+import Id from '@salesforce/user/Id';
 import { loadScript } from 'lightning/platformResourceLoader';
 import createResponseforFileUpload from '@salesforce/apex/AWSS3Controller.createResponseforFileUpload';
+import updateRespFilesCount from '@salesforce/apex/AWSS3Controller.updateRespFilesCount';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 
 export default class AWSS3FileOperations extends LightningElement {
     @api assessmentRecId;
     @api recId;
+    @track userId = Id;
     @api isdisabled;
     @api questionId;
     @api objectName;
@@ -41,9 +44,12 @@ export default class AWSS3FileOperations extends LightningElement {
     get acceptedFormats() {
         return ['.pdf', '.png', '.jpg', '.jpeg', '.xlsx', '.xls', '.txt', '.docx', '.doc'];
     }
-
+    @api handleFilesdata(filesdata) {
+        this.isdisabled = true;
+    }
     connectedCallback() {
         console.log(this.responseRecId);
+        console.log('isdisabled', this.isdisabled);
         if ((this.recId === null || this.recId === undefined) && this.assessmentRecId != null) {
             this.fileRecordID = this.assessmentRecId;
         }
@@ -114,14 +120,18 @@ export default class AWSS3FileOperations extends LightningElement {
                 let fileList = [];
                 this.keyList = [];
                 files && files.forEach(file => {
-                    const objectKey = file.Key;
-                    let fileName = objectKey.substring(objectKey.lastIndexOf("/") + 1);
-                    let fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1);
-                    if (fileExtension === 'doc' || fileExtension === 'docx' || fileExtension === 'xls' || fileExtension === 'xlsx') {
-                        fileList.push({ type: fileExtension, preview: false, key: objectKey, url: this.endpoint + '/' + objectKey, value: fileName.substring(fileName.indexOf("_") + 1) });
-                    }
-                    else {
-                        fileList.push({ type: fileExtension, preview: true, key: objectKey, url: this.endpoint + '/' + objectKey, value: fileName.substring(fileName.indexOf("_") + 1) });
+                    let checkFile = file.Key.split('/')
+                    if (checkFile[checkFile.length - 1] != null && checkFile[checkFile.length - 1] != '') {
+
+                        const objectKey = file.Key;
+                        let fileName = objectKey.substring(objectKey.lastIndexOf("/") + 1);
+                        let fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1);
+                        if (fileExtension === 'doc' || fileExtension === 'docx' || fileExtension === 'xls' || fileExtension === 'xlsx') {
+                            fileList.push({ type: fileExtension, preview: false, key: objectKey, url: this.endpoint + '/' + objectKey, value: fileName });
+                        }
+                        else {
+                            fileList.push({ type: fileExtension, preview: true, key: objectKey, url: this.endpoint + '/' + objectKey, value: fileName });
+                        }
                     }
                 });
                 this.keyList = fileList.reverse();
@@ -163,9 +173,14 @@ export default class AWSS3FileOperations extends LightningElement {
 
     //Open Delete Modal Popup
     handleDeletePopup(event) {
-        this.showDeleteModal = true;
         this.fileKey = event.target.name;
         this.keyString = this.fileKey.replace(this.endpoint + '/', '');
+        if (this.keyString.includes(this.userId)) {
+            this.showDeleteModal = true;
+        }
+        else {
+            this.showToastMessage('No Delete Access', 'You do not have access to delete this file', 'error');
+        }
     }
 
     //Close Delete Modal Popup
@@ -184,12 +199,16 @@ export default class AWSS3FileOperations extends LightningElement {
         };
         this.s3.deleteObject(params, (error, data) => {
             if (data) {
-                let fileName = this.fileKey.substring(this.fileKey.lastIndexOf("/") + 1);
-                this.showToastMessage('Deleted', fileName.substring(fileName.indexOf("_") + 1) + ' - Deleted Successfully', 'success');
-                this.fileKey = '';
-                this.keyString = '';
-                this.previewUrl = '';
-                this.showFrame = false;
+                updateRespFilesCount({
+                    responseId: this.responseRecId,
+                    filesCount: this.keyList.length - 1
+                }).then(reco => {
+                    this.showToastMessage('Deleted', this.fileKey.substring(this.fileKey.lastIndexOf("/") + 1) + ' - Deleted Successfully', 'success');
+                    this.fileKey = '';
+                    this.keyString = '';
+                    this.previewUrl = '';
+                    this.showFrame = false;
+                });
             }
         });
     }
@@ -207,16 +226,22 @@ export default class AWSS3FileOperations extends LightningElement {
                 if (rec) {
                     this.responseRecId = rec.Id;
                     filesUpload({
-                        recId: this.fileRecordID, objectName: this.objectName, pathRecId: this.responseRecId, deleteFlag: true
+                        recId: this.fileRecordID, objectName: this.objectName, pathRecId: this.responseRecId, deleteFlag: true, userId: this.userId
                     }).then(result => {
                         if (result) {
                             this.renderFlag = true;
-                            this.showToastMessage('Uploaded', 'Uploaded Successfully', 'success');
-                            const selectedEvent = new CustomEvent('getdata', {
-                                detail: rec
+                            updateRespFilesCount({
+                                responseId: this.responseRecId,
+                                filesCount: this.keyList.length + 1
+                            }).then(reco => {
+                                this.showToastMessage('Uploaded', 'Uploaded Successfully', 'success');
+                                const selectedEvent = new CustomEvent('getdata', {
+                                    detail: rec
+                                });
+                                // Dispatches the event.
+                                this.dispatchEvent(selectedEvent);
                             });
-                            // Dispatches the event.
-                            this.dispatchEvent(selectedEvent);
+
                         }
                         else {
                             this.showToastMessage('Exceeded File Limit', 'The maximum file size you can upload is 10 MB', 'error');
@@ -232,11 +257,21 @@ export default class AWSS3FileOperations extends LightningElement {
         }
         else {
             filesUpload({
-                recId: this.fileRecordID, objectName: this.objectName, pathRecId: this.responseRecId, deleteFlag: true
+                recId: this.fileRecordID, objectName: this.objectName, pathRecId: this.responseRecId, deleteFlag: true, userId: this.userId
             }).then(result => {
                 if (result) {
-                    this.renderFlag = true;
-                    this.showToastMessage('Uploaded', 'Uploaded Successfully', 'success');
+                    updateRespFilesCount({
+                        responseId: this.responseRecId,
+                        filesCount: this.keyList.length + 1
+                    }).then(reco => {
+                        this.renderFlag = true;
+                        this.showToastMessage('Uploaded', 'Uploaded Successfully', 'success');
+                        const selectedEvent = new CustomEvent('getdata', {
+                            detail: this.questionId
+                        });
+                        // Dispatches the event.
+                        this.dispatchEvent(selectedEvent);
+                    });
                 }
                 else {
                     this.showToastMessage('Exceeded File Limit', 'The maximum file size you can upload is 10 MB', 'error');

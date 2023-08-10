@@ -30,11 +30,7 @@
 							</template>
 						</div>
 						<div>
-							<!-- <template lwc:if={showButtons.Summary}>
-                                <lightning-button label="Summary" title="Summary" name="Summary" variant="brand"
-                                    onclick={summaryClickHandler}>
-                                </lightning-button>
-                            </template> -->
+							
 						</div>
 					</div>
 					<!-- Displays button and picklist for navigations --END-->
@@ -89,6 +85,7 @@
 							</lightning-layout>
 						</template>
 					</div>
+
 					<div>
 						<ul class="slds-accordion">
 							<li class="slds-accordion__list-item">
@@ -301,7 +298,7 @@
 							class="slds-m-around_xxx-small">
 						</lightning-button>
 						<lightning-button variant="Brand" label="Submit & Close Review" title="Save Response"
-							onclick={handleSubmitReviewCustomer} flexibility="auto" class="slds-m-around_xxx-small">
+							onclick={submitResponse} flexibility="auto" class="slds-m-around_xxx-small">
 						</lightning-button>
 					</lightning-button-group>
 				</div>
@@ -312,7 +309,10 @@
 			
 
 			</template>
+
 		</template>
+
+
 	</template>
     <template if:true={isCustomerModalPopup}>
 		<!-- Modal/Popup Box LWC starts here -->
@@ -341,4 +341,5 @@
 		</section>
 		<div class="slds-backdrop slds-backdrop_open"></div>
 	</template>
+
 </template>

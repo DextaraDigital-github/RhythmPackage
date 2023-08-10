@@ -14,6 +14,7 @@ public with sharing class QuestionService {
     static QuestionSelector selector = QuestionSelector.getInstance();
     /**
     * @description Singleton Design Pattern 
+    * @return
     */
     public static QuestionService getInstance(){
             if(service == null){
@@ -68,8 +69,8 @@ public with sharing class QuestionService {
     }
     /**
     * @description createQuestions methos is to create questions and update questions.
-    * @param questions It is a Map of Question object contains fields.
-    * @param isUpdate  is boolean value, if true updates the question, if false inserts the question.
+    * @param questionId It is a Map of Question object contains fields.
+    * @param templateId  This is the templateId
     * @return Map of Id and its Question__c record
     */
     public List<SObject> deleteQuestion(String questionId,String templateId){
@@ -102,8 +103,8 @@ public with sharing class QuestionService {
     }
     /**
     * @description gets conditional questions data of particular question.
-    * @param templateId it is an id of Template
     * @param questionId it is an id of Question
+    * @param templateId it is an id of Template
     * @return List of Question__c record
     */
     public List<SObject> getChildQuestions(String questionId,String templateId){
@@ -113,8 +114,8 @@ public with sharing class QuestionService {
     
     /**
     * @description gets question data of particular question.
-    * @param templateId it is an id of Template
     * @param questionId it is an id of Question
+    * @param templateId it is an id of Template
     * @return List of Question__c record
     */
     public List<SObject> getQuestionsData(String questionId, String templateId){
@@ -146,6 +147,9 @@ public with sharing class QuestionService {
         return selector.updateQuestionsSequence(newParameterMap);
     }
 
+     /**
+    * @description It is used to throw the exception
+    */
     public class SecurityControllerException extends Exception{
     }
 }

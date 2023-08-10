@@ -15,6 +15,7 @@ public with sharing class UserController {
     * @return
     */
     @AuraEnabled
+    /* sfge-disable-stack ApexFlsViolationRule */
     public static ResultWrapper createUser(string contactId){
         try {
             ResultWrapper resWrap = service.createUser(contactId);

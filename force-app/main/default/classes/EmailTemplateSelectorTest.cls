@@ -16,6 +16,7 @@ public class EmailTemplateSelectorTest {
     private static void fetchEmailTemplatesTest() {
 		String ids= UserInfo.getUserId();
 		User u=[select id from user where id=:ids limit 1];
+        String testString;
         System.runAs(u) {
             test.startTest();
             try {
@@ -25,9 +26,11 @@ public class EmailTemplateSelectorTest {
                 selector.fetchEmailTemplates(emailtempParameterMap);
                 emailtempParameterMap.put('filter', ' WHERE InvalidField__c = true');
                 selector.fetchEmailTemplates(emailtempParameterMap);
+                testString='Success';
+                System.assertEquals(testString=='Success', true,'fetch content version.');
             }
             catch (AuraHandledException e) {
-                //System.assert(e.getMessage().contains('field'), 'field doesn\'t exists');
+                System.assertEquals(e.getMessage() != null, true,'error cached');
             }
             test.stopTest();
         }

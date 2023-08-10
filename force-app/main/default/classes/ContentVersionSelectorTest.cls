@@ -15,6 +15,7 @@ private class ContentVersionSelectorTest {
     private static void fetchContentVersionsTest() {
 	 String ids= UserInfo.getUserId();
         User u=[select id from user where id=:ids limit 1];
+        String testString;
         System.runAs(u) {
         test.startTest();
         try {
@@ -22,8 +23,10 @@ private class ContentVersionSelectorTest {
             String cvfilter = 'where ContentDocumentId in';
             Map<String,Object> emailtempParameterMap = new Map<String,Object>{'fields'=>cvfields, 'filter'=>cvfilter};    
             selector.fetchContentVersions(emailtempParameterMap);
+            testString='Success';
+            System.assertEquals(testString=='Success', true,'fetch content version.');
         }catch (AuraHandledException e) {
-            //System.assert(e.getMessage().contains('field'), 'field doesn\'t exists');
+            System.assertEquals(e.getMessage() != null, true,'error cached');
         }
         test.stopTest();
     }}

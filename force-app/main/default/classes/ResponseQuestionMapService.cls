@@ -14,6 +14,7 @@ public with sharing class ResponseQuestionMapService{
 
     /**
     * @description Singleton Design Pattern 
+    * @return
     */
     public static ResponseQuestionMapService getInstance(){
            if(service == null){
@@ -21,12 +22,15 @@ public with sharing class ResponseQuestionMapService{
             }
         return service;
     }
-
+	/**
+    * @description create Response Question Map for corresponding Question and Response Attribute
+    * @param responseQuestionmap It is a List of Response_Question_Map__c maps containing Response_Question_Map__c fields.   
+    * @return List of create Response_Question_Map__c records
+    */
     public List<SObject> createResponseQuestionMap(List<SObject> responseQuestionmap){
         if(responseQuestionmap.isEmpty() == false){
             Database.SaveResult[] results = safe.doInsert(responseQuestionmap);
             List<String> errorsList = SecurityCheckController.safeClassExceptionHandlerInsert(results);
-            system.debug('errorsList---->'+errorsList);
             if(errorsList.size()>0){
                 Database.rollback(sp);
                 throw new SecurityControllerException(String.join(errorsList, ', ' ));
@@ -35,6 +39,9 @@ public with sharing class ResponseQuestionMapService{
         return responseQuestionmap;
     }
 
+    /**
+    * @description It is used to throw the exception
+    */
     public class SecurityControllerException extends Exception{
     }
 }

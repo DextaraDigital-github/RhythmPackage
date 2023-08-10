@@ -3,12 +3,15 @@
 	<template if:true={responses}>
 		<template if:true={isPreviewComponent}>
 			<template if:true={conditionaldisplay}>
-				<p>↳[{conditionaval}]: </p>
+				<p class="slds-p-horizontal_small">↳[{conditionaval}]: </p>
 			</template>
 		</template>
 		<template for:each={responses} for:item="questionary">
 			<div key={questionary.Id} class="temp_question_border-bottom">
-				<div class="qactivelabelcont" data-id={questionary.Id} onmousedown={handleQuestionHighlight}>
+
+				<div class="qactivelabelcont" data-id={questionary.Id} data-disable={questionary.isEditable}
+					data-response={questionary.ResponseId} onmousedown={handleQuestionHighlight}
+					data-showupload={questionary.showUpload}>
 					<div
 						class="slds-grid slds-text-align_left slds-p-top_x-small slds-p-horizontal_small slds-p-bottom_small">
 						<div class="slds-col" style="min-width:22px">
@@ -179,7 +182,9 @@
 												<template if:true={questionary.capaAction}>
 													<lightning-button-icon variant="neutral" label="Review & Comments"
 														title="Review & Comments" data-id={questionary.Id}
-														icon-name="utility:comments" onclick={handleQuestionHighlight}>
+														icon-name="utility:comments" onclick={handleQuestionHighlight}
+														data-disable={questionary.isEditable}
+					                                    data-response={questionary.ResponseId} data-showupload={questionary.showUpload}>
 													</lightning-button-icon>
 												</template>
 
@@ -242,8 +247,9 @@
 												<template if:true={issupplier}>
 													<template if:true={questionary.customerFlag}>
 														<template if:true={questionary.rejectButton}>
-															<lightning-button-icon variant="neutral" data-label="Rejected"
-																title="Rejected" data-id={questionary.Id}
+															<lightning-button-icon variant="neutral"
+																data-label="Rejected" title="Rejected"
+																data-id={questionary.Id}
 																class="slds-p-left_koushik  rqt-redbtn"
 																icon-name="utility:close">
 															</lightning-button-icon>
@@ -254,8 +260,8 @@
 														<template if:false={questionary.rejectButton}>
 															<template if:false={questionary.needData}>
 																<lightning-button-icon variant="destructive"
-																	data-label="Reject" title="Reject" onclick={handleReject}
-																	data-id={questionary.Id}
+																	data-label="Reject" title="Reject"
+																	onclick={handleReject} data-id={questionary.Id}
 																	class="slds-p-left_koushik rqt-redbtn_n"
 																	icon-name="utility:close"
 																	disabled={questionary.disableReject}>
@@ -273,8 +279,8 @@
 														</template>
 														<template if:true={questionary.rejectButton}>
 															<lightning-button-icon variant="destructive"
-																data-label="Rejected" title="Rejected" onclick={handleReject}
-																data-id={questionary.Id}
+																data-label="Rejected" title="Rejected"
+																onclick={handleReject} data-id={questionary.Id}
 																class="slds-p-left_koushik rqt-redbtn"
 																icon-name="utility:close"
 																disabled={questionary.disableReject}
@@ -284,6 +290,16 @@
 													</template>
 												</template>
 											</lightning-button-group>
+											
+												<template if:true={questionary.showUpload}>
+													<lightning-button-icon variant="base"  icon-name="utility:attach" data-label="upload" title="titleName"
+														onclick={handleupload} data-id={questionary.Id}
+														data-showupload={questionary.showUpload}
+														data-disable={questionary.isEditable}
+														data-response={questionary.ResponseId}>
+													</lightning-button-icon>
+												</template>
+											
 										</div>
 									</div>
 								</div>
@@ -325,6 +341,7 @@
 											</template>
 										</template>
 									</template>
+
 									<!-- Flag Ends here -->
 								</div>
 							</div>
@@ -352,9 +369,9 @@
 							<template if:true={questionary.customerFlag}>
 								<template if:false={questionary.rejectButton}>
 									<template if:false={questionary.needData}>
-										<lightning-button variant="destructive" data-label="Reject" onclick={handleReject}
-											data-id={questionary.Id} class="slds-p-left_medium rqt-redbtn"
-											disabled={questionary.disableReject}>
+										<lightning-button variant="destructive" data-label="Reject"
+											onclick={handleReject} data-id={questionary.Id}
+											class="slds-p-left_medium rqt-redbtn" disabled={questionary.disableReject}>
 										</lightning-button>
 									</template>
 									<template if:true={questionary.needData}>
@@ -412,6 +429,7 @@
 							</template>
 
 						</template>
+
 					</div>
 				</div>
 
@@ -475,12 +493,15 @@
 												</label>
 											</div> -->
 											<!-- <p>{questionary.isEditable}</p> -->
-											<c-portal-s3-files object-name={objectApiName}
+											<!-- <lightning-button variant="base" label="upload" title="titleName" onclick={handleupload}
+					  data-id={questionary.Id} data-showupload={questionary.showUpload} data-disable={questionary.isEditable} data-response={questionary.ResponseId}>
+					</lightning-button> -->
+											<!-- <c-portal-s3-files object-name={objectApiName}
 												isdisabled = {questionary.isEditable}
 												response-rec-id={questionary.ResponseId} ongetdata={handleOnLoad}
 												assessment-rec-id={accountassessmentid} rec-id={recid}
 												question-id={questionary.Id}>
-											</c-portal-s3-files>
+											</c-portal-s3-files> -->
 											<!-- <lightning-input type="file"
 												accept=".xlsx, .xls, .csv, .png, .doc, .docx, .pdf"
 												label="Attachment : (Limit Size : 3.5mb)" data-id={questionary.Id}
@@ -614,8 +635,8 @@
 									onselectchange={handleConversationHistory} responses={childquestion.questions}
 									onactionchange={handleActionChange} key={childquestion.isdisplay}
 									ongetdata={handleFileRecord} onhandleonload={handleFileRecord}
-									conditionaval={childquestion.optionValue} recid={recordId}
-									accountassessmentid={accountassessmentid}
+									conditionaval={childquestion.optionValue} recid={recordId} onuploadfile={handleChildUpload}
+									accountassessmentid={accountassessmentid} qtype={questionary.type}
 									onremovequeshighlight={removehighlightHandler} onvaluechange={handlechildchange}
 									onrejectchange={handleRejectButton} timeline={timeline}
 									is-preview-component={isPreviewComponent}>

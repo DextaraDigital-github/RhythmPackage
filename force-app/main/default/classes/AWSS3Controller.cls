@@ -57,12 +57,13 @@ public with sharing class AWSS3Controller {
 * @return flag on uploaded successfully
 */ 
     @AuraEnabled
-    public static Boolean uploadFiles(Id recId, String objectName,Id pathRecId,Boolean deleteFlag) {
+    /* sfge-disable-stack ApexFlsViolationRule */
+    public static Boolean uploadFiles(Id recId, String objectName,Id pathRecId,Boolean deleteFlag, Id userId) {
         Boolean uploadedFlag = false;
         try {
-            if(recId != null && objectName != null) {
+            if(recId != null && objectName != null && userId != null) {
                 
-                uploadedFlag=service.uploadFiles(recId, objectName, pathRecId,deleteFlag);
+                uploadedFlag=service.uploadFiles(recId, objectName, pathRecId, deleteFlag, userId);
             }
             return uploadedFlag;
         } catch(exception e) {
@@ -77,6 +78,7 @@ public with sharing class AWSS3Controller {
 * @return Id 
 */ 
     @AuraEnabled
+    /* sfge-disable-stack ApexFlsViolationRule */
     public static Response__c createResponseforFileUpload(String fileResp) {
         try{
             Response__c respId;
@@ -98,6 +100,7 @@ public with sharing class AWSS3Controller {
 * @return Id 
 */
     @AuraEnabled
+    /* sfge-disable-stack ApexFlsViolationRule */
     public static Id saveActionRecord(List<SObject> actionResponse){
         try{
             Id actionRecordId;
@@ -131,6 +134,25 @@ public with sharing class AWSS3Controller {
                 }
             }
             return hasStatusNew;
+        }
+        catch(Exception e) {
+            String errorMsg = e.getMessage();
+            throw new AuraHandledException(ErrorMsg);
+        }
+    }
+
+    /**
+    * @description update Files count.
+    * @param responseId This is a record id of an Response.
+    * @param filesCount
+    *@return
+    */    
+    @AuraEnabled
+    public static void updateRespFilesCount(String responseId, Integer filesCount) {
+        try {
+            if(String.isNotBlank(responseId) && filesCount > 0) {
+                service.updateRespFilesCount(responseId, filesCount);
+            }
         }
         catch(Exception e) {
             String errorMsg = e.getMessage();

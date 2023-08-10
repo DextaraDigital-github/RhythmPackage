@@ -9,17 +9,18 @@ public with sharing class EmailService {
     public static SecurityCheckController safe = new SecurityCheckController();   //Implementing singleton pattern
     public static List<ErrorTransactionLog__c> errorList;   //Stores list of ErrorTransactionLog__c records to store errors
     public static ErrorTransactionLog__c errorRec;   //Used for creating an instance for ErrorTransactionLog__c to log/store an error
-
+    
     static EmailTemplateSelector selector = EmailTemplateSelector.getInstance();
     static AccountAssessmentRelationSelector accAssselector = AccountAssessmentRelationSelector.getInstance();
     static UserSelector usSelector = UserSelector.getInstance();
-
     private static EmailService service = null; //private static instance of the class
+    
     /**
-    * @description Singleton Design Pattern 
+    * @description Singleton Design Pattern
+    * @return
     */
-    public static EmailService getInstance(){
-           if(service == null){
+    public static EmailService getInstance() {
+           if(service == null) {
                 service = new EmailService();
             }
         return service;
@@ -33,13 +34,12 @@ public with sharing class EmailService {
     public List<sObject> fetchAccounts(String parameterMap) {
         Map<String,Object> newParameterMap = (Map<String,Object>)JSON.deserializeUntyped(parameterMap);
         String assessmentId = (String)newParameterMap.get('assessmentId');
-        String searchKey = (newParameterMap.get('searchKey') == null)?'':(String)newParameterMap.get('searchKey');
         
         List<String> accFields = new List<String>{'Account__c', 'Account__r.Name'};
-        String accFilter = ' WHERE Assessment__c = \'' + String.escapeSingleQuotes(assessmentId) + '\' AND Account__r.Name LIKE \'%' + String.escapeSingleQuotes(searchKey) + '%\' ';
+        String accFilter = ' WHERE Assessment__c = \'' + String.escapeSingleQuotes(assessmentId) + '\' ';
         Map<String,Object> accParameterMap = new Map<String,Object>{'fields'=>accFields, 'filter'=>accFilter};
         Map<Id,AccountAssessmentRelation__c> aarMap = accAssselector.fetchAccounts(accParameterMap);
-        if(aarMap != null){
+        if(aarMap != null) {
             List<AccountAssessmentRelation__c> aarList = aarMap.values();
         	if(aarList != null) {
             	return aarList;
@@ -57,8 +57,7 @@ public with sharing class EmailService {
         List<String> childQuery = new List<String>{'(SELECT Id, ContentDocumentId, ContentDocument.FileType, ContentDocument.Title FROM ContentDocumentLinks)'};
         Map<String,Object> emailtempParameterMap = new Map<String,Object>{'fields'=>emailTempFields, 'childQuery'=>childQuery};
         Map<Id,EmailTemplate> emailTemplateMap = selector.fetchEmailTemplates(emailtempParameterMap);
-        if(emailTemplateMap != null)
-        {
+        if(emailTemplateMap != null) {
             List<EmailTemplate> emailTemplateList = emailTemplateMap.values();
         	if(emailTemplateList != null) {
             	return emailTemplateList;
@@ -73,8 +72,7 @@ public with sharing class EmailService {
     */
     public void sendEmail(String parameterMap) {
         try {
-            Map<String,Object> newParameterMap = (Map<String,Object>)json.deserializeUntyped(parameterMap);
-        	Database.executeBatch(new sendEmailBatch(newParameterMap),95);
+            Database.executeBatch(new sendEmailBatch(parameterMap),95);
         }
         catch(Exception e) {
             errorList = new List<ErrorTransactionLog__c>();
@@ -101,10 +99,10 @@ public with sharing class EmailService {
         
         List<String> userFields = new List<String>{'Id', 'Email', 'Contact.AccountId', 'Contact.Account.Name'};
         String userFilter=' WHERE Id IN (SELECT RelationId FROM EmailMessageRelation WHERE EmailMessage.RelatedToId = \''+String.escapeSingleQuotes(assessmentId)+'\' AND RelationType = \'ToAddress\') ';
-        List<String> childQuery = new List<String>{' (SELECT Id, EmailMessageId, EmailMessage.FromName, EmailMessage.CreatedDate, EmailMessage.Subject, EmailMessage.HtmlBody, EmailMessage.EmailTemplate.Name, EmailMessage.RelatedTo.Name FROM EmailMessageRelations WHERE EmailMessage.RelatedToId = \''+String.escapeSingleQuotes(assessmentId)+'\' AND RelationType = \'ToAddress\' ORDER BY EmailMessage.CreatedDate DESC) '};
+        List<String> childQuery = new List<String>{' (SELECT Id, EmailMessageId, EmailMessage.FromName, EmailMessage.FromAddress, EmailMessage.CreatedDate, EmailMessage.Subject, EmailMessage.HtmlBody, EmailMessage.EmailTemplate.Name, EmailMessage.RelatedTo.Name, EmailMessage.Failed_Recipients__c FROM EmailMessageRelations WHERE EmailMessage.RelatedToId = \''+String.escapeSingleQuotes(assessmentId)+'\' AND RelationType = \'ToAddress\' ORDER BY EmailMessage.CreatedDate DESC) '};
         Map<String,Object> emParameterMap = new Map<String,Object>{'fields'=>userFields, 'filter'=>userFilter, 'childQuery'=>childQuery};
         Map<Id,User> userMap = usSelector.fetchUsers(emParameterMap);
-        if(userMap != null){
+        if(userMap != null) {
             List<User> userList = userMap.values();
         	if(userList != null) {
             	return userList;

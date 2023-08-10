@@ -1,6 +1,11 @@
 <template>
 	<div class="rtmvpc-card slds-p-around_medium">
 		<div class="c-container">
+			<lightning-tabset>
+			<lightning-tab variant="base" label="Details" value="Details" onactive={handleDetailClick}></lightning-tab>
+			<lightning-tab variant="base" label="Files" value="Files"   onactive={handleDetailClick}></lightning-tab>
+			</lightning-tabset>
+			<template if:false={showForm}>
 			<lightning-layout multiple-rows>
 				<template if:true={showToast}>
 					<c-Show-Toast-Message message-from-component={totastmessage} is-show-modal={showToast}
@@ -147,7 +152,12 @@
 			<template if:true={isSave}>
 				<button class="slds-button slds-button_brand slds-float_right" onclick={handleSave}>Submit</button>
 			</template>
-
+			</template>
+			<template if:true={showForm}>
+	<!-- S3 Code -->
+						<c-aws-s3-files record-id={actionid} object-api-name={objectApiName} show-upload="true" isupload={isSave}></c-aws-s3-files>
+					<!-- S3 Code -->
+			</template>
 			<template if:true={showPopup}>
 				<section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="modal-heading-01"
 					class="slds-modal slds-fade-in-open">

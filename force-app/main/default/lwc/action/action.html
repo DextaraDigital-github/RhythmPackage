@@ -1,4 +1,5 @@
 <template>
+	<template if:false={showAction}>
 	<!-- <div class="cad-sec_bodyfull1 cad-titlebutton_more"> -->
 		<div class="cad-sec_vcontainer2_2" style="height:calc(100% - 0px);">
 			<div class="slds-scrollable_y" style="max-height:calc(100% - 40px); --slds-c-input-color-border: rgb(187 187 187);">
@@ -89,7 +90,7 @@
 						<lightning-layout-item size="12" padding="around_x-small">
 							<lightning-combobox options={options} label="Status" data-id="Rhythm__Status__c"
 								onchange={handleChange} value={responseMap.Rhythm__Status__c} disabled={isSave}
-								class="slds-p-left_xx-small slds-p-right_x-small slds-p-top_small" required="true">
+								class="slds-p-left_x-small slds-p-right_x-small slds-p-top_small" required="true">
 							</lightning-combobox>
 						</lightning-layout-item>
 
@@ -110,7 +111,7 @@
 								<tr height="50px" key={item.key}>
 									<!-- style="border: solid 2px lightgrey;" -->
 									<td colspan="16" >
-										<lightning-icon icon-name="doctype:flash" alternative-text="File"
+										<lightning-icon icon-name={item.icon} alternative-text="File"
 											class="slds-p-around_x-small">
 										</lightning-icon>
 									</td>
@@ -223,5 +224,6 @@
 			</section>
 		</div>
 		<div class="slds-backdrop slds-backdrop_open"></div>
+	</template>
 	</template>
 </template>

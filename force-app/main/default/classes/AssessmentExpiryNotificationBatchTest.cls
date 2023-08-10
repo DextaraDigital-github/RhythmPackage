@@ -20,21 +20,17 @@ private with sharing class AssessmentExpiryNotificationBatchTest {
             Id clinicRecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByName().get('Supplier').getRecordTypeId();
             Map<String, Object> accAttributes = new Map<String, Object>{'RecordTypeId'=>clinicRecordTypeId,'Name'=>'Supplier','Rhythm__Email__c'=>'test@gmail.com'};
             List<Account> accts = TestDataFactory.createAccounts(1,true,accAttributes);
-            //System.debug('accts==>'+accts[0].Id);
             Map<String,Object> contactAttributes  = new Map<String,Object>{'AccountId'=>accts[0].Id,'Email'=>'test123@gmail.com','LastName'=>'TestLName'};
-            List<Contact> contacts = TestDataFactory.createContacts(1,true,contactAttributes);
+            TestDataFactory.createContacts(1,true,contactAttributes);
             Map<String, Object> assementTemplateattributes = new Map<String, Object>{'Name'=>'2023 Assessment template'};
             List<Assessment_Template__c> templist=TestDataFactory.createAssessmentTemp(1,true,assementTemplateattributes);
-            //System.debug('templist'+templist[0].Id);
             Map<String, Object> sectionAttributes = new Map<String, Object>{'Rhythm__Assessment_Template__c'=>templist[0].Id,'Name'=>'Section1'};
             List<Section__c> seclist=TestDataFactory.createSection(1,true,sectionAttributes);
-            //System.debug('seclist'+seclist[0].Id);
 
             Map<String, Object> questionAttributes = new Map<String, Object>{'Rhythm__Assessment_Template__c'=>templist[0].Id,
             'Rhythm__Question__c'=>'What is the feedback for service?','Rhythm__Question_Type__c'=>'Text','Rhythm__Required__c'=>True,
             'Rhythm__Section__c'=>seclist[0].Id};
             List<Question__c> qstnlist=TestDataFactory.createQuestion(1,true,questionAttributes);
-            //System.debug('qstnlist'+qstnlist[0].Id);
             Map<String, Object> assessmentattributes = new Map<String, Object>{'Template__c'=>templist[0].Id,
             'Name'=>'Assessment 2023','Rhythm__Status__c'=>'New','Rhythm__Number_of_Questions__c'=>10,'Rhythm__Start_Date__c'=>Date.Today(),'Rhythm__End_Date__c'=>Date.Today()+2,'Rhythm__Expiry_Reminder_Before_in_Days__c'=>2};
             List<Assessment__c> asslist=TestDataFactory.createAssessment(1,true,assessmentattributes);
@@ -43,7 +39,6 @@ private with sharing class AssessmentExpiryNotificationBatchTest {
             'Rhythm__Status__c'=>'New','Rhythm__End_Date__c'=>Date.newInstance(2030, 4, 26),'Rhythm__Number_of_Responses__c'=>10,
             'Rhythm__Start_Date__c'=>Date.newInstance(2030, 3, 26)};
             List<AccountAssessmentRelation__c> accountasslist=TestDataFactory.createAccountAssessment(1,true,accountassesments);
-            //System.debug('kkk'+accountasslist);
             Map<String, Object> responseattributes = new Map<String, Object>{'Rhythm__AccountAssessmentRelation__c'=>accountasslist[0].Id,
             'Rhythm__Question__c'=>qstnlist[0].id,'Rhythm__Flag__c'=>true,'Rhythm__Is_Latest_Response__c'=>True};
             TestDataFactory.createResponse(1,true,responseattributes); 
@@ -53,8 +48,7 @@ private with sharing class AssessmentExpiryNotificationBatchTest {
     * @description method for coverage AssessmentExpiryNotificationBatch.
     */
     @isTest
-    static void expiryBatchTest()
-    {
+    static void expiryBatchTest(){
         user u = [SELECT Id,UserName FROM User WHERE Email='standarduser@testorg.com' LIMIT 1];
         System.runAs(u){
             Test.startTest();

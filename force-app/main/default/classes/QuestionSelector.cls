@@ -13,7 +13,8 @@ public with sharing class QuestionSelector {
     private static QuestionSelector selector = null; //private static instance of the class
     
     /**
-    * @description Singleton Design Pattern 
+    * @description Singleton Design Pattern
+    * @return
     */
     public static QuestionSelector getInstance(){
            if(selector == null){
@@ -24,7 +25,7 @@ public with sharing class QuestionSelector {
 
     /**
     * @description To get all the sections related to a template.
-    * @param templateId This is a record id of an Template.
+    * @param mqIds This is a set of main question ids.
     * @return 
     */
     public List<Question__c> getSubQuestions(set<Id> mqIds){
@@ -82,7 +83,6 @@ public with sharing class QuestionSelector {
     * @param parameterMap It is a Map of all parameters like Questions Ids to be updated
     * @return List of Question__c records
     */
-    //RED FLAG
     public List<Question__c> updateQuestionsSequence(Map<String,Object> parameterMap){
         List<String> questionIdList = (List<Id>)JSON.deserialize(JSON.serialize(parameterMap.get('questionIdList')),List<String>.class);
         String questionId = (String)parameterMap.get('questionId');
@@ -146,8 +146,8 @@ public with sharing class QuestionSelector {
     }
     /**
     * @description gets question data of particular question.
-    * @param templateId it is an id of Template
-    * @param questionId it is an id of Question
+    * @param questionId it is an id of Template
+    * @param templateId it is an id of Question
     * @return List of Question__c record
     */
     public List<SObject> getQuestionsData(String questionId, String templateId){
@@ -167,8 +167,8 @@ public with sharing class QuestionSelector {
     }
     /**
     * @description gets conditional questions data of particular question.
-    * @param templateId it is an id of Template
-    * @param questionId it is an id of Question
+    * @param questionId it is an id of Template
+    * @param templateId it is an id of Question
     * @return List of Question__c record
     */
     public List<SObject> getChildQuestions(String questionId,String templateId){
@@ -184,7 +184,9 @@ public with sharing class QuestionSelector {
             throw new AuraHandledException(e.getMessage());
         }
     }
-
+    /**
+    * @description It is used to throw the exception
+    */
     public class SecurityControllerException extends Exception{
     }
 }

@@ -59,6 +59,11 @@ public with sharing class CAPAController {
     public static void notifyUsers(Map<string,object> actionData, String body, List<Id> userList){
         service.notifyUsers(actionData,body,userList);
     }
+    
+    @AuraEnabled
+    public static void deleteCapa(Map<string,object> deletedata){
+        service.deleteCapa(deletedata);
+    }
 
     @AuraEnabled
     public static Date getCurrentDate(){

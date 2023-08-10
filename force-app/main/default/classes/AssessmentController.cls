@@ -20,13 +20,14 @@ public with sharing class AssessmentController {
     @AuraEnabled
     public static List<SObject> getSupplierAssessmentList(String assessmentId){
         try{
-            String query =  'SELECT Id,Assessment__r.Name,Assessment__r.Template__c,Account__c,'
-                            +'Assessment__r.Disclosure__c,Status__c,Account__r.Name'
-                            + ' FROM AccountAssessmentRelation__c'
-                            + ' WHERE Id=\'' + String.escapeSingleQuotes(assessmentId) + '\''
-                            + ' WITH SECURITY_ENFORCED'
-                            + ' LIMIT 1';
-            return safe.doQuery(query);
+            assessmentId = String.escapeSingleQuotes(assessmentId);
+            List<AccountAssessmentRelation__c> acctAssessmntList =  [SELECT Id,Assessment__r.Name,Assessment__r.Template__c,
+                                                                    Assessment__r.Disclosure__c,Status__c,Account__r.Name
+                                                                    FROM AccountAssessmentRelation__c
+                                                                    WHERE Id=:assessmentId
+                                                                    WITH SECURITY_ENFORCED
+                                                                    LIMIT 1];
+            return acctAssessmntList;
         }catch(exception e){
             String errorMsg = e.getMessage();
             throw new AuraHandledException(errorMsg);
@@ -41,15 +42,16 @@ public with sharing class AssessmentController {
     @AuraEnabled
     public static List<SObject> getQuestionsList(String templateId){
         try{
-            String query = 'SELECT Id,Name,Section__c,Question_Type__c,'
-                          +'Required__c,Default_Value__c,Conditional_Response__c,'
-                          +'OptionValueSet__c,Question__c,Requires_File_Upload__c,'
-                          +'Parent_Question__c,HelpText__c,Section__r.Name,Section__r.Id,Assessment_Template__c'
-                          +' FROM Question__c'
-                          +' WHERE Assessment_Template__c =\'' + String.escapeSingleQuotes(templateId) + '\''
-                          +' WITH SECURITY_ENFORCED'
-                          +' ORDER BY  Section__r.Section_Sequence_Number__c,Question_Sequence_Number__c';
-            return safe.doQuery(query);
+            templateId = String.escapeSingleQuotes(templateId);
+            List<Question__c> questionList = [SELECT Id,Name,Section__c,Question_Type__c,
+                                            Required__c,Default_Value__c,Conditional_Response__c,
+                                            OptionValueSet__c,Question_Sequence_Number__c,Question__c,Requires_File_Upload__c,
+                                            Parent_Question__c,HelpText__c,Section__r.Name,Section__r.Id,Assessment_Template__c
+                                            FROM Question__c
+                                            WHERE Assessment_Template__c =:templateId
+                                            WITH SECURITY_ENFORCED
+                                            ORDER BY  Section__r.Section_Sequence_Number__c,Question_Sequence_Number__c];
+            return questionList;
         }catch(exception e){
             String errorMsg = e.getMessage();
             throw new AuraHandledException(errorMsg);
@@ -66,14 +68,15 @@ public with sharing class AssessmentController {
     @AuraEnabled
     public static List<SObject> getSupplierResponseList(String assessmentId){
         try{
-            String query = 'SELECT Id, Question__c,Assessment__c,Question__r.Question_Type__c,'
-                         + 'Assessment__r.Name,Files__c, Response__c,Rejected__c,'
-                         + 'CreatedDate, Flag__c, Conversation_History__c,LastModifiedDate,LastModifiedById'
-                         + ' FROM Response__c'
-                         + ' WHERE AccountAssessmentRelation__c=\'' + String.escapeSingleQuotes(assessmentId) + '\''
-                         + ' AND Is_Latest_Response__c= true'
-                         + ' WITH SECURITY_ENFORCED';
-            return safe.doQuery(query);
+            assessmentId = String.escapeSingleQuotes(assessmentId);
+            List<Response__c> responseList = [SELECT Id,Question__c,Assessment__c,Question__r.Question_Type__c,
+                                                Assessment__r.Name,Files__c,Response__c,Rejected__c,
+                                                CreatedDate,Flag__c,Conversation_History__c,LastModifiedDate,LastModifiedById
+                                                FROM Response__c
+                                                WHERE AccountAssessmentRelation__c= :assessmentId
+                                                AND Is_Latest_Response__c= true
+                                                WITH SECURITY_ENFORCED];
+            return responseList;
         }catch(exception e){
             String errorMsg = e.getMessage();
             throw new AuraHandledException(errorMsg);
@@ -87,96 +90,33 @@ public with sharing class AssessmentController {
     * @return 
     */
     @AuraEnabled
+    /* sfge-disable-stack ApexFlsViolationRule */
     public static List<SObject> createSupplierResponse(List<SObject> suppResponseList,String paramMap){
         Map<String,object> queryMap = (Map<String,Object>)JSON.deserializeUntyped(paramMap);
         String accAssmtId =(string)queryMap.get('accountassessmentid');
+        accAssmtId = String.escapeSingleQuotes(accAssmtId);
         SObjectType responseType = Schema.getGlobalDescribe().get('Rhythm__Response__c');
 		Map<String,Schema.SObjectField> fieldMap = responseType.getDescribe().fields.getMap();
         Schema.SObjectField idVal = fieldMap.get('Id');
         
         Database.UpsertResult[] upsertResult = safe.doUpsert(suppResponseList,idVal);
-        String assmtQuery =  'SELECT Id,Name,Follow_Up_Requests__c,Status__c,'
-                               +'Assessment__c,Account__c,PdfConvertor__c'
-                               +' FROM AccountAssessmentRelation__c'
-                               +' WHERE Id=\'' + String.escapeSingleQuotes(accAssmtId) + '\''
-                               +' WITH SECURITY_ENFORCED';
-
-            List<AccountAssessmentRelation__c> assessment = safe.doQuery(assmtQuery);
-            if(!assessment.isEmpty()){
-                assessment[0].Status__c =(String)queryMap.get('status');
-                assessment[0].PdfConvertor__c =(String)queryMap.get('pdfContnet');
-                if((String)queryMap.get('status')=='Submitted'){
-                    assessment[0].Submission_Date__c = DateTime.now();
-                }
-                Database.SaveResult[] updResult = safe.doUpdate(assessment);
-            }   
+       
+        List<AccountAssessmentRelation__c> assessment = [SELECT Id,Name,Follow_Up_Requests__c,Status__c,
+                                                        Assessment__c,Account__c,PdfConvertor__c
+                                                        FROM AccountAssessmentRelation__c
+                                                        WHERE Id=:accAssmtId
+                                                        WITH SECURITY_ENFORCED];
+        if(!assessment.isEmpty()){
+            assessment[0].Status__c =(String)queryMap.get('status');
+            assessment[0].PdfConvertor__c =(String)queryMap.get('pdfContnet');
+                assessment[0].Response_Percentage__c = (Decimal)queryMap.get('percentage');
+            if((String)queryMap.get('status')=='Submitted'){
+                assessment[0].Submission_Date__c = DateTime.now();
+                
+            }
+            Database.SaveResult[] updResult = safe.doUpdate(assessment);
+        }   
         return suppResponseList;
-        /*try{
-            Map<String,object> queryMap = (Map<String,Object>)JSON.deserializeUntyped(paramMap);
-            String accAssmtId =(string)queryMap.get('accountassessmentid');
-            List<Id> questionIds = new List<Id>();
-            Map<Id,SObject> suppResponseMap = new Map<Id,SObject>();
-            for(SObject response:suppResponseList){
-                questionIds.add((Id)response.get('Rhythm__Question__c'));
-                suppResponseMap.put((Id)response.get('Rhythm__Question__c'),response);
-            }
-            List<Response__c> existingResponses = new List<Response__c>();
-            if(!questionIds.isEmpty()){
-                string query = 'SELECT Id,Name,Question__c,Response__c,Files__c,Assessment__c,'
-                        + 'Flag__c,Is_Latest_Response__c,AccountAssessmentRelation__c'
-                        +' FROM Response__c'
-                        +' WHERE Question__c IN:questionIds'
-                        +' AND AccountAssessmentRelation__c=\'' + String.escapeSingleQuotes(accAssmtId) + '\''
-                        +' AND Is_Latest_Response__c = true';
-                Map<String, Object> bindVariables = new Map<String, Object>{'questionIds' => questionIds};
-                existingResponses = safe.doQueryWithBinds(query,bindVariables);
-            }
-            if (sp == null){
-                sp = Database.setSavepoint();
-            }
-            for(Response__c resp :existingResponses){
-                ((Response__c)suppResponseMap.get(resp.Question__c)).put('Files__c', resp.Files__c);
-                resp.Is_Latest_Response__c = false;
-            }
-            if(suppResponseMap.values().isEmpty() == false){
-                Database.SaveResult[] results = safe.doInsert(suppResponseMap.values());
-                List<String> errorsList = SecurityCheckController.safeClassExceptionHandlerInsert(results);
-                if(errorsList.size()>0){
-                    Database.rollback(sp);
-                    throw new SecurityControllerException(String.join(errorsList, ', ' ));
-                }
-            }
-            Database.SaveResult[] saveResult = safe.doUpdate(existingResponses);
-            List<String> errorList = SecurityCheckController.safeClassExceptionHandlerInsert(saveResult);
-            if(errorList.size()>0){
-                Database.rollback(sp);
-                throw new SecurityControllerException(String.join( errorList, ', ' ));
-            }
-            String assmtQuery =  'SELECT Id,Name,Follow_Up_Requests__c,Status__c,'
-                               +'Assessment__c,Account__c,PdfConvertor__c'
-                               +' FROM AccountAssessmentRelation__c'
-                               +' WHERE Id=\'' + String.escapeSingleQuotes(accAssmtId) + '\''
-                               +' WITH SECURITY_ENFORCED';
-
-            List<AccountAssessmentRelation__c> assessment = safe.doQuery(assmtQuery);
-            if(!assessment.isEmpty()){
-                assessment[0].Status__c =(String)queryMap.get('status');
-                assessment[0].PdfConvertor__c =(String)queryMap.get('pdfContnet');
-                if((String)queryMap.get('status')=='Submitted'){
-                    assessment[0].Submission_Date__c = DateTime.now();
-                }
-                Database.SaveResult[] updResult = safe.doUpdate(assessment);
-                List<String> upderrorList = SecurityCheckController.safeClassExceptionHandlerInsert(updResult);
-                if(upderrorList.size()>0){
-                    Database.rollback(sp);
-                    throw new SecurityControllerException(String.join( upderrorList, ', ' ));
-                }
-            }
-            return suppResponseList;
-        }catch(exception e){
-            string errorMsg = e.getMessage();
-            throw new AuraHandledException(errorMsg);
-        }*/
     }
     
     /**
@@ -185,16 +125,17 @@ public with sharing class AssessmentController {
     * @return
     */
     @AuraEnabled
+    /* sfge-disable-stack ApexFlsViolationRule */
     public static List<SObject> updateAccountAssessmentStatus(String paramMap)
     {
         try{
             Map<String,object> queryMap = (Map<String,Object>)JSON.deserializeUntyped(paramMap);
             String accAssmtId =(String)queryMap.get('recId');
-            String query = 'SELECT Id,Name,Status__c,Assessment__c,Account__c'
-                         +' FROM AccountAssessmentRelation__c'
-                         +' WHERE Id=\'' + String.escapeSingleQuotes(accAssmtId) + '\''
-                         +' WITH SECURITY_ENFORCED';
-            List<AccountAssessmentRelation__c> accountAssessment = safe.doQuery(query);
+            accAssmtId = String.escapeSingleQuotes(accAssmtId);
+            List<AccountAssessmentRelation__c> accountAssessment = [SELECT Id,Name,Status__c,Assessment__c,Account__c
+                                                                    FROM AccountAssessmentRelation__c
+                                                                    WHERE Id=:accAssmtId
+                                                                    WITH SECURITY_ENFORCED];
             if (sp == null){
                 sp = Database.setSavepoint();
             }
@@ -226,16 +167,17 @@ public with sharing class AssessmentController {
     public static List<SObject> getAssessmentStatus(String assessmentId, String objectName){
         try{
             string fName = 'Rhythm__Status__c';
-            string query = 'SELECT Object_Field_Name__c,Object_Field_Value__c,ActivityUserId__c,'
-                         + 'Object_Name__c,object_Record_Id__c,Activity_User__c,CreatedDate'
-                         +' FROM FieldHistoryTracking__c'
-                         +' WHERE object_Record_Id__c=\'' + String.escapeSingleQuotes(assessmentId) + '\''
-                         +' AND Object_Name__c=\'' + String.escapeSingleQuotes(objectName) + '\''
-                         +' AND Object_Field_Name__c=\'' + String.escapeSingleQuotes(fName) + '\''
-                         +' WITH SECURITY_ENFORCED'
-                         +' ORDER BY CreatedDate DESC';
-
-            List<SObject> assessmentstatus = safe.doQuery(query);
+            fName = String.escapeSingleQuotes(fName);
+            assessmentId = String.escapeSingleQuotes(assessmentId);
+            objectName = String.escapeSingleQuotes(objectName);
+            List<SObject> assessmentstatus = [SELECT Object_Field_Name__c,Object_Field_Value__c,
+                                            Object_Name__c,object_Record_Id__c,ActivityUserId__c,Activity_User__c,CreatedDate
+                                            FROM FieldHistoryTracking__c
+                                            WHERE object_Record_Id__c=:assessmentId
+                                            AND Object_Name__c=:objectName
+                                            AND Object_Field_Name__c=:fName
+                                            WITH SECURITY_ENFORCED
+                                            ORDER BY CreatedDate DESC];
             return assessmentstatus;
         }catch(exception e){
             string errorMsg = e.getMessage();
@@ -248,16 +190,14 @@ public with sharing class AssessmentController {
     * @return
     */
     @AuraEnabled
-    public static List<Object> getAssesmentRecords()
-    {
+    public static List<Object> getAssesmentRecords(){
         try{
-            String query = 'SELECT Name,Target_Completion_Date__c,Status__c,Additional_Requests__c,'
-                         + 'Customer_Review__c,Number_of_Questions__c,Start_Date__c,'
-                         + 'End_Date__c,CreatedDate,CreatedUser__c'
-                         +' FROM Assessment__c'
-                         +' WITH SECURITY_ENFORCED'
-                         +' LIMIT 100';
-            List<Assessment__c> assessmentRecords = safe.doQuery(query);
+            List<Assessment__c> assessmentRecords = [SELECT Name,Target_Completion_Date__c,Status__c,Additional_Requests__c,
+                                                    Customer_Review__c,Number_of_Questions__c,Start_Date__c,
+                                                    End_Date__c,CreatedDate,CreatedUser__c
+                                                    FROM Assessment__c
+                                                    WITH SECURITY_ENFORCED
+                                                    LIMIT 100];
             return assessmentRecords;
         }catch(exception e){
             String errorMsg = e.getMessage();
@@ -273,20 +213,20 @@ public with sharing class AssessmentController {
     * @return
     */
     @AuraEnabled
-    public static List<Object> getAccountAssesmentRecords(String accountId, String assessmentId)
-    {
+    public static List<Object> getAccountAssesmentRecords(String accountId, String assessmentId){
         try{
-            String query = 'SELECT Id,IsDeleted,Name,Account__c,Assessment__c,Assessment__r.name,'
-                        + 'Assessment__r.Status__c,Assessment__r.Customer_Review__c,CreatedDate,'
-                        + 'Assessment__r.Number_of_Questions__c,Status__c,Start_Date__c,End_Date__c,'
-                        + 'Assessment__r.Additional_Requests__c,Number_of_Questions__c,Assessment__r.CreatedDate,'
-                        + 'Assessment__r.Template__c, Number_of_Responses__c,Assessment__r.CreatedBy.Name,Assessment__r.CreatedUser__c'
-                        + ' FROM AccountAssessmentRelation__c'
-                        + ' WHERE Account__c=\'' + String.escapeSingleQuotes(accountId) + '\''
-                        + ' AND Assessment__c=\'' + String.escapeSingleQuotes(assessmentId) + '\''
-                        + ' WITH SECURITY_ENFORCED'
-                        + ' ORDER BY CreatedDate DESC';
-            List<SObject> accountAssessment = safe.doQuery(query);
+            accountId = String.escapeSingleQuotes(accountId);
+            assessmentId =  String.escapeSingleQuotes(assessmentId);
+            List<AccountAssessmentRelation__c> accountAssessment = [SELECT Id,IsDeleted,Name,Account__c,Assessment__c,Assessment__r.name,
+                                                Assessment__r.Status__c,Assessment__r.Customer_Review__c,CreatedDate,
+                                                Assessment__r.Number_of_Questions__c,Status__c,Start_Date__c,End_Date__c,
+                                                Assessment__r.Additional_Requests__c,Number_of_Questions__c,Assessment__r.CreatedDate,
+                                                Assessment__r.Template__c,Number_of_Responses__c,Assessment__r.CreatedBy.Name,Assessment__r.CreatedUser__c
+                                                FROM AccountAssessmentRelation__c
+                                                WHERE Account__c=:accountId
+                                                AND Assessment__c=:assessmentId
+                                                WITH SECURITY_ENFORCED
+                                                ORDER BY CreatedDate DESC];
             return accountAssessment;
         }catch(exception e){
             String errorMsg = e.getMessage();
@@ -300,22 +240,21 @@ public with sharing class AssessmentController {
     * @return
     */
     @AuraEnabled
-    public static List<Response__c> getResponseList(String responseWrapper)
-    {
+    public static List<Response__c> getResponseList(String responseWrapper){
         try{
             Map<String,Object> responseMap = (Map<String,Object>)JSON.deserializeUntyped(responseWrapper);
             String quesId = (String)responseMap.get('questionId');
+            quesId = String.escapeSingleQuotes(quesId);
             String accAssmtId = (String)responseMap.get('accountassessmentId');
-            String query = 'SELECT Conversation_History__c,createdDate'
-                            +' FROM Response__c'
-                            +' WHERE AccountAssessmentRelation__c=\'' + String.escapeSingleQuotes(accAssmtId) + '\''
-                            +' AND Question__c=\'' + String.escapeSingleQuotes(quesId) + '\''
-                            +' AND Is_Latest_Response__c=true'
-                            +' WITH SECURITY_ENFORCED';
-            List<Response__c> responseRecords = safe.doQuery(query);
+            accAssmtId = String.escapeSingleQuotes(accAssmtId);
+            List<Response__c> responseRecords = [SELECT Conversation_History__c,createdDate
+                                                FROM Response__c
+                                                WHERE AccountAssessmentRelation__c=:accAssmtId
+                                                AND Question__c=:quesId
+                                                AND Is_Latest_Response__c=true
+                                                WITH SECURITY_ENFORCED];
             return responseRecords;
         }catch(exception e){
-            
             string errorMsg = e.getMessage();
             throw new AuraHandledException(errorMsg);
         }
@@ -326,8 +265,7 @@ public with sharing class AssessmentController {
 	* @return
 	*/
     @AuraEnabled
-    public static String getUserName()
-    {
+    public static String getUserName(){
         String userName=UserInfo.getName();
         return userName;
     }
@@ -341,11 +279,11 @@ public with sharing class AssessmentController {
     {
         try{
             String userId = userinfo.getuserid();
-            String query = 'SELECT Contact.AccountId'
-                         +' FROM User'
-                         +' WHERE Id=\'' + String.escapeSingleQuotes(userId) + '\''
-                         +' WITH SECURITY_ENFORCED';
-            List<User> userList = safe.doQuery(query);
+            userId = String.escapeSingleQuotes(userId);
+            List<User> userList =  [SELECT Contact.AccountId
+                                    FROM User
+                                    WHERE Id=:userId
+                                    WITH SECURITY_ENFORCED];
             if(userList.isEmpty() == false){
                 return userList[0].Contact.AccountId;
             }else{
@@ -356,22 +294,48 @@ public with sharing class AssessmentController {
             String errorMsg = e.getMessage();
             throw new AuraHandledException(errorMsg);
         }
-        
-        //return null;
     }
-     @AuraEnabled
-    public static void updateRejectFlag(List<SObject> updateRejectFlagList){
-        
-        UPDATE updateRejectFlagList;
-         
-               
-    }
+
     @AuraEnabled
+    /* sfge-disable-stack ApexFlsViolationRule */
+    public static void updateRejectFlag(List<SObject> updateRejectFlagList){
+        try{
+            if (sp == null){
+                sp = Database.setSavepoint();
+            }
+            if(updateRejectFlagList.isEmpty() == false){
+                Database.SaveResult[] saveResult = safe.doUpdate(updateRejectFlagList);
+                List<String> errorsList = SecurityCheckController.safeClassExceptionHandlerInsert(saveResult);
+                if(errorsList.size()>0){
+                    Database.rollback(sp);
+                    throw new SecurityControllerException(String.join(errorsList, ', ' ));
+                }
+            }
+        }catch(exception e){
+            String errorMsg = e.getMessage();
+            throw new AuraHandledException(errorMsg);
+        }    
+    }
+
+    @AuraEnabled
+    /* sfge-disable-stack ApexFlsViolationRule */
     public static void insertRejectFlag(List<SObject> insertRejectFlagList){
-        
-        INSERT insertRejectFlagList;
-         
-               
+        try{
+            if (sp == null){
+                sp = Database.setSavepoint();
+            }
+            if(insertRejectFlagList.isEmpty() == false){
+                Database.SaveResult[] saveResult = safe.doInsert(insertRejectFlagList);
+                List<String> errorsList = SecurityCheckController.safeClassExceptionHandlerInsert(saveResult);
+                if(errorsList.size()>0){
+                    Database.rollback(sp);
+                    throw new SecurityControllerException(String.join(errorsList, ', ' ));
+                }
+            }
+        }catch(exception e){
+            String errorMsg = e.getMessage();
+            throw new AuraHandledException(errorMsg);
+        }
     }
     
     /**
@@ -379,10 +343,8 @@ public with sharing class AssessmentController {
     * @return
     */
     @AuraEnabled
-    public static string getCommunityURL()
-    {
+    public static string getCommunityURL(){
         try{
-            Id currentNetworkId = Network.getNetworkId();
             String relativeUrlBase = URL.getSalesforceBaseUrl().toExternalForm()+'/login';
             return relativeUrlBase;
         }catch(exception e){
@@ -390,25 +352,24 @@ public with sharing class AssessmentController {
             throw new AuraHandledException(errorMsg);
         }
     }
-    
-    
     /**
     * @description To get the response information of all fields in AccountAssessmentRelation__c for a particular Account__c.
     * @param accountId This is a record id of an Account__c.
     * @return
     */
     @AuraEnabled
-    public static List<SObject> getAssessmentJunctionRecords(String accountId)
-    {
+    public static List<SObject> getAssessmentJunctionRecords(String accountId){
         try{
-            String query = 'SELECT Id,IsDeleted,Name,Account__c,Assessment__c,Assessment__r.name,'
-                        +'Assessment__r.Status__c,Assessment__r.Customer_Review__c,Assessment__r.Number_of_Questions__c,'
-                        +'Assessment__r.CreatedBy.Name,Status__c,End_Date__c,Completed__c,Follow_Up_Requests__c,Assessment__r.Template__c'
-                        +' FROM AccountAssessmentRelation__c'
-                        +' WHERE Account__c=\'' + String.escapeSingleQuotes(accountId) + '\''
-                        +' WITH SECURITY_ENFORCED'
-                        +' ORDER BY CreatedDate DESC';
-            List<SObject> assessmentData = safe.doQuery(query);
+            accountId = String.escapeSingleQuotes(accountId);
+            List<AccountAssessmentRelation__c> assessmentData = [SELECT Id,IsDeleted,Name,Account__c,Assessment__c,Assessment__r.name,
+                                                                Assessment__r.Status__c,Assessment__r.Customer_Review__c,Assessment__r.Number_of_Questions__c,
+                                                                Assessment__r.CreatedBy.Name,Status__c,Response_Percentage__c,End_Date__c,Completed__c,
+                                                                Follow_Up_Requests__c,Assessment__r.Template__c
+                                                                FROM AccountAssessmentRelation__c
+                                                                WHERE Status__c != 'Cancel'
+                                                                AND Account__c=:accountId
+                                                                WITH SECURITY_ENFORCED
+                                                                ORDER BY CreatedDate DESC];
             return assessmentData;
         }catch(exception e){
             String errorMsg = e.getMessage();
@@ -418,27 +379,24 @@ public with sharing class AssessmentController {
         }
     }
 
-
-    
     /**
     * @description To get the response data
     * @param assrecordId record id of a AccountAssessmentRelation__c.
     * @return
     */
     @AuraEnabled
-    public static List<Sobject> getAccountAssessmentRecordData(String assrecordId)
-    {
+    public static List<Sobject> getAccountAssessmentRecordData(String assrecordId){
         try{
-            String query = 'SELECT Id, IsDeleted, Name,Account__c,Assessment__c, Assessment__r.Name,'
-                     + 'Assessment__r.Status__c,Assessment__r.Customer_Review__c,CreatedDate,Account__r.Name,'
-                     + 'Assessment__r.Number_of_Questions__c,Start_Date__c,End_Date__c,Status__c,'
-                     + 'Assessment__r.Additional_Requests__c,Number_of_Questions__c,Assessment__r.CreatedDate,'
-                     + 'Assessment__r.Template__c, Number_of_Responses__c,Assessment__r.CreatedBy.Name,'
-                     + 'Assessment__r.CreatedUser__c,CreatedBy.Name'
-                     + ' FROM AccountAssessmentRelation__c'
-                     + ' WHERE Id=\'' + String.escapeSingleQuotes(assrecordId) + '\''
-                     + ' WITH SECURITY_ENFORCED';
-            List<SObject> accountassessment = safe.doQuery(query);
+            assrecordId = String.escapeSingleQuotes(assrecordId);
+            List<AccountAssessmentRelation__c> accountassessment =  [SELECT Id,IsDeleted,Name,Account__c,Assessment__c,Assessment__r.Name,
+                                                                    Assessment__r.Status__c,Assessment__r.Customer_Review__c,CreatedDate,Account__r.Name,
+                                                                    Assessment__r.Number_of_Questions__c,Start_Date__c,End_Date__c,Status__c,
+                                                                    Assessment__r.Additional_Requests__c,Number_of_Questions__c,Assessment__r.CreatedDate,
+                                                                    Assessment__r.Template__c,Number_of_Responses__c,Assessment__r.CreatedBy.Name,
+                                                                    Assessment__r.CreatedUser__c,CreatedBy.Name
+                                                                    FROM AccountAssessmentRelation__c
+                                                                    WHERE Id=:assrecordId
+                                                                    WITH SECURITY_ENFORCED];
             return accountassessment;
         }catch(exception e){
             String errorMsg = e.getMessage();
@@ -453,18 +411,19 @@ public with sharing class AssessmentController {
     * @return
     */
     @AuraEnabled
-    public static List<SObject> getResponseFlag(String questionId, String accountAssessmentId)
-    {
+    /* sfge-disable-stack ApexFlsViolationRule */
+    public static List<SObject> getResponseFlag(String questionId, String accountAssessmentId){
         try{
-            String query =  'SELECT Id, Question__c,Assessment__c,Question__r.Question_Type__c,'
-                          + 'Assessment__r.Name,Files__c, Response__c,CreatedBy.Name,CreatedDate, Flag__c,'
-                          + 'Conversation_History__c,LastModifiedDate,LastModifiedById'
-                          + ' FROM Response__c'
-                          + ' WHERE Question__c=\'' + String.escapeSingleQuotes(questionId) + '\''
-                          + ' AND AccountAssessmentRelation__c=\'' + String.escapeSingleQuotes(accountAssessmentId) + '\''
-                          + ' AND Is_Latest_Response__c= true'
-                          + ' WITH SECURITY_ENFORCED';
-            List<Response__c> supplierResponseList =  safe.doQuery(query);
+            questionId = String.escapeSingleQuotes(questionId);
+            accountAssessmentId = String.escapeSingleQuotes(accountAssessmentId);
+            List<Response__c> supplierResponseList =   [SELECT Id,Question__c,Assessment__c,Question__r.Question_Type__c,
+                                                        Assessment__r.Name,Files__c,Response__c,CreatedBy.Name,CreatedDate,Flag__c,
+                                                        Conversation_History__c,LastModifiedDate,LastModifiedById
+                                                        FROM Response__c
+                                                        WHERE Question__c=:questionId
+                                                        AND AccountAssessmentRelation__c=:accountAssessmentId
+                                                        AND Is_Latest_Response__c= true
+                                                        WITH SECURITY_ENFORCED];
             if (sp == null){
                 sp = Database.setSavepoint();
             }
@@ -511,22 +470,23 @@ public with sharing class AssessmentController {
     * @return
     */
     @AuraEnabled
-    public static Object deleteFileAttachment(String deleteMap)
-    {
+     /* sfge-disable-stack ApexFlsViolationRule */
+    public static Object deleteFileAttachment(String deleteMap){
         try{
             Map<String,Object> filemap = (Map<String,Object>) JSON.deserializeUntyped(deleteMap);
             String quesId = (String)filemap.get('questionId');
+            quesId = String.escapeSingleQuotes(quesId);
             String accAssmtId = (String)filemap.get('accountAssessmentId');
-            String query = 'SELECT Id,Question__c,Question__r.Name,Assessment__r.Name,'
-                         + 'Files__c,Response__c,CreatedBy.Name,CreatedDate,Flag__c,'
-                         + 'Conversation_History__c,LastModifiedDate,LastModifiedById'
-                         + ' FROM Response__c'
-                         + ' WHERE Question__c=\'' + String.escapeSingleQuotes(quesId) + '\''
-                         + ' AND AccountAssessmentRelation__c=\'' + String.escapeSingleQuotes(accAssmtId) + '\''
-                         + ' AND Is_Latest_Response__c= true'
-                         + ' WITH SECURITY_ENFORCED'
-                         + ' LIMIT 50000';
-            List<Response__c> responseRecords = safe.doQuery(query);
+            accAssmtId = String.escapeSingleQuotes(accAssmtId);
+            List<Response__c> responseRecords = [SELECT Id,Question__c,Question__r.Name,Assessment__r.Name,
+                                                Files__c,Response__c,CreatedBy.Name,CreatedDate,Flag__c,
+                                                Conversation_History__c,LastModifiedDate,LastModifiedById
+                                                FROM Response__c
+                                                WHERE Question__c=:quesId
+                                                AND AccountAssessmentRelation__c=:accAssmtId
+                                                AND Is_Latest_Response__c= true
+                                                WITH SECURITY_ENFORCED
+                                                LIMIT 50000];
             List<Object> responseFilesData= (List<Object>)JSON.deserializeUntyped(responseRecords[0].Files__c);
             if (sp == null){
                 sp = Database.setSavepoint();
@@ -561,19 +521,19 @@ public with sharing class AssessmentController {
     * @return
     */
     @AuraEnabled
-    public static Boolean saveChatterResponse(String chatWrapperstring)// responseList,string assessmentId,string questionId)
-    {
+    /* sfge-disable-stack ApexFlsViolationRule */
+    public static Boolean saveChatterResponse(String chatWrapperstring){// responseList,string assessmentId,string questionId)
         try{
             Map<String,Object> chatMap = (Map<String,Object>)JSON.deserializeUntyped(chatWrapperstring);
             String quesId = (String)chatMap.get('questionId');
             String accAssmtId = (String)chatMap.get('accountassessmentId');
-            String query = 'SELECT Conversation_History__c,createdDate'
-                         + ' FROM Response__c'
-                         + ' WHERE AccountAssessmentRelation__c=\'' + String.escapeSingleQuotes(accAssmtId) + '\''
-                         + ' AND Question__c=\'' + String.escapeSingleQuotes(quesId) + '\''
-                         + ' AND Is_Latest_Response__c=true'
-                         + ' WITH SECURITY_ENFORCED';
-            List<Response__c> responseRecords = safe.doQuery(query);
+            accAssmtId = String.escapeSingleQuotes(accAssmtId);
+            List<Response__c> responseRecords = [SELECT Conversation_History__c,createdDate
+                                                FROM Response__c
+                                                WHERE AccountAssessmentRelation__c=:accAssmtId
+                                                AND Question__c=:quesId
+                                                AND Is_Latest_Response__c=true
+                                                WITH SECURITY_ENFORCED];
             if (sp == null){ 
                 sp = Database.setSavepoint();
             }
@@ -613,8 +573,8 @@ public with sharing class AssessmentController {
     * @return 
     */
     @AuraEnabled
-    public static ErrorTransactionLog__c errorLogRecord(String errorLogWrapper)
-    {
+    /* sfge-disable-stack ApexFlsViolationRule */
+    public static ErrorTransactionLog__c errorLogRecord(String errorLogWrapper){
         try{
             Map<String,Object> errorLogMap = (Map<String,Object>)JSON.deserializeUntyped(errorLogWrapper);
             ErrorTransactionLog__c errorRecord=new ErrorTransactionLog__c();
@@ -640,18 +600,16 @@ public with sharing class AssessmentController {
             String errorMsg = e.getMessage();
             throw new AuraHandledException(errorMsg);
         }
-        
     }
 
- 
     /**
     * @description Its used to save the file and save the reference link in Response__c in JSON format.
     * @param fileResp wrapper with questionid, assessmentid and file data to upload.
     * @return
     */
-    @AuraEnabled    
-    public static List<SObject> uploadFile(String fileResp)
-    {
+    @AuraEnabled
+    /* sfge-disable-stack ApexFlsViolationRule */
+    public static List<SObject> uploadFile(String fileResp){
         try{
             Map<String,Object> filemap = (Map<String,Object>) JSON.deserializeUntyped(fileResp);
             String quesId = (String)filemap.get('quesId');
@@ -684,30 +642,39 @@ public with sharing class AssessmentController {
                             +' WITH SECURITY_ENFORCED';
             safe.doQuery(query);
             String ftype = ((String)filemap.get('name')).substringAfter('.');
-
             if(String.isNotBlank(quesId) && String.isNotBlank(accAssmtId)){
-                String questionQuery = 'SELECT Id,Files__c,Question__c'
-                                        +' FROM Response__c'
-                                        +' WHERE Question__c =\'' + String.escapeSingleQuotes(quesId) + '\''
-                                        +' AND AccountAssessmentRelation__c =\'' + String.escapeSingleQuotes(accAssmtId) + '\''
-                                        +' AND Is_Latest_Response__c = true'
-                                        +' WITH SECURITY_ENFORCED';
-
-                srList = safe.doQuery(questionQuery);
                 List<String> errorList = new List<String>();
+                List<ContentVersion> newcvList = [SELECT Id,ContentDocumentId 
+                                                FROM ContentVersion 
+                                                WHERE Id=:cvId 
+                                                WITH SECURITY_ENFORCED];
+                ContentDocumentLink cDocLink = new ContentDocumentLink();
+                cDocLink.ContentDocumentId = newcvList[0].ContentDocumentId;//Add ContentDocumentId
+                cDocLink.LinkedEntityId = accAssmtId;//Add attachment parentId
+                cDocLink.ShareType = 'V';//V - Viewer permission. C - Collaborator permission. I - Inferred permission.
+                cDocLink.Visibility = 'AllUsers';//AllUsers, InternalUsers, SharedUsers
+                List<ContentDocumentLink> cdlList = new List<ContentDocumentLink>{cDocLink};
+                Database.SaveResult[] cdlSResult = safe.doInsert(cdlList);
+                errorList = SecurityCheckController.safeClassExceptionHandlerInsert(cdlSResult);
+
+                srList = [SELECT Id,Files__c,Question__c
+                            FROM Response__c
+                            WHERE Question__c =:quesId
+                            AND AccountAssessmentRelation__c =:accAssmtId
+                            AND Is_Latest_Response__c = true
+                            WITH SECURITY_ENFORCED];
+
                 if(srList.isEmpty() == false){
-                    String fileUrl = baseUrl+'/sfc/servlet.shepherd/document/download/'+cvList[0].ContentDocumentId+'?operationContext=S1';
+                    String fileUrl = baseUrl+'/sfc/servlet.shepherd/document/download/'+newcvList[0].ContentDocumentId+'?operationContext=S1';
                     String fileJson = '{"name":"'+(String)filemap.get('name')+'","url":"'+fileUrl+'","type":"'+ftype+'"}';
                     srList[0].Files__c = (srList[0].Files__c == null || srList[0].Files__c.trim().length() == 0 || srList[0].Files__c=='[]') ? '['+fileJson+']' : '['+fileJson+','+srList[0].Files__c.substring(1,srList[0].Files__c.length());
                     Database.SaveResult[] saveResult = safe.doUpdate(srList);
                     errorList = SecurityCheckController.safeClassExceptionHandlerInsert(saveResult);
-                    
-                }
-                else{
+                }else{
                     Response__c res=new Response__c();
                     res.Question__c= quesId;
                     res.AccountAssessmentRelation__c= accAssmtId;
-                    String fileUrl = baseUrl+'/sfc/servlet.shepherd/document/download/'+cvList[0].ContentDocumentId+'?operationContext=S1';
+                    String fileUrl = baseUrl+'/sfc/servlet.shepherd/document/download/'+newcvList[0].ContentDocumentId+'?operationContext=S1';
                     String fileJson = '[{"name":"'+(String)filemap.get('name')+'","url":"'+fileUrl+'","type":"'+ftype+'"}]';
                     res.Files__c = fileJson;
                     res.Is_Latest_Response__c = true;
@@ -739,37 +706,34 @@ public with sharing class AssessmentController {
     public static List<Account> getAllSuppliers(String existingData, String searchKey, String exSearchKey){
         Set<String> selSet = new Set<String>();
         Set<Id> existingSups = new Set<Id>();
+        String recordTypeId = String.valueOf(Schema.SObjectType.Account.getRecordTypeInfosByName().get('Supplier').getRecordTypeId());
         selSet.add(existingData);
         String query = '';
+        exSearchKey = String.escapeSingleQuotes(exSearchKey);
+        searchKey = String.escapeSingleQuotes(searchKey);
         try{
             if(String.isNotBlank(existingData)){
                 existingSups = (Set<Id>) JSON.deserialize(existingData, Set<Id>.class);
             }
-            query = 'SELECT Id,Name FROM Account';
+            query = 'SELECT Id,Name FROM Account WHERE RecordTypeId = \''+recordTypeId+'\'';
             String filter = '';
             if(string.isNotBlank(searchKey)){
-                String sKey ='\'%'+String.escapeSingleQuotes(searchKey)+'%\'';
-                filter += ' WHERE ((Name LIKE '+sKey+') ';
+                String sKey ='\'%'+searchKey+'%\'';
+                filter += ' AND (((Name LIKE '+sKey+') ';
             }
-            if(string.isNotBlank(existingData))
-            {
-                if(string.isNotBlank(searchKey))
-                {
+            if(string.isNotBlank(existingData)){
+                if(string.isNotBlank(searchKey)){
                     filter += ' AND (Id NOT IN :existingSups)) OR ((Id IN :existingSups) ';
+                }else{
+                    filter += ' AND ((Id NOT IN :existingSups) OR ((Id IN :existingSups) ';
                 }
-                else
-                {
-                    filter += ' WHERE (Id NOT IN :existingSups) OR ((Id IN :existingSups) ';
-                }
-                if(string.isNotBlank(exSearchKey))
-                {
-                    string sKey = '\'%'+String.escapeSingleQuotes(exSearchKey)+'%\'';
+                if(string.isNotBlank(exSearchKey)){
+                    string sKey = '\'%'+exSearchKey+'%\'';
                 	filter += ' AND (Name LIKE '+sKey+') ';
                 }
             }
-            if(String.isNotBlank(filter))
-            {
-                filter+=' )';
+            if(String.isNotBlank(filter)){
+                filter+=' ))';
             }
             query = query+filter+' ORDER BY CreatedDate DESC';
         }catch(exception e){
@@ -790,6 +754,7 @@ public with sharing class AssessmentController {
     * @return
     */
     @AuraEnabled
+    /* sfge-disable-stack ApexFlsViolationRule */
     public static ResultWrapper sendAssessment(SObject assessmentRecord,String operationType, String suppliers,String existingSups, String deleteList){
         ResultWrapper resWrap = new ResultWrapper();
         try{
@@ -803,23 +768,16 @@ public with sharing class AssessmentController {
                 assmtList.add(assessmentRecord);
                     Database.SaveResult[] saveResult = safe.doInsert(assmtList);
                     errorList = SecurityCheckController.safeClassExceptionHandlerInsert(saveResult);
-                  
-                
-                 
             }else{
-                
-                assessmentId = assessmentRecord.Id;
-                             
+                assessmentId = assessmentRecord.Id;             
             }
             if(errorList.size()>0){
                 Database.rollback(sp);
                 throw new SecurityControllerException(String.join( errorList, ', ' ));
             }
             else if (assmtList.isEmpty() == false && assmtList[0].Id != null){
-                assessmentId = assmtList[0].Id;
-                     
+                assessmentId = assmtList[0].Id; 
             }
-         
             Date asmtStartDate = (Date)assessmentRecord.get('Start_Date__c');
             Date asmtEndDate = (Date)assessmentRecord.get('End_Date__c') != null?(Date)assessmentRecord.get('End_Date__c'):null;
             Set<String> suppliersList = new Set<String>();
@@ -838,18 +796,12 @@ public with sharing class AssessmentController {
             if(String.isNotBlank(deleteList)){
                 deleteSupList = (set<string>) JSON.deserialize(deleteList, set<string>.class);
                 List<Assessment_Supplier__c> deleteAccAssRelns = new List<Assessment_Supplier__c>();
-                String assSupQuery = 'SELECT Id'
-                                    +' FROM Assessment_Supplier__c' 
-                                    +' WHERE Account__c IN:deleteSupList';
-                Map<String, Object> bindVariables = new Map<String, Object>{'deleteSupList' => deleteSupList};
-                List<Assessment_Supplier__c> assSuppList = safe.doQueryWithBinds(assSupQuery,bindVariables);
+                List<Assessment_Supplier__c> assSuppList=  [SELECT Id
+                                                            FROM Assessment_Supplier__c
+                                                            WHERE Account__c IN:deleteSupList
+                                                            WITH SECURITY_ENFORCED];
                 if(assSuppList.isEmpty() == false){
-                    for(Assessment_Supplier__c assReln:assSuppList){
-                        deleteAccAssRelns.add(assReln);
-                    }
-                }
-                if(deleteAccAssRelns.isEmpty() == false){
-                    List<Database.DeleteResult> deleteResult = safe.doDelete(deleteAccAssRelns);
+                    List<Database.DeleteResult> deleteResult = safe.doDelete(assSuppList);
                     errorList = SecurityCheckController.safeClassExceptionHandlerDelete(deleteResult);
                 }
                 if(errorList.size()>0){
@@ -861,11 +813,10 @@ public with sharing class AssessmentController {
             List<Assessment_Supplier__c> assessSupList = new List<Assessment_Supplier__c>();
             
             Date todayDate = Date.Today();
-            String query = 'SELECT Id,Name'
-                          +' FROM Account'
-                          +' WHERE ID IN:suppliersIds';
-            Map<String, Object> bindVariables = new Map<String, Object>{'suppliersIds' => suppliersIds};
-            List<Account> accList = safe.doQueryWithBinds(query,bindVariables);
+            List<Account> accList = [SELECT Id,Name
+                                    FROM Account
+                                    WHERE ID IN:suppliersIds
+                                    WITH SECURITY_ENFORCED];
             if(accList.isEmpty() == false){
                 for(Account acc:accList){
                     Assessment_Supplier__c assessSup = new Assessment_Supplier__c();
@@ -905,7 +856,6 @@ public with sharing class AssessmentController {
                 Database.rollback(sp);
                 throw new SecurityControllerException(String.join(errorsList, ', ' ));
             }
-
             Set<Id> successRecordsIdSet = new Set<Id>();
             if(accountAssessRelnsList.isEmpty() == false){
                 Database.SaveResult[] results = safe.doInsert(accountAssessRelnsList);
@@ -932,7 +882,6 @@ public with sharing class AssessmentController {
             resWrap.message = e.getMessage();
             resWrap.errorCode = '';
             String errorMsg = e.getMessage();
-           
             throw new AuraHandledException(ErrorMsg);
         }
         return resWrap;
@@ -1010,14 +959,13 @@ public with sharing class AssessmentController {
         ResultWrapper resWrap = new ResultWrapper();
         try{
             String status = 'Inactive';
-            String query = 'SELECT Id'
-                        + ' FROM Assessment_Supplier__c'
-                        + ' WHERE Assessment__c= \'' + String.escapeSingleQuotes(assessmentId) + '\''
-                        + ' AND Status__c= \'' + String.escapeSingleQuotes(status) + '\''
-                        + ' WITH SECURITY_ENFORCED';
-            
-            List<Assessment_Supplier__c> assessSuppList = safe.doQuery(query);
-
+            status = String.escapeSingleQuotes(status);
+            assessmentId = String.escapeSingleQuotes(assessmentId);
+            List<Assessment_Supplier__c> assessSuppList= [SELECT Id
+                                                        FROM Assessment_Supplier__c
+                                                        WHERE Assessment__c=:assessmentId
+                                                        AND Status__c=:status
+                                                        WITH SECURITY_ENFORCED];
             if (sp == null){
                 sp = Database.setSavepoint();
             }
@@ -1055,12 +1003,13 @@ public with sharing class AssessmentController {
     @AuraEnabled(cacheable=true)
     public static List<Assessment__c> getAssessmentRecord(String assessmentId){
         try{
-            String query = 'SELECT Id,Start_Date__c,End_Date__c'
-                        +' FROM Assessment__c'
-                        +' WHERE Id=\'' + String.escapeSingleQuotes(assessmentId) + '\''
-                        +' WITH SECURITY_ENFORCED'
-                        +' LIMIT 1';      
-            return safe.doQuery(query);
+            assessmentId = String.escapeSingleQuotes(assessmentId);
+            List<Assessment__c> assessmentList =  [SELECT Id,Start_Date__c,End_Date__c
+                                                    FROM Assessment__c
+                                                    WHERE Id=:assessmentId
+                                                    WITH SECURITY_ENFORCED
+                                                    LIMIT 1];
+            return assessmentList;
         }catch(exception e){
             String errorMsg = e.getMessage();
             throw new AuraHandledException(ErrorMsg);
@@ -1099,14 +1048,15 @@ public with sharing class AssessmentController {
     * @return
     */
     @AuraEnabled
+    /* sfge-disable-stack ApexFlsViolationRule */
     public static ResultWrapper deleteAssessment(string assessmentId){
         ResultWrapper resWrap = new ResultWrapper();
         try{
-            string query = 'SELECT Id'
-                        + ' FROM Assessment__c'
-                        + ' WHERE Id= \'' + String.escapeSingleQuotes(assessmentId) + '\''
-                        + ' WITH SECURITY_ENFORCED';
-            List<Assessment__c> deleteAssmtsList = safe.doQuery(query);
+            assessmentId = String.escapeSingleQuotes(assessmentId);
+            List<Assessment__c> deleteAssmtsList = [SELECT Id
+                                                    FROM Assessment__c
+                                                    WHERE Id=:assessmentId
+                                                    WITH SECURITY_ENFORCED];
             List<String> errorList = new List<String>();
             if (sp == null){
                 sp = Database.setSavepoint();
@@ -1145,16 +1095,50 @@ public with sharing class AssessmentController {
         try{
             List<Assessment_Template__c> templateList = new List<Assessment_Template__c>();
             if(string.isNotBlank(templateId)){
-                String query = 'SELECT Id,Status__c,Name'
-                         +' FROM Assessment_Template__c'
-                         +' WHERE Id=\'' + String.escapeSingleQuotes(templateId) + '\''
-                         +' WITH SECURITY_ENFORCED';
-                templateList = safe.doQuery(query);
+                templateList = [SELECT Id,Status__c,Name
+                                FROM Assessment_Template__c
+                                WHERE Id=:templateId
+                                WITH SECURITY_ENFORCED];
             }
             return templateList;
         }catch(exception e){
             String errorMsg = e.getMessage();
             throw new AuraHandledException(ErrorMsg);
+        }
+    }
+    
+    /**
+    * @description It is used to delete the response.
+    * @param deletedata reponse object data.
+    * @return
+    */
+    @AuraEnabled
+    /* sfge-disable-stack ApexFlsViolationRule */
+    public static List<Response__c> deleteResponse(Map<string,object> deletedata){
+        List<Object> lst = (List<Object>)deletedata.get('responsequestionId');
+        List<string> questionId= new List<String>();
+        for(Integer i=0;i<lst.size();i++){
+            questionId.add(String.valueOf(lst[i]));   
+        }
+        string accountAssessmentid=(string)deletedata.get('accountassessmentId');
+        List<Response__c> deleteResponseList=[SELECT Id 
+                                            FROM Response__c 
+                                            WHERE Question__c IN : questionId
+                                            AND AccountAssessmentRelation__c=:accountAssessmentid
+                                            AND Is_Latest_Response__c= true];
+          try{
+            if(deleteResponseList.isEmpty() == false){
+                List<Database.DeleteResult> deleteResult = safe.doDelete(deleteResponseList);
+                List<String> errorList = SecurityCheckController.safeClassExceptionHandlerDelete(deleteResult);
+                if(errorList.size()>0){
+                    Database.rollback(sp);
+                    throw new SecurityControllerException(String.join( errorList, ', ' ));
+                }
+            }
+            return deleteResponseList;
+        }catch(exception e){
+            String errorMsg = e.getMessage();
+            throw new AuraHandledException(errorMsg);
         }
     }
     

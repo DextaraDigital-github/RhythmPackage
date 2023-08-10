@@ -179,12 +179,11 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
                         this.showNotification('Success','Assessment created and suppliers added successfully.','success');
                         this.navigateToRecordPage();
                     }else{
-                        //this.showNotification('Error',result.message,'error');
+                        this.showNotification('Error',result.message,'error');
                     }
                 })
                 .catch(error => {
-                    this.error = error;
-                    //this.showNotification('Error',error,'error');
+                    this.showNotification('Error',error,'error');
                 });
             }else{
                 this.showNotification('Error','Please select atleast one supplier to proceed.','error');

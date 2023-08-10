@@ -12,6 +12,7 @@ public with sharing class SectionService {
 
     /**
     * @description Singleton Design Pattern 
+    * @return
     */
     public static SectionService getInstance(){
            if(service == null){
@@ -20,6 +21,12 @@ public with sharing class SectionService {
         return service;
     }
 
+    /**
+    * @description To get sections related to template.
+    * @param templateId It is template id.
+    * @param sectionName Name of the section.
+    * @return
+    */
     public List<SObject> getSections(String templateId, String sectionName){
         return selector.getSections(templateId,sectionName);
     }

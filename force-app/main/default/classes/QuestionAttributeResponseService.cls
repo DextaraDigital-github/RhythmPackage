@@ -13,7 +13,8 @@ public with sharing class QuestionAttributeResponseService {
     static QuestionAttributeResponseSelector selector = QuestionAttributeResponseSelector.getInstance();
 
     /**
-    * @description Singleton Design Pattern 
+    * @description Singleton Design Pattern
+    * @return
     */
     public static QuestionAttributeResponseService getInstance(){
            if(service == null){
@@ -92,7 +93,7 @@ public with sharing class QuestionAttributeResponseService {
     }
    /**
     * @description gets al Response Attribute Records based on  Response_Attribute__c Ids
-    * @param questionlst is a list of Response_Attribute__c id. 
+    * @param respAttrId is a list of Response_Attribute__c id. 
     * @return List of Response_Attribute__c records
     */
     public List<SObject> getQuesRespAttribute(List<String> respAttrId){
@@ -107,6 +108,9 @@ public with sharing class QuestionAttributeResponseService {
         return selector.getQuestionRespAttributes(questionlst);
     }
     
+    /**
+    * @description It is used to throw the exception
+    */
     public class SecurityControllerException extends Exception{
     }
 }
