@@ -14,7 +14,7 @@ on:
 
 jobs:
 
- environment-setup:
+  environment-setup:
     name: environment-setup
     runs-on: ubuntu-latest
 
@@ -30,14 +30,14 @@ jobs:
         with:
           node-version: '12'
 		  
- if_merged:
+  if_merged:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
     - run: |
         echo The PR was merged
 
- validate:
+  validate:
     name: Scratchorg creation and package installation
     needs: [environment-setup]
     runs-on: ubuntu-latest
