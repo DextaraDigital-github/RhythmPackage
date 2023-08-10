@@ -459,7 +459,7 @@ export default class Questionnaire extends LightningElement {
                                                     if (childQuestion.isdisplay && question.type !== 'Picklist (Multi-Select)') {
                                                         question.showUpload = (childQuestion.uploadrequired === 'Yes' || childQuestion.uploadrequired === 'Optional') ? true : false;
                                                     }
-                                                    if (question.type === 'Picklist (Multi-Select)') {
+                                                    if (question.type === 'Picklist (Multi-Select)' && typeof question.value !== 'undefined') {
                                                         let lst = JSON.parse(question.value);
                                                         if (lst.includes(childQuestion.optionValue)) {
                                                             if ((childQuestion.uploadrequired === 'Yes' || childQuestion.uploadrequired === 'Optional')) {
@@ -473,7 +473,7 @@ export default class Questionnaire extends LightningElement {
                                                                 if (respAttr.isdisplay && ques.type !== 'Picklist (Multi-Select)') {
                                                                     ques.showUpload = (respAttr.uploadrequired === 'Yes' || respAttr.uploadrequired === 'Optional') ? true : false;
                                                                 }
-                                                                if (ques.type === 'Picklist (Multi-Select)') {
+                                                                if (ques.type === 'Picklist (Multi-Select)' && typeof ques.value !== 'undefined') {
                                                                     let lst = JSON.parse(ques.value);
                                                                     if (lst.includes(respAttr.optionValue)) {
                                                                         if ((respAttr.uploadrequired === 'Yes' || respAttr.uploadrequired === 'Optional')) {
@@ -686,7 +686,7 @@ export default class Questionnaire extends LightningElement {
                                                     }
                                                 }
                                             }
-                                            if (question.type === 'Picklist (Multi-Select)') {
+                                            if (question.type === 'Picklist (Multi-Select)' && typeof question.value !== 'undefined') {
                                                 let lst = JSON.parse(question.value);
                                                 if (lst.includes(childQuestion.optionValue)) {
                                                     if ((childQuestion.uploadrequired === 'Yes' || childQuestion.uploadrequired === 'Optional')) {
@@ -713,7 +713,7 @@ export default class Questionnaire extends LightningElement {
                                                                 }
                                                             }
                                                         }
-                                                        if (ques.type === 'Picklist (Multi-Select)') {
+                                                        if (ques.type === 'Picklist (Multi-Select)' && typeof ques.value !== 'undefined') {
                                                             let lst = JSON.parse(ques.value);
                                                             if (lst.includes(respAttr.optionValue)) {
                                                                 if ((respAttr.uploadrequired === 'Yes' || respAttr.uploadrequired === 'Optional')) {
