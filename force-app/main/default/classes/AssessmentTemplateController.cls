@@ -40,12 +40,12 @@ public with sharing class AssessmentTemplateController {
         return secList;
     }
 
-/**
-* @description Get the details of the Template.
-* @param templateId This is a record id of an Template__c.
-*@return
-*/    
-    @AuraEnabled(Cacheable=true)
+    /**
+    * @description Get the details of the Template.
+    * @param templateId This is a record id of an Template__c.
+    *@return
+    */    
+    @AuraEnabled
     public static Boolean getTemplateDetails(String templateId) {
         try {
             Boolean hasStatusNew = false;
@@ -331,6 +331,34 @@ public with sharing class AssessmentTemplateController {
             List<Section__c> sectionList = [SELECT Id FROM Section__c WHERE Assessment_Template__c=:templateId WITH SECURITY_ENFORCED];
             return sectionList.size();
         }catch(exception e){
+            String errorMsg = e.getMessage();
+            throw new AuraHandledException(ErrorMsg);
+        }
+    }
+
+      /**
+* @description Get the details of the Template.
+* @param templateId This is a record id of an Template__c.
+*@return
+*/    
+    @AuraEnabled(cacheable=true)
+    public static Boolean getTemplateDetail(String templateId) {
+        try {
+            Boolean hasStatusNew = false;
+            templateId = String.escapeSingleQuotes(templateId);
+            if(String.isNotBlank(templateId)) {
+                List<Assessment_Template__c> assessmentList=  [SELECT Status__c
+                                                                FROM Assessment_Template__c
+                                                                WHERE Id= :templateId
+                                                                WITH SECURITY_ENFORCED];
+                Assessment_Template__c assessmentTemp = (AssessmentList.size()==1)?AssessmentList[0]:null;
+                if(assessmentTemp  != null && assessmenttemp.Status__c.equalsIgnoreCase('New')){
+                    hasStatusNew = true;
+                }
+            }
+            return hasStatusNew;
+        }
+        catch(Exception e) {
             String errorMsg = e.getMessage();
             throw new AuraHandledException(ErrorMsg);
         }

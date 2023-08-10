@@ -63,41 +63,7 @@ global with sharing class SendAssessmentNotificationsBatch implements Database.B
                 }
             }
             if(successRecordsIdSet.isEmpty() == false){
-               
-                for(AccountAssessmentRelation__c assRelRec:[SELECT Id,Account__r.Name,Account__r.Email__c,Assessment__c FROM AccountAssessmentRelation__c WHERE ID IN:successRecordsIdSet WITH SECURITY_ENFORCED]){
-                    if(String.isNotBlank(assRelRec.Account__r.Email__c) && siteData != null){
-                        List<String> sendTo = new List<String>();
-                        sendTo.add(assRelRec.Account__r.Email__c);
-                        Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
-                        mail.setToAddresses(sendTo);
-                        mail.setSubject('Sample Survey');
-                        String body = '<html><body>'+
-                        '<br><br>'+'Dear '+assRelRec.Account__r.Name+
-                        '<br><br>'+'we’d like to complete a short survey.'+
-                        '<br><br><a href='+siteData.Site_URL__c+assRelRec.Id+'>Take the survey now.</a>'+
-                                        '<br><br>'+'Kind regards,'+
-                                        '<br>'+'Rhythm';
-                        mail.setHtmlBody(body);
-                        emailMessagesList.add(mail);
-                    }
-                    
-                }
-            }
-            if(emailMessagesList.isEmpty() == false){
-                List<Messaging.SendEmailResult> emailResults = Messaging.sendEmail(emailMessagesList);
-                for(Messaging.SendEmailResult result :emailResults) {   
-                    List<Messaging.SendEmailError> errors = result.getErrors();                                 
-                    if(!result.IsSuccess() && errors.size() > 0){
-                        Messaging.SendEmailError err = errors[0];
-                        ErrorTransactionLog__c errorRec = new ErrorTransactionLog__c();
-                        errorRec.Class_Name__c = 'SendAssessmentNotificationsBatch';
-                        errorRec.Error_Stack_Trace__c = err.getMessage();
-                        errorRec.Name = 'Error Record';
-                        errorRec.LWC_Component_Name__c = '';
-                        errorRec.Method_Name__c = 'ExecuteMethod';
-                        errorList.add(errorRec);
-                    }
-                }
+                AssessmentController.sendEmails(successRecordsIdSet,'');
             }
         }catch(exception e){
             ErrorTransactionLog__c errorRec = new ErrorTransactionLog__c();
