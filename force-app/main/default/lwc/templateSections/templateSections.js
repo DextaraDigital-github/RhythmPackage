@@ -5,6 +5,7 @@ import getTemplateSections from '@salesforce/apex/AssessmentTemplateController.g
 import getQuestionsList from '@salesforce/apex/AssessmentTemplateController.getQuestionsLists';
 import getSectionRecsCount from '@salesforce/apex/AssessmentTemplateController.getRecordsCount';
 import deleteRecords from '@salesforce/apex/AssessmentTemplateController.deleteRecords';
+import getTemplateDetail from '@salesforce/apex/AssessmentTemplateController.getTemplateDetail';
 import getTemplateDetails from '@salesforce/apex/AssessmentTemplateController.getTemplateDetails';
 import { refreshApex } from '@salesforce/apex';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
@@ -26,6 +27,7 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
     @api disableButtons;
     @api objectName = 'Rhythm__Section__c';
     @track selectedRows = [];
+    @track actionName = '';
 
     sectionColumns = [
         {
@@ -76,7 +78,7 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
     //End: Reorder Columns
 
     //Get Template Status Details
-    @wire(getTemplateDetails, { templateId: '$recordId' })
+    @wire(getTemplateDetail, { templateId: '$recordId' })
     getRecs(result) {
         this.wiredRecsData = result;
         this.disableButtons = result.data;
@@ -86,22 +88,20 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
     }
 
     // Open Create Modal
-    handlenew() {
+    handleNew() {
         this.showModal.createModal = true;
     }
 
     //Save and New Functionality for New Record
     reOpenCreateModal() {
-        // this.showModal.createModal = false;
-        // this.showModal.createModal = true;
         setTimeout(() => {
-            this.handlenew();
+            this.handleNew();
         }, 500);
     }
 
     //Save the record and Open new reocrd creation
     handleSaveNew() {
-        this.handlenew();
+        this.handleNew();
     }
 
     // Close Create Modal
@@ -123,8 +123,8 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
 
     //Record View and Eit actions
     handleRowActions(event) {
-        const actionName = event.detail.action.name;
-        const row = event.detail.row;
+        const actionName = this.actionName;
+        const row = this.row;
         switch (actionName) {
             case 'view':
                 this[NavigationMixin.Navigate]({
@@ -439,5 +439,50 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
     //record form onsuccess
     handleSuccess() {
         this.handleSectionsData();
+    }
+
+    handleGetTemplate(event) {
+        this.actionName = event.currentTarget.dataset.name;
+        this.handleTemplateDetails();
+    }
+    handleGetTemplateDetails(event) {
+        this.actionName = event.detail.action.name;
+        this.row = event.detail.row;
+        this.handleTemplateDetails();
+    }
+
+    handleTemplateDetails() {
+        getTemplateDetails({ templateId: this.recordId }).then(result => {
+            this.disableButtons = result;
+            if (this.disableButtons === false) {
+                this.columns = [...this.sectionColumns].filter(col => col.type !== 'action');
+                if (this.actionName != '') {
+                    location.reload();
+                    this.dispatchEvent(
+                        new ShowToastEvent({
+                            title: 'Error',
+                            message: 'Template status is changed to active, further changes cannot be made to it.',
+                            variant: 'error'
+                        })
+                    );
+                }
+            }
+            else if (this.actionName != '') {
+                if (this.actionName === 'New') {
+                    this.handleNew();
+                }
+                else if (this.actionName === 'Reorder Section') {
+                    this.handleReorderSections();
+                }
+                else if (this.actionName === 'Reorder Question') {
+                    this.handleReorderQuestions();
+                }
+                else if (this.actionName === 'view' || this.actionName === 'edit' || this.actionName === 'delete') {
+                    this.handleRowActions();
+                }
+            }
+        }).catch(error => {
+            //console.log('Error' + error);
+        });
     }
 }

@@ -22,10 +22,10 @@ export default class RtmvpcCreateResponseAttributes extends LightningElement {
             this.constructNewWrapper();
         }
     }
-     /* 
-        This method method is used to display the toast messages.
-    */
-     configureToast(_title, _message, _variant) {
+    /* 
+       This method method is used to display the toast messages.
+   */
+    configureToast(_title, _message, _variant) {
         const toast = new ShowToastEvent({
             title: _title,
             message: _message,
@@ -38,39 +38,46 @@ export default class RtmvpcCreateResponseAttributes extends LightningElement {
     */
     constructWrapper() {
         let disable = false;
-        if(typeof this.isdisable!=='undefined'){
+        if (typeof this.isdisable !== 'undefined') {
             disable = this.isdisable;
         }
-        let lst =[];
+        let lst = [];
         lst.push(this.questionId);
         /*
             Apex method is used to get the Response Attribute data in onload for particular question.
         */
         getQuestionRespAttributes({ questionlst: lst }).then(result => {
+            let cnt =0;
+            let len = result.length;
             result.forEach(res => {
-                let rowlabel= res.Rhythm__Response_value__c;
-                if(this.quesType==='Checkbox')
-                {
+                let rowlabel = res.Rhythm__Response_value__c;
+                if (this.quesType === 'Checkbox') {
                     disable = true;
                     this.isCheckbox = true;
-                    if(res.Rhythm__Response_value__c==='true'){
+                    if (res.Rhythm__Response_value__c === 'true') {
                         rowlabel = 'Checked';
                     }
-                    else{
-                        rowlabel='Unchecked'
+                    else {
+                        rowlabel = 'Unchecked'
                     }
                 }
                 let responsewrapper = {};
                 let rownum = this.tablerowlst.length + 1;
                 responsewrapper.rownum = this.tablerowlst.length + 1;
-                let rowdata = [{ 'label': 'Rhythm__Response_value__c','rowlabel':rowlabel, 'value': res.Rhythm__Response_value__c, 'ispicklist': false, 'key': 'responseValue-' + rownum, 'display': true,'isEditable':disable  },
-                { 'label': 'Rhythm__preferred_Not_preferred__c','rowlabel':res.Rhythm__preferred_Not_preferred__c, 'value': res.Rhythm__preferred_Not_preferred__c, 'ispicklist': true, 'options': this.preferredOptions, 'key': 'preffered-' + rownum, 'display': true,'isEditable':disable  },
-                { 'label': 'Rhythm__Upload_Required__c','rowlabel':res.Rhythm__Upload_Required__c, 'value': res.Rhythm__Upload_Required__c, 'ispicklist': true, 'options': this.reqFileOptions, 'key': 'uploadrequired-' + rownum, 'display': true,'isEditable':disable  },
-                { 'label': 'Rhythm__Score__c','rowlabel':res.Rhythm__Score__c, 'value': res.Rhythm__Score__c, 'ispicklist': false, 'key': 'score-' + rownum, 'display': true,'isEditable':this.isdisable  },
-                { 'label': 'Rhythm__Weight__c','rowlabel':res.Rhythm__Weight__c, 'value': res.Rhythm__Weight__c, 'ispicklist': false, 'key': 'weight-' + rownum, 'display': true,'isEditable':this.isdisable  },
-                { 'label': 'Id','rowlabel':res.Id, 'value': res.Id, 'ispicklist': false, 'key': 'id-' + rownum, 'display': false,'isEditable':this.isdisable}
+                let rowdata = [{ 'label': 'Rhythm__Response_value__c', 'rowlabel': rowlabel, 'value': res.Rhythm__Response_value__c, 'ispicklist': false, 'key': 'responseValue-' + rownum, 'display': true, 'isEditable': disable },
+                { 'label': 'Rhythm__preferred_Not_preferred__c', 'rowlabel': res.Rhythm__preferred_Not_preferred__c, 'value': res.Rhythm__preferred_Not_preferred__c, 'ispicklist': true, 'options': this.preferredOptions, 'key': 'preffered-' + rownum, 'display': true, 'isEditable': disable },
+                { 'label': 'Rhythm__Upload_Required__c', 'rowlabel': res.Rhythm__Upload_Required__c, 'value': res.Rhythm__Upload_Required__c, 'ispicklist': true, 'options': this.reqFileOptions, 'key': 'uploadrequired-' + rownum, 'display': true, 'isEditable': disable },
+                { 'label': 'Rhythm__Score__c', 'rowlabel': res.Rhythm__Score__c, 'value': res.Rhythm__Score__c, 'ispicklist': false, 'key': 'score-' + rownum, 'display': true, 'isEditable': this.isdisable },
+                { 'label': 'Rhythm__Weight__c', 'rowlabel': res.Rhythm__Weight__c, 'value': res.Rhythm__Weight__c, 'ispicklist': false, 'key': 'weight-' + rownum, 'display': true, 'isEditable': this.isdisable },
+                { 'label': 'Id', 'rowlabel': res.Id, 'value': res.Id, 'ispicklist': false, 'key': 'id-' + rownum, 'display': false, 'isEditable': this.isdisable }
                 ];
                 responsewrapper.rowdata = rowdata;
+                responsewrapper.isAddnewrow = false;
+               
+                if(cnt===len-1){
+                    responsewrapper.isAddnewrow = true;
+                }
+                cnt++;
                 this.tablerowlst.push(responsewrapper);
 
             });
@@ -114,53 +121,54 @@ export default class RtmvpcCreateResponseAttributes extends LightningElement {
     /*
         handleQuestionTypeChange method is used to change the wrapper based on response type change.
     */
-    @api handleQuestionTypeChange(value)
-    {
-        this.tablerowlst=[];
+    @api handleQuestionTypeChange(value) {
+        this.tablerowlst = [];
         this.quesType = value;
         this.constructNewWrapper();
     }
-     /*
-        This method is used to construct the wrapper for clickling on add new response attribute
-    */
+    /*
+       This method is used to construct the wrapper for clickling on add new response attribute
+   */
     constructNewWrapper() {
-        if(this.quesType ==='Checkbox')
-        {
-        let responsewrapper = {};
-        let rownum = this.tablerowlst.length + 1;
-        responsewrapper.rownum = this.tablerowlst.length + 1;
-        let rowdata = [{ 'label': 'Rhythm__Response_value__c','rowlabel':'Checked', 'value':'true', 'ispicklist': false,'isNumber': false, 'key': 'responseValue-' + rownum, 'display': true ,'isEditable':true },
-        { 'label': 'Rhythm__preferred_Not_preferred__c','rowlabel':'', 'value': '', 'ispicklist': true,'isNumber': false, 'options': this.preferredOptions, 'key': 'preffered-' + rownum, 'display': true,'isEditable':false  },
-        { 'label': 'Rhythm__Upload_Required__c','rowlabel':'', 'value': '', 'ispicklist': true,'isNumber': false, 'options': this.reqFileOptions, 'key': 'uploadrequired-' + rownum, 'display': true,'isEditable':false  },
-        { 'label': 'Rhythm__Score__c','rowlabel':'', 'value': '', 'ispicklist': false,'isNumber': true, 'key': 'score-' + rownum, 'display': true,'isEditable':false  },
-        { 'label': 'Rhythm__Weight__c','rowlabel':'', 'value': '', 'ispicklist': false,'isNumber': true, 'key': 'weight-' + rownum, 'display': true,'isEditable':false  }];
-        responsewrapper.rowdata = rowdata;
-        this.tablerowlst.push(responsewrapper);
-        responsewrapper = {};
-        rownum = this.tablerowlst.length + 1;
-        responsewrapper.rownum = this.tablerowlst.length + 1;
-        rowdata = [{ 'label': 'Rhythm__Response_value__c','rowlabel':'Unchecked', 'value':'false', 'ispicklist': false, 'isNumber': false, 'key': 'responseValue-' + rownum, 'display': true ,'isEditable':true },
-        { 'label': 'Rhythm__preferred_Not_preferred__c','rowlabel':'', 'value': '', 'ispicklist': true,'isNumber': false, 'options': this.preferredOptions, 'key': 'preffered-' + rownum, 'display': true,'isEditable':false  },
-        { 'label': 'Rhythm__Upload_Required__c','rowlabel':'', 'value': '', 'ispicklist': true,'isNumber': false, 'options': this.reqFileOptions, 'key': 'uploadrequired-' + rownum, 'display': true,'isEditable':false  },
-        { 'label': 'Rhythm__Score__c','rowlabel':'', 'value': '', 'ispicklist': false,'isNumber': true, 'key': 'score-' + rownum, 'display': true,'isEditable':false  },
-        { 'label': 'Rhythm__Weight__c','rowlabel':'', 'value': '', 'ispicklist': false,'isNumber': true, 'key': 'weight-' + rownum, 'display': true,'isEditable':false  }];
-        responsewrapper.rowdata = rowdata;
-        this.tablerowlst.push(responsewrapper);
-        this.isCheckbox = true;
+        if (this.quesType === 'Checkbox') {
+            let responsewrapper = {};
+            let rownum = this.tablerowlst.length + 1;
+            responsewrapper.rownum = this.tablerowlst.length + 1;
+            let rowdata = [{ 'label': 'Rhythm__Response_value__c', 'rowlabel': 'Checked', 'value': 'true', 'ispicklist': false, 'isNumber': false, 'key': 'responseValue-' + rownum, 'display': true, 'isEditable': true },
+            { 'label': 'Rhythm__preferred_Not_preferred__c', 'rowlabel': '', 'value': '', 'ispicklist': true, 'isNumber': false, 'options': this.preferredOptions, 'key': 'preffered-' + rownum, 'display': true, 'isEditable': false },
+            { 'label': 'Rhythm__Upload_Required__c', 'rowlabel': '', 'value': '', 'ispicklist': true, 'isNumber': false, 'options': this.reqFileOptions, 'key': 'uploadrequired-' + rownum, 'display': true, 'isEditable': false },
+            { 'label': 'Rhythm__Score__c', 'rowlabel': '', 'value': '', 'ispicklist': false, 'isNumber': true, 'key': 'score-' + rownum, 'display': true, 'isEditable': false },
+            { 'label': 'Rhythm__Weight__c', 'rowlabel': '', 'value': '', 'ispicklist': false, 'isNumber': true, 'key': 'weight-' + rownum, 'display': true, 'isEditable': false }];
+            responsewrapper.rowdata = rowdata;
+            responsewrapper.isAddnewrow = false;
+            this.tablerowlst.push(responsewrapper);
+            responsewrapper = {};
+            rownum = this.tablerowlst.length + 1;
+            responsewrapper.rownum = this.tablerowlst.length + 1;
+            rowdata = [{ 'label': 'Rhythm__Response_value__c', 'rowlabel': 'Unchecked', 'value': 'false', 'ispicklist': false, 'isNumber': false, 'key': 'responseValue-' + rownum, 'display': true, 'isEditable': true },
+            { 'label': 'Rhythm__preferred_Not_preferred__c', 'rowlabel': '', 'value': '', 'ispicklist': true, 'isNumber': false, 'options': this.preferredOptions, 'key': 'preffered-' + rownum, 'display': true, 'isEditable': false },
+            { 'label': 'Rhythm__Upload_Required__c', 'rowlabel': '', 'value': '', 'ispicklist': true, 'isNumber': false, 'options': this.reqFileOptions, 'key': 'uploadrequired-' + rownum, 'display': true, 'isEditable': false },
+            { 'label': 'Rhythm__Score__c', 'rowlabel': '', 'value': '', 'ispicklist': false, 'isNumber': true, 'key': 'score-' + rownum, 'display': true, 'isEditable': false },
+            { 'label': 'Rhythm__Weight__c', 'rowlabel': '', 'value': '', 'ispicklist': false, 'isNumber': true, 'key': 'weight-' + rownum, 'display': true, 'isEditable': false }];
+            responsewrapper.rowdata = rowdata;
+            responsewrapper.isAddnewrow = false;
+            this.tablerowlst.push(responsewrapper);
+            this.isCheckbox = true;
         }
-        else{
-        this.isCheckbox = false;
-        let responsewrapper = {};
-        let rownum = this.tablerowlst.length + 1;
-        responsewrapper.rownum = this.tablerowlst.length + 1;
-        let rowdata = [{ 'label': 'Rhythm__Response_value__c','rowlabel':'', 'value': '', 'ispicklist': false,'isNumber': false, 'key': 'responseValue-' + rownum, 'display': true ,'isEditable':false },
-        { 'label': 'Rhythm__preferred_Not_preferred__c','rowlabel':'', 'value': '', 'ispicklist': true,'isNumber': false, 'options': this.preferredOptions, 'key': 'preffered-' + rownum, 'display': true,'isEditable':false  },
-        { 'label': 'Rhythm__Upload_Required__c','rowlabel':'', 'value': '', 'ispicklist': true,'isNumber': false, 'options': this.reqFileOptions, 'key': 'uploadrequired-' + rownum, 'display': true,'isEditable':false  },
-        { 'label': 'Rhythm__Score__c','rowlabel':'', 'value': '', 'ispicklist': false,'isNumber': true, 'key': 'score-' + rownum, 'display': true,'isEditable':false  },
-        { 'label': 'Rhythm__Weight__c','rowlabel':'', 'value': '', 'ispicklist': false,'isNumber': true, 'key': 'weight-' + rownum, 'display': true,'isEditable':false  }];
-        responsewrapper.rowdata = rowdata;
-        this.tablerowlst.push(responsewrapper);
-        }   
+        else {
+            this.isCheckbox = false;
+            let responsewrapper = {};
+            let rownum = this.tablerowlst.length + 1;
+            responsewrapper.rownum = this.tablerowlst.length + 1;
+            let rowdata = [{ 'label': 'Rhythm__Response_value__c', 'rowlabel': '', 'value': '', 'ispicklist': false, 'isNumber': false, 'key': 'responseValue-' + rownum, 'display': true, 'isEditable': false },
+            { 'label': 'Rhythm__preferred_Not_preferred__c', 'rowlabel': '', 'value': '', 'ispicklist': true, 'isNumber': false, 'options': this.preferredOptions, 'key': 'preffered-' + rownum, 'display': true, 'isEditable': false },
+            { 'label': 'Rhythm__Upload_Required__c', 'rowlabel': '', 'value': '', 'ispicklist': true, 'isNumber': false, 'options': this.reqFileOptions, 'key': 'uploadrequired-' + rownum, 'display': true, 'isEditable': false },
+            { 'label': 'Rhythm__Score__c', 'rowlabel': '', 'value': '', 'ispicklist': false, 'isNumber': true, 'key': 'score-' + rownum, 'display': true, 'isEditable': false },
+            { 'label': 'Rhythm__Weight__c', 'rowlabel': '', 'value': '', 'ispicklist': false, 'isNumber': true, 'key': 'weight-' + rownum, 'display': true, 'isEditable': false }];
+            responsewrapper.rowdata = rowdata;
+            responsewrapper.isAddnewrow = true;
+            this.tablerowlst.push(responsewrapper);
+        }
     }
     /*
         This method is used to store the values of Response Attributes.
@@ -191,8 +199,20 @@ export default class RtmvpcCreateResponseAttributes extends LightningElement {
     */
     handleNewRow() {
         this.constructNewWrapper();
+        let cnt =0;
+        let len = this.tablerowlst.length;
+        this.tablerowlst.forEach(tab=>{
+            
+            if(cnt===len-1){
+                tab.isAddnewrow =  true;
+            }
+            else{
+                tab.isAddnewrow = false;
+            }
+            cnt++;
+        })
     }
-    handlefocus(event){
+    handlefocus(event) {
         // let dataId = event.currentTarget.getAttribute('data-val');
         // let respValue = event.target.value;
         // console.log('dataId',dataId);

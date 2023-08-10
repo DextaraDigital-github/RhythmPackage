@@ -127,10 +127,10 @@ export default class AWSS3FileOperations extends LightningElement {
                         let fileName = objectKey.substring(objectKey.lastIndexOf("/") + 1);
                         let fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1);
                         if (fileExtension === 'doc' || fileExtension === 'docx' || fileExtension === 'xls' || fileExtension === 'xlsx') {
-                            fileList.push({ type: fileExtension, preview: false, key: objectKey, url: this.endpoint + '/' + objectKey, value: fileName });
+                            fileList.push({ type: fileExtension, preview: false, key: objectKey, url: this.endpoint + '/' + objectKey, value: fileName.substring(fileName.indexOf("_") + 1) });
                         }
                         else {
-                            fileList.push({ type: fileExtension, preview: true, key: objectKey, url: this.endpoint + '/' + objectKey, value: fileName });
+                            fileList.push({ type: fileExtension, preview: true, key: objectKey, url: this.endpoint + '/' + objectKey, value: fileName.substring(fileName.indexOf("_") + 1) });
                         }
                     }
                 });
@@ -203,7 +203,8 @@ export default class AWSS3FileOperations extends LightningElement {
                     responseId: this.responseRecId,
                     filesCount: this.keyList.length - 1
                 }).then(reco => {
-                    this.showToastMessage('Deleted', this.fileKey.substring(this.fileKey.lastIndexOf("/") + 1) + ' - Deleted Successfully', 'success');
+                    let fileName = this.fileKey.substring(this.fileKey.lastIndexOf("/") + 1);
+                    this.showToastMessage('Deleted', fileName.substring(fileName.indexOf("_") + 1) + ' - Deleted Successfully', 'success');
                     this.fileKey = '';
                     this.keyString = '';
                     this.previewUrl = '';

@@ -60,6 +60,7 @@ private class AssessmentTemplateControllerTest {
             templist[0].status__c='Active';
             //update templist[0];
             AssessmentTemplateController.getTemplateDetails(templist[0].id);
+            AssessmentTemplateController.getTemplateDetail(templist[0].id);
             System.assert(templist.size()>0, True);
             Test.stopTest();
         }

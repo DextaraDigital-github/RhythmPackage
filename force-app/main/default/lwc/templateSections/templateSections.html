@@ -30,22 +30,22 @@
 										<template if:true={disableButtons}>
 											<div class="slds-p-left_small">
 												<lightning-button slds-button_neutral
-													style="font-size: small;color: white;" title="Reorder"
-													onclick={handleReorderSections} variant="neutral" type="submit"
+													style="font-size: small;color: white;" data-name="Reorder Section" title="Reorder"
+													onclick={handleGetTemplate} variant="neutral" type="submit"
 													name="Section Reorder" label="Section Reorder">
 												</lightning-button>
 											</div>
 											<div class="slds-p-left_small">
 												<lightning-button slds-button_neutral
-													style="font-size: small;color: white;" title="Reorder"
-													onclick={handleReorderQuestions} variant="neutral" type="submit"
+													style="font-size: small;color: white;" data-name="Reorder Question" title="Reorder"
+													onclick={handleGetTemplate} variant="neutral" type="submit"
 													name="Question Reorder" label="Question Reorder">
 												</lightning-button>
 											</div>
 											<div class="slds-p-left_small slds-p-right_small">
 												<lightning-button slds-button_neutral
-													style="font-size: small;color: white;" title="New Record"
-													onclick={handlenew} variant="neutral" type="submit" name="New"
+													style="font-size: small;color: white;" data-name="New" title="New Record"
+													onclick={handleGetTemplate} variant="neutral" type="submit" name="New"
 													label="New">
 												</lightning-button>
 											</div>
@@ -64,7 +64,7 @@
 					</div>
 					<div class="cdg">
 						<lightning-tree-grid data={sectionListData} columns={columns} key-field="Id"
-							onrowaction={handleRowActions} wrap-text-max-lines="5">
+							onrowaction={handleGetTemplateDetails} wrap-text-max-lines="5">
 						</lightning-tree-grid>
 					</div>
 
