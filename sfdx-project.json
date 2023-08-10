@@ -4,7 +4,7 @@
             "path": "force-app",
             "package": "RhythmLabs",
             "versionName": "ver 0.1",
-            "versionNumber": "0.4.0.NEXT",
+            "versionNumber": "0.5.0.NEXT",
             "ancestorVersion": "HIGHEST",
             "default": true,
             "definitionFile": "config/project-scratch-def.json"
@@ -31,6 +31,7 @@
         "RhythmLabs@0.3.0-5": "04tDp000000J2SUIA0",
         "RhythmLabs@0.3.0-7": "04tDp000000J2SeIAK",
         "RhythmLabs@0.3.0-8": "04tDp000000J2SjIAK",
-        "RhythmLabs@0.4.0-1": "04tDp000000J2SoIAK"
+        "RhythmLabs@0.4.0-1": "04tDp000000J2SoIAK",
+        "RhythmLabs@0.5.0-1": "04tDp000000RgYRIA0"
     }
 }
