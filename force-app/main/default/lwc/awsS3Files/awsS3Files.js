@@ -55,14 +55,14 @@ export default class AWSS3FileOperations extends LightningElement {
                 });
         }
         else if (this.objectApiName === 'Rhythm__Action__c') {
-            if (!this.showUpload === true) {
-                this.disableFlag = true;
-                this.heightStyle = 'height:387px;';
+            if (this.showUpload === '' || this.showUpload === undefined) {
+                this.disableFlag = false;
             }
             else {
-                //this.disableFlag = false;
-                console.log('this.disableflag', this.isupload);
                 this.disableFlag = !(this.isupload);
+                if (this.disableFlag === true) {
+                    this.heightStyle = 'height:387px;';
+                }
             }
         }
         else {
