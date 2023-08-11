@@ -34,70 +34,69 @@ private class SendEmailBatchTest {
     */
     @isTest
     private static void sendEmailTest(){
-	 String ids= UserInfo.getUserId();
-        User u=[select id from user where id=:ids limit 1];
+        List<Account> accountList=[select id from Account ];
+        List<Contact> conList = [Select Id,Email,AccountId from Contact where AccountId IN: accountList];
+        List<User> userList = new List<User>();
+        User u1 = [SELECT Id FROM User where Email='sysadmin01@testorg.com'];
+        System.runAs(u1) {
+            Profile p = [Select Id from Profile where Name ='Customer Community User'];
+            UserRole role = new UserRole(Name = 'Test Role');
+            insert role;
+           
+            User user = new User();
+            user.FirstName = 'John';
+            user.LastName = 'Doe';
+            user.Username = 'johndoe@example123.com';
+            user.Email = 'johndoe@example.com';
+            user.Alias = 'johnd';
+            user.CommunityNickname = 'johnd';
+            user.TimeZoneSidKey = 'America/New_York';
+            user.LocaleSidKey = 'en_US';
+            user.EmailEncodingKey = 'UTF-8';
+            user.ProfileId = p.Id;
+            user.LanguageLocaleKey = 'en_US';
+            user.ContactId = conList[0].Id;
+            //user.UserRoleId = role.Id;
+            userList.add(user);
+            insert userList;
+        }
+        user u = [SELECT Id,UserName FROM User WHERE Email='standarduser@testorg.com' LIMIT 1];
         String testString;
         System.runAs(u) {
-        List<Account> accountList=[select id from Account ];
-        List<String> accountIds = new List<String>();
-        for (Account acc : accountList) {
-            accountIds.add(acc.Id);
+            List<String> accountIds = new List<String>();
+            for (Account acc : accountList) {
+                accountIds.add(acc.Id);
+            }
+            Map<Id,Account> accMap = new Map<Id,Account>([SELECT Id,Name FROM Account WHERE ID IN:accountIds]);
+            String selectedRecipientsData = JSON.serialize(accMap);
+            String selectedAccounts = JSON.serialize(accountIds);
+            
+            List<Assessment__c> assessmentList=[select id from Assessment__c];
+        
+            
+            Map<String, Object> paramMap = new Map<String, Object>();
+                paramMap.put('assessmentId', assessmentList[0].Id);
+                paramMap.put('subject', 'Testing mails');
+                paramMap.put('body', 'Hello');
+                paramMap.put('isBuilderContent', false);
+                paramMap.put('selectedRecipients', accountIds);
+                paramMap.put('selectedRecipientsData', selectedRecipientsData);
+                paramMap.put('templateId', '');
+                paramMap.put('hasCustomAttachments', false);
+                paramMap.put('hasCustomContents', true);
+                paramMap.put('attachmentsData', new Map<String, Object>{
+                'attachments'=> new List<Object>(),
+                    'contentDocuments'=> new List<Object>(),
+                    'customContentDocuments'=> new List<Object>(),
+                    'standardContentDocuments'=> new List<Object>(),
+                    'deleteContentDocuments'=> new List<Object>()
+                    });
+            Test.startTest();
+            SendEmailBatch emailtest = new SendEmailBatch(JSON.serialize(paramMap));
+            Database.executeBatch(emailtest);
+            testString='Success';
+            System.assertEquals(testString=='Success', true,'batch executed.');
+            Test.stopTest();
         }
-        Map<Id,Account> accMap = new Map<Id,Account>([SELECT Id,Name FROM Account WHERE ID IN:accountIds]);
-        String selectedRecipientsData = JSON.serialize(accMap);
-        String selectedAccounts = JSON.serialize(accountIds);
-        List<Contact> conList = [Select Id,Email,AccountId from Contact where AccountId IN: accountList];
-        List<Assessment__c> assessmentList=[select id from Assessment__c];
-    
-        Profile p = [Select Id from Profile where Name ='Customer Community User'];
-        UserRole role = new UserRole(Name = 'Test Role');
-        insert role;
-        List<User> userList = new List<User>();
-        User user = new User();
-        user.FirstName = 'John';
-        user.LastName = 'Doe';
-        user.Username = 'johndoe@example123.com';
-        user.Email = 'johndoe@example.com';
-        user.Alias = 'johnd';
-        user.CommunityNickname = 'johnd';
-        user.TimeZoneSidKey = 'America/New_York';
-        user.LocaleSidKey = 'en_US';
-        user.EmailEncodingKey = 'UTF-8';
-        user.ProfileId = p.Id;
-        user.LanguageLocaleKey = 'en_US';
-        user.ContactId = conList[0].Id;
-        //user.UserRoleId = role.Id;
-        userList.add(user);
-        insert userList;
-        EmailTemplate e = new EmailTemplate (
-            developerName = 'test',
-            IsActive = true,
-            Body = 'Test body',
-            TemplateType= 'Text', Name = 'test', FolderId = userList[0].Id); // plus any other fields that you want to set
-		insert e;
-        Map<String, Object> paramMap = new Map<String, Object>();
-            paramMap.put('assessmentId', assessmentList[0].Id);
-            paramMap.put('subject', 'Testing mails');
-            paramMap.put('body', 'Hello');
-            paramMap.put('isBuilderContent', false);
-            paramMap.put('selectedRecipients', accountIds);
-            paramMap.put('selectedRecipientsData', selectedRecipientsData);
-            paramMap.put('templateId', e.Id);
-            paramMap.put('hasCustomAttachments', false);
-            paramMap.put('hasCustomContents', true);
-            paramMap.put('attachmentsData', new Map<String, Object>{
-            'attachments'=> new List<Object>(),
-                'contentDocuments'=> new List<Object>(),
-                'customContentDocuments'=> new List<Object>(),
-                'standardContentDocuments'=> new List<Object>(),
-                'deleteContentDocuments'=> new List<Object>()
-                });
-        Test.startTest();
-        SendEmailBatch emailtest = new SendEmailBatch(JSON.serialize(paramMap));
-        Database.executeBatch(emailtest);
-        testString='Success';
-        System.assertEquals(testString=='Success', true,'batch executed.');
-        Test.stopTest();
     }
-}
 }

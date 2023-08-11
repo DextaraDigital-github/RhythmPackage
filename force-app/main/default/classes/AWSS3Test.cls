@@ -82,7 +82,7 @@ private class AWSS3Test {
     @isTest
     private static void testGetAuthenticationData() {
         String ids= UserInfo.getUserId();
-        User u=[select id from user where id=:ids limit 1];
+        user u = [SELECT Id,UserName FROM User WHERE Email='standarduser@testorg.com' LIMIT 1];
         System.runAs(u) {
             List<Assessment_Template__c> templist=[select id from Assessment_Template__c];
             List<Action__c> actlist=[select id,Question__c,AccountAssessment__c from Action__c];
@@ -105,7 +105,7 @@ private class AWSS3Test {
     @isTest
     private  static void testGetFileSignedUrl() {
         String ids= UserInfo.getUserId();
-        User u=[select id from user where id=:ids limit 1];
+        user u = [SELECT Id,UserName FROM User WHERE Email='standarduser@testorg.com' LIMIT 1];
         System.runAs(u) {
             Test.startTest();
             String result = AWSS3Controller.getFileSignedUrl('location', 'file', 60);
@@ -121,7 +121,7 @@ private class AWSS3Test {
     @isTest
     private  static void testcreateResponseforFileUpload() {
         String ids= UserInfo.getUserId();
-        User u=[select id from user where id=:ids limit 1];
+        user u = [SELECT Id,UserName FROM User WHERE Email='standarduser@testorg.com' LIMIT 1];
         System.runAs(u) {
             List<Response__c> resplist=[select id,Question__c,AccountAssessmentRelation__c from Response__c];
             List<Rhythm__AccountAssessmentRelation__c> asslist=[select Id,Rhythm__Account__c, Rhythm__Assessment__c from Rhythm__AccountAssessmentRelation__c LIMIT 1];
@@ -140,7 +140,7 @@ private class AWSS3Test {
     @isTest
     private  static void testcreateRespforFileUpload() {
         String ids= UserInfo.getUserId();
-        User u=[select id from user where id=:ids limit 1];
+        user u = [SELECT Id,UserName FROM User WHERE Email='standarduser@testorg.com' LIMIT 1];
         System.runAs(u) {
             List<Account> acc = [Select Id,Name from Account];
             List<Response__c> resp=[Select id,Question__c,AccountAssessmentRelation__c  from Response__c];
@@ -163,7 +163,7 @@ private class AWSS3Test {
     @isTest
     private  static void testUploadFiles() {
         String ids= UserInfo.getUserId();
-        User u=[select id from user where id=:ids limit 1];
+        user u = [SELECT Id,UserName FROM User WHERE Email='standarduser@testorg.com' LIMIT 1];
         System.runAs(u) {
             List<Account> acc = [Select Id,Name from Account];
             Test.startTest();
@@ -176,7 +176,7 @@ private class AWSS3Test {
     @isTest
     private  static void testAwsuploadFiles() {
         String ids= UserInfo.getUserId();
-        User u=[select id from user where id=:ids limit 1];
+        user u = [SELECT Id,UserName FROM User WHERE Email='standarduser@testorg.com' LIMIT 1];
         System.runAs(u) {
             List<Account> acc = [Select Id,Name from Account];
             List<ContentDocumentLink> condocList= [SELECT ContentDocumentId,LinkedEntityId FROM ContentDocumentLink WHERE LinkedEntityId =:acc[0].id];
@@ -200,7 +200,7 @@ private class AWSS3Test {
     @isTest
     private static void awsTest(){
         String ids= UserInfo.getUserId();
-        User u=[select id from user where id=:ids limit 1];
+        user u = [SELECT Id,UserName FROM User WHERE Email='standarduser@testorg.com' LIMIT 1];
         System.runAs(u) {
             Dom.Document doc = new Dom.Document();
             Dom.Xmlnode rootNode = doc.createRootElement('TestReport', null, null);
