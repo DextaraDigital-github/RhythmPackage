@@ -330,6 +330,7 @@ export default class Questionnaire extends LightningElement {
             this.assessment = this.recordId;
             this.documentParentId = this.recordId;
             this.isTemplate = true;
+            this.objectName = 'Rhythm__Assessment_Template__c';
         } else {
             this.layoutItemSize = 12;
             this.assessment = this.accountassessmentid;

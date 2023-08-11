@@ -109,6 +109,8 @@ private class EmailServiceTest {
                 for (Account acc : accountList) {
                     accountIds.add(acc.Id);
                 }
+                Map<Id,Account> accMap = new Map<Id,Account>([SELECT Id,Name FROM Account WHERE ID IN:accountIds]);
+                String selectedRecipientsData = JSON.serialize(accMap);
                 String selectedAccounts = JSON.serialize(accountIds);
                 
                 Assessment_Template__c templates=[select id from Assessment_Template__c];
@@ -119,7 +121,8 @@ private class EmailServiceTest {
                 paramMap.put('subject', 'Testing mails');
                 paramMap.put('body', 'Hello');
                 paramMap.put('isBuilderContent', false);
-                paramMap.put('selectedAccounts', accountIds);
+                paramMap.put('selectedRecipients', accountIds);
+                paramMap.put('selectedRecipientsData', selectedRecipientsData);
                 paramMap.put('templateId', templates.Id);
                 paramMap.put('hasCustomAttachments', false);
                 paramMap.put('hasCustomContents', false);
@@ -156,7 +159,6 @@ private class EmailServiceTest {
             Map<String, Object> parameterMap = new Map<String, Object>();
             parameterMap.put('assessmentId', assessmentList[0].Id);
             parameterMap.put('searchKey', 'Test');
-            String parameterMapJson = JSON.serialize(parameterMap);
             Test.startTest();
             testString='Success';
             System.assertEquals(testString=='Success', true,'fetch content version.');

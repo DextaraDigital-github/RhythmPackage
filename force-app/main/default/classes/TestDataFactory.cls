@@ -136,7 +136,15 @@ public with sharing class TestDataFactory{
         LocaleSidKey='en_US', ProfileId = portalProfile.Id,
         TimeZoneSidKey='America/Los_Angeles',
         UserName=uniqueUserName,UserRoleId =ur.Id);
+
+        User userTwo = new User(Alias = 'standt', Email='standarduser2@testorg.com',
+        EmailEncodingKey='UTF-8', LastName='Testing_2', LanguageLocaleKey='en_US',
+        LocaleSidKey='en_US', ProfileId = portalProfile.Id,
+        TimeZoneSidKey='America/Los_Angeles',
+        UserName=uniqueUserName+'_2',UserRoleId =ur.Id);
         lstuser.add(u);
+        lstuser.add(userTwo);
+
         set<Id> userId = new set<Id>();
         List<user> retUser = createRecords(lstuser, true, new Map<String, Object>());
         userId.add(retUser[0].Id);

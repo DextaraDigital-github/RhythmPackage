@@ -11,7 +11,7 @@ public with sharing class TemplateController {
     /**
     * @description clone template and its related records.
     * @param templateId This is a record id of an Template.
-    * @param SObject template data to create new record.
+    * @param templateRecord template data to create new record.
     * @return 
     */
     @AuraEnabled

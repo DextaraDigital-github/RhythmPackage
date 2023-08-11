@@ -54,6 +54,7 @@ public with sharing class AWSS3Controller {
 * @param objectName This is the object name of a record.
 * @param pathRecId This is the recordId.
 * @param deleteFlag This is the deleteFlag.
+* @param userId This is th userId.
 * @return flag on uploaded successfully
 */ 
     @AuraEnabled
@@ -145,7 +146,6 @@ public with sharing class AWSS3Controller {
     * @description update Files count.
     * @param responseId This is a record id of an Response.
     * @param filesCount
-    *@return
     */    
     @AuraEnabled
     /* sfge-disable-stack ApexFlsViolationRule */
