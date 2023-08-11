@@ -125,6 +125,9 @@ public with sharing class TestDataFactory{
     public static User createTestUser(){
         UserRole ur = createTestRole();
         Profile portalProfile = [SELECT Id FROM Profile WHERE Name='Standard Platform User' WITH SECURITY_ENFORCED Limit 1];
+
+        Profile sysAdmin = [SELECT Id FROM Profile WHERE Name='System Administrator' WITH SECURITY_ENFORCED Limit 1];
+
         List<user> lstuser = new List<User>();
         String orgId = UserInfo.getOrganizationId();
         String dateString = String.valueof(Datetime.now()).replace(' ','').replace(':','').replace('-','');
@@ -142,8 +145,16 @@ public with sharing class TestDataFactory{
         LocaleSidKey='en_US', ProfileId = portalProfile.Id,
         TimeZoneSidKey='America/Los_Angeles',
         UserName=uniqueUserName+'_2',UserRoleId =ur.Id);
+
+        User userThree = new User(Alias = 'standt', Email='sysadmin01@testorg.com',
+        EmailEncodingKey='UTF-8', LastName='Testing_23', LanguageLocaleKey='en_US',
+        LocaleSidKey='en_US', ProfileId = sysAdmin.Id,
+        TimeZoneSidKey='America/Los_Angeles',
+        UserName=uniqueUserName+'_3',UserRoleId =ur.Id);
+
         lstuser.add(u);
         lstuser.add(userTwo);
+        lstuser.add(userThree);
 
         set<Id> userId = new set<Id>();
         List<user> retUser = createRecords(lstuser, true, new Map<String, Object>());
