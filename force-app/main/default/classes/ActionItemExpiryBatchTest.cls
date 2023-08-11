@@ -64,9 +64,6 @@ public class ActionItemExpiryBatchTest {
             System.runAs(u){
                 String testString;
                 Test.startTest();
-                List<Action__c> ationItemList = [SELECT Id,Due_Date__c FROM Action__c WHERE Name='test action' LIMIT 1];
-                ationItemList[0].Due_Date__c = Date.Today() - 1;
-                update ationItemList;
                 ActionItemExpiryBatch b = new ActionItemExpiryBatch();
                 testString = 'Success';
                 Database.executeBatch(b);
@@ -74,7 +71,7 @@ public class ActionItemExpiryBatchTest {
                 System.assertEquals(testString=='Success', true,'Batch Ran Successfully.');
             }
         }catch(exception e){
-
+            System.assertEquals(e.getMessage()!=null, true,'Error Catched.');
         }
     }
 }

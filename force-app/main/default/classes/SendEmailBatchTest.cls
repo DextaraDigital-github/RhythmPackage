@@ -43,8 +43,10 @@ private class SendEmailBatchTest {
         for (Account acc : accountList) {
             accountIds.add(acc.Id);
         }
+        Map<Id,Account> accMap = new Map<Id,Account>([SELECT Id,Name FROM Account WHERE ID IN:accountIds]);
+        String selectedRecipientsData = JSON.serialize(accMap);
+        String selectedAccounts = JSON.serialize(accountIds);
         List<Contact> conList = [Select Id,Email,AccountId from Contact where AccountId IN: accountList];
-        Assessment_Template__c templates=[select id from Assessment_Template__c];
         List<Assessment__c> assessmentList=[select id from Assessment__c];
     
         Profile p = [Select Id from Profile where Name ='Customer Community User'];
@@ -78,7 +80,8 @@ private class SendEmailBatchTest {
             paramMap.put('subject', 'Testing mails');
             paramMap.put('body', 'Hello');
             paramMap.put('isBuilderContent', false);
-            paramMap.put('selectedAccounts', accountIds);
+            paramMap.put('selectedRecipients', accountIds);
+            paramMap.put('selectedRecipientsData', selectedRecipientsData);
             paramMap.put('templateId', e.Id);
             paramMap.put('hasCustomAttachments', false);
             paramMap.put('hasCustomContents', true);

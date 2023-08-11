@@ -199,6 +199,7 @@ public with sharing class AWSS3Service extends AWS {
 * @param objectName This is the object name of a record.
 * @param pathRecId This is the recordId.
 * @param deleteFlag This is the deleteFlag.
+* @param userId This is the userId.
 * @return flag on uploaded successfully
 */ 
     public Boolean uploadFiles(Id recId, String objectName, Id pathRecId,Boolean deleteFlag, Id userId) {
@@ -381,18 +382,16 @@ public with sharing class AWSS3Service extends AWS {
     * @description update Files count.
     * @param responseId This is a record id of an Response.
     * @param filesCount
-    *@return
     */
     public void updateRespFilesCount(String responseId, Integer filesCount) {
         try {
             List<Response__c> srList = new List<Response__c>();
-            List<String> errorList = new List<String>();
             if(String.isNotBlank(responseId) && filesCount > 0) {
                 Response__c res=new Response__c();
                 res.Id= responseId;
                 res.Files__c = String.valueOf(filesCount);
                 srList.add(res);
-                Database.SaveResult[] saveResult = safe.doUpdate(srList);
+                safe.doUpdate(srList);
             }
         }
         catch(Exception e) {
