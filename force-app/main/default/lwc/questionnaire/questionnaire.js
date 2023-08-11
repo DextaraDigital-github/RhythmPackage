@@ -696,6 +696,12 @@ export default class Questionnaire extends LightningElement {
                                                 }
                                             }
                                             childQuestion.questions.forEach(ques => {
+                                                if (question.Rhythm__Flag__c === true) {                                                  
+                                                    var status=this.timeline[0].status;
+                                                    if (status === 'Need More Information') {
+                                                        ques.isEditable = false;
+                                                    }
+                                                }
                                                 if (childQuestion.isdisplay && ques.required) {
                                                     this.requiredQuestionList.push(ques.Id);
                                                 }
@@ -983,10 +989,11 @@ export default class Questionnaire extends LightningElement {
                                                             }
                                                         }
                                                     }
+                                                    if (!childbool) {
+                                                        ques.showUpload = false;
+                                                    }
                                                 }
-                                                if (!childbool) {
-                                                    ques.showUpload = false;
-                                                }
+                                               
                                             })
                                         }
                                     }
