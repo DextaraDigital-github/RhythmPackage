@@ -72,12 +72,6 @@ export default class RtmvpcCreateResponseAttributes extends LightningElement {
                 { 'label': 'Id', 'rowlabel': res.Id, 'value': res.Id, 'ispicklist': false, 'key': 'id-' + rownum, 'display': false, 'isEditable': this.isdisable }
                 ];
                 responsewrapper.rowdata = rowdata;
-                responsewrapper.isAddnewrow = false;
-               
-                if(cnt===len-1){
-                    responsewrapper.isAddnewrow = true;
-                }
-                cnt++;
                 this.tablerowlst.push(responsewrapper);
 
             });
@@ -114,6 +108,29 @@ export default class RtmvpcCreateResponseAttributes extends LightningElement {
             }
         });
         this.tablerowlst.splice(index - 1, 1);
+        let cnt =0;
+        this.tablerowlst.forEach(tab=>{
+            cnt++
+            tab.rownum = cnt;
+            tab.rowdata.forEach(row=>{
+                let key = row.key;
+                if(key.includes('responseValue')){
+                    row.key = 'responseValue-'+cnt;
+                }
+                else if(key.includes('preffered')){
+                    row.key = 'preffered-'+cnt;
+                }
+                else if(key.includes('uploadrequired')){
+                    row.key = 'uploadrequired-'+cnt;
+                }
+                else if(key.includes('score')){
+                    row.key = 'score-'+cnt;
+                }
+                else if(key.includes('weight')){
+                    row.key = 'weight-'+cnt;
+                }
+            })
+        });
         if (this.tablerowlst.length == 0) {
             this.constructNewWrapper();
         }
@@ -140,7 +157,7 @@ export default class RtmvpcCreateResponseAttributes extends LightningElement {
             { 'label': 'Rhythm__Score__c', 'rowlabel': '', 'value': '', 'ispicklist': false, 'isNumber': true, 'key': 'score-' + rownum, 'display': true, 'isEditable': false },
             { 'label': 'Rhythm__Weight__c', 'rowlabel': '', 'value': '', 'ispicklist': false, 'isNumber': true, 'key': 'weight-' + rownum, 'display': true, 'isEditable': false }];
             responsewrapper.rowdata = rowdata;
-            responsewrapper.isAddnewrow = false;
+        
             this.tablerowlst.push(responsewrapper);
             responsewrapper = {};
             rownum = this.tablerowlst.length + 1;
@@ -151,7 +168,7 @@ export default class RtmvpcCreateResponseAttributes extends LightningElement {
             { 'label': 'Rhythm__Score__c', 'rowlabel': '', 'value': '', 'ispicklist': false, 'isNumber': true, 'key': 'score-' + rownum, 'display': true, 'isEditable': false },
             { 'label': 'Rhythm__Weight__c', 'rowlabel': '', 'value': '', 'ispicklist': false, 'isNumber': true, 'key': 'weight-' + rownum, 'display': true, 'isEditable': false }];
             responsewrapper.rowdata = rowdata;
-            responsewrapper.isAddnewrow = false;
+            
             this.tablerowlst.push(responsewrapper);
             this.isCheckbox = true;
         }
@@ -166,7 +183,7 @@ export default class RtmvpcCreateResponseAttributes extends LightningElement {
             { 'label': 'Rhythm__Score__c', 'rowlabel': '', 'value': '', 'ispicklist': false, 'isNumber': true, 'key': 'score-' + rownum, 'display': true, 'isEditable': false },
             { 'label': 'Rhythm__Weight__c', 'rowlabel': '', 'value': '', 'ispicklist': false, 'isNumber': true, 'key': 'weight-' + rownum, 'display': true, 'isEditable': false }];
             responsewrapper.rowdata = rowdata;
-            responsewrapper.isAddnewrow = true;
+            
             this.tablerowlst.push(responsewrapper);
         }
     }
@@ -199,18 +216,6 @@ export default class RtmvpcCreateResponseAttributes extends LightningElement {
     */
     handleNewRow() {
         this.constructNewWrapper();
-        let cnt =0;
-        let len = this.tablerowlst.length;
-        this.tablerowlst.forEach(tab=>{
-            
-            if(cnt===len-1){
-                tab.isAddnewrow =  true;
-            }
-            else{
-                tab.isAddnewrow = false;
-            }
-            cnt++;
-        })
     }
     handlefocus(event) {
         // let dataId = event.currentTarget.getAttribute('data-val');
