@@ -897,6 +897,10 @@ public with sharing class AssessmentController {
             List<ErrorTransactionLog__c> errorList = new List<ErrorTransactionLog__c>();
             Configuration__mdt siteData = Configuration__mdt.getInstance('Site_URL');
             List<Messaging.SingleEmailMessage> emailMessagesList = new List<Messaging.SingleEmailMessage>();
+            Map<Integer,String> monthMap = new Map<Integer,String>{
+                1=>'Jan',2=>'Feb',3=>'Mar',4=>'Apr',5=>'May',6=>'Jun',
+                7=>'Jul',8=>'Aug',9=>'Sep',10=>'Oct',11=>'Nov',12=>'Dec'
+            };
             List<AccountAssessmentRelation__c> assRlnsList= [SELECT Id,Account__c,Account__r.Name,
                                                             Account__r.Email__c,Assessment__r.End_Date__c,Assessment__c,Assessment__r.Name
                                                             FROM AccountAssessmentRelation__c
@@ -980,13 +984,19 @@ public with sharing class AssessmentController {
                     }
                 }else if(source.equalsIgnoreCase('ExpiryNotification')){
                     for(AccountAssessmentRelation__c assRelRec:assRlnsList){
+                        Date endDate = assRelRec.Assessment__r.End_Date__c;
+                        Integer month = endDate.month();
+                        String month_str = monthMap.get(month);
+                        Integer day = endDate.day();
+                        Integer year =  endDate.year();
+                        String endDate_str = month_str+'-'+String.valueOf(day)+'-'+String.valueOf(year);
                         if(accUserMap.containsKey(assRelRec.Account__c)){
                             for(User uRec:accUserMap.get(assRelRec.Account__c)){
                                 Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
                                 String subject = 'Due Date remainder for '+assRelRec.Assessment__r.Name;
                                 String body = '<html><body>'+
                                     '<br><br>'+'Dear '+uRec.Name+','+
-                                    '<br><br>'+'The deadline for completing your Assessment is '+assRelRec.Assessment__r.End_Date__c+'. This is a reminder to make sure you’ve finished the Assessment by then.'+
+                                    '<br><br>'+'The deadline for completing your Assessment is '+endDate_str+'. This is a reminder to make sure you’ve finished the Assessment by then.'+
                                     '<br><br>To access the Assessment click on this <a href='+siteData.Site_URL__c+assRelRec.Id+'>Link</a> and log in with your username and password.'+
                                     '<br><br>'+'Thanks,'+
                                     '<br>'+UserInfo.getName();
