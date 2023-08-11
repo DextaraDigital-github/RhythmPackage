@@ -186,14 +186,18 @@ public with sharing class SendEmailBatch implements Database.batchable<sObject>,
             Map<String,Object> selectedRecipient = (Map<String,Object>)JSON.deserializeUntyped(JSON.serialize(selectedRecipientsMap.get(String.valueOf(accId))));
             if(!email.accUserMap.containsKey(accId)) {    // Storing 'No Email' against accountId which is not in accUserMap as the account might not have a primary contact, account's primary contact or the primary contact's user might not have an email
             	failedEmailsMap.Id = accId;
-                failedEmailsMap.Name = (String)selectedRecipient.get('Name');
+                if(selectedRecipient != null){
+                    failedEmailsMap.Name = (String)selectedRecipient.get('Name');
+                }
                 failedEmailsMap.Email = 'No Email';
                 failedEmailsMapList.add(failedEmailsMap);
                 htmlBody += '<li>' + failedEmailsMap.Name + ' (' + 'No Email' + ')</li>';
             }
             else if(email.userEmailMap != null && email.userEmailMap.size() > 0 && !email.userEmailMap.containsKey(email.accUserMap.get(accId).Id)) {   // Storing email and this email might not have been sent due to some other issue despite the user having email address
             	failedEmailsMap.Id = accId;
-                failedEmailsMap.Name = (String)selectedRecipient.get('Name');
+                if(selectedRecipient != null){
+                    failedEmailsMap.Name = (String)selectedRecipient.get('Name');
+                }
                 failedEmailsMap.Email = email.userEmailMap.get('Email');
                 failedEmailsMapList.add(failedEmailsMap);
                 htmlBody += '<li>' + failedEmailsMap.Name + ' (' + email.userEmailMap.get('Email') + ')</li>';
