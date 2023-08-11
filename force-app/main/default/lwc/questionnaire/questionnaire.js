@@ -1483,10 +1483,10 @@ export default class Questionnaire extends LightningElement {
                 else {
                     this.countAutoSave++;
                     if (this.countAutoSave === 1 && this.accountAssessmentStatus!=='In Progress' && this.accountAssessmentStatus!=='Need More Information') {
-                        const selectedEvent = new CustomEvent('updatetimeline', {
+                       /* const selectedEvent = new CustomEvent('updatetimeline', {
                             detail: filemaplst
                         });
-                        this.dispatchEvent(selectedEvent);
+                        this.dispatchEvent(selectedEvent);*/
                     }
                 }
             }).catch(error => {
