@@ -1114,8 +1114,10 @@ export default class Questionnaire extends LightningElement {
     handleSave() {
         this.ishideToast = true;
         this.isAutoSave = false;
+        this.success = true;
+        this.showToast = true;
         this.countAutoSave = 0;
-        this.constructResponse(false);    
+        setTimeout(() => { this.totastmessage = 'Responses saved successfully'; });
     }
 
     /* handleSubmit method is used to save the responses for particular question and update the assessment status to submit */
@@ -1448,6 +1450,7 @@ export default class Questionnaire extends LightningElement {
                     this.responselstMap[res.Rhythm__Question__c] = res.Id;
                 });
                 if (isSubmit) {
+                    this.showButtons.Save_Submit = false;
                     this.questionsAndAnswerss.forEach(questionAnswer => {
                         questionAnswer.questions.forEach(question => {
                             if (question.Flag__c !== true) {
@@ -1470,15 +1473,11 @@ export default class Questionnaire extends LightningElement {
                 filemaplst.updateTimeline = true;
                 filemaplst.files = false;
                 if (!this.isAutoSave) {
-                    if (this.filesdata.length > 0) {
-                        filemaplst.files = isSubmit;
-                    }
-                    this.totastmessage = 'Responses saved successfully';
                     const selectedEvent = new CustomEvent('updatetimeline', {
                         detail: filemaplst
                     });
                     this.dispatchEvent(selectedEvent);
-                    this.handleOnload();
+                    //this.handleOnload();
                 }
                 else {
                     this.countAutoSave++;
