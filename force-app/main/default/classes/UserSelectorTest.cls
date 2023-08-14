@@ -35,9 +35,8 @@ public class UserSelectorTest {
                 parameterMap.put('fields', new List<String>{'Id', 'Name'});
                 parameterMap.put('filter', 'WHERE IsActive = true');
                 parameterMap.put('childQuery', new List<String>{'SELECT Id, Name FROM UserRole'});
-                List<User> testUsers=[select id from User];
                 Test.startTest();
-                Map<Id, User> result = selector.fetchUsers(parameterMap);
+                selector.fetchUsers(parameterMap);
                 Test.stopTest();
                 testString='Success';
                 System.assertEquals(testString=='Success', true,'fetch users.');

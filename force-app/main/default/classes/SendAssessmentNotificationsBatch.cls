@@ -28,8 +28,6 @@ global with sharing class SendAssessmentNotificationsBatch implements Database.B
     global void execute(Database.BatchableContext bc, List<Assessment_Supplier__c> scope){
         List<ErrorTransactionLog__c> errorList = new List<ErrorTransactionLog__c>();
         try{
-            Configuration__mdt siteData = Configuration__mdt.getInstance('Site_URL');
-            List<Messaging.SingleEmailMessage> emailMessagesList = new List<Messaging.SingleEmailMessage>();
             List<AccountAssessmentRelation__c> accountAssessRelnsList = new List<AccountAssessmentRelation__c>();
             for(Assessment_Supplier__c assSuppl:scope){
                 AccountAssessmentRelation__c accAssessReln = new AccountAssessmentRelation__c();

@@ -5,11 +5,7 @@
 	<div class="" style="margin-bottom:16px;">
 		<div class="">
 			<div class="">
-				<!-- <p class="slds-p-bottom_medium slds-p-horizontal_medium ">
-                    <lightning-formatted-rich-text value={showDisclosure}></lightning-formatted-rich-text>
-                </p> -->
-
-				<!-- Displays status message when an assessment is saved/ submitted --START-->
+				
 				<template if:true={ishideToast}>
 					<template if:true={showToast}>
 						<c-Show-Toast-Message message-from-component={totastmessage} is-show-modal={showToast}
@@ -22,11 +18,7 @@
 					<div class="temp_flexbox_space-between">
 						<div>
 							<template lwc:if={showButtons.Section_Navigation.show}>
-								<!-- <lightning-combobox name="Section Navigation" variant="label-hidden"
-                                    value={showButtons.Section_Navigation.value}
-                                    options={showButtons.Section_Navigation.options}
-                                    onchange={section_navigationChangeHandler}>
-                                </lightning-combobox> -->
+								
 							</template>
 						</div>
 						<div>
@@ -55,42 +47,45 @@
 						</template>
 					</div>
 
-					<div>
-						<template if:true={showFiles}>
-							<lightning-layout multiple-rows="true">
-								<template for:each={keyList} for:item="item" for:index="index">
-									<lightning-layout-item size={layoutItemSize} key={item.key}>
-										<table style="table-layout: fixed;">
-											<tr hidden>
-												<td>
-												</td>
-												<td>
-												</td>
-											</tr>
-											<tr>
-												<td width="10px">
-													<lightning-icon data-id={item.key} onclick={handleDownload}
-														title={item.url} icon-name={item.icon}
-														alternative-text="File" size="xx-small"
-														class="slds-p-around_x-small">
-													</lightning-icon>
-												</td>
-												<td width="90px">
-													{item.value}
-												</td>
-											</tr>
-										</table>
-									</lightning-layout-item>
-								</template>
-							</lightning-layout>
-						</template>
-					</div>
+					<template if:true={isTemplate}>
+						<div>
+							<template if:true={showFiles}>
+								<lightning-layout multiple-rows="true">
+									<template for:each={keyList} for:item="item" for:index="index">
+										<lightning-layout-item size={layoutItemSize} key={item.key}>
+											<table style="table-layout: fixed;">
+												<tr hidden>
+													<td>
+													</td>
+													<td>
+													</td>
+												</tr>
+												<tr>
+													<td width="10px">
+														<lightning-icon data-id={item.key} onclick={handleDownload}
+															title={item.url} icon-name={item.icon}
+															alternative-text="File" size="xx-small"
+															class="slds-p-around_x-small">
+														</lightning-icon>
+													</td>
+													<td width="90px">
+														{item.value}
+													</td>
+												</tr>
+											</table>
+										</lightning-layout-item>
+									</template>
+								</lightning-layout>
+							</template>
+						</div>
+					</template>
+					
 
 					<div>
 						<ul class="slds-accordion">
 							<li class="slds-accordion__list-item">
 								<template if:false={isTemplate}>
-									<template if:true={showDisclosure}>
+									<template if:true={displayDisclosure}>
 										<section class={showAccordion}>
 											<div class="slds-accordion__summary">
 												<h2 class="slds-accordion__summary-heading">
@@ -107,6 +102,37 @@
 												</h2>
 											</div>
 											<div class="slds-accordion__content" id="referenceId-21">{showDisclosure}
+											</div>
+
+											<div class="slds-accordion__content">
+												<template if:true={showFiles}>
+													<lightning-layout multiple-rows="true">
+														<template for:each={keyList} for:item="item" for:index="index">
+															<lightning-layout-item size={layoutItemSize} key={item.key}>
+																<table style="table-layout: fixed;">
+																	<tr hidden>
+																		<td>
+																		</td>
+																		<td>
+																		</td>
+																	</tr>
+																	<tr>
+																		<td width="5px">
+																			<lightning-icon data-id={item.key} onclick={handleDownload}
+																				title={item.url} icon-name={item.icon}
+																				alternative-text="File" size="xx-small"
+																				class="slds-p-around_x-small">
+																			</lightning-icon>
+																		</td>
+																		<td width="90px">
+																			<a data-id={item.key} title={item.url} onclick={handleDownload} href={previewUrl} target="_blank">{item.value}</a>
+																		</td>
+																	</tr>
+																</table>
+															</lightning-layout-item>
+														</template>
+													</lightning-layout>
+												</template>
 											</div>
 										</section>
 									</template>
@@ -191,25 +217,9 @@
 						</ul>
 					</div>
 
-					<!-- <template if:true={isSubmitted}>
-                        <div class="slds-p-around_medium slds-p-left_none slds-p-right_none"
-                            style="display:flex; justify-content: space-between; align-items:center">
-                        </div>
-                    </template> -->
-					<!-- <div class="slds-border_top slds-m-top_small"></div> -->
+					
 
-					<!-- Displays Save, Save & Submit buttons if the Assessment is not Submitted --START-->
-					<!-- <template lwc:if={showButtons.Save_Submit}>
-                        <br>
-                        <lightning-button variant="Brand" label="Save & Submit" title="Save Response"
-                            onclick={handleSubmit} flexibility="auto" class="slds-float--right slds-button_neutral">
-                        </lightning-button>
-                        &nbsp;&nbsp;
-                        <lightning-button variant="Brand" label="Save" title="Save Response" onclick={handleSave}
-                            flexibility="auto" class="slds-float--right" style="margin-right: 5px;"></lightning-button>
-                        &nbsp;&nbsp;</br>
-                    </template> -->
-					<!-- Displays Save, Save & Submit buttons if the Assessment is not Submitted --END-->
+					
 				</div>
 			</div>
 			<!-- <template if:true={showspinner}>

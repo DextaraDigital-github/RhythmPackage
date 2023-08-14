@@ -1,11 +1,20 @@
+/**
+* Class Name         : CAPAService
+* Developer          : Reethika           
+* Created Date       : 12-07-2023
+* @description       : This class is used to perform the logic related to Action object
+* Last Modified Date : 
+*/
 public with sharing class CAPAService {
     public static SecurityCheckController safe = new SecurityCheckController();//use singleton pattern
     private static Savepoint sp;
 
     private static CAPAService service = null; //private static instance of the class
     static CAPASelector selector = CAPASelector.getInstance();
+
     /**
-    * @description Singleton Design Pattern 
+    * @description Singleton Design Pattern
+    * @return
     */
     public static CAPAService getInstance(){
            if(service == null){
@@ -14,7 +23,10 @@ public with sharing class CAPAService {
         return service;
     }
 
-    // RED FOR NO COMMENTS
+    /**
+    * @description To get the picklist for action object fields.
+    * @return
+    */
     public Map<string,List<string>> getPicklistValues(){
         try{
             if ((!Schema.sObjectType.Action__c.isAccessible())
@@ -44,6 +56,11 @@ public with sharing class CAPAService {
         }
     }
 
+     /**
+    * @description To save the action record.
+    * @param actionResponse action record data.
+    * @param isUpdate boolean to check the dml type.
+    */
     public void saveActionResponse(List<SObject> actionResponse, Boolean isUpdate){
         try{
             List<String> errorsList = new List<String>();
@@ -65,6 +82,11 @@ public with sharing class CAPAService {
         }
     }
 
+     /**
+    * @description To detele the action record.
+    * @param questionId question record id.
+    * @param accountAssessmentId response record id.
+    */
     public List<Action__c> deleteActionData(string questionId, string accountAssessmentId){
         List<Action__c> deleteData=selector.deleteActionData(questionId,accountAssessmentId);
         try{
@@ -83,35 +105,71 @@ public with sharing class CAPAService {
         }
     }
     
+    /**
+    * @description To get the action records related to particular user.
+    * @param userName logged in user's username.
+    * @return
+    */
     public List<user> getRecordsList(string userName){
        List<user> userData= selector.getRecordsList(userName);
         return userData;
     }
     
+    /**
+    * @description To get the action records related to a question and response record.
+    * @param actionResponse Map with action related data.
+    * @return
+    */
     public List<Action__c> getActionResponse(Map<String,string> actionResponse){
         List<Action__c> actionItemData = selector.getActionResponse(actionResponse);
         return actionItemData;
     }
     
+    /**
+    * @description To get the action records related to a response record.
+    * @param accountAssessment response data.
+    * @return
+    */
     public List<Action__c> getActionRecords(string accountAssessment){
         List<Action__c> actionRecords = selector.getActionRecords(accountAssessment);
         return actionRecords;
     }
     
-     public List<Action__c> actionRecords(){
+    /**
+    * @description To get the action records.
+    * @return
+    */
+    public List<Action__c> actionRecords(){
         List<Action__c> actionItemRecords = selector.actionRecords();
         return actionItemRecords;
     }
     
+     /**
+    * @description To get the selected action record.
+    * @param actionid action record id.
+    * @return
+    */
     public List<Action__c> selectedActionRecord(string actionid){
         List<Action__c> selectedActionRecord= selector.selectedActionRecord(actionid);
         return selectedActionRecord;
     }
 
+     /**
+    * @description To send capa notification.
+    * @param subject subject of the email.
+    * @param body body of the email.
+    * @param userList list of users to send emails.
+    */
     public void send(String subject, String body, List<Id> userList){
         List<Messaging.SendEmailResult> mailInfo = SendEmail.send(subject,body,userList);
     }
 
+     /**
+    * @description To notify the user for CAPA.
+    * @param actionData action record data.
+    * @param body body of the email.
+    * @param userList list of users to send emails.
+    */
     public void notifyUsers(Map<string,object> actionData, String body, List<Id> userList){
         Object targetId = selector.notifyUsers();
         actionData.put('targetId',targetId);
@@ -121,17 +179,19 @@ public with sharing class CAPAService {
         }      
         SendEmail.notifyUsers(actionData,body,userdata);  
     }
-     
+    
+    /**
+    * @description To delete the existing CAPA.
+    * @param deletedata data needs to be deleted.
+    */
     public List<Action__c> deleteCapa(Map<string,object> deletedata){
         List<Object> lst = (List<Object>)deletedata.get('capaquestionId');
-        System.debug('lst'+lst);
         List<string> questionId= new List<String>();
         for(Integer i=0;i<lst.size();i++){
          questionId.add(String.valueOf(lst[i]));   
         }
-         string accountAssessmentid=(string)deletedata.get('accountassessmentId');
+        string accountAssessmentid=(string)deletedata.get('accountassessmentId');
         List<Action__c> deleteDataContent=selector.deleteCapa(questionId,accountAssessmentid);
-        System.debug('deleteDataContent koushik'+deleteDataContent);
         try{
             if(deleteDataContent.isEmpty() == false){
                 

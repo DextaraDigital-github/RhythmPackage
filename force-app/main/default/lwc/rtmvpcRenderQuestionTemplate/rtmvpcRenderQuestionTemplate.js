@@ -19,7 +19,7 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
     @track checkedLabel;
     @api qtype;
     @api accountassessment;
-    @track objectApiName='Rhythm__Response__c';
+    @track objectApiName = 'Rhythm__Response__c';
     @api sectionid;
     @api accountid;
     @track customeFlagsList = [];
@@ -28,26 +28,28 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
     @api recid;
     @track acceptedFormats = ['.pdf', '.png', '.pdf', '.csv', '.docx'];
     @api uploadingFile = false;
-     @api showicon;
+    @api showicon;
     @api timeline;
-    @track conditionaldisplay= false;
-    @track uploadMap={};
+    @track conditionaldisplay = false;
+    @track uploadMap = {};
+    @track showPopup = false;
+    @track showSupplierPopup = false;
     connectedCallback() {
-        console.log('qtype',this.qtype);
-        if(typeof this.conditionaval!=='undefined' && typeof this.qtype!=='undefined'){
+        console.log('qtype', this.qtype);
+        if (typeof this.conditionaval !== 'undefined' && typeof this.qtype !== 'undefined') {
             this.conditionaldisplay = true;
-            if(this.qtype==='Checkbox'){
-                if(this.conditionaval===true){
-                    this.conditionaval ='Checked';
+            if (this.qtype === 'Checkbox') {
+                if (this.conditionaval === true) {
+                    this.conditionaval = 'Checked';
                 }
-                else{
-                    this.conditionaval ='Unchecked';
+                else {
+                    this.conditionaval = 'Unchecked';
                 }
             }
         }
-        console.log('isSupplier',this.issupplier);
-        console.log('accountassessmentid',this.accountassessmentid);
-        console.log('Responses',this.responses);
+        console.log('isSupplier', this.issupplier);
+        console.log('accountassessmentid', this.accountassessmentid);
+        console.log('Responses', this.responses);
         this.chatterMap.openChat = false;
         this.chatterMap.disableSendButton = true;
         if (this.responses && this.responses.length > 0) {
@@ -78,81 +80,80 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
     // this.dispatchEvent(selectedAction);
 
     // }
-      /* handleReject is used to change the status of a question to reject,rejected or approved by onClick and dispatch the
-       data to its parent component (Questionnaire) */
-    handleReject(event){
+    /* handleReject is used to change the status of a question to reject,rejected or approved by onClick and dispatch the
+     data to its parent component (Questionnaire) */
+    handleReject(event) {
         console.log('handleReject===>');
-        console.log('koushik',this.responses);
+        console.log('koushik', this.responses);
         var quesId = event.currentTarget.dataset.id;
-        var label= event.currentTarget.dataset.label;
-        var rejectMap={};
-        rejectMap.questionId=quesId;
-        if(!this.issupplier){
-            if(this.responses && this.responses.length > 0){
+        var label = event.currentTarget.dataset.label;
+        var rejectMap = {};
+        rejectMap.questionId = quesId;
+        if (!this.issupplier) {
+            if (this.responses && this.responses.length > 0) {
                 this.responses.forEach(res => {
-                    if(res.Id === quesId){
-                        if(label === 'Reject' || label ==='Rejected'){
-                        rejectMap.rejectResponse = !(res.rejectButton);
-                           console.log('label', rejectMap.rejectResponse);
-                        this.timeline.forEach(res=>{
-                              if(res.status === 'Need More Information'){                             
-                                  rejectMap.needData = !(res.needData);
-                              }
-                          })                   
+                    if (res.Id === quesId) {
+                        if (label === 'Reject' || label === 'Rejected') {
+                            rejectMap.rejectResponse = !(res.rejectButton);
+                            console.log('label', rejectMap.rejectResponse);
+                            this.timeline.forEach(res => {
+                                if (res.status === 'Need More Information') {
+                                    rejectMap.needData = !(res.needData);
+                                }
+                            })
                         }
-                        else{
+                        else {
                             console.log('sampledata');
                             rejectMap.needData = !(res.needData);
                         }
                     }
-                    
+
                 })
             }
-             const selectedEvent = new CustomEvent('rejectchange', {
-                 bubbles:true,
-                detail:rejectMap
+            const selectedEvent = new CustomEvent('rejectchange', {
+                bubbles: true,
+                detail: rejectMap
             });
-             this.dispatchEvent(selectedEvent);
-           
+            this.dispatchEvent(selectedEvent);
+
         }
     }
 
-    handleRejectButton(event){
+    handleRejectButton(event) {
         console.log('koushik123');
-         const selectedEvent = new CustomEvent('rejectchange', {
-                bubbles : true,
-                detail:event.detail
-            });
-            // Dispatches the event.
-            this.dispatchEvent(selectedEvent);
-           
-            
-        }
+        const selectedEvent = new CustomEvent('rejectchange', {
+            bubbles: true,
+            detail: event.detail
+        });
+        // Dispatches the event.
+        this.dispatchEvent(selectedEvent);
 
- 
 
-     /* openActionForm is used to open the CAPA form and dispatch the questionId to its parent component(Questionnaire) */
-    openActionForm(event)
-    {
-        console.log('openaction',event.currentTarget.dataset.id);
-        let actionMap={};
-        actionMap.quesId=event.currentTarget.dataset.id;
-        actionMap.showCapaForm=true;
+    }
 
- 
-         const selectedEvent = new CustomEvent('actionchange', {
-                detail: actionMap
-            });
-            // Dispatches the event.
+
+
+    /* openActionForm is used to open the CAPA form and dispatch the questionId to its parent component(Questionnaire) */
+    openActionForm(event) {
+        console.log('openaction', event.currentTarget.dataset.id);
+        let actionMap = {};
+        actionMap.quesId = event.currentTarget.dataset.id;
+        actionMap.showCapaForm = true;
+
+
+        const selectedEvent = new CustomEvent('actionchange', {
+            detail: actionMap
+        });
+        // Dispatches the event.
         this.dispatchEvent(selectedEvent);
 
     }
-    handleActionChange(event){
+    handleActionChange(event) {
         const selectedEvent = new CustomEvent('actionchange', {
-                detail: event.detail
-            });
-            // Dispatches the event.
-            this.dispatchEvent(selectedEvent);
+            detail: event.detail
+        });
+        // Dispatches the event.
+        this.dispatchEvent(selectedEvent);
 
 
     }
@@ -160,15 +161,24 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
     openReview(event) {
         var quesId = event.currentTarget.dataset.id;
         var flagresponse;
+        var flagbool = false;
         if (!this.issupplier) {
             if (this.responses && this.responses.length > 0) {
                 this.responses.forEach(res => {
                     if (res.Id === quesId) {
                         flagresponse = !(res.Rhythm__Flag__c);
+                        res.Children.forEach(conditional => {
+                            if (conditional.questions.length > 0) {
+
+                                flagbool = true;
+                                console.log('sampledataflag', flagbool);
+                            }
+
+                        })
                     }
                 })
-              
-                
+
+
             }
             this.chatterMap.questionId = quesId;
             this.chatterMap.accountType = 'vendor';
@@ -181,70 +191,104 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
                 this.chatterMap.openChat = false;
                 this.chatterMap.disableSendButton = true;
             }
-            console.log('this.chatterMap',this.chatterMap);
-            const selectedEvent = new CustomEvent('flagchange', {
-                detail: this.chatterMap
-            });
-            this.dispatchEvent(selectedEvent);
+            if (this.chatterMap.responseflag === true && flagbool === true) {
+                console.log('sampledata');
+                this.showPopup = true;
+            }
+            else {
+                console.log('sampledata123');
+                const selectedEvent = new CustomEvent('flagchange', {
+                    detail: this.chatterMap
+                });
+                this.dispatchEvent(selectedEvent);
+            }
         }
     }
-    handleuploadfile()
-    {
-        this.uploadMap={};
-        this.uploadMap.objectApiName=this.objectApiName;
-        this.uploadMap.recid=this.recid;
-        this.uploadMap.accountassessmentid=this.accountassessmentid;
+    handleCancelButton() {
+        this.showPopup = false;
+        this.showSupplierPopup = false;     
+        const selectedEvent = new CustomEvent('valuechange', {
+            bubbles: true,
+            detail: undefined
+        });
+        //dispatches event
+        this.dispatchEvent(selectedEvent);
 
     }
-    handleupload(event)
-    {
-        this.handleuploadfile();
-        this.uploadMap.questionId=event.currentTarget.dataset.id;       
-        this.uploadMap.isEditable=event.currentTarget.dataset.disable;
-        this.uploadMap.response=event.currentTarget.dataset.response;
-        this.uploadMap.showUpload=event.currentTarget.dataset.showupload;
-        console.log('showupload',this.uploadMap.showUpload);
-       
-         const selectedEvent = new CustomEvent('uploadfile', {
-                detail: this.uploadMap
-            });
-            // Dispatches the event.
-            this.dispatchEvent(selectedEvent);
-
-    }
-    handleChildUpload(event){
-        console.log('child',this.uploadMap);
-         const selectedEvent = new CustomEvent('uploadfile', {
-                bubbles:true,
-                detail: event.detail
-            });
-            // Dispatches the event.
-            this.dispatchEvent(selectedEvent);
-
-    }
-    handlecustomerFlag(event)
-    {
+    handleFlagButton() {
+        this.showPopup = false;
+        console.log('this.chatterMap', this.chatterMap);
         const selectedEvent = new CustomEvent('flagchange', {
-                detail: event.detail
-            });
-            // Dispatches the event.
-            this.dispatchEvent(selectedEvent);
+            detail: this.chatterMap
+        });
+        this.dispatchEvent(selectedEvent);
+    }
+    handleuploadfile() {
+        this.uploadMap = {};
+        this.uploadMap.objectApiName = this.objectApiName;
+        this.uploadMap.recid = this.recid;
+        this.uploadMap.accountassessmentid = this.accountassessmentid;
+
+    }
+    handleupload(event) {
+        this.handleuploadfile();
+        this.uploadMap.questionId = event.currentTarget.dataset.id;
+        this.uploadMap.isEditable = event.currentTarget.dataset.disable;
+        this.uploadMap.response = event.currentTarget.dataset.response;
+        this.uploadMap.showUpload = event.currentTarget.dataset.showupload;
+        console.log('showupload', this.uploadMap.showUpload);
+
+        const selectedEvent = new CustomEvent('uploadfile', {
+            detail: this.uploadMap
+        });
+        // Dispatches the event.
+        this.dispatchEvent(selectedEvent);
+
+    }
+    handleChildUpload(event) {
+        console.log('child', this.uploadMap);
+        const selectedEvent = new CustomEvent('uploadfile', {
+            bubbles: true,
+            detail: event.detail
+        });
+        // Dispatches the event.
+        this.dispatchEvent(selectedEvent);
+
+    }
+    handlecustomerFlag(event) {
+        const selectedEvent = new CustomEvent('flagchange', {
+            detail: event.detail
+        });
+        // Dispatches the event.
+        this.dispatchEvent(selectedEvent);
     }
 
     /*handleChange is used to dispatch an event to its parent component(Questionnaire) and change the response and send back to the parent component*/
     handleChange(event) {
+        console.log('sampe');
         var changedvalue = event.target.value;
         let questionId = event.currentTarget.dataset.key;
         let parentQuestionId;
         if (this.responses && this.responses.length > 0) {
             this.responses.forEach(res => {
-                if ((typeof changedvalue === 'undefined' || changedvalue === '' || changedvalue === '[]') && res.Id === questionId) {
+                res.Children.forEach(conditional => {
+                    if (conditional.questions.length > 0) {
+                        this.timeline.forEach(result=>{
+                            if(result.status === 'In Review'){
+                                 this.showSupplierPopup=true;
+                            }
+                        })
+                       
+                    }
+                })
+                if ((typeof changedvalue === 'undefined' || changedvalue === '' || changedvalue === '[]' ) && res.Id === questionId ) {
                     if (typeof res.defaultValue !== 'undefined') {
+                        console.log('handlechange');
                         changedvalue = res.defaultValue;
                     }
                 }
                 if (res.Id === questionId) {
-                    if(typeof res.conditional!=='undefined'){
+                    if (typeof res.conditional !== 'undefined') {
                         parentQuestionId = res.parentQuestionId;
                     }
                     if (res.isCheckbox === true) {
@@ -256,20 +300,35 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
                         }
                     }
                 }
+                
             });
         }
-        console.log('parentQuestionId',parentQuestionId);
+        console.log('parentQuestionId', parentQuestionId);
         this.responsemap.parent = parentQuestionId;
         this.responsemap.SectionId = this.sectionid;
         this.responsemap.option = changedvalue;
         this.responsemap.questionId = questionId;
+
         /*This dispatch event is used to send the data to questionnaire on onchange to perform saving.*/
+        if( this.showSupplierPopup === false){
         const selectedEvent = new CustomEvent('valuechange', {
             bubbles: true,
             detail: this.responsemap
         });
         //dispatches event
         this.dispatchEvent(selectedEvent);
+        }
+    }
+    handleResponseChange()
+    {
+        this.showSupplierPopup = false;
+         const selectedEvent = new CustomEvent('valuechange', {
+            bubbles: true,
+            detail: this.responsemap
+        });
+        //dispatches event
+        this.dispatchEvent(selectedEvent);
+
     }
 
     /* openChatHandler is used to dispatch an event to its parent component(Questionnaire) by sending
@@ -284,7 +343,6 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
     getShowUploadStatus() {
         this.showUploadProgress = false;
     }
-
     /* handlechildchange is used to dispatch the value to parent component(Questionnaire) on value change*/
     handlechildchange(event) {
         const selectedEvent = new CustomEvent('valuechange', {
@@ -374,14 +432,12 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
         this.dispatchEvent(selectedEvent);
     }
 
-    handleQuestionHighlight(event)
-    {
+    handleQuestionHighlight(event) {
         let child = this.template.querySelectorAll('c-rtmvpc-render-question-template');
-        if(typeof child != 'undefined' && child.length > 0)
-        {
+        if (typeof child != 'undefined' && child.length > 0) {
             child[0].removehighlightHandler('id');
         }
-        const removequeshighlight = new CustomEvent('removequeshighlight',{detail:'id'});
+        const removequeshighlight = new CustomEvent('removequeshighlight', { detail: 'id' });
         this.dispatchEvent(removequeshighlight);
         this.highlightQuestionHandler(event);
     }
@@ -433,40 +489,39 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
             }
         }
         this.chatterMap.questionId = quesId;
-         this.chatterMap.openReviewComments=true;
+        this.chatterMap.openReviewComments = true;
         this.handleuploadfile();
-        this.uploadMap.questionId=event.currentTarget.dataset.id;       
-        this.uploadMap.isEditable=event.currentTarget.dataset.disable;
-        this.uploadMap.response=event.currentTarget.dataset.response;
-        this.uploadMap.showUpload=event.currentTarget.dataset.showupload;
+        this.uploadMap.questionId = event.currentTarget.dataset.id;
+        this.uploadMap.isEditable = event.currentTarget.dataset.disable;
+        this.uploadMap.response = event.currentTarget.dataset.response;
+        this.uploadMap.showUpload = event.currentTarget.dataset.showupload;
         const selectedEvent = new CustomEvent('selectchange', {
-            detail: {chat:this.chatterMap,file:this.uploadMap}
+            detail: { chat: this.chatterMap, file: this.uploadMap }
         });
         // Dispatches the event.
         this.dispatchEvent(selectedEvent);
 
     }
     handleOnLoad(event) {
-        
-         const selectedEvent = new CustomEvent('getdata', {
-            bubbles:true,
-            composed :false,
-            detail: event.detail
-        });
-        // Dispatches the event.
-        this.dispatchEvent(selectedEvent);
-    }
-    handleFileRecord(event){
+
         const selectedEvent = new CustomEvent('getdata', {
-            bubbles:true,
-            composed :false,
+            bubbles: true,
+            composed: false,
             detail: event.detail
         });
         // Dispatches the event.
         this.dispatchEvent(selectedEvent);
     }
-    handleConversationHistory(event)
-    {
+    handleFileRecord(event) {
+        const selectedEvent = new CustomEvent('getdata', {
+            bubbles: true,
+            composed: false,
+            detail: event.detail
+        });
+        // Dispatches the event.
+        this.dispatchEvent(selectedEvent);
+    }
+    handleConversationHistory(event) {
         const selectedEvent = new CustomEvent('selectchange', {
             detail: event.detail
         });

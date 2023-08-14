@@ -46,7 +46,8 @@ public with sharing class AssessmentController {
             List<Question__c> questionList = [SELECT Id,Name,Section__c,Question_Type__c,
                                             Required__c,Default_Value__c,Conditional_Response__c,
                                             OptionValueSet__c,Question_Sequence_Number__c,Question__c,Requires_File_Upload__c,
-                                            Parent_Question__c,HelpText__c,Section__r.Name,Section__r.Id,Assessment_Template__c
+                                            Parent_Question__c,HelpText__c,Section__r.Section_Sequence_Number__c,
+                                            Section__r.Name,Section__r.Id,Assessment_Template__c
                                             FROM Question__c
                                             WHERE Assessment_Template__c =:templateId
                                             WITH SECURITY_ENFORCED
@@ -98,9 +99,7 @@ public with sharing class AssessmentController {
         SObjectType responseType = Schema.getGlobalDescribe().get('Rhythm__Response__c');
 		Map<String,Schema.SObjectField> fieldMap = responseType.getDescribe().fields.getMap();
         Schema.SObjectField idVal = fieldMap.get('Id');
-        
-        Database.UpsertResult[] upsertResult = safe.doUpsert(suppResponseList,idVal);
-       
+        safe.doUpsert(suppResponseList,idVal);
         List<AccountAssessmentRelation__c> assessment = [SELECT Id,Name,Follow_Up_Requests__c,Status__c,
                                                         Assessment__c,Account__c,PdfConvertor__c
                                                         FROM AccountAssessmentRelation__c
@@ -108,13 +107,14 @@ public with sharing class AssessmentController {
                                                         WITH SECURITY_ENFORCED];
         if(!assessment.isEmpty()){
             assessment[0].Status__c =(String)queryMap.get('status');
+            
             assessment[0].PdfConvertor__c =(String)queryMap.get('pdfContnet');
                 assessment[0].Response_Percentage__c = (Decimal)queryMap.get('percentage');
             if((String)queryMap.get('status')=='Submitted'){
                 assessment[0].Submission_Date__c = DateTime.now();
                 
             }
-            Database.SaveResult[] updResult = safe.doUpdate(assessment);
+            safe.doUpdate(assessment);
         }   
         return suppResponseList;
     }
@@ -269,6 +269,16 @@ public with sharing class AssessmentController {
         String userName=UserInfo.getName();
         return userName;
     }
+    /** 
+    * @description get pdf content method is used to get the data from AccountAssessment
+	* @return AccountAssessmentrecord
+	*/
+    @AuraEnabled
+    public static List<SObject> getPdfContent(String accountassessmentId){
+        List<SObject> accasslst =[Select id,PdfConvertor__c,Assessment__r.Name 
+                                  from AccountAssessmentRelation__c where id=:accountassessmentId];
+        return accasslst;
+    }
 
     /**
     * @description Gets the AccountId information of a user who logged in to portal.
@@ -296,6 +306,11 @@ public with sharing class AssessmentController {
         }
     }
 
+    /**
+    * @description To update the rejected flag.
+    * @param updateRejectFlagList This is the list of records. 
+    * @return 
+    */
     @AuraEnabled
     /* sfge-disable-stack ApexFlsViolationRule */
     public static void updateRejectFlag(List<SObject> updateRejectFlagList){
@@ -317,6 +332,11 @@ public with sharing class AssessmentController {
         }    
     }
 
+    /**
+    * @description To create the rejected flag.
+    * @param insertRejectFlagList This is the list of records. 
+    * @return 
+    */
     @AuraEnabled
     /* sfge-disable-stack ApexFlsViolationRule */
     public static void insertRejectFlag(List<SObject> insertRejectFlagList){
@@ -795,7 +815,6 @@ public with sharing class AssessmentController {
             }
             if(String.isNotBlank(deleteList)){
                 deleteSupList = (set<string>) JSON.deserialize(deleteList, set<string>.class);
-                List<Assessment_Supplier__c> deleteAccAssRelns = new List<Assessment_Supplier__c>();
                 List<Assessment_Supplier__c> assSuppList=  [SELECT Id
                                                             FROM Assessment_Supplier__c
                                                             WHERE Account__c IN:deleteSupList
@@ -986,17 +1005,17 @@ public with sharing class AssessmentController {
                     for(AccountAssessmentRelation__c assRelRec:assRlnsList){
                         Date endDate = assRelRec.Assessment__r.End_Date__c;
                         Integer month = endDate.month();
-                        String month_str = monthMap.get(month);
+                        String monthStr = monthMap.get(month);
                         Integer day = endDate.day();
                         Integer year =  endDate.year();
-                        String endDate_str = month_str+'-'+String.valueOf(day)+'-'+String.valueOf(year);
+                        String endDateStr = monthStr+'-'+String.valueOf(day)+'-'+String.valueOf(year);
                         if(accUserMap.containsKey(assRelRec.Account__c)){
                             for(User uRec:accUserMap.get(assRelRec.Account__c)){
                                 Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
                                 String subject = 'Due Date remainder for '+assRelRec.Assessment__r.Name;
                                 String body = '<html><body>'+
                                     '<br><br>'+'Dear '+uRec.Name+','+
-                                    '<br><br>'+'The deadline for completing your Assessment is '+endDate_str+'. This is a reminder to make sure you’ve finished the Assessment by then.'+
+                                    '<br><br>'+'The deadline for completing your Assessment is '+endDateStr+'. This is a reminder to make sure you’ve finished the Assessment by then.'+
                                     '<br><br>To access the Assessment click on this <a href='+siteData.Site_URL__c+assRelRec.Id+'>Link</a> and log in with your username and password.'+
                                     '<br><br>'+'Thanks,'+
                                     '<br>'+UserInfo.getName();
@@ -1212,7 +1231,8 @@ public with sharing class AssessmentController {
                                             FROM Response__c 
                                             WHERE Question__c IN : questionId
                                             AND AccountAssessmentRelation__c=:accountAssessmentid
-                                            AND Is_Latest_Response__c= true];
+                                            AND Is_Latest_Response__c= true
+                                            WITH SECURITY_ENFORCED];
           try{
             if(deleteResponseList.isEmpty() == false){
                 List<Database.DeleteResult> deleteResult = safe.doDelete(deleteResponseList);

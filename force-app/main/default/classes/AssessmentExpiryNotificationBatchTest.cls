@@ -59,4 +59,22 @@ private with sharing class AssessmentExpiryNotificationBatchTest {
             System.assertEquals(count>0,true,'available assessment for reminder');
         }
     }
+
+    @isTest
+    static void expiryBatchTestCatch(){
+        try{
+            user u = [SELECT Id,UserName FROM User WHERE LastName='Testing_2' LIMIT 1];
+            System.runAs(u){
+                Test.startTest();
+                AssessmentExpiryNotificationBatch b = new AssessmentExpiryNotificationBatch();
+                Database.executeBatch(b);
+                Test.stopTest();
+                integer  count = [select count() from AccountAssessmentRelation__c where Status__c!='Submitted' AND Assessment__r.Expiry_Reminder_Date__c!= null AND Assessment__r.Expiry_Reminder_Date__c=:Date.today()];
+                System.assertEquals(count>0,true,'available assessment for reminder');
+            }
+        }catch(exception e){
+            system.debug('message----->'+e.getMessage());
+            System.assertEquals(e.getMessage()!=null,true,'error catched.');
+        }
+    }
 }

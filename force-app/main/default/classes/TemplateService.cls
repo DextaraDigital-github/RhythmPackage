@@ -32,7 +32,7 @@ public with sharing class TemplateService{
     /**
     * @description To Clone the Template and its related records.
     * @param templateId This is a record id of an Template.
-    * @param SObject template data to create new record.
+    * @param templateRecord template data to create new record.
     * @return 
     */
     public TemplateController.ResultWrapper cloneTemplate(string templateId,SObject templateRecord){
@@ -154,6 +154,7 @@ public with sharing class TemplateService{
             }
         }
         if(pqIdsMap.isEmpty() == false){
+            cloneResponseAttrs(pqIdsMap);
             cloneChildQuestions(sectionIdsMap,newTemplateId,pqIdsMap);
         }
     }
@@ -166,7 +167,6 @@ public with sharing class TemplateService{
     * @param pqIdsMap This is a map of old questions and new questions.
     */
     private void cloneChildQuestions(Map<Id,Id> sectionIdsMap,string newTemplateId,Map<Id,Id> pqIdsMap){
-        
         set<Id> mqIds = new set<Id>();
         List<Question__c> cqList = new List<Question__c>();
         List<Question__c> oldCQueList = new List<Question__c>();
@@ -202,7 +202,6 @@ public with sharing class TemplateService{
                     }
                 }
             }
-            questionIdsMap.putAll(pqIdsMap);
             questionIdsMap.putAll(cqIdsMap);
             if(questionIdsMap.isEmpty() == false){
                 cloneResponseAttrs(questionIdsMap);
