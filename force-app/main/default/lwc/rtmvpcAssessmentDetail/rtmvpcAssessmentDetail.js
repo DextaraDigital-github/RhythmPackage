@@ -8,6 +8,7 @@ import { LightningElement, track, api } from 'lwc';
 import getAssessmentStatus from '@salesforce/apex/AssessmentController.getAssessmentStatus';
 import getAccountAssessmentRecordData from '@salesforce/apex/AssessmentController.getAccountAssessmentRecordData';
 import getUserName from '@salesforce/apex/AssessmentController.getUserName';
+import getPdfContent from '@salesforce/apex/AssessmentController.getPdfContent';
 import errorLogRecord from '@salesforce/apex/AssessmentController.errorLogRecord';
 import getQuestionsList from '@salesforce/apex/AssessmentController.getQuestionsList'; //To fetch all the Questions from the Assessment_Template__c Id from the Supplier_Assessment__c record
 import getSupplierResponseList from '@salesforce/apex/AssessmentController.getSupplierResponseList'; //To fetch all the Supplier_Response__c records related to the Supplier_Assessment__c record
@@ -400,67 +401,12 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
         this.template.querySelector('c-Questionnaire').handleConversationData(this.chatterData);
 
     }
-
     handleExportCSV() {
         if (this.recordId !== null && typeof this.recordId !== 'undefined') {
             this.accountassessmentid = this.recordId;
         }
-        getSupplierAssessmentList({ assessmentId: this.accountassessmentid }).then(resultData => {
-            var assessmentTemplateId = resultData[0].Rhythm__Assessment__r.Rhythm__Template__c;
-            getQuestionsList({ templateId: assessmentTemplateId }).then(result => {
-                var resultMap = result;
-                getSupplierResponseList({ assessmentId: this.accountassessmentid }).then(suppRespResult => {
-                    suppRespResult.forEach(qres => {
-                        var savedResponseList = new Map();
-                        savedResponseList.set('value', qres.Rhythm__Response__c);
-                        if (('Rhythm__Conversation_History__c' in qres)) {
-                            savedResponseList.set('history', (qres.Rhythm__Conversation_History__c));
-                        }
-                        if (('Rhythm__Files__c' in qres)) {
-                            savedResponseList.set('files', (qres.Rhythm__Files__c));
-                        }
-                        this.savedResponseMap.set(qres.Rhythm__Question__c, savedResponseList);
-                    });
-                    this.finalSection = this.constructWrapper(resultMap, this.savedResponseMap);
-                    let str = 'Section,Question,Answer,ConversationHistory,NumberOfAttachments\n';
-                    for (const key of this.finalSection.keys()) {
-                        for (let i = 0; i < this.finalSection.get(key).length; i++) {
-                            if (typeof this.finalSection.get(key)[i].conversationHistory != "undefined" && this.isJsonString(this.finalSection.get(key)[i].conversationHistory)) {
-                                let tempstr = '';
-                                let convJSON = JSON.parse(this.finalSection.get(key)[i].conversationHistory);
-                                for (let j = 0; j < convJSON.length; j++) {
-                                    tempstr = tempstr + convJSON[j].Name + ':' + convJSON[j].Text + '\n';
-                                }
-                                this.finalSection.get(key)[i].conversationHistory = tempstr;
-                            }
-                            if (typeof this.finalSection.get(key)[i].files != "undefined" && this.isJsonString(this.finalSection.get(key)[i].files)) {
-                                this.finalSection.get(key)[i].files = JSON.parse(this.finalSection.get(key)[i].files).length;
-                            }
-                            str += '"' + key + '","' + (i + 1) + '. ' + this.finalSection.get(key)[i].question + '","' + this.finalSection.get(key)[i].value + '","' + this.finalSection.get(key)[i].conversationHistory + '","' + this.finalSection.get(key)[i].files + '"\n';
-                        }
-                        str += '\n';
-                    }
-                    str = str.replaceAll('undefined', '').replaceAll('null', '');
-                    let blob = new Blob([str], { type: 'text/plain' });
-                    let url = window.URL.createObjectURL(blob);
-                    let atag = document.createElement('a');
-                    atag.setAttribute('href', url);
-                    atag.setAttribute('download', resultData[0].Rhythm__Assessment__r.Name + '.csv');
-                    atag.click();
-                }).catch(error => {
-                    errorLogRecord({ componentName: 'CustomTable', methodName: 'getSupplierResponseList', className: 'AssessmentController', errorData: error.message }).then(() => {
-                    });
-                })
-            }).catch(error => {
-                errorLogRecord({ componentName: 'CustomTable', methodName: 'getQuestionsList', className: 'AssessmentController', errorData: error.message }).then(() => {
-                });
-            })
-        }).catch(error => {
-            errorLogRecord({ componentName: 'CustomTable', methodName: 'getSupplierAssessmentList', className: 'AssessmentController', errorData: error.message }).then(() => {
-            });
-        })
+        this.handlCsv(this.accountassessmentid);
     }
-
     isJsonString(str) {
         try {
             JSON.parse(str);
@@ -497,7 +443,6 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
         });
         return questionMap;
     }
-
     handleExportPDF() {
         if (this.recordId !== null && typeof this.recordId !== 'undefined') {
             let pageurl = window.location.href;
@@ -510,71 +455,7 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
             }
         }
         else {
-            getSupplierAssessmentList({ assessmentId: this.accountassessmentid }).then(resultData => {
-                var assessmentTemplateId = resultData[0].Rhythm__Assessment__r.Rhythm__Template__c;
-                getQuestionsList({ templateId: assessmentTemplateId }).then(result => {
-                    var resultMap = result;
-                    getSupplierResponseList({ assessmentId: this.accountassessmentid }).then(suppRespresult => {
-                        suppRespresult.forEach(qres => {
-                            var savedResponseList = new Map();
-                            savedResponseList.set('value', qres.Rhythm__Response__c);
-                            if (('Rhythm__Conversation_History__c' in qres)) {
-                                savedResponseList.set('history', (qres.Rhythm__Conversation_History__c));
-                            }
-                            if (('Rhythm__Files__c' in qres)) {
-                                savedResponseList.set('files', (qres.Rhythm__Files__c));
-                            }
-                            this.savedResponseMap.set(qres.Rhythm__Question__c, savedResponseList);
-                        });
-                        this.finalSection = this.constructWrapper(resultMap, this.savedResponseMap);
-                        let tableHtml = '<table><thead><tr>';
-                        tableHtml += '<th>Section</th><th colspan="2">Question</th><th>Response</th><th>ConversationHistory</th><th>NumberOfAttachments</th>';
-                        tableHtml += '</tr></thead><tbody>';
-                        let count = 0;
-                        for (const key of this.finalSection.keys()) {
-                            count += 1;
-                            if (count % 2 === 0) {
-                                tableHtml += '<tr><td class="evenLeftTd" rowspan=' + this.finalSection.get(key).length + '>' + key + '</td>';
-                            }
-                            else {
-                                tableHtml += '<tr><td class="oddLeftTd" rowspan=' + this.finalSection.get(key).length + '>' + key + '</td>';
-                            }
-                            for (let i = 0; i < this.finalSection.get(key).length; i++) {
-                                if (typeof this.finalSection.get(key)[i].conversationHistory != "undefined" && this.isJsonString(this.finalSection.get(key)[i].conversationHistory)) {
-                                    let str = '';
-                                    for (let j = 0; j < JSON.parse(this.finalSection.get(key)[i].conversationHistory).length; j++) {
-                                        str = str + JSON.parse(this.finalSection.get(key)[i].conversationHistory)[j].Name + ':' + JSON.parse(this.finalSection.get(key)[i].conversationHistory)[j].Text + '\n';
-                                    }
-                                    this.finalSection.get(key)[i].conversationHistory = str;
-                                }
-                                if (typeof this.finalSection.get(key)[i].files != "undefined" && this.isJsonString(this.finalSection.get(key)[i].files)) {
-                                    this.finalSection.get(key)[i].files = JSON.parse(this.finalSection.get(key)[i].files).length;
-                                }
-                                tableHtml += '<td class="align-to-top">' + (i + 1) + '.</td><td>' + this.finalSection.get(key)[i].question + '</td><td>' + this.finalSection.get(key)[i].value + '</td><td> ' + this.finalSection.get(key)[i].conversationHistory + '</td><td> ' + this.finalSection.get(key)[i].files + '</td></tr>';
-                            }
-                            tableHtml += '<tr><td></td><td></td><td></td><td></td></tr>';
-                        }
-                        tableHtml += '</tbody></table>';
-                        let win = window.open('', '', 'width=' + (window.innerWidth * 0.9) + ',height=' + (window.innerHeight * 0.9) + ',location=no, top=' + (window.innerHeight * 0.1) + ', left=' + (window.innerWidth * 0.1));
-                        let style = '<style>@media print { * {-webkit-print-color-adjust:exact;}}} @page{ margin: 0px;} *{margin: 0px; padding: 0px; height: 0px; font-family: Source Sans Pro, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif !important;} .headerDiv{width: 100%; height: 56px; padding: 20px; background-color: #03314d;} .headerText{font-size: 40px; color: white; font-weight: bold} .tableDiv{padding: 20px;} table {border-collapse:collapse; font-size: 14px;} table td, th{ padding: 4px;} table tr:nth-child(odd) td {background-color: #F9F9F9;} .oddLeftTd{background-color: #E9E9E9 !important;} .evenLeftTd{background-color: #F1F1F1 !important;} table th{ border: 1px solid #E9E9E9; background-color:#B5BEC58F} table { page-break-inside:auto; } tr { page-break-inside:avoid; page-break-after:auto; } .align-to-top{ vertical-align: top; }</style>';
-                        win.document.getElementsByTagName('head')[0].innerHTML += style;
-                        win.document.getElementsByTagName('body')[0].innerHTML += '<div class="headerDiv slds-p-around_small"><span class="headerText">Rhythm</span></div><br/>';
-                        tableHtml = tableHtml.replaceAll('undefined', '').replaceAll('null', '');
-                        win.document.getElementsByTagName('body')[0].innerHTML += '<div class="tableDiv slds-p-around_medium">' + tableHtml + '</div>';
-                        win.print();
-                        win.close();
-                    }).catch(error => {
-                        errorLogRecord({ componentName: 'CustomTable', methodName: 'getSupplierResponseList', className: 'AssessmentController', errorData: error.message }).then(() => {
-                        });
-                    })
-                }).catch(error => {
-                    errorLogRecord({ componentName: 'CustomTable', methodName: 'getQuestionsList', className: 'AssessmentController', errorData: error.message }).then(() => {
-                    });
-                })
-            }).catch(error => {
-                errorLogRecord({ componentName: 'CustomTable', methodName: 'getSupplierAssessmentList', className: 'AssessmentController', errorData: error.message }).then(() => {
-                });
-            })
+            this.handlepdf(this.accountassessmentid);
         }
     }
 
@@ -588,5 +469,102 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
             this.dispatchEvent(selectedEvent);
             this.handleOnload();
         }
+    }
+    handlepdf(accountassessmentId) {
+        getPdfContent({ accountassessmentId: accountassessmentId }).then(result => {
+            let attachment = (result[0].Rhythm__PdfConvertor__c);
+            name = result[0].Rhythm__Assessment__r.Name;
+           
+            let attachmentstr = attachment.replaceAll('&quot;', '\"');
+            let parseLst = JSON.parse(attachmentstr);
+            let count = 0;
+             console.log('parseLst',parseLst);
+            let tableHtml = '<table><thead><tr>';
+            tableHtml += '<th>Section</th><th colspan="2">Question</th><th>Response</th><th>NumberOfAttachments</th><th>ConversationHistory</th>';
+            tableHtml += '</tr></thead><tbody>';
+            for (const section in parseLst) {
+                count++;
+                let data = parseLst[section];
+                tableHtml += '<tr><td class="oddLeftTd" rowspan=' + data.length + '>' + section + '</td>';
+                if (count % 2 === 0) {
+                   // tableHtml += '<tr><td class="evenLeftTd" rowspan=' + section.length + '>' + section + '</td>';
+                }
+                else {
+                    
+                }
+                
+                data.forEach(ques => {
+                    tableHtml += '<tr><td class="align-to-top">';
+                    tableHtml = tableHtml + ques.snumber + '</td><td>' + ques.question + '</td>';
+                    if (typeof ques.value !== 'undefined') {
+                        tableHtml = tableHtml + '<td>' + ques.value + '</td>';
+                    }
+                    if (typeof ques.files !== 'undefined') {
+                        tableHtml = tableHtml + '<td>' + ques.files + '</td>';
+                    }
+                    if (typeof ques.conversationHistory !== 'undefined') {
+                        tableHtml = tableHtml + '<td>' + ques.conversationHistory + '</td>';
+                    }
+                    tableHtml = tableHtml +'</tr>';
+                });
+            }
+            tableHtml += '</tbody></table>';
+            console.log('Str>>', tableHtml);
+            let win = window.open('', '', 'width=' + (window.innerWidth * 0.9) + ',height=' + (window.innerHeight * 0.9) + ',location=no, top=' + (window.innerHeight * 0.1) + ', left=' + (window.innerWidth * 0.1));
+            let style = '<style>@media print { * {-webkit-print-color-adjust:exact;}}} @page{ margin: 0px;} *{margin: 0px; padding: 0px; height: 0px; font-family: Source Sans Pro, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif !important;} .headerDiv{width: 100%; height: 56px; padding: 20px; background-color: #03314d;} .headerText{font-size: 40px; color: white; font-weight: bold} .tableDiv{padding: 20px;} table {border-collapse:collapse; font-size: 14px;} table td, th{ padding: 4px;} table tr:nth-child(odd) td {background-color: #F9F9F9;} .oddLeftTd{background-color: #E9E9E9 !important;} .evenLeftTd{background-color: #F1F1F1 !important;} table th{ border: 1px solid #E9E9E9; background-color:#B5BEC58F} table { page-break-inside:auto; } tr { page-break-inside:avoid; page-break-after:auto; } .align-to-top{ vertical-align: top; }</style>';
+            win.document.getElementsByTagName('head')[0].innerHTML += style;
+            win.document.getElementsByTagName('body')[0].innerHTML += '<div class="headerDiv slds-p-around_small"><span class="headerText">Rhythm</span></div><br/>';
+            tableHtml = tableHtml.replaceAll('undefined', '').replaceAll('null', '');
+            win.document.getElementsByTagName('body')[0].innerHTML += '<div class="tableDiv slds-p-around_medium">' + tableHtml + '</div>';
+            win.print();
+            win.close();
+        }).catch(error => {
+
+        });
+
+
+
+    }
+    handlCsv(accountassessmentId) {
+        let name = 'Sample';
+        console.log('this.accountassessmentId', accountassessmentId);
+
+        getPdfContent({ accountassessmentId: accountassessmentId }).then(result => {
+            let attachment = (result[0].Rhythm__PdfConvertor__c);
+            name = result[0].Rhythm__Assessment__r.Name;
+            let attachmentstr = attachment.replaceAll('&quot;', '\"');
+            let parseLst = JSON.parse(attachmentstr);
+            let str = 'Section,Question,Answer,NumberOfAttachments,ConversationHistory\n';
+            for (const section in parseLst) {
+                str = str + section + '"\n"';
+                let data = parseLst[section];
+                console.log('data', data);
+                data.forEach(ques => {
+                    str = str + ques.snumber + '","' + ques.question + '","';
+                    if (typeof ques.value !== 'undefined') {
+                        str = str + ques.value + '","';
+                    }
+                    if (typeof ques.files !== 'undefined') {
+                        str = str + ques.files + '","';
+                    }
+                    if (typeof ques.conversationHistory !== 'undefined') {
+                        str = str + ques.conversationHistory;
+                    }
+                    str = str + '"\n"';
+                });
+                str = str + '"\n"';
+            }
+            console.log('Str>>', str);
+            //str = str.replaceAll('undefined', '').replaceAll('null', '');
+            let blob = new Blob([str], { type: 'text/plain' });
+            let url = window.URL.createObjectURL(blob);
+            let atag = document.createElement('a');
+            //finalQuestionlst.push(questionmap);
+            atag.setAttribute('href', url);
+            atag.setAttribute('download', name + '.csv');
+            atag.click();
+        }).catch(error => {
+
+        });
     }
 }
