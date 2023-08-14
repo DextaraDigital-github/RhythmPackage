@@ -1159,7 +1159,14 @@ export default class Questionnaire extends LightningElement {
     startAutoSave() {
         this.ishideToast = false;
         if (this.isAutoSave) {
-            this.constructResponse(false);  
+            this.constructResponse(false);
+            this.countAutoSave++;
+             if (this.countAutoSave === 1) {
+                const selectedEvent = new CustomEvent('updatetimeline', {
+                    detail: true
+                });
+                this.dispatchEvent(selectedEvent);
+            }
         }
     }
     closeModal() {
@@ -1493,15 +1500,6 @@ export default class Questionnaire extends LightningElement {
                         detail: filemaplst
                     });
                     this.dispatchEvent(selectedEvent);
-                }
-                else {
-                    this.countAutoSave++;
-                    if (this.countAutoSave === 1 && this.accountAssessmentStatus!=='In Progress' && this.accountAssessmentStatus!=='Need More Information') {
-                       /* const selectedEvent = new CustomEvent('updatetimeline', {
-                            detail: filemaplst
-                        });
-                        this.dispatchEvent(selectedEvent);*/
-                    }
                 }
             }).catch(error => {
                 console.log('error',error);
