@@ -1,6 +1,26 @@
 <!-- This html is used to display different types of questions in sections -->
 <template>
 	<template if:true={responses}>
+		<template if:true={showSupplierPopup}>
+						<section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="modal-heading-02"
+							class="slds-modal slds-fade-in-open">
+							<div class="slds-modal__container">
+								<div class="slds-modal__header">
+									<h1 id="modal-heading-02" class="slds-modal__title slds-hyphenate">
+										
+									</h1>
+								</div>
+								<div class="slds-modal__content slds-p-around_medium" id="modal-content-id-2">
+									<p>Attachments and CAPAs added to the Conditional questions will be deleted when the response is changed</p>
+								</div>
+								<div class="slds-modal__footer">
+									<button class="slds-button slds-button_neutral" aria-label="Cancel and close" onclick={handleCancelButton}>Cancel</button>
+									<button class="slds-button slds-button_brand" onclick={handleResponseChange}>Ok</button>
+								</div>
+							</div>
+						</section>
+		<div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
+	</template>
 		<template if:true={isPreviewComponent}>
 			<template if:true={conditionaldisplay}>
 				<p class="slds-p-horizontal_small">↳[{conditionaval}]: </p>
@@ -332,11 +352,19 @@
 											</template>
 											<template if:false={questionary.Rhythm__Flag__c}>
 												<template if:false={questionary.reviewForm}>
+													<template if:false={questionary.disableReject}>
 													<lightning-icon data-id={questionary.Id}
 														icon-name="utility:priority" size="x-small"
 														class="cib-forward:hover slds-m-right_medium"
 														onclick={openReview}>
 													</lightning-icon>
+													</template>
+													<template if:true={questionary.disableReject}>
+													<lightning-icon data-id={questionary.Id}
+														icon-name="utility:priority" size="x-small"
+														class="cib-forward:hover slds-m-right_medium">														
+													</lightning-icon>
+												</template>
 												</template>
 											</template>
 										</template>
@@ -520,7 +548,7 @@
 													</div>
 												</div>
 											</template> -->
-											<template if:true={uploadingFile}>
+											<!-- <template if:true={uploadingFile}>
 												<div
 													class="slds-m-left_xx-small slds-m-right_small slds-m-vertical_small cad-tnailcard2">
 													<div class="slds-grid slds-wrap">
@@ -614,7 +642,7 @@
 														</div>
 													</div>
 												</template>
-											</template>
+											</template> -->
 										</div>
 
 									</div>
@@ -647,5 +675,25 @@
 				</template>
 			</div>
 		</template>
+	</template>
+	<template if:true={showPopup}>
+						<section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="modal-heading-01"
+							class="slds-modal slds-fade-in-open">
+							<div class="slds-modal__container">
+								<div class="slds-modal__header">
+									<h1 id="modal-heading-01" class="slds-modal__title slds-hyphenate">
+										
+									</h1>
+								</div>
+								<div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+									<p>Flagging the question will make the response editable, Attachments and CAPAs added to the Conditional questions will be deleted when the response is changed</p>
+								</div>
+								<div class="slds-modal__footer">
+									<button class="slds-button slds-button_neutral" aria-label="Cancel and close" onclick={handleCancelButton}>Cancel</button>
+									<button class="slds-button slds-button_brand" onclick={handleFlagButton}>Ok</button>
+								</div>
+							</div>
+						</section>
+		<div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
 	</template>
 </template>

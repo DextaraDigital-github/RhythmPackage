@@ -46,7 +46,8 @@ public with sharing class AssessmentController {
             List<Question__c> questionList = [SELECT Id,Name,Section__c,Question_Type__c,
                                             Required__c,Default_Value__c,Conditional_Response__c,
                                             OptionValueSet__c,Question_Sequence_Number__c,Question__c,Requires_File_Upload__c,
-                                            Parent_Question__c,HelpText__c,Section__r.Name,Section__r.Id,Assessment_Template__c
+                                            Parent_Question__c,HelpText__c,Section__r.Section_Sequence_Number__c,
+                                            Section__r.Name,Section__r.Id,Assessment_Template__c
                                             FROM Question__c
                                             WHERE Assessment_Template__c =:templateId
                                             WITH SECURITY_ENFORCED
@@ -106,6 +107,7 @@ public with sharing class AssessmentController {
                                                         WITH SECURITY_ENFORCED];
         if(!assessment.isEmpty()){
             assessment[0].Status__c =(String)queryMap.get('status');
+            
             assessment[0].PdfConvertor__c =(String)queryMap.get('pdfContnet');
                 assessment[0].Response_Percentage__c = (Decimal)queryMap.get('percentage');
             if((String)queryMap.get('status')=='Submitted'){
@@ -266,6 +268,16 @@ public with sharing class AssessmentController {
     public static String getUserName(){
         String userName=UserInfo.getName();
         return userName;
+    }
+    /** 
+    * @description get pdf content method is used to get the data from AccountAssessment
+	* @return AccountAssessmentrecord
+	*/
+    @AuraEnabled
+    public static List<SObject> getPdfContent(String accountassessmentId){
+        List<SObject> accasslst =[Select id,PdfConvertor__c,Assessment__r.Name 
+                                  from AccountAssessmentRelation__c where id=:accountassessmentId];
+        return accasslst;
     }
 
     /**
