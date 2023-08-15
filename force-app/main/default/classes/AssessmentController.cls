@@ -71,7 +71,7 @@ public with sharing class AssessmentController {
         try{
             assessmentId = String.escapeSingleQuotes(assessmentId);
             List<Response__c> responseList = [SELECT Id,Question__c,Assessment__c,Question__r.Question_Type__c,
-                                                Assessment__r.Name,Files__c,Response__c,Rejected__c,
+                                                Assessment__r.Name,Files__c,Response__c,Reject__c,
                                                 CreatedDate,Flag__c,Conversation_History__c,LastModifiedDate,LastModifiedById
                                                 FROM Response__c
                                                 WHERE AccountAssessmentRelation__c= :assessmentId
