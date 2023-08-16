@@ -917,6 +917,11 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
+        <field>Response__c.Reject__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
         <field>Response__c.Response_Version__c</field>
         <readable>true</readable>
     </fieldPermissions>

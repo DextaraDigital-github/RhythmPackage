@@ -8,8 +8,10 @@
         }
     },
    	refreshPage: function(cmp, event, helper){
-        console.log('successeventValue----->',event.getParam('value'));
         $A.get('e.force:refreshView').fire();
-    }
-    
+    },
+    onPageReferenceChange: function(cmp, event, helper) {
+    	var myPageRef = cmp.get("v.pageReference");
+        $A.get('e.force:refreshView').fire();
+	}
 })

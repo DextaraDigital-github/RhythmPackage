@@ -220,4 +220,66 @@ public class QuestionControllerTest {
             System.assertEquals(qType.size()>0, true,'Question deleted successfully'); 
         }
     }
+
+    @isTest
+    static void createResponseAttributesTest(){
+        user u = [SELECT Id,UserName FROM User WHERE Email='standarduser@testorg.com' LIMIT 1];
+        List<Question__c> ques = [SELECT id,Assessment_Template__c,Section__c from Question__c];
+        Response_Attribute__c quesAtr = new Response_Attribute__c();
+        quesAtr.preferred_Not_preferred__c ='Preferred';
+        quesAtr.QuestionId__c = ques[0].Id;
+        quesAtr.Response_value__c ='Yes';
+        quesAtr.Score__c =5;
+        quesAtr.Upload_Required__c ='Yes';
+        quesAtr.Weight__c=10;
+        List<Sobject> responseAttrlst = new List<SObject>();
+        responseAttrlst.add(quesAtr);
+        System.runAs(u){
+           Test.startTest();
+           List<SObject> qType = QuestionController.createResponseAttributes(responseAttrlst);
+           Test.stopTest();
+           System.assertEquals(qType.size()>0, true,'Response Attribute Updated successfully');
+        }
+    }
+    @isTest
+    static void updateResponseAttributesTest(){
+        user u = [SELECT Id,UserName FROM User WHERE Email='standarduser@testorg.com' LIMIT 1];
+        List<Response_Attribute__c> responseAttrlst = [SELECT id,preferred_Not_preferred__c,QuestionId__c,Response_value__c,
+                                        Score__c,Upload_Required__c FROM Response_Attribute__c];
+        System.runAs(u){
+           Test.startTest();
+            responseAttrlst[0].Rhythm__Score__c =8;
+            List<SObject> respType = QuestionController.updateResponseAttributes(responseAttrlst);
+           Test.stopTest();
+           System.assertEquals(respType.size()>0, true,'Response Attribute Updated successfully');
+        }
+    }
+    @isTest
+    static void deleteResponseAttributeTest(){
+        user u = [SELECT Id,UserName FROM User WHERE Email='standarduser@testorg.com' LIMIT 1];
+        List<Question__c> ques = [SELECT id,Assessment_Template__c,Section__c from Question__c];
+        List<String> quesLst = new List<String>();
+        quesLst.add(ques[0].Id);
+        System.runAs(u){
+           Test.startTest();
+          
+            List<SObject> respType = QuestionController.deleteQuesRespAttribute(quesLst);
+            QuestionAttributeResponseController.deleteResponseAttribute(null);
+           Test.stopTest();
+           System.assertEquals(respType.size()>0, true,'Response Attribute Deleted successfully');
+        }
+    }
+     @isTest
+    static void deleteQuesRespAttributeTest(){
+        user u = [SELECT Id,UserName FROM User WHERE Email='standarduser@testorg.com' LIMIT 1];
+        List<Question__c> ques = [SELECT id,Assessment_Template__c,Section__c from Question__c];
+        List<String> quesLst = new List<String>();
+        quesLst.add(ques[0].Id);
+        System.runAs(u){
+           Test.startTest();
+            List<SObject> respType = QuestionAttributeResponseController.deleteQuesRespAttribute(quesLst);
+           Test.stopTest();
+           System.assertEquals(respType.size()>0, true,'Response Attribute Deleted successfully');
+        }
+    }
 }

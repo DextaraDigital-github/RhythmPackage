@@ -1,19 +1,65 @@
 <template>
-    <lightning-quick-action-panel header="Manage Suppliers">
-        <div>
-            <c-add-suppliers onupdatedsupliers={updateSupplierData} record-id={assessmentId}></c-add-suppliers>
+    <template if:true={showLWC}>
+        <div class="slds-clearfix">
+            <div class="slds-float_right">
+                <lightning-button label="Manage Suppliers" title="Manage Suppliers" onclick={handleSuppliers} >
+                </lightning-button>
+            </div>
         </div>
-        <div slot="footer" class="slds-align_absolute-right">
-            <lightning-button
-                variant="neutral"
-                label="Cancel" onclick={closeModal}>
-            </lightning-button>
-            <lightning-button
-                variant="brand"
-                label="Save" onclick={handleAdd}
-                class="slds-m-left_x-small">
-            </lightning-button>
-        </div>
-    </lightning-quick-action-panel>
+        <template if:true={showManageSuppliers}>
+            <section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="modal-heading-01" class="slds-modal slds-fade-in-open slds-modal_medium">
+                <div class="slds-modal__container">
+                    <div class="slds-modal__header">
+                        <h1 id="modal-heading-01" class="slds-modal__title slds-hyphenate">Manage Suppliers</h1>
+                    </div>
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <lightning-quick-action-panel>
+                            <div>
+                                <c-add-suppliers onupdatedsupliers={updateSupplierData} record-id={recordId}></c-add-suppliers>
+                            </div>
+                        </lightning-quick-action-panel>
+                    </div>
+                    <div class="slds-modal__footer">
+                        <lightning-button
+                            variant="neutral"
+                            label="Cancel" onclick={closeModal}>
+                        </lightning-button>
+                        <lightning-button
+                            variant="brand"
+                            label="Save" onclick={handleAdd}
+                            class="slds-m-left_x-small">
+                        </lightning-button>
+                    </div>
+                </div>
+              </section>
+              <div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
+        </template>
+    </template>
+    <template if:true={source}>
+        <section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="modal-heading-02" class="slds-modal slds-fade-in-open slds-modal_medium">
+            <div class="slds-modal__container">
+                <div class="slds-modal__header">
+                    <h1 id="modal-heading-02" class="slds-modal__title slds-hyphenate">Manage Suppliers</h1>
+                </div>
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-2">
+                    <div>
+                        <c-add-suppliers onupdatedsupliers={updateSupplierData} record-id={recordId}></c-add-suppliers>
+                    </div>
+                </div>
+                <div class="slds-modal__footer">
+                    <lightning-button
+                        variant="neutral"
+                        label="Cancel" onclick={closeModal}>
+                    </lightning-button>
+                    <lightning-button
+                        variant="brand"
+                        label="Save" onclick={handleAdd}
+                        class="slds-m-left_x-small">
+                    </lightning-button>
+                </div>
+            </div>
+          </section>
+          <div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
+    </template>
     
 </template>

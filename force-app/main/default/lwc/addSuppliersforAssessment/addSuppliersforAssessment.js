@@ -1,5 +1,4 @@
 import { LightningElement,api,track,wire} from 'lwc';
-import { CloseActionScreenEvent } from 'lightning/actions';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import addSuppliers from '@salesforce/apex/AssessmentController.sendAssessment';
 import getAssessmentRecord from '@salesforce/apex/AssessmentController.getAssessmentRecord';
@@ -15,6 +14,13 @@ export default class AddSuppliersforAssessment extends NavigationMixin(Lightning
     startDate;
     endDate;
     assessmentId;
+    showManageSuppliers = false;
+    showLWC = false;
+    @api source;
+
+    handleSuppliers(){
+        this.showManageSuppliers = true;
+    }
 
     @wire(CurrentPageReference)
     getPageReferenceParameters(currentPageReference) {
@@ -25,6 +31,10 @@ export default class AddSuppliersforAssessment extends NavigationMixin(Lightning
 
     connectedCallback() {
         this.getTodayDate();
+        console.log('source--->',this.source);
+        if(typeof this.source === 'undefined'){
+            this.showLWC = true;
+        }
     }
 
     getTodayDate(){
@@ -74,7 +84,9 @@ export default class AddSuppliersforAssessment extends NavigationMixin(Lightning
                     addSuppliers({assessmentRecord:this.assessmentRecord,operationType:'update',suppliers:JSON.stringify(this.suppliersList),existingSups:exSupListStr,deleteList:deleteListStr})
                     .then(result => {
                         if(result.isSuccess === true){
-                            this.showModal = false;
+                            this.showManageSuppliers = false;
+                            this.source = false;
+                            this.showLWC = false;
                             this.showNotification('Success','Suppliers Added to Assessments Successfully.','success');
                             this.closeModal();
                             this.navigateToRecordPage();
@@ -113,7 +125,12 @@ export default class AddSuppliersforAssessment extends NavigationMixin(Lightning
     }
 
     closeModal() {
-        this.dispatchEvent(new CloseActionScreenEvent());
+        if(this.source){
+            this.source = false;
+        }else{
+            this.showManageSuppliers = false;
+        }
+        this.navigateToRecordPage();
     }
     navigateToRecordPage(){
         this[NavigationMixin.Navigate]({

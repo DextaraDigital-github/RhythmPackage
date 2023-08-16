@@ -74,7 +74,8 @@ public with sharing class CAPASelector {
                 Priority__c,Assigned_To__r.Name,Flag_Status__c 
                 FROM Action__c 
                 WHERE Assigned_To__c=:userId
-                WITH SECURITY_ENFORCED];
+                WITH SECURITY_ENFORCED
+               ORDER BY CreatedDate DESC];
     }
 
      /**

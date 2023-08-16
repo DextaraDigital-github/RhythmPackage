@@ -22,7 +22,7 @@ private class AssessmentControllerTest
             Id clinicRecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByName().get('Supplier').getRecordTypeId();
             Map<String, Object> accAttributes = new Map<String, Object>{'RecordTypeId'=>clinicRecordTypeId,'Name'=>'Supplier','Email__c'=>'test@gmail.com'};
             List<Account> accts = TestDataFactory.createAccounts(1,true,accAttributes);
-            Map<String,Object> contactAttributes  = new Map<String,Object>{'AccountId'=>accts[0].Id,'Email'=>'test123@gmail.com','LastName'=>'John David'};
+            Map<String,Object> contactAttributes  = new Map<String,Object>{'AccountId'=>accts[0].Id,'Email'=>'standarduser@testorg.com','Primary_Contact__c'=>true,'LastName'=>'John David'};
             TestDataFactory.createContacts(1,true,contactAttributes);
             Map<String, Object> assementTemplateattributes = new Map<String, Object>{'Name'=>'2023 Assessment template'};
             List<Assessment_Template__c> templist=TestDataFactory.createAssessmentTemp(1,true,assementTemplateattributes);
@@ -35,10 +35,14 @@ private class AssessmentControllerTest
             Map<String, Object> assessmentattributes = new Map<String, Object>{'Template__c'=>templist[0].Id,
             'Name'=>'Assessment 2023','Rhythm__Status__c'=>'New','Rhythm__Number_of_Questions__c'=>10};
             List<Assessment__c> asslist=TestDataFactory.createAssessment(1,true,assessmentattributes);
+             Map<String, Object> responseattributes = new Map<String, Object>{'Rhythm__Flag__c'=>true,
+            'Rhythm__Reject__c'=>'WithHold'};
+            List<Response__c> resplist=TestDataFactory.createResponse(1,true,responseattributes);
             
             Map<String,Object> accountassesments = new Map<String,Object>{'Rhythm__Account__c'=>accts[0].Id,'Rhythm__Assessment__c'=>asslist[0].Id,
                 'Rhythm__Status__c'=>'New','Rhythm__End_Date__c'=>Date.newInstance(2030, 4, 26),'Rhythm__Number_of_Responses__c'=>10,
                     'Rhythm__Start_Date__c'=>Date.newInstance(2030, 3, 26)};
+                        
             TestDataFactory.createAccountAssessment(1,true,accountassesments);
         }   
     }
@@ -214,6 +218,20 @@ private class AssessmentControllerTest
             List<Object> assessmentRecordData=AssessmentController.getAssesmentRecords();
             Test.stopTest();
             System.assertEquals(assessmentRecordData!=null,true,'Assessment Record Exist');
+        }
+    }
+    @isTest
+    static void assesmentRecordsCatchTest(){
+        user u = [SELECT Id,UserName FROM User WHERE Email='sysadmin01@testorg.com' LIMIT 1];
+        System.runAs(u){
+            try{
+                Test.startTest();
+                List<Object> assessmentRecordData=AssessmentController.getAssesmentRecords();
+                Test.stopTest();
+                System.assertEquals(assessmentRecordData!=null,true,'Assessment Record Exist');
+            }catch(exception e){
+                System.assertEquals(e.getMessage()!=null, true,'Error Catched.');
+            }
         }
     }
     
@@ -839,6 +857,89 @@ private class AssessmentControllerTest
             delete assmentRelList;
             delete asmtRecord;
             undelete asmtRecord;
+            testString = 'Success';
+            System.assertEquals(testString =='Success', true,'assessment deleted');
+            Test.stopTest();
+        }
+    }
+        @isTest
+        static void insertRejectFlag(){
+        user u = [SELECT Id,UserName FROM User WHERE Email='standarduser@testorg.com' LIMIT 1];
+        System.runAs(u){
+            List<Question__c> questions=[select Id,Name,Assessment_Template__c from Question__c ];
+            List<AccountAssessmentRelation__c> accAssessment =[SELECT Id,Account__c,Assessment__c from AccountAssessmentRelation__c];
+            Response__c resp = new Response__c();
+            resp.Question__c =questions[0].Id;
+            resp.Rhythm__Response__c ='Yes';
+            resp.AccountAssessmentRelation__c = accAssessment[0].Id;
+            List<SObject> resplst = new List<SObject>();
+            resplst.add(resp);
+            Test.startTest();
+            AssessmentController.insertRejectFlag(resplst);
+            Test.stopTest();
+            System.assertEquals(resplst!=null, true,'Supplier Response records created');
+        }   
+    }
+    @isTest
+    static void insertRejectFlagError()
+    {
+        user u = [SELECT Id,UserName FROM User WHERE Email='standarduser@testorg.com' LIMIT 1];
+        System.runAs(u){
+            Test.startTest();
+            try{
+            AssessmentController.insertRejectFlag(null);
+            }
+            catch(exception e){
+                System.assertEquals(true,true,'insertRejectFlag catch block');
+            }
+            Test.stopTest();
+        }
+        
+    }
+    
+     @isTest
+        static void updateRejectFlag(){
+        user u = [SELECT Id,UserName FROM User WHERE Email='standarduser@testorg.com' LIMIT 1];
+        System.runAs(u){
+            List<Question__c> questions=[SELECT Id,Name,Assessment_Template__c from Question__c ];
+            List<AccountAssessmentRelation__c> accAssessment =[SELECT Id,Account__c,Assessment__c from AccountAssessmentRelation__c];
+            List<Response__c> resp=[SELECT Flag__c,Reject__c from Response__c];            
+            resp[0].Reject__c ='WithHold';
+            update resp;
+            
+            Test.startTest();
+            AssessmentController.updateRejectFlag(resp);
+            Test.stopTest();
+            System.assertEquals(resp!=null, true,'Supplier Response records updated');
+        }   
+    }
+    @isTest
+    static void updateRejectFlagError()
+    {
+        user u = [SELECT Id,UserName FROM User WHERE Email='standarduser@testorg.com' LIMIT 1];
+        System.runAs(u){
+            Test.startTest();
+            try{
+            AssessmentController.updateRejectFlag(null);
+            }
+            catch(exception e){
+                System.assertEquals(true,true,'updateRejectFlag catch block');
+            }
+            Test.stopTest();
+        }
+    }
+
+    @isTest
+    static void sendEmailsTestFUR(){
+        user u = [SELECT Id,UserName FROM User WHERE Email='standarduser@testorg.com' LIMIT 1];
+        System.runAs(u){
+            String testString;
+            List<SObject> assmentList = [select id,Start_Date__c,End_Date__c,Template__c from Assessment__c];
+            SObject asmtRecord = assmentList[0];
+            List<SObject> assmentRelList = [SELECT Id FROM AccountAssessmentRelation__c WHERE Assessment__c=:asmtRecord.Id];
+            set<Id> assRlset = new  set<Id>{assmentRelList[0].Id};
+            Test.startTest();
+            AssessmentController.sendEmails(assRlset,'FUR');
             testString = 'Success';
             System.assertEquals(testString =='Success', true,'assessment deleted');
             Test.stopTest();

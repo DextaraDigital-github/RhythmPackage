@@ -35,6 +35,7 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
     @track showPopup = false;
     @track showSupplierPopup = false;
     connectedCallback() {
+       
         console.log('qtype', this.qtype);
         if (typeof this.conditionaval !== 'undefined' && typeof this.qtype !== 'undefined') {
             this.conditionaldisplay = true;

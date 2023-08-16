@@ -240,6 +240,11 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
                 }
             })
         }
+        setTimeout(()=>{
+             console.log(' this.template',this.template.querySelectorAll('c-Questionnaire')[0]);
+            this.template.querySelectorAll('c-Questionnaire')[0].gethandleTimeline(this.assessmentTimeline);
+        },400);
+       
     }
     /*To display only the flagged questions(flag colour- green) or all questions(flag colour- red) by clicking on flag */
     handleChange(event) {
@@ -494,7 +499,7 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
                 }
                 
                 data.forEach(ques => {
-                    tableHtml += '<tr><td class="align-to-top">';
+                    tableHtml += '<td class="align-to-top">';
                     tableHtml = tableHtml + ques.snumber + '</td><td>' + ques.question + '</td>';
                     if (typeof ques.value !== 'undefined') {
                         tableHtml = tableHtml + '<td>' + ques.value + '</td>';

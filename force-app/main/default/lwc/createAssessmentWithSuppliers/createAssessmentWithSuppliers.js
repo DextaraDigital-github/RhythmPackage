@@ -114,8 +114,7 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
         return this.dateValue;
     }
 
-    updateValuesHandler(event)
-    {
+    updateValuesHandler(event){
         this.values[event.currentTarget.dataset.id] = event.target.value;
     }
     
@@ -199,7 +198,7 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
 
     closeModal(){
         this.showModal = false;
-        if(this.values.template !== undefined && this.values.template){
+        if(this.templateId !== undefined && this.templateId){
             this.navigateRelatedListView();
         }else{
             this.navigateToObjectHome();
@@ -239,7 +238,7 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
         this[NavigationMixin.Navigate]({
             type: 'standard__recordRelationshipPage',
             attributes: {
-                recordId: this.values.template,
+                recordId: this.templateId,
                 objectApiName: 'Rhythm__Assessment_Template__c',
                 relationshipApiName: 'Rhythm__Assessments__r',
                 actionName: 'view'

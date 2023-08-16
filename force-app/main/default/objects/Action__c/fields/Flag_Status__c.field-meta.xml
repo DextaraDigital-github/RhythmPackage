@@ -6,9 +6,9 @@
 
   TEXT(Status__c) == &apos;Closed&apos;,
 
-  IMAGE(&apos;/resource/Rhythm__GreenFlag&apos;,&apos;green&apos;,30,30),
+  IMAGE(&apos;/resource/Rhythm__greenFlag&apos;,&apos;green&apos;,20,20),
  IF(
-  TEXT(Status__c) == &apos;Expired&apos;, IMAGE(&apos;/resource/Rhythm__orangeFlag&apos;, &apos;orange&apos;,30,30), IMAGE(&apos;/resource/Rhythm__RedFlag&apos;, &apos;red&apos;,30,30)
+  TEXT(Status__c) == &apos;Expired&apos;, IMAGE(&apos;/resource/Rhythm__orangeFlag&apos;, &apos;orange&apos;,20,20), IMAGE(&apos;/resource/Rhythm__redFlag&apos;, &apos;red&apos;,20,20)
 )
  
 )</formula>

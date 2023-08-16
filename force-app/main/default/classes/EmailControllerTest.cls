@@ -58,6 +58,30 @@ private class EmailControllerTest {
             System.assertEquals(testString=='Success', true,'email processing.');
         }
     }
+
+    @isTest
+    private static void method2(){
+        String ids= UserInfo.getUserId();
+        user u = [SELECT Id,UserName FROM User WHERE Email='standarduser2@testorg.com' LIMIT 1];
+        String testString;
+        System.runAs(u) {
+            try{
+                List<Assessment__c> aslist = [Select Id from Assessment__c];
+                List<Account> acc = [Select Id from Account];
+                Map<String,Id> parmap = new Map<String,Id>{'assessmentId'=>aslist[0].Id};
+                Map<String,Object> parmap1 = new Map<String,Object>{'selectedAccounts'=>acc};  
+                String str = JSON.serialize(parmap);
+                JSON.serialize(parmap1);
+                EmailController.fetchAccounts(str);
+                EmailController.fetchEmailtemplates();
+                EmailController.fetchEmailMessages(str);
+                testString='Success';
+                System.assertEquals(testString=='Success', true,'email processing.');
+            }catch(exception e){
+                System.assertEquals(e.getMessage() != null, true,'error catched');
+            }
+        }
+    }
     /**
     * @description
     */

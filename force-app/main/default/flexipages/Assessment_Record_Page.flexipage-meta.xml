@@ -7,9 +7,6 @@
                     <name>actionNames</name>
                     <valueList>
                         <valueListItems>
-                            <value>Rhythm__Assessment__c.Manage_Suppliers</value>
-                        </valueListItems>
-                        <valueListItems>
                             <value>Edit</value>
                             <visibilityRule>
                                 <criteria>
@@ -69,6 +66,12 @@
         <type>Facet</type>
     </flexiPageRegions>
     <flexiPageRegions>
+        <itemInstances>
+            <componentInstance>
+                <componentName>addSuppliersforAssessment</componentName>
+                <identifier>Rhythm_addSuppliersforAssessment</identifier>
+            </componentInstance>
+        </itemInstances>
         <itemInstances>
             <componentInstance>
                 <componentInstanceProperties>
