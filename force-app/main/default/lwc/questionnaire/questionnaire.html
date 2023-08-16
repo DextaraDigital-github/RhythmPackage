@@ -1,16 +1,18 @@
 <template>
+	<template if:true={ishideToast}>
+		<template if:true={showToast}>
+			<c-Show-Toast-Message message-from-component={totastmessage} is-show-modal={showToast} is-sucess={success}
+				onclosetoast={closeToastHandler}></c-Show-Toast-Message>
+		</template>
+	</template>
 	<template if:true={loading}>
 		<lightning-spinner alternative-text="Loading" size="large"></lightning-spinner>
 	</template>
 	<div class="" style="margin-bottom:16px;">
 		<div class="">
 			<div class="">
-				
-				<template if:true={ishideToast}>
-					<template if:true={showToast}>
-						<c-Show-Toast-Message message-from-component={totastmessage} is-show-modal={showToast}
-							is-sucess={success} onclosetoast={closeToastHandler}></c-Show-Toast-Message>
-					</template></template>
+
+
 				<!-- Displays status message when an assessment is saved/ submitted --END-->
 
 				<div class="rtmvpc-card slds-p-around_x-small">
@@ -18,11 +20,11 @@
 					<div class="temp_flexbox_space-between">
 						<div>
 							<template lwc:if={showButtons.Section_Navigation.show}>
-								
+
 							</template>
 						</div>
 						<div>
-							
+
 						</div>
 					</div>
 					<!-- Displays button and picklist for navigations --END-->
@@ -79,7 +81,7 @@
 							</template>
 						</div>
 					</template>
-					
+
 
 					<div>
 						<ul class="slds-accordion">
@@ -118,14 +120,18 @@
 																	</tr>
 																	<tr>
 																		<td width="5px">
-																			<lightning-icon data-id={item.key} onclick={handleDownload}
+																			<lightning-icon data-id={item.key}
+																				onclick={handleDownload}
 																				title={item.url} icon-name={item.icon}
 																				alternative-text="File" size="xx-small"
 																				class="slds-p-around_x-small">
 																			</lightning-icon>
 																		</td>
 																		<td width="90px">
-																			<a data-id={item.key} title={item.url} onclick={handleDownload} href={previewUrl} target="_blank">{item.value}</a>
+																			<a data-id={item.key} title={item.url}
+																				onclick={handleDownload}
+																				href={previewUrl}
+																				target="_blank">{item.value}</a>
 																		</td>
 																	</tr>
 																</table>
@@ -203,10 +209,11 @@
 												onfileupload={handleFileUpload} onselectchange={handlechatHistory}
 												ondeleteattachment={handledeletefile} ongetdata={handleGetRespRecord}
 												onselectquestion={selectquestionHandler} recid={recordId}
-												accountassessmentid={accountassessmentid} onuploadfile={handleuploadFile}
-												onflagchange={handleFlagResponseMethod} uploading-file={uploadingFile}
-												onactionchange={handleActionResponse} onrejectchange={handleReject}
-												timeline={timeline} is-preview-component={isPreviewComponent}>
+												accountassessmentid={accountassessmentid}
+												onuploadfile={handleuploadFile} onflagchange={handleFlagResponseMethod}
+												uploading-file={uploadingFile} onactionchange={handleActionResponse}
+												onrejectchange={handleReject} timeline={timeline}
+												is-preview-component={isPreviewComponent}>
 											</c-rtmvpc-render-question-template>
 										</div>
 
@@ -217,9 +224,9 @@
 						</ul>
 					</div>
 
-					
 
-					
+
+
 				</div>
 			</div>
 			<!-- <template if:true={showspinner}>
@@ -270,15 +277,15 @@
 					<!-- </header> -->
 					<!-- Modal/Popup Box LWC body starts here -->
 					<div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
-						<p><b>Do you want to Submit the review?
+						<p><b>Do you want to Submit the Assessment?
                     </b></p>
 					</div>
 					<!-- Modal/Popup Box LWC footer starts here -->
 					<footer class="slds-modal__footer">
-							<lightning-button variant="Neutral" label="No" onclick={closeModal}
-						class="slds-m-left_x-small"></lightning-button>
-					<lightning-button variant="brand" label="Yes" onclick={submitAssessment}
-						class="slds-m-left_x-small"></lightning-button>
+						<lightning-button variant="brand" label="Yes" onclick={submitAssessment}
+							class="slds-m-left_x-small"></lightning-button>
+						<lightning-button variant="Neutral" label="No" onclick={closeModal} class="slds-m-left_x-small">
+						</lightning-button>
 					</footer>
 				</div>
 			</section>
@@ -316,7 +323,7 @@
                 <lightning-button variant="Brand" label="Save" title="Save Response" onclick={handleSaveCustomer}
                     flexibility="auto" class="slds-float--right" style="margin-right:5px;"></lightning-button>
                 &nbsp;&nbsp; -->
-			
+
 
 			</template>
 
@@ -324,7 +331,7 @@
 
 
 	</template>
-    <template if:true={isCustomerModalPopup}>
+	<template if:true={isCustomerModalPopup}>
 		<!-- Modal/Popup Box LWC starts here -->
 		<section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
 			aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">

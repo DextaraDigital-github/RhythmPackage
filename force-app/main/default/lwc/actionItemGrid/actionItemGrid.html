@@ -59,13 +59,13 @@
 														<a>{col.value}</a>
 													</template>
 													<template lwc:elseif={col.isFlag}>
-														<img src={greenFlagUrl} style="height:30px; width:30px;" />
+														<img src={greenFlagUrl} style="height:20px; width:20px;" />
 									            	</template>
 													<template lwc:elseif={col.isOrangeFlag}>
-															<img src={orangeFlagUrl} style="height:30px; width:30px;" />
+															<img src={orangeFlagUrl} style="height:20px; width:20px;" />
 										                </template>
 														<template lwc:elseif={col.isRedFlag}>
-															<img src={redFlagUrl} style="height:30px; width:30px;" />
+															<img src={redFlagUrl} style="height:20px; width:20px; " />
 										                </template>
 															<template lwc:else>
 																{col.value}

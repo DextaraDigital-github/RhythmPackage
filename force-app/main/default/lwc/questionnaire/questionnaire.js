@@ -39,6 +39,7 @@ export default class Questionnaire extends LightningElement {
     @track requiredQuestionList = [];
     @track questionsandAnswersflag;
     @api assessment;
+    @track saveWrapper ={};
     @track totastmessage = '';
     @track isTemplate;
     @track showToast = false;
@@ -89,7 +90,7 @@ export default class Questionnaire extends LightningElement {
     @track accountName;
     @track accountId;
     @track showFollowButton = true;
-    @api timeline;
+    @track timeline;
     @track responseList = [];
     @track assessmentRecordName;
     @track filterQuestionsAndAnswers;
@@ -132,6 +133,10 @@ export default class Questionnaire extends LightningElement {
             this.accordionFlag = false;
             this.showAccordion = 'slds-accordion__section slds-is-close';
         }
+    }
+     @api gethandleTimeline(assessmenttimeLine)
+    {
+        this.timeline = assessmenttimeLine;
     }
     // This method is to handle expand all and collapse all in the supplier portal and customer portal.
     @api
@@ -211,7 +216,11 @@ export default class Questionnaire extends LightningElement {
     /* Connectedcallback is used to get data on onload */
     connectedCallback() {
         try {
-            this.loading = true;
+             this.saveWrapper.isSave = false;
+            this.saveWrapper.showToast = false;
+            this.saveWrapper.ishideToast = false;
+            this.saveWrapper.isAutoSave = false;
+            this.saveWrapper.totastmessage = '';
             this.accountsId = this.accid;
             this.isTemplate = false;
             this.handleOnload();
@@ -326,7 +335,7 @@ export default class Questionnaire extends LightningElement {
     /* handleOnload is used to get Sections data and corresponding Questions data and Responses data on onload */
     handleOnload() {
         this.saveBool = false;
-        this.ishideToast = false;
+        this.loading = true;
         let isCustomerPortal = (typeof this.recordId !== 'undefined' && typeof this.objectApiName !== 'undefined');
         if (isCustomerPortal) {
             this.assessment = this.recordId;
@@ -495,6 +504,7 @@ export default class Questionnaire extends LightningElement {
                                         })
                                         questionWrap.responsesPercentage = Math.floor((Number(questionWrap.numberOfResponses) / Number(questionWrap.numberOfQuestions)) * 100);
                                         console.log('this.questionsAndAnswers', this.questionsAndAnswerss);
+                                         this.ishideToast = false;
                                     });
                                     this.loading = false;
                                     this.filterQuestionsAndAnswers = JSON.parse(JSON.stringify(this.questionsAndAnswerss));
@@ -559,6 +569,7 @@ export default class Questionnaire extends LightningElement {
                                 });
                             })
                             questionWrap.responsesPercentage = Math.floor((Number(questionWrap.numberOfResponses) / Number(questionWrap.numberOfQuestions)) * 100);
+                             this.ishideToast = false;
                         });
                     }).catch(error => {
                     });
@@ -568,6 +579,7 @@ export default class Questionnaire extends LightningElement {
             }
         }
         else {
+            this.ishideToast = false;
             this.isSupplier = true;
             /*This method is used to get all the assessments records*/
             getSupplierAssessmentList({ assessmentId: this.accountassessmentid }).then(result => {
@@ -733,6 +745,8 @@ export default class Questionnaire extends LightningElement {
                                 questionWrap.responsesPercentage = Math.floor((Number(questionWrap.numberOfResponses) / Number(questionWrap.numberOfQuestions)) * 100);
                             });
                             this.loading = false;
+                            this.ishideToast = this.saveWrapper.ishideToast;
+                            this.showToast = this.saveWrapper.showToast;
                             this.filterQuestionsAndAnswers = JSON.parse(JSON.stringify(this.questionsAndAnswerss));
 
                         }).catch(error => {
@@ -1136,12 +1150,20 @@ export default class Questionnaire extends LightningElement {
     }
     /*handleSave method is used to save the responses for particular question */
     handleSave() {
+        this.saveWrapper.isSave = true;
+        this.saveWrapper.showToast = true;
+        this.saveWrapper.ishideToast = true;
+        this.saveWrapper.isAutoSave = false;
+        this.saveWrapper.totastmessage = 'Responses saved successfully';
         this.ishideToast = true;
+
         this.isAutoSave = false;
         this.success = true;
         this.showToast = true;
         this.countAutoSave = 0;
         setTimeout(() => { this.totastmessage = 'Responses saved successfully'; });
+        this.handleOnload();
+        
 
     }
 
@@ -1352,7 +1374,7 @@ export default class Questionnaire extends LightningElement {
                                     if (typeof subQuestion.Files__c !== 'undefined') {
                                         filesmap[subQuestion.Id] = subQuestion.Files__c;
                                     }
-                                    if (typeof subQuestion.value !== 'undefined') {
+                                    if (typeof subQuestion.value !== 'undefined' && subQuestion.value!=='') {
                                         if (subQuestion.isEmail === true && !(subQuestion.value.match(/^\w+([\\.-]?\w+)*@\w+([\\.-]?\w+)*(\.\w{2,3})+$/))) {
                                             isAssessmentValidated = true;
                                             this.showspinner = false;
@@ -1505,11 +1527,11 @@ export default class Questionnaire extends LightningElement {
                         this.dispatchEvent(selectedEvent);
                     }
                     else {
-                        if(isSubmit){
-                             setTimeout(() => {
-                            this.dispatchEvent(selectedEvent);
-                        }, 200);
-                        } 
+                        if (isSubmit) {
+                            setTimeout(() => {
+                                this.dispatchEvent(selectedEvent);
+                            }, 200);
+                        }
                     }
                 }
             }).catch(error => {
@@ -1520,6 +1542,11 @@ export default class Questionnaire extends LightningElement {
     }
     /* Used to close the toast message populated on saving */
     closeToastHandler(event) {
+         this.saveWrapper.isSave = false;
+        this.saveWrapper.showToast = false;
+        this.saveWrapper.ishideToast = false;
+        this.saveWrapper.isAutoSave = false;
+        this.saveWrapper.totastmessage = '';
         this.showToast = event.detail.showModal;
     }
     /*constructWrapperConditionalQuestion method is used to construct the wrapper for Questions and responses  */
@@ -1558,6 +1585,7 @@ export default class Questionnaire extends LightningElement {
         quTemp.needData = false;
         quTemp.disableReject = false;
         quTemp.sequenceNumber = qu.Rhythm__Question_Sequence_Number__c;
+        quTemp.chatColour=false;
         this.actionData.forEach(res => {
             if (res.Rhythm__Question__c == quTemp.Id) {
                 quTemp.saveActionForm = true;
@@ -1642,7 +1670,7 @@ export default class Questionnaire extends LightningElement {
                     else {
                         this.timeline.forEach(res => {
                             if (res.status === 'Need More Information') {
-                                quTemp.customerFlag = true;
+                                //quTemp.customerFlag = true;
                                 quTemp.capaAction = true;
                             }
                         })
@@ -1715,8 +1743,13 @@ export default class Questionnaire extends LightningElement {
                     }
                 }
             }
+            //console.log('savedresp',savedResp.get(qu.Id).Conversation_History__c);
             if (typeof savedResp.get(qu.Id) !== 'undefined' && typeof savedResp.get(qu.Id).Conversation_History__c !== 'undefined') {
                 quTemp.Rhythm__Conversation_History__c = savedResp.get(qu.Id).Conversation_History__c;
+                console.log('savedresp',savedResp.get(qu.Id).Conversation_History__c.length);
+                if(JSON.parse(savedResp.get(qu.Id).Conversation_History__c).length > 0){
+                    quTemp.chatColour=true;
+                }
             }
             else {
                 quTemp.Rhythm__Conversation_History__c = [];
@@ -1952,16 +1985,24 @@ export default class Questionnaire extends LightningElement {
             questionAnswer.questions.forEach(question => {
                 if (question.Id === chatterData.questionId) {
                     question.Rhythm__Conversation_History__c = chatterData.conversationHistory;
+                    if (JSON.parse(chatterData.conversationHistory).length > 0) {
+                        question.chatColour = true;
+                    }
+
                 }
                 question.Children.forEach(subQuestion => {
                     subQuestion.questions.forEach(ques => {
                         if (ques.Id === chatterData.questionId) {
                             ques.Rhythm__Conversation_History__c = chatterData.conversationHistory;
+                            if (JSON.parse(chatterData.conversationHistory).length > 0) {
+                                ques.chatColour = true;
+                            }
                         }
                     })
                 })
             })
         });
+        console.log('indata', this.questionsAndAnswerss);
     }
     /*This method is to update the AccountAssessmentStatus to In Review. And to display the flags in customer portal. */
     handleStartReview() {
@@ -2156,6 +2197,7 @@ based on the flags on customer portal */
             }).catch(error => {
 
             });
+            this.ishideToast = true;
             this.showToast = true;
             this.success = true;
             this.totastmessage = 'The Assessment Status is updated to  ' + param.assessmentStatus + ' successfuly.';
@@ -2198,6 +2240,7 @@ based on the flags on customer portal */
         }).catch(error => {
 
         });
+        this.ishideToast = true;
         this.showToast = true;
         this.success = true;
         this.totastmessage = 'The Assessment Status is updated to  ' + param.assessmentStatus + ' successfuly.';

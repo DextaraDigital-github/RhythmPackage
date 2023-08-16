@@ -275,8 +275,10 @@ public with sharing class AssessmentController {
 	*/
     @AuraEnabled
     public static List<SObject> getPdfContent(String accountassessmentId){
-        List<SObject> accasslst =[Select id,PdfConvertor__c,Assessment__r.Name 
-                                  from AccountAssessmentRelation__c where id=:accountassessmentId];
+        List<SObject> accasslst =[SELECT Id,PdfConvertor__c,Assessment__r.Name 
+                                  FROM AccountAssessmentRelation__c 
+                                  WHERE Id=:accountassessmentId
+                                  WITH SECURITY_ENFORCED];
         return accasslst;
     }
 

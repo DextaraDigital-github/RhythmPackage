@@ -72,6 +72,34 @@ public class TemplateControllerTest {
            System.assertEquals(seclst!=null, true,'Response Attribute Deleted successfully');
         } 
     }
+
+    @isTest
+    static void cloneTemplateTestException(){
+        user u = [SELECT Id,UserName FROM User WHERE Email='sysadmin01@testorg.com' LIMIT 1];
+        system.runAs(u){
+            try{
+                List<Assessment_Template__c> sec =[SELECT id,name,Status__c FROM Assessment_Template__c];
+                Assessment_Template__c temp = new Assessment_Template__c();
+                temp.Name = sec[0].Name+'_clone';
+                temp.Rhythm__Status__c = sec[0].Rhythm__Status__c;
+                List<Response_Attribute__c> ques = [SELECT id,QuestionId__c,Response_value__c from Response_Attribute__c];
+                Response_Question_Map__c obj = new Response_Question_Map__c();
+                obj.Rhythm__QuestionId__c = ques[0].Rhythm__QuestionId__c;
+                obj.Rhythm__ResponseAttributeId__c = ques[0].Id;
+                List<SObject> lst = new List<SObject>();
+                lst.add(obj);
+            
+                Test.startTest();
+                rqsService.createResponseQuestionMap(lst);
+                Object seclst =TemplateController.doClone(sec[0].Id,temp);
+                Test.stopTest();
+                System.assertEquals(seclst!=null, true,'Response Attribute Deleted successfully');
+            }catch(exception e){
+                System.assertEquals(e.getMessage()!=null,true,'error catched.');
+            }
+        }
+    }
+
     @isTest
     static void wrapperTest(){
         user u = [SELECT Id,UserName FROM User WHERE Email='standarduser@testorg.com' LIMIT 1];

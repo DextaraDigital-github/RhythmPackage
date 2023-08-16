@@ -200,12 +200,22 @@
 											<!-- <div class="slds-button-group koushik" style="position:absolute; z-index:99;" role="group"> -->
 											<lightning-button-group class="slds-m-left_small" style="width:auto;">
 												<template if:true={questionary.capaAction}>
-													<lightning-button-icon variant="neutral" label="Review & Comments"
+													<template if:false={questionary.chatColour}>
+													<lightning-button-icon variant="neutral"  label="Review & Comments"
 														title="Review & Comments" data-id={questionary.Id}
 														icon-name="utility:comments" onclick={handleQuestionHighlight}
 														data-disable={questionary.isEditable}
 					                                    data-response={questionary.ResponseId} data-showupload={questionary.showUpload}>
 													</lightning-button-icon>
+													</template>
+													<template if:true={questionary.chatColour}>
+													<lightning-button-icon variant="brand" label="Review & Comments"
+														title="Review & Comments" data-id={questionary.Id}
+														icon-name="utility:comments" onclick={handleQuestionHighlight}
+														data-disable={questionary.isEditable} 
+					                                    data-response={questionary.ResponseId} data-showupload={questionary.showUpload}>
+													</lightning-button-icon>
+													</template>
 												</template>
 
 												<!-- <div>
