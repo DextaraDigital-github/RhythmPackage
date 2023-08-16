@@ -49,19 +49,19 @@ public class AssessmentServiceTest {
     */
     @isTest
     public static void fetchAssessmentTemplatesTest() {
-        try{
-            string testString;
-            user u = [SELECT Id,UserName FROM User WHERE Email='standarduser@testorg.com' LIMIT 1];
-            System.runAs(u){
-				Test.startTest();
+        user u = [SELECT Id,UserName FROM User WHERE Email='standarduser@testorg.com' LIMIT 1];
+        System.runAs(u){
+            try{
+                string testString;
+                Test.startTest();
                 service.fetchAssessmentTemplates();
                 testString='Success';
-				Test.stopTest();
+                Test.stopTest();
+                System.assertEquals(testString=='Success', true,'Done with fetch Assessments');
             }
-            System.assertEquals(testString=='Success', true,'Done with fetch Assessments');
-        }
-        catch(Exception e) {
-            System.assertEquals(e.getMessage()!=null, true,'exception thrown');
+            catch(Exception e) {
+                System.assertEquals(e.getMessage()!=null, true,'exception thrown');
+            }
         }
     }
 }

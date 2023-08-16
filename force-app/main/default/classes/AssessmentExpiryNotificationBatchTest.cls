@@ -63,7 +63,7 @@ private with sharing class AssessmentExpiryNotificationBatchTest {
     @isTest
     static void expiryBatchTestCatch(){
         try{
-            user u = [SELECT Id,UserName FROM User WHERE LastName='Testing_2' LIMIT 1];
+            user u = [SELECT Id,UserName FROM User WHERE Email='sysadmin01@testorg.com' LIMIT 1];
             System.runAs(u){
                 Test.startTest();
                 AssessmentExpiryNotificationBatch b = new AssessmentExpiryNotificationBatch();

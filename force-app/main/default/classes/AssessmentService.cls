@@ -32,7 +32,7 @@ public class AssessmentService {
         List<String> fields = new List<String>{'Id', 'Name'};
         String filter = ' WHERE Status__c = \'Active\' ORDER BY Name ASC';
         Map<String,Object> newParameterMap = new Map<String,Object>{'fields'=>fields, 'filter'=>filter};
-        if(newParameterMap.isEmpty() == false){
+        if(newParameterMap != null){
             List<Assessment_Template__c> recList = selector.fetchAssessmentTemplates(newParameterMap).values();
             if(recList != null) {
                 return recList;
