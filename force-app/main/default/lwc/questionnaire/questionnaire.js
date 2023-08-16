@@ -90,7 +90,7 @@ export default class Questionnaire extends LightningElement {
     @track accountName;
     @track accountId;
     @track showFollowButton = true;
-    @track timeline;
+    @api timeline;
     @track responseList = [];
     @track assessmentRecordName;
     @track filterQuestionsAndAnswers;
