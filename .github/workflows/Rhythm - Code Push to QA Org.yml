@@ -1,5 +1,5 @@
 # Unique name for this workflow
-name: Rhythm - Code Push to QA Org(PR Merge)
+name: Rhythm - Code Push to QA Org
 
 # Definition when the workflow should run
 
