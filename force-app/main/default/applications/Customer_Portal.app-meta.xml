@@ -17,6 +17,7 @@
     <tabs>standard-Contact</tabs>
     <tabs>Assessment_Template__c</tabs>
     <tabs>Assessment__c</tabs>
+    <tabs>Action__c</tabs>
     <uiType>Lightning</uiType>
     <utilityBar>Customer_Portal_UtilityBar</utilityBar>
 </CustomApplication>
