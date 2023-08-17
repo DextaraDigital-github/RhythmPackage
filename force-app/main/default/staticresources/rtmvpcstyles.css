@@ -442,3 +442,24 @@
 		.menuicontoggle { margin-left:0px; }
 		.rtmvpc-contents { padding-left:0px; }
 	}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+	.cCenterPanel, .contentRegion.comm-layout-column, .comm-content-header.comm-layout-column, .comm-content-footer.comm-layout-column {
+        width: 400px; /* Adjust the width as needed */
+        max-width: 800px; /* Set a maximum width if desired */
+        margin: 0 auto;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+    }
+    .comm-content-header.comm-layout-column, .comm-content-footer.comm-layout-column {
+        display: none;
+    }
+
+    .cCenterPanel, .contentRegion.comm-layout-column .ui-widget .salesforceIdentityLoginForm2 {
+        min-width:300px;
+    }
+    .rtmvpc { width:calc(100vw - 0px); height:calc(100vh - 0px);  overflow-x: hidden; overflow-y: auto; position: absolute!important; top: 0px!important; left: 0px!important; }
+    .cCenterPanel.slds-m-top--x-large.slds-p-horizontal--medium{margin-top:0px!important; }
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                

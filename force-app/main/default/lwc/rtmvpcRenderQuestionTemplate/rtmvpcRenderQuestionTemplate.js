@@ -267,6 +267,7 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
     /*handleChange is used to dispatch an event to its parent component(Questionnaire) and change the response and send back to the parent component*/
     handleChange(event) {
         console.log('sampe');
+        this.showSupplierPopup=false;
         var changedvalue = event.target.value;
         let questionId = event.currentTarget.dataset.key;
         let parentQuestionId;

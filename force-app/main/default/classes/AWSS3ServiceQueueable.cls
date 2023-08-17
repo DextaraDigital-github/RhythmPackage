@@ -14,17 +14,17 @@ public class AWSS3ServiceQueueable implements Queueable, Database.AllowsCallouts
     public Boolean deleteFlag;
     public String objectName;
     public Set<Id> contVerIds;
-
+    
     private static AWSS3ServiceQueueable service = null; //private static instance of the class
     
     /**
-    * @description Singleton Design Pattern
-    * @return
-    */
+* @description Singleton Design Pattern
+* @return
+*/
     public static AWSS3ServiceQueueable getInstance(){
-            if(service == null){
-                service = new AWSS3ServiceQueueable();
-            }
+        if(service == null){
+            service = new AWSS3ServiceQueueable();
+        }
         return service;
     }
     
@@ -68,8 +68,10 @@ public class AWSS3ServiceQueueable implements Queueable, Database.AllowsCallouts
                             }
                             putAttachment.versionData=conver;
                             String name = conver.Title.substringBeforeLast('.');
-                            name = name.replaceAll(' ','');
-                            Name = name.replaceAll('[^a-zA-Z0-9 -]', '');
+                            name = name.replaceAll(' ','_');
+                            // Name = name.replaceAll('[^a-zA-Z0-9 -]', '');
+                            name = name.replace('(', '');
+                            name = name.replace(')', '');
                             name = name.replaceAll('-','');
                             Datetime datetimeVal = Datetime.now(); // Returns the current Datetime based on a GMT calendar.
                             String timeStamp = datetimeVal.format('yyyyMMdd\'T\'HHmmss');

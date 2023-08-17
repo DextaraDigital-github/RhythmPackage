@@ -30,6 +30,7 @@ export default class RtmvpcAssessments extends NavigationMixin(LightningElement)
     ];
     /* connectedCallback is used to get accountAssessment data based on the account Id */
     connectedCallback() {
+        console.log('connectedassessments');
         this.fieldsList = [];
         if (this.tablefieldList && this.tablefieldList.length > 0) {
             this.tablefieldList.forEach(tabList => {
@@ -47,6 +48,11 @@ export default class RtmvpcAssessments extends NavigationMixin(LightningElement)
         if (currentPageReference) {
             this.urlId = currentPageReference.state?.Rhythm__AccountAssessmentRelation__c;
         }
+    }
+    @api handleInbox()
+    {
+        this.show.survey = false;
+        this.show.grid = true;
     }
 
     /* fetchingRecords is used to get accountAssessment data based on the account Id and URL navigation */
