@@ -2,7 +2,6 @@ import { LightningElement, track, api } from 'lwc';
 import getRecsCount from '@salesforce/apex/AssessmentTemplateController.getRecordsCount';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent'
 
-
 export default class CustomRecordForm extends LightningElement {
 
   @api fieldsList;
@@ -11,6 +10,7 @@ export default class CustomRecordForm extends LightningElement {
   @api lookupLabel;
   @track selLookupId;
   @track newFlag = false;
+  @track disbaleSave = false;
 
   connectedCallback() {
     this.fieldsList = JSON.parse(JSON.stringify(this.fieldsList));
@@ -36,6 +36,7 @@ export default class CustomRecordForm extends LightningElement {
 
   //handle submit for record edit form
   handleSubmit(event) {
+    this.disbaleSave = true;
     var isVal = true;
     this.template.querySelectorAll('lightning-input-field').forEach(element => {
       isVal = isVal && element.reportValidity();

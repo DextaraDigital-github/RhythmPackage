@@ -8,7 +8,7 @@
 public with sharing class AWSS3Controller {  
     public static SecurityCheckController safe = new SecurityCheckController();//use singleton pattern
     private static Savepoint sp;
-
+    
     static AWSS3Service service = AWSS3Service.getInstance();
     
     /**
@@ -119,16 +119,16 @@ public with sharing class AWSS3Controller {
 * @param templateId This is a record id of an Template__c.
 *@return
 */    
-    @AuraEnabled(Cacheable=true)
+    @AuraEnabled
     public static Boolean getTemplateDetails(String templateId) {
         try {
             Boolean hasStatusNew = true;
             templateId = String.escapeSingleQuotes(templateId);
             if(String.isNotBlank(templateId)) {
                 List<Assessment_Template__c> assessmentList=  [SELECT Status__c
-                                                                FROM Assessment_Template__c
-                                                                WHERE Id= :templateId
-                                                                WITH SECURITY_ENFORCED];
+                                                               FROM Assessment_Template__c
+                                                               WHERE Id= :templateId
+                                                               WITH SECURITY_ENFORCED];
                 Assessment_Template__c assessmentTemp = (AssessmentList.size()==1)?AssessmentList[0]:null;
                 if(assessmentTemp  != null && assessmenttemp.Status__c.equalsIgnoreCase('New')){
                     hasStatusNew = false;
@@ -141,12 +141,12 @@ public with sharing class AWSS3Controller {
             throw new AuraHandledException(ErrorMsg);
         }
     }
-
+    
     /**
-    * @description update Files count.
-    * @param responseId This is a record id of an Response.
-    * @param filesCount
-    */    
+* @description update Files count.
+* @param responseId This is a record id of an Response.
+* @param filesCount
+*/    
     @AuraEnabled
     /* sfge-disable-stack ApexFlsViolationRule */
     public static void updateRespFilesCount(String responseId, Integer filesCount) {
@@ -160,7 +160,27 @@ public with sharing class AWSS3Controller {
             throw new AuraHandledException(ErrorMsg);
         }
     }
-
+    
+    /**
+* @description deleteContentDocument
+* @param recordId This is a record id.
+*/ 
+    @AuraEnabled
+    /* sfge-disable-stack ApexFlsViolationRule */
+    public static void deleteContentDocument(String recordId) {
+        try { 
+            if(recordId != null) {
+                service.deleteContentDocument(recordId);
+            }
+        }
+        catch(Exception e) {
+            String errorMsg = e.getMessage();
+            throw new AuraHandledException(ErrorMsg);
+        }
+    }
+    
+    
+    
     /**
 * @description It is used to throw the exception
 */

@@ -284,7 +284,7 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
         })
         setTimeout(() => {
             this.template.querySelectorAll('c-action')[0].displayForm(this.showResponseForm);
-        }, 500);
+        }, 400);
 
     }
     // emptyFormData(event){
@@ -355,7 +355,7 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
         this.openRightFile = false;
         setTimeout(() => {
             this.template.querySelectorAll('c-action')[0].displayForm(this.actionData);
-        }, 300);
+        }, 200);
 
     }
     handleFileData(event) {
@@ -466,7 +466,11 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
 
     handleupdatetimeline(event) {
         let filesdata = event.detail;
-        this.handleTimeLine();
+        if(filesdata.files){
+            console.log('samppledata');
+        this.template.querySelector('c-portal-s3-files').handleFilesdata(filesdata);
+        }
+        this.handleTimeLine();        
         if (typeof filesdata.data !== 'undefined') {
             const selectedEvent = new CustomEvent('handlepdfcsv', {
                 detail: filesdata
