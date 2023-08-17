@@ -182,6 +182,7 @@ export default class Questionnaire extends LightningElement {
             })
 
         }
+        this.handleRequiredCheck();
     }
     //Used /* handleAccordionSection is used to handle opening and closing of a disclosure */
     handleAccordionSection() {
@@ -750,12 +751,6 @@ export default class Questionnaire extends LightningElement {
                                                 }
                                             }
                                             childQuestion.questions.forEach(ques => {
-                                                if (question.Rhythm__Flag__c === true) {
-                                                    var status = this.timeline[0].status;
-                                                    if (status === 'Need More Information') {
-                                                        ques.isEditable = false;
-                                                    }
-                                                }
                                                 if (childQuestion.isdisplay && ques.required) {
                                                     this.requiredQuestionList.push(ques.Id);
                                                 }
