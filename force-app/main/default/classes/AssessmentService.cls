@@ -30,7 +30,7 @@ public class AssessmentService {
     */
     public List<sObject> fetchAssessmentTemplates() {
         List<String> fields = new List<String>{'Id', 'Name'};
-        String filter = ' WHERE Status__c = \'Active\' ORDER BY Name ASC';
+        String filter = ' WHERE Status__c = \'Active\' ORDER BY CreatedDate DESC';
         Map<String,Object> newParameterMap = new Map<String,Object>{'fields'=>fields, 'filter'=>filter};
         if(newParameterMap != null){
             List<Assessment_Template__c> recList = selector.fetchAssessmentTemplates(newParameterMap).values();

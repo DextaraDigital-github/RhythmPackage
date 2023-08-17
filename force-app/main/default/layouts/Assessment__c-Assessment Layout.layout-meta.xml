@@ -110,7 +110,6 @@
         <relatedList>AccountAssessmentRelation__c.Assessment__c</relatedList>
     </relatedLists>
     <relatedLists>
-        <customButtons>Manage_Suppliers</customButtons>
         <excludeButtons>MassChangeOwner</excludeButtons>
         <excludeButtons>New</excludeButtons>
         <fields>Account__c</fields>

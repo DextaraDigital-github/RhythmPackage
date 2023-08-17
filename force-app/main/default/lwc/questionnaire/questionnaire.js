@@ -120,7 +120,6 @@ export default class Questionnaire extends LightningElement {
     previewUrl;
 
     @api handleGetRespRecord(quesid) {
-        console.log('quesid', quesid);
         if (typeof quesid.response !== 'undefined' && quesid.response !== '') {
             let responsemap = quesid.response;
             this.questionsAndAnswerss.forEach(questionAnswer => {
@@ -182,6 +181,7 @@ export default class Questionnaire extends LightningElement {
             })
 
         }
+        this.handleRequiredCheck();
     }
     //Used /* handleAccordionSection is used to handle opening and closing of a disclosure */
     handleAccordionSection() {
@@ -750,12 +750,6 @@ export default class Questionnaire extends LightningElement {
                                                 }
                                             }
                                             childQuestion.questions.forEach(ques => {
-                                                if (question.Rhythm__Flag__c === true) {
-                                                    var status = this.timeline[0].status;
-                                                    if (status === 'Need More Information') {
-                                                        ques.isEditable = false;
-                                                    }
-                                                }
                                                 if (childQuestion.isdisplay && ques.required) {
                                                     this.requiredQuestionList.push(ques.Id);
                                                 }
@@ -1235,12 +1229,12 @@ export default class Questionnaire extends LightningElement {
         if (this.isAutoSave) {
             this.constructResponse(false);
             this.countAutoSave++;
-            if (this.countAutoSave === 1) {
-                const selectedEvent = new CustomEvent('updatetimeline', {
-                    detail: true
-                });
-                this.dispatchEvent(selectedEvent);
-            }
+            // if (this.countAutoSave === 1) {
+            //     const selectedEvent = new CustomEvent('updatetimeline', {
+            //         detail: true
+            //     });
+            //     this.dispatchEvent(selectedEvent);
+            // }
         }
     }
     closeModal() {
