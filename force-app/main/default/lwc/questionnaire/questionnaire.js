@@ -568,6 +568,7 @@ export default class Questionnaire extends LightningElement {
                                     });
                                 });
                             })
+                            console.log('this.questionsAndAnswerss',this.questionsAndAnswerss);
                             questionWrap.responsesPercentage = Math.floor((Number(questionWrap.numberOfResponses) / Number(questionWrap.numberOfQuestions)) * 100);
                              this.ishideToast = false;
                         });
@@ -741,8 +742,8 @@ export default class Questionnaire extends LightningElement {
                                         });
                                     }
                                 });
-                                console.log('this.questionsAndAnswerss', this.questionsAndAnswerss);
                                 questionWrap.responsesPercentage = Math.floor((Number(questionWrap.numberOfResponses) / Number(questionWrap.numberOfQuestions)) * 100);
+                                console.log('this.questionsAndAnswerss', this.questionsAndAnswerss);
                             });
                             this.loading = false;
                             this.ishideToast = this.saveWrapper.ishideToast;
@@ -872,7 +873,6 @@ export default class Questionnaire extends LightningElement {
     //Used /* /onResponseChange method is used to change the wrapper and display the changed responsed for questions values on UI */
     onResponseChange(event) {
         this.requiredQuestionList = [];
-
         this.questionresponseafterchange = event.detail;
         console.log('event.detail', event.detail);
         if (this.questionresponseafterchange !== undefined && this.questionresponseafterchange !== null) {
@@ -967,6 +967,7 @@ export default class Questionnaire extends LightningElement {
                     }
                     else {
                         if (this.questionresponseafterchange.parent === question.Id) {
+                            console.log('Else Condition Response');
                             let childbool = false;
                             //This loop is to iterate over the Child Questions for a particular sections and Questions in the wrapper.
                             question.Children.forEach(subquestion => {
@@ -1161,8 +1162,9 @@ export default class Questionnaire extends LightningElement {
         this.success = true;
         this.showToast = true;
         this.countAutoSave = 0;
-        setTimeout(() => { this.totastmessage = 'Responses saved successfully'; });
-        this.handleOnload();
+        setTimeout(() => { this.totastmessage = 'Responses saved successfully';
+        this.handleOnload(); },400);
+        
         
 
     }
@@ -1451,6 +1453,24 @@ export default class Questionnaire extends LightningElement {
             this.totastmessage = 'Please fill Mandatory questions ';
             if (this.requiredFilesLst.length > 0) {
                 this.totastmessage = 'Please upload required file.'
+                this.questionsAndAnswerss.forEach(questionAnswer=>{
+                    questionAnswer.questions.forEach(question=>{
+                        if(this.requiredFilesLst.includes(question.Id)){
+                            question.attachmentStyle = 'slds-button slds-button_icon slds-button_icon-border-filled rqt-attchbtn-red';
+                        }
+                        if(question.Children.length>0){
+                            question.Children.forEach(childwrap=>{
+                                if(childwrap.isdisplay){
+                                    childwrap.questions.forEach(ques=>{
+                                        if(this.requiredFilesLst.includes(ques.Id)){
+                                            ques.attachmentStyle = 'slds-button slds-button_icon slds-button_icon-border-filled rqt-attchbtn-red';
+                                        }
+                                    })
+                                }
+                            })
+                        }
+                    })
+                })
             }
         }
 
@@ -1519,7 +1539,7 @@ export default class Questionnaire extends LightningElement {
                 filemaplst.files = false;
                 if (!this.isAutoSave) {
                     this.success = true;
-                    this.totastmessage = 'Responses Submitted Sucessfully';
+                    this.totastmessage = 'Responses Saved Sucessfully';
                     const selectedEvent = new CustomEvent('updatetimeline', {
                         detail: filemaplst
                     });
@@ -1584,6 +1604,7 @@ export default class Questionnaire extends LightningElement {
         quTemp.rejectButton = false;
         quTemp.needData = false;
         quTemp.disableReject = false;
+        quTemp.attachmentStyle= 'slds-button slds-button_icon slds-button_icon-border-filled rqt-attchbtn-black';
         quTemp.sequenceNumber = qu.Rhythm__Question_Sequence_Number__c;
         quTemp.chatColour=false;
         this.actionData.forEach(res => {
