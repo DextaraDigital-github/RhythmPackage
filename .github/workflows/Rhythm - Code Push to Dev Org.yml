@@ -1,9 +1,10 @@
 # Unique name for this workflow
-name: Rhythm - Code Push to Dev Org(PR Merge)
+name: Rhythm - Code Push to Dev Org
 
 # Definition when the workflow should run
 
 on:
+  workflow_dispatch:
   pull_request:
     branches:
       - development
