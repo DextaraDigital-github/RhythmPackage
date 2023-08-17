@@ -120,7 +120,6 @@ export default class Questionnaire extends LightningElement {
     previewUrl;
 
     @api handleGetRespRecord(quesid) {
-        console.log('quesid', quesid);
         if (typeof quesid.response !== 'undefined' && quesid.response !== '') {
             let responsemap = quesid.response;
             this.questionsAndAnswerss.forEach(questionAnswer => {
@@ -1230,12 +1229,12 @@ export default class Questionnaire extends LightningElement {
         if (this.isAutoSave) {
             this.constructResponse(false);
             this.countAutoSave++;
-            if (this.countAutoSave === 1) {
-                const selectedEvent = new CustomEvent('updatetimeline', {
-                    detail: true
-                });
-                this.dispatchEvent(selectedEvent);
-            }
+            // if (this.countAutoSave === 1) {
+            //     const selectedEvent = new CustomEvent('updatetimeline', {
+            //         detail: true
+            //     });
+            //     this.dispatchEvent(selectedEvent);
+            // }
         }
     }
     closeModal() {
