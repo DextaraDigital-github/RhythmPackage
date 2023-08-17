@@ -466,18 +466,10 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
 
     handleupdatetimeline(event) {
         let filesdata = event.detail;
+        this.handleTimeLine(); 
         if(filesdata.files){
-            console.log('samppledata');
         this.template.querySelector('c-portal-s3-files').handleFilesdata(filesdata);
-        }
-        this.handleTimeLine();        
-        if (typeof filesdata.data !== 'undefined') {
-            const selectedEvent = new CustomEvent('handlepdfcsv', {
-                detail: filesdata
-            });
-            this.dispatchEvent(selectedEvent);
-            this.handleOnload();
-        }
+        }      
     }
     handlepdf(accountassessmentId) {
         getPdfContent({ accountassessmentId: accountassessmentId }).then(result => {

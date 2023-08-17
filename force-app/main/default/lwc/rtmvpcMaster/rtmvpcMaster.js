@@ -103,12 +103,15 @@ export default class RtmvpcMaster extends NavigationMixin(LightningElement) {
         this.isReports = false; 
         this.isDashboard = false; 
         this.isSettings = false;
+          console.log('this.isAssessments',this.isAssessments);
         if (event.detail === 'Inbox') {
             this.isInbox = true;
             data = 'Rhythm__Inbox__c';
+           
         }
         else if(event.detail === 'Home') {this.isHome = true; }
         else if(event.detail === 'Calendar'){this.isCalendar = true; }
+       
        else if (event.detail === 'Assessments') {
             this.isAssessments = true;
             data = 'Rhythm__Assessments__c';
@@ -124,6 +127,7 @@ export default class RtmvpcMaster extends NavigationMixin(LightningElement) {
             this.isAction = true;
             data = 'Rhythm__Action__c';
         }
+        console.log('this.isAssessments',this.isAssessments);
 
         const pageRef = {
             type: 'comm__namedPage',
@@ -137,6 +141,10 @@ export default class RtmvpcMaster extends NavigationMixin(LightningElement) {
         };
         // Navigate to the community page
         this[NavigationMixin.Navigate](pageRef);
+        if(this.isAssessments === true)
+        {
+             this.template.querySelector('c-rtmvpc-assessments').handleInbox();
+        }
 
     }
 
@@ -180,6 +188,7 @@ export default class RtmvpcMaster extends NavigationMixin(LightningElement) {
             this.isAssessments = false;
             if (this.openClicked === 'Rhythm__Inbox__c') { this.isInbox = true; }
             if (this.openClicked === 'Rhythm__Action__c') { this.isAction = true; }
+            if (this.openClicked === 'Rhythm__Assessments__c') { this.isAssessments = true; }
 
         }
         if (typeof this.urlId !== 'undefined') {

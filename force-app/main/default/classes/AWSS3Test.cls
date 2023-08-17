@@ -109,8 +109,8 @@ private class AWSS3Test {
         System.runAs(u) {
             Test.startTest();
             String result = AWSS3Controller.getFileSignedUrl('location', 'file', 60);
-        service.convertToHex('01','test');
-        service.uriEncode('01*',true);
+            service.convertToHex('01','test');
+            service.uriEncode('01*',true);
             Test.stopTest();
             System.assertEquals(result, result, 'Assert Failed');
         }
@@ -151,7 +151,7 @@ private class AWSS3Test {
             filemap.put('assessmentId', resp[0].AccountAssessmentRelation__c);
             filemap.put('quesId', resp[0].Question__c);
             AWSS3Controller.uploadFiles(acc[0].Id, 'Account', null, true, u.id);
-            AWSS3Controller.createResponseforFileUpload (JSON.serialize(filemap));
+            AWSS3Controller.createResponseforFileUpload (JSON.serialize(filemap));            
             Test.stopTest();
             System.assertEquals(1,asslist.size(),'Assert Failed');
         }
@@ -188,7 +188,9 @@ private class AWSS3Test {
             qService.pathRecId = null;
             qService.deleteFlag = true;
             qService.contVerIds = new Set<Id>{versionData[0].id};            
-            service.convertToHex('c','test');
+                service.convertToHex('c','test');
+            AWSS3Controller.deleteContentDocument(acc[0].Id);
+            
             Test.stopTest();
             System.assertEquals(1,acc.size(),'Assert Failed');
         }

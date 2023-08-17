@@ -95,9 +95,8 @@
 									<div class="slds-text-align_center slds-text-heading_large">
 										<template if:true={showSections}>
 											<c-Questionnaire vendor={accountid} assessment={assessmentid}
-												timeline={assessmentTimeline} object-api-name={objectApiName}
-												record-id={recordId} accid={assaccId} onselectconversation={chatHistory}
-												onshowsummary={showsummaryHandler}
+												object-api-name={objectApiName} record-id={recordId} accid={assaccId}
+												onselectconversation={chatHistory} onshowsummary={showsummaryHandler}
 												account-assessment-status={accountAssessmentStatus}
 												onupdatetimeline={handleupdatetimeline} onuploadfile={handleFileData}
 												onexpandcollapse={handleExpandCollapse}
@@ -119,7 +118,7 @@
 							<div class="slds-float_right slds-is-relative">
 								<button class="cad_actions " onclick={handleRightButtonClick} title="Show / Hide Timeline Panel"><i class=" las la-chevron-circle-right" style="transform:rotate(0deg);"></i></button>
 							</div>
-							<div >
+							<div>
 								<lightning-button-icon class="cad_actions slds-float_right slds-is-absolute"
 									style="right:30px;top:3px;" size="small" icon-name="utility:edit_form"
 									onclick={handleSelectedAction}>
@@ -129,33 +128,39 @@
 									onclick={handleSelectedFile}>
 								</lightning-button-icon>
 								<lightning-button-icon class="cad_actions slds-float_right slds-is-absolute "
-									style="right:90px;top:3px;border-radius:0px" size="small" icon-name="utility:comments"
-									onclick={handleSelectedChat}>
+									style="right:90px;top:3px;border-radius:0px" size="small"
+									icon-name="utility:comments" onclick={handleSelectedChat}>
 								</lightning-button-icon>
 							</div>
 						</div>
 						<div class="cad-sec_bodyfull1 cad-titlebutton_more">
-										
-										<template if:true={openReviewComments}>
-											<c-rtmvpc-assessment-chatter chattermap={showChat}
-												onchatconversation={handleChat} recordid={customerId} timeline={assessmentTimeline}>
-											</c-rtmvpc-assessment-chatter>
-										</template>
-										<template if:true={showCapaForm}>
-											<c-action showresponse={showResponseForm} oncloseform={closeForm}
-												onremovedeleteicon={handleDeleteIcon}>
-											</c-action>
-										</template>
-										<template if:true={openRightFile}>
-											<template if:true={showUpload}>
-											<c-portal-s3-files object-name={objectApiName}
-												isdisabled = {isdisabled}
+							<div class="cad-sec_vcontainer2_2" style="height:calc(100% - 0px);">
+								<div class="slds-scrollable_y"
+									style="max-height:calc(100% - 40px); --slds-c-input-color-border: rgb(187 187 187);">
+
+
+									<template if:true={openReviewComments}>
+										<c-rtmvpc-assessment-chatter chattermap={showChat}
+											onchatconversation={handleChat} recordid={customerId}
+											timeline={assessmentTimeline}>
+										</c-rtmvpc-assessment-chatter>
+									</template>
+									<template if:true={showCapaForm}>
+										<c-action showresponse={showResponseForm} oncloseform={closeForm}
+											onremovedeleteicon={handleDeleteIcon}>
+										</c-action>
+									</template>
+									<template if:true={openRightFile}>
+										<template if:true={showUpload}>
+											<c-portal-s3-files object-name={objectApiName} isdisabled={isdisabled}
 												response-rec-id={responseId} ongetdata={handleOnLoad}
 												assessment-rec-id={accountassessmentFileId} rec-id={recid}
 												question-id={questionId}>
 											</c-portal-s3-files>
-											</template>
 										</template>
+									</template>
+								</div>
+							</div>
 
 						</div>
 					</div>
