@@ -1,7 +1,5 @@
 <template>
-	<template if:true={loading}>
-		<lightning-spinner alternative-text="Loading" size="large"></lightning-spinner>
-	</template>
+
 	<template if:true={createQues}>
 		<section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="modal-heading-01"
 			class="slds-modal slds-fade-in-open slds-modal_small">
@@ -16,7 +14,10 @@
 				<div class="slds-modal__header">
 					<h1 id="modal-heading-01" class="slds-modal__title slds-hyphenate">New Question</h1>
 				</div>
-				<div class="slds-modal__content" id="modal-content-id-2">
+				<div class="slds-modal__content slds-is-relative" id="modal-content-id-2">
+					<template if:true={loading}>
+						<lightning-spinner alternative-text="Loading" size="large"></lightning-spinner>
+					</template>
 					<div>
 						<div class="slds-p-top_small slds-p-bottom_small slds-p-horizontal_medium">
 							<lightning-layout multiple-rows>
@@ -124,9 +125,11 @@
 					</div>
 				</div>
 				<div class="slds-modal__footer">
-					<button class="slds-button slds-button_neutral" aria-label="Cancel and close" onclick={handleClose}>Cancel</button>
-					<lightning-button class="slds-button" variant="brand" label="Save" title="Save" disabled={isdisabled}
-						onclick={handlesave}></lightning-button>
+					<template if:false={loading}>
+						<button class="slds-button slds-button_neutral" aria-label="Cancel and close" onclick={handleClose}>Cancel</button>
+						<lightning-button class="slds-button" variant="brand" label="Save" title="Save"
+							disabled={isdisabled} onclick={handlesave}></lightning-button>
+					</template>
 				</div>
 			</div>
 		</section>
@@ -143,6 +146,9 @@
 		</template>
 	</template> -->
 	<template if:true={childQuesCreation}>
+		<template if:true={loading}>
+			<lightning-spinner alternative-text="Loading" size="large"></lightning-spinner>
+		</template>
 		<div class="slds-p-top_small slds-p-bottom_small slds-p-horizontal_medium">
 			<lightning-layout multiple-rows>
 				<lightning-layout-item size="6" class="slds-p-left_medium slds-p-right_medium slds-p-bottom_x-small"
@@ -181,7 +187,7 @@
 						<span class="slds-form-element__label slds-no-flex">Required</span>
 					</div>
 				</lightning-layout-item>
-				
+
 				<template if:false={showResponseAttributes}>
 					<lightning-layout-item size="12"
 						class="slds-p-left_medium slds-p-right_medium slds-p-bottom_x-small" small-device-size="6"
