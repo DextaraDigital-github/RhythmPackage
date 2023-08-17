@@ -35,7 +35,6 @@ export function constructMultilevelhierarchy(queryResults, savedResp, respAttr, 
                     responseValues.push(resp.Id);
                 }
             });
-            
             createChildHierarchy(children, hierarchyObj, savedResp, respAttr, temp,true);
             temp.hierarchy.push(hierarchyObj);
             /*} else {
@@ -70,6 +69,11 @@ export function createChildHierarchy(queryResults, parentObj, savedResp, respAtt
             temp.parentQuestionList.push(parentObj.Id);
             if (childObj.type === 'Radio' || childObj.type === 'Picklist (Multi-Select)' || childObj.type === 'Checkbox' ||
                 childObj.type === 'Picklist') {
+                respAttr.forEach(resp=>{
+                if(resp.Rhythm__QuestionId__c===childObj.Id){
+                    responseValues.push(resp.Id);
+                }
+            });
                 createChildHierarchy(queryResults, childObj, savedResp, respAttr, thistemp,false);
             }
             if (parentObj.type === 'Checkbox') {
@@ -136,7 +140,6 @@ export function createChildHierarchy(queryResults, parentObj, savedResp, respAtt
                     let lst = [];
                     lst.push(childObj);
                     childmp.questions = lst;
-                    console.log('childmp', childmp);
                     parentObj.Children.push(childmp);
                 }
             }
@@ -205,7 +208,6 @@ export function createChildHierarchy(queryResults, parentObj, savedResp, respAtt
             }
         });
         while(responseValues.length>0){
-            console.log('responseValues in while',responseValues);
             createChildHierarchy(queryResults,parentObj, savedResp, respAttr, thistemp  ,false);
         }
     }
@@ -225,7 +227,6 @@ export function createChildHierarchy(queryResults, parentObj, savedResp, respAtt
                 childmp.isdisplay = (parentObj.value === resp.Rhythm__Response_value__c);
                 childmp.questions = [];
                 childlst.push(childmp);
-                console.log('For Slice');
                 let index = responseValues.indexOf(resp.Id);
                 let del =responseValues.splice(index,1);
             }

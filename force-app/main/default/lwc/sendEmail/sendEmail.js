@@ -206,7 +206,7 @@ export default class SendEmail extends NavigationMixin(LightningElement) {
                     }
                 }
             }
-            this.columns = [{ fieldName: 'name', label: 'Name', sortable: true }, { fieldName: 'email', label: 'Email', sortable: true }, { fieldName: 'status', label: 'Email Status', sortable: true }]
+            this.columns = [{ fieldName: 'Name', label: 'Name', sortable: true }, { fieldName: 'Email', label: 'Email', sortable: true }, { fieldName: 'status', label: 'Email Status', sortable: true }]
         }
         else {
             this.pagesList = ['chooseRecipients', 'composeEmail'];

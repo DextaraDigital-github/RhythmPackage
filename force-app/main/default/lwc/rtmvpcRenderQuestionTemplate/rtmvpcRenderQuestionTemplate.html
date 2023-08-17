@@ -2,25 +2,26 @@
 <template>
 	<template if:true={responses}>
 		<template if:true={showSupplierPopup}>
-						<section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="modal-heading-02"
-							class="slds-modal slds-fade-in-open">
-							<div class="slds-modal__container">
-								<div class="slds-modal__header">
-									<h1 id="modal-heading-02" class="slds-modal__title slds-hyphenate">
-										
-									</h1>
-								</div>
-								<div class="slds-modal__content slds-p-around_medium" id="modal-content-id-2">
-									<p>Attachments and CAPAs added to the Conditional questions will be deleted when the response is changed</p>
-								</div>
-								<div class="slds-modal__footer">
-									<button class="slds-button slds-button_neutral" aria-label="Cancel and close" onclick={handleCancelButton}>Cancel</button>
-									<button class="slds-button slds-button_brand" onclick={handleResponseChange}>Ok</button>
-								</div>
-							</div>
-						</section>
-		<div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
-	</template>
+			<section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="modal-heading-02"
+				class="slds-modal slds-fade-in-open">
+				<div class="slds-modal__container">
+					<div class="slds-modal__header">
+						<h1 id="modal-heading-02" class="slds-modal__title slds-hyphenate">
+
+						</h1>
+					</div>
+					<div class="slds-modal__content slds-p-around_medium" id="modal-content-id-2">
+						<p>Attachments and CAPAs added to the Conditional questions will be deleted when the response is
+							changed</p>
+					</div>
+					<div class="slds-modal__footer">
+						<button class="slds-button slds-button_neutral" aria-label="Cancel and close" onclick={handleCancelButton}>Cancel</button>
+						<button class="slds-button slds-button_brand" onclick={handleResponseChange}>Ok</button>
+					</div>
+				</div>
+			</section>
+			<div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
+		</template>
 		<template if:true={isPreviewComponent}>
 			<template if:true={conditionaldisplay}>
 				<p class="slds-p-horizontal_small">↳[{conditionaval}]: </p>
@@ -201,20 +202,24 @@
 											<lightning-button-group class="slds-m-left_small" style="width:auto;">
 												<template if:true={questionary.capaAction}>
 													<template if:false={questionary.chatColour}>
-													<lightning-button-icon variant="neutral"  label="Review & Comments"
-														title="Review & Comments" data-id={questionary.Id}
-														icon-name="utility:comments" onclick={handleQuestionHighlight}
-														data-disable={questionary.isEditable}
-					                                    data-response={questionary.ResponseId} data-showupload={questionary.showUpload}>
-													</lightning-button-icon>
+														<lightning-button-icon variant="neutral"
+															label="Review & Comments" title="Review & Comments"
+															data-id={questionary.Id} icon-name="utility:comments"
+															onclick={handleQuestionHighlight}
+															data-disable={questionary.isEditable}
+															data-response={questionary.ResponseId}
+															data-showupload={questionary.showUpload}>
+														</lightning-button-icon>
 													</template>
 													<template if:true={questionary.chatColour}>
-													<lightning-button-icon variant="brand" label="Review & Comments"
-														title="Review & Comments" data-id={questionary.Id}
-														icon-name="utility:comments" onclick={handleQuestionHighlight}
-														data-disable={questionary.isEditable} 
-					                                    data-response={questionary.ResponseId} data-showupload={questionary.showUpload}>
-													</lightning-button-icon>
+														<lightning-button-icon variant="brand" label="Review & Comments"
+															title="Review & Comments" data-id={questionary.Id}
+															icon-name="utility:comments"
+															onclick={handleQuestionHighlight}
+															data-disable={questionary.isEditable}
+															data-response={questionary.ResponseId}
+															data-showupload={questionary.showUpload}>
+														</lightning-button-icon>
 													</template>
 												</template>
 
@@ -277,12 +282,17 @@
 												<template if:true={issupplier}>
 													<template if:true={questionary.customerFlag}>
 														<template if:true={questionary.rejectButton}>
-															<lightning-button-icon variant="neutral"
+															<button class="slds-button slds-button_icon slds-button_icon-border-filled" style="cursor:no-drop;" 
+															data-label="Rejected" title="Rejected"
+																data-id={questionary.Id}>
+																<lightning-icon icon-name="utility:close" size="xx-small"></lightning-icon>
+																<span class="slds-assistive-text">Close</span>
+															</button>
+															<!-- <lightning-button-icon variant="neutral"
 																data-label="Rejected" title="Rejected"
-																data-id={questionary.Id}
-																class="slds-p-left_koushik  rqt-redbtn"
-																icon-name="utility:close">
-															</lightning-button-icon>
+																data-id={questionary.Id}																
+																icon-name="utility:close" >
+															</lightning-button-icon> -->
 														</template></template>
 												</template>
 												<template if:false={issupplier}>
@@ -320,16 +330,27 @@
 													</template>
 												</template>
 											</lightning-button-group>
-											
-												<template if:true={questionary.showUpload}>
-													<lightning-button-icon variant="base"  icon-name="utility:attach" data-label="upload" title="titleName"
+
+											<template if:true={questionary.showUpload}>
+
+												<!-- <div variant="base" style='sds-c-icon-color-foreground'  icon-name="utility:attach" data-label="upload" title="titleName"
 														onclick={handleupload} data-id={questionary.Id}
 														data-showupload={questionary.showUpload}
 														data-disable={questionary.isEditable}
 														data-response={questionary.ResponseId}>
-													</lightning-button-icon>
-												</template>
-											
+													</div> -->
+												<button class={questionary.attachmentStyle}  data-label="upload" title="titleName"
+														onclick={handleupload} data-id={questionary.Id}
+														data-showupload={questionary.showUpload}
+														data-disable={questionary.isEditable}
+														data-response={questionary.ResponseId}>
+														<div aria-hidden="true">
+															<lightning-icon icon-name="utility:attach" size="x-small"></lightning-icon>
+														</div>
+														<span class="slds-assistive-text">Settings</span>
+													</button>
+											</template>
+
 										</div>
 									</div>
 								</div>
@@ -363,18 +384,18 @@
 											<template if:false={questionary.Rhythm__Flag__c}>
 												<template if:false={questionary.reviewForm}>
 													<template if:false={questionary.disableReject}>
-													<lightning-icon data-id={questionary.Id}
-														icon-name="utility:priority" size="x-small"
-														class="cib-forward:hover slds-m-right_medium"
-														onclick={openReview}>
-													</lightning-icon>
+														<lightning-icon data-id={questionary.Id}
+															icon-name="utility:priority" size="x-small"
+															class="cib-forward:hover slds-m-right_medium"
+															onclick={openReview}>
+														</lightning-icon>
 													</template>
 													<template if:true={questionary.disableReject}>
-													<lightning-icon data-id={questionary.Id}
-														icon-name="utility:priority" size="x-small"
-														class="cib-forward:hover slds-m-right_medium">														
-													</lightning-icon>
-												</template>
+														<lightning-icon data-id={questionary.Id}
+															icon-name="utility:priority" size="x-small"
+															class="cib-forward:hover slds-m-right_medium">
+														</lightning-icon>
+													</template>
 												</template>
 											</template>
 										</template>
@@ -673,11 +694,11 @@
 									onselectchange={handleConversationHistory} responses={childquestion.questions}
 									onactionchange={handleActionChange} key={childquestion.isdisplay}
 									ongetdata={handleFileRecord} onhandleonload={handleFileRecord}
-									conditionaval={childquestion.optionValue} recid={recordId} onuploadfile={handleChildUpload}
-									accountassessmentid={accountassessmentid} qtype={questionary.type}
-									onremovequeshighlight={removehighlightHandler} onvaluechange={handlechildchange}
-									onrejectchange={handleRejectButton} timeline={timeline}
-									is-preview-component={isPreviewComponent}>
+									conditionaval={childquestion.optionValue} recid={recordId}
+									onuploadfile={handleChildUpload} accountassessmentid={accountassessmentid}
+									qtype={questionary.type} onremovequeshighlight={removehighlightHandler}
+									onvaluechange={handlechildchange} onrejectchange={handleRejectButton}
+									timeline={timeline} is-preview-component={isPreviewComponent}>
 								</c-rtmvpc-render-question-template>
 							</div>
 						</template>
@@ -687,23 +708,24 @@
 		</template>
 	</template>
 	<template if:true={showPopup}>
-						<section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="modal-heading-01"
-							class="slds-modal slds-fade-in-open">
-							<div class="slds-modal__container">
-								<div class="slds-modal__header">
-									<h1 id="modal-heading-01" class="slds-modal__title slds-hyphenate">
-										
-									</h1>
-								</div>
-								<div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
-									<p>Flagging the question will make the response editable, Attachments and CAPAs added to the Conditional questions will be deleted when the response is changed</p>
-								</div>
-								<div class="slds-modal__footer">
-									<button class="slds-button slds-button_neutral" aria-label="Cancel and close" onclick={handleCancelButton}>Cancel</button>
-									<button class="slds-button slds-button_brand" onclick={handleFlagButton}>Ok</button>
-								</div>
-							</div>
-						</section>
+		<section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="modal-heading-01"
+			class="slds-modal slds-fade-in-open">
+			<div class="slds-modal__container">
+				<div class="slds-modal__header">
+					<h1 id="modal-heading-01" class="slds-modal__title slds-hyphenate">
+
+					</h1>
+				</div>
+				<div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+					<p>Flagging the question will make the response editable, Attachments and CAPAs added to the
+						Conditional questions will be deleted when the response is changed</p>
+				</div>
+				<div class="slds-modal__footer">
+					<button class="slds-button slds-button_neutral" aria-label="Cancel and close" onclick={handleCancelButton}>Cancel</button>
+					<button class="slds-button slds-button_brand" onclick={handleFlagButton}>Ok</button>
+				</div>
+			</div>
+		</section>
 		<div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
 	</template>
 </template>

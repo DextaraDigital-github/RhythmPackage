@@ -4,6 +4,7 @@ import filesUpload from '@salesforce/apex/AWSS3Controller.uploadFiles';
 import getAuthentication from '@salesforce/apex/AWSS3Controller.getAuthenticationData';
 import awsjssdk from '@salesforce/resourceUrl/AWSJSSDK';
 import getTemplateDetails from '@salesforce/apex/AWSS3Controller.getTemplateDetails';
+import deleteContentDocument from '@salesforce/apex/AWSS3Controller.deleteContentDocument';
 import Id from '@salesforce/user/Id';
 import { loadScript } from 'lightning/platformResourceLoader';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
@@ -130,14 +131,12 @@ export default class AWSS3FileOperations extends LightningElement {
             if (err) {
                 console.error(err);
             } else {
-
                 const files = data.Contents;
                 let fileList = [];
                 this.keyList = [];
                 files && files.forEach(file => {
                     let checkFile = file.Key.split('/')
                     if (checkFile[checkFile.length - 1] != null && checkFile[checkFile.length - 1] != '') {
-
                         const objectKey = file.Key;
                         let fileName = objectKey.substring(objectKey.lastIndexOf("/") + 1);
                         let fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1);
@@ -226,20 +225,35 @@ export default class AWSS3FileOperations extends LightningElement {
 
     //Upload files to AWS after uploaded successfully to salesforce
     handleUploadFinished() {
-        filesUpload({
-            recId: this.recordId, objectName: this.objectApiName, pathRecId: null, deleteFlag: true, userId: this.userId
-        }).then(result => {
-            if (result) {
-                this.renderFlag = true;
-                this.showToastMessage('Uploaded', 'Uploaded Successfully', 'success');
-            }
-            else {
-                this.showToastMessage('Exceeded File Limit', 'The maximum file size you can upload is 10 MB', 'error');
-            }
-        })
-            .catch(error => {
-                window.console.log(error);
+        getTemplateDetails({ templateId: this.recordId })
+            .then(result => {
+                this.disableFlag = result;
+                if (result === true) {
+                    this.heightStyle = 'height:387px;';
+                    deleteContentDocument({ recordId: this.recordId })
+                        .then(result => {
+                            this.showToastMessage('Error', 'Template status is changed to active, further changes cannot be made to it.', 'error');
+                        });
+                }
+                else {
+                    filesUpload({
+                        recId: this.recordId, objectName: this.objectApiName, pathRecId: null, deleteFlag: true, userId: this.userId
+                    }).then(result => {
+                        if (result) {
+                            this.renderFlag = true;
+                            this.showToastMessage('Uploaded', 'Uploaded Successfully', 'success');
+                        }
+                        else {
+                            this.showToastMessage('Exceeded File Limit', 'The maximum file size you can upload is 10 MB', 'error');
+                        }
+                    })
+                        .catch(error => {
+                            window.console.log(error);
+                        });
+                }
+
             });
+
     }
 
     //Toast Message handler

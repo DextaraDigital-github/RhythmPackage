@@ -16,23 +16,23 @@ public with sharing class AWSS3Service extends AWS {
     public HttpResponse res;
     public ContentVersion versionData;
     public static HttpRequest req;
-
+    
     private static AWSS3Service serviceClasa = null; //private static instance of the class
     
     /**
-    * @description Singleton Design Pattern
-    * @return
-    */
+* @description Singleton Design Pattern
+* @return
+*/
     public static AWSS3Service getInstance(){
-            if(serviceClasa == null){
-                serviceClasa = new AWSS3Service();
-            }
+        if(serviceClasa == null){
+            serviceClasa = new AWSS3Service();
+        }
         return serviceClasa;
     }
     
     /**
-    * @description init method used for initialize the AWS signature and upload file.
-    */ 
+* @description init method used for initialize the AWS signature and upload file.
+*/ 
     public override void init() {
         Map<String, String> s3Map = new Map<String, String>();
         List<s3configuration__mdt> s3List = s3configuration__mdt.getAll().values();
@@ -219,7 +219,7 @@ public with sharing class AWSS3Service extends AWS {
                     versionData= [SELECT Id, Title, ContentSize, FileExtension, ContentDocumentId, VersionData FROM ContentVersion WHERE ContentDocumentId IN:contDocIds WITH SECURITY_ENFORCED];
                 }
                 for(ContentVersion conver:versionData) {
-                     contentDocumentIds.add(conver.ContentDocumentId);
+                    contentDocumentIds.add(conver.ContentDocumentId);
                     filesize = fileSizeToString(conver.ContentSize);
                     if(filesize.contains('MB')) {
                         if(Double.valueOf(filesize.remove(' MB')) > 10) {
@@ -293,11 +293,11 @@ public with sharing class AWSS3Service extends AWS {
             return string.valueOf(gb) + ' GB';
         }    
     }
-      /**
+    /**
 * @description saveActionRecord.
 * @param actionResponse
 * @return Id 
- */
+*/
     public Id saveActionRecord(List<SObject> actionResponse){
         try{
             Id actionRecordId;
@@ -325,7 +325,7 @@ public with sharing class AWSS3Service extends AWS {
             throw new AuraHandledException(errorMsg);
         } 
     }
-     /**
+    /**
 * @description uploadFilestoResponses.
 * @param fileResp
 * @return Id 
@@ -376,13 +376,14 @@ public with sharing class AWSS3Service extends AWS {
         }
         
     }
-
-
+    
+    
+    
     /**
-    * @description update Files count.
-    * @param responseId This is a record id of an Response.
-    * @param filesCount
-    */
+* @description update Files count.
+* @param responseId This is a record id of an Response.
+* @param filesCount
+*/
     public void updateRespFilesCount(String responseId, Integer filesCount) {
         try {
             List<Response__c> srList = new List<Response__c>();
@@ -399,10 +400,48 @@ public with sharing class AWSS3Service extends AWS {
             throw new AuraHandledException(ErrorMsg);
         }
     }
-  
+    
     /**
-    * @description It is used to throw the exception
-    */
+* @description deleteContentDocument
+* @param recordId This is a record id.
+*/ 
+    public void deleteContentDocument(String recordId) {
+        List<String> errorList = new List<String>();
+        Set<Id> contentDocumentIds = new Set<Id>();
+        List<ContentVersion> versionData;
+        List<Id> contDocIds = new List<Id>();
+        try {
+            List<ContentDocumentLink> condocList= [SELECT ContentDocumentId,LinkedEntityId FROM ContentDocumentLink WHERE LinkedEntityId =:recordId WITH SECURITY_ENFORCED];
+            if(condocList.size() > 0) {
+                for(ContentDocumentLink condoc:condocList) {
+                    contDocIds.add(condoc.ContentDocumentId);
+                }
+                versionData= [SELECT Id, Title, ContentSize, FileExtension, ContentDocumentId, VersionData FROM ContentVersion WHERE ContentDocumentId IN:contDocIds WITH SECURITY_ENFORCED];
+            }
+            for(ContentVersion conver:versionData) {
+                contentDocumentIds.add(conver.ContentDocumentId);
+            }
+            if(contentDocumentIds.size() > 0) {
+                List<ContentDocument> conList= [SELECT Id FROM ContentDocument where ContentAssetId = null And Id IN: contentDocumentIds WITH SECURITY_ENFORCED];
+                List<Database.DeleteResult> deleteResult = safe.doDelete(conList);
+                errorList = SecurityCheckController.safeClassExceptionHandlerDelete(deleteResult); 
+                
+                if(errorList.size()>0) {
+                    Database.rollback(sp);
+                    throw new SecurityControllerException(String.join( errorList, ', ' ));
+                }
+            }
+        }
+        catch(Exception e) {
+            String errorMsg = e.getMessage();
+            throw new AuraHandledException(ErrorMsg);
+        }
+    }
+    
+    
+    /**
+* @description It is used to throw the exception
+*/
     public class SecurityControllerException extends Exception{
     }
 }

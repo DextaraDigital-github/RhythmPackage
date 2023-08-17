@@ -92,7 +92,7 @@ export default class RtmvpcRelatedEmails extends LightningElement {
                             emailJson = emailMap.get(email.EmailMessageId);
                         }
                         if (typeof user.Contact != 'undefined' && typeof user.Contact.AccountId != 'undefined' && typeof user.Contact.Account != 'undefined' && typeof user.Contact.Account.Name != 'undefined') {
-                            emailJson.recipientsData.push({ id: user.Contact.AccountId, name: user.Contact.Account.Name, email: user.Email, status: 'Sent' });
+                            emailJson.recipientsData.push({ Id: user.Contact.AccountId, Name: user.Contact.Account.Name, Email: user.Email, status: 'Sent' });
                             emailMap.set(email.EmailMessageId, emailJson);
                         }
                     });

@@ -17,6 +17,10 @@
         <property name="vendor" type="String" />
 		<property name="assessment" type="String"/>
 		<property name="recordId" type="String" label="Record Id" description="Automatically bind the page's record id to the component variable" default="{!recordId}"/>
+		<supportedFormFactors>
+			<supportedFormFactor type="Large" />
+			<supportedFormFactor type="Small" />
+		</supportedFormFactors>
     </targetConfig>
 </targetConfigs>
 </LightningComponentBundle>
