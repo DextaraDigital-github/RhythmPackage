@@ -217,6 +217,7 @@ export default class AWSS3FileOperations extends LightningElement {
 
     //Upload files to AWS after uploaded successfully to salesforce
     handleUploadFinished() {
+        let respMap = {};
         if (this.responseRecId == null) {
             let filemap = {};
             filemap.quesId = this.questionId;
@@ -236,8 +237,10 @@ export default class AWSS3FileOperations extends LightningElement {
                                 filesCount: this.keyList.length + 1
                             }).then(reco => {
                                 this.showToastMessage('Uploaded', 'Uploaded Successfully', 'success');
+                                 respMap.response = rec;
+                                respMap.questionId = '';
                                 const selectedEvent = new CustomEvent('getdata', {
-                                    detail: rec
+                                    detail: respMap
                                 });
                                 // Dispatches the event.
                                 this.dispatchEvent(selectedEvent);
@@ -267,10 +270,12 @@ export default class AWSS3FileOperations extends LightningElement {
                     }).then(reco => {
                         this.renderFlag = true;
                         this.showToastMessage('Uploaded', 'Uploaded Successfully', 'success');
+                        respMap.response = '';
+                        respMap.questionId = this.questionId;
                         const selectedEvent = new CustomEvent('getdata', {
-                            detail: this.questionId
+                            detail: respMap
                         });
-                        // Dispatches the event.
+                        // Dispatches the event. 
                         this.dispatchEvent(selectedEvent);
                     });
                 }

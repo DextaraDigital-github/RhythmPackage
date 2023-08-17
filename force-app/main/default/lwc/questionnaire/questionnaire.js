@@ -120,7 +120,9 @@ export default class Questionnaire extends LightningElement {
     previewUrl;
 
     @api handleGetRespRecord(quesid) {
+        console.log('quesid',quesid);
         if (typeof quesid.response !== 'undefined' && quesid.response !== '') {
+            console.log('quesid.response',quesid.response);
             let responsemap = quesid.response;
             this.questionsAndAnswerss.forEach(questionAnswer => {
                 questionAnswer.questions.forEach(question => {
@@ -148,7 +150,7 @@ export default class Questionnaire extends LightningElement {
         else if (typeof quesid.questionId !== 'undefined' && quesid.questionId !== '') {
             this.questionsAndAnswerss.forEach(questionAnswer => {
                 questionAnswer.questions.forEach(question => {
-                    if (question.Id === responsemap.Rhythm__Question__c) {
+                    if (question.Id === quesid.questionId) {
                         if (typeof question.Files__c !== 'undefined') {
                             let n = Number(question.Files__c);
                             n++;
@@ -163,7 +165,7 @@ export default class Questionnaire extends LightningElement {
                         question.Children.forEach(childAttr => {
                             if (childAttr.isdisplay) {
                                 childAttr.questions.forEach(ques => {
-                                    if (ques.Id === responsemap.Rhythm__Question__c) {
+                                    if (ques.Id === quesid.questionId) {
                                         if (typeof ques.Files__c !== 'undefined') {
                                             let n = Number(ques.Files__c);
                                             n++;
@@ -181,6 +183,7 @@ export default class Questionnaire extends LightningElement {
             })
 
         }
+        console.log('this.questionsAndAnswerss File',this.questionsAndAnswerss);
         this.handleRequiredCheck();
     }
     //Used /* handleAccordionSection is used to handle opening and closing of a disclosure */
@@ -196,6 +199,7 @@ export default class Questionnaire extends LightningElement {
     }
     @api gethandleTimeline(assessmenttimeLine) {
         this.timeline = assessmenttimeLine;
+        //this.accountAssessmentStatus = assessmentStatus;
     }
     // This method is to handle expand all and collapse all in the supplier portal and customer portal.
     @api
