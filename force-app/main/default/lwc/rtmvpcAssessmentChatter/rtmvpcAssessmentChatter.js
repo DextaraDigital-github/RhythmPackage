@@ -75,7 +75,12 @@ export default class RtmvpcAssessmentChatter extends LightningElement {
    /*callChatterResponse is used to save the conversation history between vendor and customer in the response record */
    callChatterResponse(response) {
       this.responseWrapper.responseList = response;
-      saveChatterResponse({ chatWrapperstring: JSON.stringify(this.responseWrapper) }).then(() => {
+      saveChatterResponse({ chatWrapperstring: JSON.stringify(this.responseWrapper) }).then((result) => {
+          const selectedEvent = new CustomEvent('sendresponse', {
+            detail: result
+         });
+         /* Dispatches the event.*/
+         this.dispatchEvent(selectedEvent);
 
       }).catch((err) => {
          var errormap = {};

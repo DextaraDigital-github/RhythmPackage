@@ -91,6 +91,7 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
     }
 
     handleTimeLine() {
+        console.log('this.assessmentTimeline',this.assessmentTimeline);
         this.assessmentTimeline = [];
         let accountAssessmentRecord = ''
         getUserName({}).then(result => {
@@ -225,6 +226,19 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
 
 
     }
+     handleResponse(event)
+    {
+        let response=event.detail;
+        console.log('sampledata');
+        this.template.querySelector('c-Questionnaire').handleChatResponse(response);
+    }
+    handleDeleteFile(event)
+    {
+        console.log('handleDeleteFile');
+        let mp = event.detail;
+        console.log('handleDeleteFile');
+        this.template.querySelector('c-Questionnaire').handleDeleteFile(mp);
+    }
     handleFilter() {
         if (this.objectApiName === 'Rhythm__AccountAssessmentRelation__c') {
             this.assessmentTimeline.forEach(res => {
@@ -284,7 +298,7 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
         })
         setTimeout(() => {
             this.template.querySelectorAll('c-action')[0].displayForm(this.showResponseForm);
-        }, 400);
+        }, 500);
 
     }
     // emptyFormData(event){
@@ -355,7 +369,7 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
         this.openRightFile = false;
         setTimeout(() => {
             this.template.querySelectorAll('c-action')[0].displayForm(this.actionData);
-        }, 200);
+        }, 500);
 
     }
     handleFileData(event) {

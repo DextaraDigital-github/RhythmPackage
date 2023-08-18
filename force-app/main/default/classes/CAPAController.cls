@@ -6,7 +6,7 @@ public with sharing class CAPAController {
     * @description get picklist values.
     * @return
     */
-    @AuraEnabled(cacheable=true)
+    @AuraEnabled
     public static Map<string,List<string>> getPicklistValues(){
         Map<string,List<string>> values = service.getPicklistValues();
         return values;

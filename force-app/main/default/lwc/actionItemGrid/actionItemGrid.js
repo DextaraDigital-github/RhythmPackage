@@ -1,4 +1,4 @@
-import { LightningElement, track, wire } from 'lwc';
+import { LightningElement, track, wire,api } from 'lwc';
 import actionRecords from '@salesforce/apex/CAPAController.actionRecords';
 import getCurrentDate from '@salesforce/apex/CAPAController.getCurrentDate';
 import greenFlag from '@salesforce/resourceUrl/greenFlag';
@@ -102,6 +102,12 @@ export default class ActionItemGrid extends NavigationMixin(LightningElement) {
         if (currentPageReference) {
             this.urlId = currentPageReference.state?.Rhythm__Action__c;
         }
+    }
+    @api handleActionItem()
+    {
+        console.log('handle');
+        this.show.grid = true;
+        this.show.survey = false;
     }
     takeSurveyHandler(event) {
 
