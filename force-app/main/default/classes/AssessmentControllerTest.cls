@@ -483,9 +483,9 @@ private class AssessmentControllerTest
             String resp = '[{"createdTime":"2023-07-03T07:52:21.000Z","Text":"male","Name":"John David","accountType":"supplier","recipientType":"cad-ad-supplier"}]';
             queryMap2.put('responseList',resp);
             Test.startTest();
-            Boolean isChatterSaved = AssessmentController.saveChatterResponse(JSON.serialize(queryMap2));
+            Map<String,String> isChatterSaved = AssessmentController.saveChatterResponse(JSON.serialize(queryMap2));
             Test.stopTest();
-            System.assertEquals(isChatterSaved,true,'Chatter response saved');
+            System.assertEquals(isChatterSaved.size() !=0 ,true,'Chatter response saved');
         }
         
     }
@@ -495,12 +495,12 @@ private class AssessmentControllerTest
         user u = [SELECT Id,UserName FROM User WHERE Email='standarduser@testorg.com' LIMIT 1];
         System.runAs(u){
             Test.startTest();
-            Boolean isChatterSaved;
+            Map<String,String> isChatterSaved= new Map<String,String>();
             try{
             isChatterSaved = AssessmentController.saveChatterResponse(null);
             }
             catch(exception e){
-                System.assertEquals(isChatterSaved,null,'Chatter response not saved');
+                System.assertEquals(isChatterSaved.size()<0,false,'Chatter response not saved');
             }
             Test.stopTest();
         }
