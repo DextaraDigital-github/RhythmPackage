@@ -57,6 +57,7 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
     @track sectionList;
     @track sectionListData;
     @track questionsList;
+    @track selectedSectionName;
     @track showModal = { createModal: false, editModal: false, deleteModal: false };
 
     @api fieldListforCreation = {
@@ -119,6 +120,7 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
     // Close Edit Modal
     closeEditModal() {
         this.showModal.editModal = false;
+        this.handleRefresh();
     }
 
     //Record View and Eit actions
@@ -136,14 +138,9 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
                 });
                 break;
             case 'edit':
-                this[NavigationMixin.Navigate]({
-                    type: 'standard__recordPage',
-                    attributes: {
-                        recordId: row.Id,
-                        objectApiName: this.objectName,
-                        actionName: 'edit'
-                    }
-                });
+                this.showModal.editModal = true;
+                this.selectedRecordId = this.row.Id;
+                this.selectedSectionName = this.row.Name;
                 break;
             case 'delete':
                 this.selectedRows = [];
@@ -152,6 +149,7 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
                 break;
             default:
         }
+        this.handleRefresh();
     }
 
     //Reorder Functionality Starts

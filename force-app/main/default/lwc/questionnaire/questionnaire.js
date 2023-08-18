@@ -312,6 +312,7 @@ export default class Questionnaire extends LightningElement {
     connectedCallback() {
         try {
             this.accountsId = this.accid;
+            this.showAccordion ='slds-accordion__section slds-is-open';
             this.isTemplate = false;
             this.handleOnload();
         } catch (e) {
@@ -1198,7 +1199,7 @@ export default class Questionnaire extends LightningElement {
     handleSave() {
         this.ishideToast = true;
         this.isAutoSave = false;
-        this.totastmessage = 'Responses saved successfully';
+        this.totastmessage = 'Responses Saved successfully';
         this.success = true;
         this.showToast = true;
         this.questionsAndAnswerss.forEach(questionAnswer => {
@@ -1579,6 +1580,7 @@ export default class Questionnaire extends LightningElement {
                 });
                 let filemaplst = {};
                 if (isSubmit) {
+                    this.totastmessage = 'Responses Submitted Successfully';
                     this.showButtons.Save_Submit = false;
                     this.questionsAndAnswerss.forEach(questionAnswer => {
                         questionAnswer.questions.forEach(question => {
@@ -1608,7 +1610,7 @@ export default class Questionnaire extends LightningElement {
                 filemaplst.updateTimeline = true;
                 if (!this.isAutoSave) {
                     this.success = true;
-                    this.totastmessage = 'Responses Saved Sucessfully';
+                    
                     const selectedEvent = new CustomEvent('updatetimeline', {
                         detail: filemaplst
                     });

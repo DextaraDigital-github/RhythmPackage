@@ -11,6 +11,8 @@ export default class CustomRecordForm extends LightningElement {
   @track selLookupId;
   @track newFlag = false;
   @track disbaleSave = false;
+  @api sectionId;
+  @api sectionName;
 
   connectedCallback() {
     this.fieldsList = JSON.parse(JSON.stringify(this.fieldsList));
@@ -103,17 +105,31 @@ export default class CustomRecordForm extends LightningElement {
       }
       else if (this.objName === 'Rhythm__Section__c') {
         fields.Rhythm__Assessment_Template__c = this.templateId;
+        if (this.sectionId != null && this.sectionId != undefined) {
+          fields.Id === this.sectionId;
+        }
         getRecsCount({ objName: 'Questions', templateId: this.templateId }).then(result => {
-          fields.Rhythm__Section_Sequence_Number__c = (typeof result !== 'undefined') ? Number(result) + 1 : '0';
+          //fields.Rhythm__Section_Sequence_Number__c = (typeof result !== 'undefined') ? Number(result) + 1 : '0';
           this.template.querySelector('lightning-record-edit-form').submit(fields);
           this.handleCancel(event);
-          this.dispatchEvent(
-            new ShowToastEvent({
-              title: 'Success',
-              message: 'successfully created',
-              variant: 'success',
-            }),
-          );
+          if (this.sectionId != null && this.sectionId != undefined) {
+            this.dispatchEvent(
+              new ShowToastEvent({
+                title: 'Success',
+                message: 'successfully updated',
+                variant: 'success',
+              }),
+            );
+          }
+          else {
+            this.dispatchEvent(
+              new ShowToastEvent({
+                title: 'Success',
+                message: 'successfully created',
+                variant: 'success',
+              }),
+            );
+          }
           if (this.newFlag === true) {
             const selEvent = new CustomEvent('savenew');
             this.dispatchEvent(selEvent);

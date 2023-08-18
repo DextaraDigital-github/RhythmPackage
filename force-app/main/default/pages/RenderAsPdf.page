@@ -1,18 +1,28 @@
-<apex:page applyHtmlTag="true" applyBodyTag="true" controller="DisplayPDFController" showHeader="false" cache="true" readOnly="true" standardStylesheets="false">
-    <div>
-        <div class="headerDiv slds-p-around_small">
-            <span class="headerText">Rhythm</span>
+<apex:page renderAs="pdf" controller="DisplayPDFController" showHeader="false" cache="true">
+    <apex:stylesheet value="{!URLFOR($Resource.pdfStyles, 'styles.css')}"/>
+    <div style="width:100vw;">
+    	<div class="headerDiv" style="height: 56px; padding: 20px; background-color: #03314d; font-family: Source Sans Pro, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif !important;">
+            <div class="headerText" style="font-size: 40px; color: white; font-weight: bold">Rhythm</div>
         </div>
-        <div class="tableDiv">
-            <apex:outputText value="{!displayText}" />
+        <div class="tableDiv" style="width:100%; font-family: Source Sans Pro, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif !important;">
+            <table style="border-collapse:collapse; padding: 4px; page-break-inside:auto; width:100%;">
+                <thead style="background-color: rgb(181 190 197) !important; font-size: 14px;">
+                    <tr style="page-break-inside:avoid; page-break-after:auto; width:100%;">
+                        <apex:repeat value="{!columns}" var="column">
+                            <th style="padding: 10px; border: 1px solid #E9E9E9;">{!column.label}</th>
+                        </apex:repeat>
+                    </tr>
+                </thead>
+                <tbody style="background-color: #F9F9F9 !important; font-size: 12px;">
+                    <apex:repeat value="{!data}" var="row">
+                        <tr style="page-break-inside:avoid; page-break-after:auto;">
+                            <apex:repeat value="{!columns}" var="column">
+                                <td style="padding: 10px; border: 1px solid #E9E9E9;">{!row[column.name]}</td>
+                            </apex:repeat>
+                        </tr>
+                    </apex:repeat>
+                </tbody>
+            </table>
         </div>
-    </div> 
-    <script>
-    setTimeout(function(){
-        console.log('HI');
-        var style = '<style>@media print { * {-webkit-print-color-adjust:exact;}}} @page{ margin: 0px;} *{margin: 0px; padding: 0px; height: 0px; font-family: Source Sans Pro, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif !important;} .headerDiv{width: 100%; height: 56px; padding: 20px; background-color: #03314d;} .headerText{font-size: 40px; color: white; font-weight: bold} .tableDiv{padding: 20px;} table {border-collapse:collapse; font-size: 14px;} table td, th{ padding: 4px;} table tr:nth-child(odd) td {background-color: #F9F9F9;} .oddLeftTd{background-color: #E9E9E9 !important;} .evenLeftTd{background-color: #F1F1F1 !important;} table th{ border: 1px solid #E9E9E9; background-color:#B5BEC58F} table { page-break-inside:auto; } tr { page-break-inside:avoid; page-break-after:auto; } .align-to-top{ vertical-align: top; }</style>';
-        document.getElementsByTagName('head')[0].innerHTML += style;
-        window.print();
-    });
-    </script>
+    </div>
 </apex:page>
