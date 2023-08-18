@@ -145,6 +145,11 @@ export default class RtmvpcMaster extends NavigationMixin(LightningElement) {
         {
              this.template.querySelector('c-rtmvpc-assessments').handleInbox();
         }
+        if(this.isAction === true)
+        {
+            console.log('handleaction', this.template.querySelector('c-action-item-grid'));
+             this.template.querySelector('c-action-item-grid').handleActionItem();
+        }
 
     }
 

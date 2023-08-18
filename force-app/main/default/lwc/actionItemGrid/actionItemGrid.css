@@ -33,7 +33,7 @@ div.cdg div.tr:hover div.td:first-child, div.cdg div.tr:hover div.td:nth-child(2
 div.cdg div.tr div.td a {border-bottom:1px dotted var(--link-primary-n); text-decoration:none;}
 
 div.cdg div.th:first-child input[type=checkbox], div.cdg div.td input[type=checkbox] { margin:auto;}
-div.cdg div.th:first-child, div.cdg div.td:first-child { text-align:center; min-width:40px; width:40px; max-width:40px; z-index:5;}
+div.cdg div.th:first-child, div.cdg div.td:first-child { text-align:center; min-width:2px; width:2px; max-width:2px; z-index:5;}
 div.cdg div.tr div.th:first-child {z-index:6;}
 
 div.cdg .slds-input { background:rgb(255 255 255 / 30%); border-color:#949fa9; color:#333333; width:100%; }

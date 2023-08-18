@@ -94,10 +94,10 @@
 								<div class="slds-scrollable_y" style="max-height:calc(100% - 40px);">
 									<div class="slds-text-align_center slds-text-heading_large">
 										<template if:true={showSections}>
-											<c-Questionnaire vendor={accountid} assessment={assessmentid}
+											<c-Questionnaire vendor={accountid} assessment={assessmentid} onsendresponse={handleResponse}
 												object-api-name={objectApiName} record-id={recordId} accid={assaccId}
 												onselectconversation={chatHistory} onshowsummary={showsummaryHandler}
-												account-assessment-status={accountAssessmentStatus}
+												account-assessment-status={accountAssessmentStatus} 
 												onupdatetimeline={handleupdatetimeline} onuploadfile={handleFileData}
 												onexpandcollapse={handleExpandCollapse}
 												accountassessmentid={accountassessmentid} template-id={tempId}
@@ -153,7 +153,7 @@
 									<template if:true={openRightFile}>
 										<template if:true={showUpload}>
 											<c-portal-s3-files object-name={objectApiName} isdisabled={isdisabled}
-												response-rec-id={responseId} ongetdata={handleOnLoad}
+												response-rec-id={responseId} ongetdata={handleOnLoad} ondeletefile={handleDeleteFile}
 												assessment-rec-id={accountassessmentFileId} rec-id={recid}
 												question-id={questionId}>
 											</c-portal-s3-files>

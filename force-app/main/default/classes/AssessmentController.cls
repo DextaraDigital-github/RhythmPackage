@@ -544,9 +544,10 @@ public with sharing class AssessmentController {
     */
     @AuraEnabled
     /* sfge-disable-stack ApexFlsViolationRule */
-    public static Boolean saveChatterResponse(String chatWrapperstring){// responseList,string assessmentId,string questionId)
+    public static Map<String,String> saveChatterResponse(String chatWrapperstring){// responseList,string assessmentId,string questionId)
         try{
             Map<String,Object> chatMap = (Map<String,Object>)JSON.deserializeUntyped(chatWrapperstring);
+            Map<string,string> responseData=new Map<string,string>();
             String quesId = (String)chatMap.get('questionId');
             String accAssmtId = (String)chatMap.get('accountassessmentId');
             accAssmtId = String.escapeSingleQuotes(accAssmtId);
@@ -576,17 +577,25 @@ public with sharing class AssessmentController {
                 List<Response__c> responseList = new List<Response__c>();
                 responseList.add(response);
                 Database.SaveResult[] results = safe.doInsert(responseList);
+                for(Database.SaveResult result : results) {
+                    if(result.isSuccess()){
+                        responseData.put('questionId',(String)chatMap.get('questionId'));
+                        responseData.put('responseId',result.getId());
+                        
+                    }
+                }
                 List<String> errorsList = SecurityCheckController.safeClassExceptionHandlerInsert(results);
                 if(errorsList.size()>0){
                     Database.rollback(sp);
                     throw new SecurityControllerException(String.join(errorsList, ', ' ));
                 }
             }
+            return responseData;
         }catch(exception e){
             String errorMsg = e.getMessage();
             throw new AuraHandledException(errorMsg);
         }
-        return true;
+        
     }
     
      /**

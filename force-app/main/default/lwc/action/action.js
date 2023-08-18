@@ -78,6 +78,7 @@ export default class Action extends LightningElement {
       .then(() => {
         this.configAWS();
       });
+      this.handleGetpicklistvalue();
   }
   renderedCallback() {
     Promise.all([
@@ -272,25 +273,10 @@ export default class Action extends LightningElement {
       });
     }
   }
-
-  //Toast Message handler
-  async showToastMessage(title, message, variant) {
-    this.dispatchEvent(
-      new ShowToastEvent({
-        title: title,
-        message: message,
-        variant: variant,
-      }),
-    );
-    this.renderFlag = true;
-    this.configAWS();
-    //eval("$A.get('e.force:refreshView').fire();");
-    //this.retrieveFilesFromS3();
-  }
-  /* S3 Code Ends*/
-  @wire(getPicklistValues, {})
-  picklistdata({ error, data }) {
-    if (data) {
+  handleGetpicklistvalue(){
+    getPicklistValues({}).then(data=>{
+      console.log('handleGetpicklistvalue',data);
+      if (data) {
       this.pickListNames = [];
       for (let key in data) {
         let pickListNamedata = [];
@@ -314,15 +300,61 @@ export default class Action extends LightningElement {
       }
       this.onloadPicklist = this.pickListNames;
       console.log('picklist', this.onloadPicklist);
-    } else if (error) {
-      let errormap = {};
-      errormap.componentName = 'Action';
-      errormap.methodName = 'getPicklistValues';
-      errormap.className = 'AssessmentController';
-      errormap.errorData = error;
-      errorLogRecord({ errorLogWrapper: JSON.stringify(errormap) }).then(() => { });
     }
+    }).catch(error=>{
+
+    })
   }
+  //Toast Message handler
+  async showToastMessage(title, message, variant) {
+    this.dispatchEvent(
+      new ShowToastEvent({
+        title: title,
+        message: message,
+        variant: variant,
+      }),
+    );
+    this.renderFlag = true;
+    this.configAWS();
+    //eval("$A.get('e.force:refreshView').fire();");
+    //this.retrieveFilesFromS3();
+  }
+  /* S3 Code Ends*/
+  // @wire(getPicklistValues, {})
+  // picklistdata({ error, data }) {
+  //   if (data) {
+  //     this.pickListNames = [];
+  //     for (let key in data) {
+  //       let pickListNamedata = [];
+  //       data[key].forEach(item => {
+  //         let map = { 'label': item, 'value': item };
+  //         pickListNamedata.push(map);
+  //       });
+  //       let obj = {};
+  //       obj.key = key;
+  //       let labelname = key.substring(8, key.length - 3);
+  //       labelname = labelname.replaceAll('_', ' ');
+  //       obj.label = labelname;
+  //       obj.options = pickListNamedata;
+  //       if (obj.label === 'Priority' || obj.label === 'Status') {
+  //         obj.required = true;
+  //       }
+  //       else {
+  //         obj.required = false;
+  //       }
+  //       this.pickListNames.push(obj);
+  //     }
+  //     this.onloadPicklist = this.pickListNames;
+  //     console.log('picklist', this.onloadPicklist);
+  //   } else if (error) {
+  //     let errormap = {};
+  //     errormap.componentName = 'Action';
+  //     errormap.methodName = 'getPicklistValues';
+  //     errormap.className = 'AssessmentController';
+  //     errormap.errorData = error;
+  //     errorLogRecord({ errorLogWrapper: JSON.stringify(errormap) }).then(() => { });
+  //   }
+  // }
 
   @api displayForm(response) {
     this.showAction = true;
@@ -493,11 +525,11 @@ export default class Action extends LightningElement {
       this.showToast = true;
       this.success = true;
       this.totastmessage = 'Action Item has been deleted successfully';
-      send({ subject: (result[0].Name), body: 'Action Item has been deleted successfully', userList: userlist }).then(() => {
+      // send({ subject: (result[0].Name), body: 'Action Item has been deleted successfully', userList: userlist }).then(() => {
 
-      }).catch(error => {
-        console.log('ggfgf', error);
-      })
+      // }).catch(error => {
+      //   console.log('ggfgf', error);
+      // })
 
       const selectedAction = new CustomEvent('removedeleteicon', {
         detail: this.questionId
@@ -554,11 +586,11 @@ export default class Action extends LightningElement {
             this.showToast = true;
             this.success = true;
             this.totastmessage = 'Action Item has been created successfully';
-            send({ subject: (this.showresponse[0].Name), body: 'Action Item has been created successfully', userList: userlist }).then(() => {
+            // send({ subject: (this.showresponse[0].Name), body: 'Action Item has been created successfully', userList: userlist }).then(() => {
 
-            }).catch(error => {
-              console.log('ggfgf', error);
-            })
+            // }).catch(error => {
+            //   console.log('ggfgf', error);
+            // })
             this.displayForm(this.updateData);
             this.saveActionResponse.saveActionForm = true;
             const selectedAction = new CustomEvent('closeform', {
@@ -570,11 +602,11 @@ export default class Action extends LightningElement {
             this.showToast = true;
             this.success = true;
             this.totastmessage = 'Action Item has been updated successfully';
-            send({ subject: (this.showresponse[0].Name), body: 'Action Item has been updated successfully', userList: userlist }).then(() => {
+            // send({ subject: (this.showresponse[0].Name), body: 'Action Item has been updated successfully', userList: userlist }).then(() => {
 
-            }).catch(error => {
-              console.log('ggfgf', error);
-            });
+            // }).catch(error => {
+            //   console.log('ggfgf', error);
+            // });
 
             if (this.saveActionResponse.Rhythm__Status__c === 'Closed' && this.isSupplier === true) {
               this.showToast = true;

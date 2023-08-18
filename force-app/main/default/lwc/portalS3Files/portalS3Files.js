@@ -209,6 +209,18 @@ export default class AWSS3FileOperations extends LightningElement {
                     this.keyString = '';
                     this.previewUrl = '';
                     this.showFrame = false;
+                    let rmp = {};
+                    rmp.responseId = this.responseRecId;
+                    rmp.questionId = this.questionId;
+                    rmp.numberoffiles = this.keyList.length - 1;
+                    const selectedEvent = new CustomEvent('deletefile', {
+                        detail: {value : rmp}
+                    });
+                    console.log('rmp',rmp);
+                    console.log('selectedEvent',selectedEvent);
+                    // Dispatches the event.
+                    this.dispatchEvent(selectedEvent);
+                    
                 });
             }
         });
@@ -237,7 +249,7 @@ export default class AWSS3FileOperations extends LightningElement {
                                 filesCount: this.keyList.length + 1
                             }).then(reco => {
                                 this.showToastMessage('Uploaded', 'Uploaded Successfully', 'success');
-                                 respMap.response = rec;
+                                respMap.response = rec;
                                 respMap.questionId = '';
                                 const selectedEvent = new CustomEvent('getdata', {
                                     detail: respMap
