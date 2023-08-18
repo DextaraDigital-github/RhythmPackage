@@ -92,7 +92,7 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
 
     handleTimeLine() {
         console.log('this.assessmentTimeline',this.assessmentTimeline);
-        this.assessmentTimeline = [];
+        
         let accountAssessmentRecord = ''
         getUserName({}).then(result => {
             this.isRecordPage = false;
@@ -107,65 +107,71 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
             }
             /* */
             getAccountAssessmentRecordData({ assrecordId: accountAssessmentRecord }).then(asmtResult => {
-                if (this.isRecordPage) {
-                    this.assessid = asmtResult[0].Rhythm__Assessment__r.Id;
-                } else {
-                    this.assesstid = this.accountassessmentid;
-                }
-                if (asmtResult && asmtResult.length > 0) {
-                    asmtResult.forEach(accAssessment => {
-                        if (typeof accAssessment.Rhythm__Assessment__c !== 'undefined' && typeof accAssessment.Rhythm__Assessment__r.Id !== 'undefined') {
-                            //if (accAssessment.Rhythm__Assessment__r.Id === this.assessid) {
-                            if (typeof accAssessment.Rhythm__Status__c !== 'undefined') {
-                                this.statusassessment = accAssessment.Rhythm__Status__c;
-                                this.accountAssessmentStatus = this.statusassessment;
-                                // if (this.statusassessment === 'Need More Information' || this.statusassessment === 'Review Completed') {
-                                //     this.showstatus = true;
-                                // }
-                                this.assessmentName = accAssessment.Rhythm__Assessment__r.Name;
-                                if (typeof accAssessment.Rhythm__Start_Date__c !== 'undefined') {
-                                    let statustrack = {};
-                                    let dateformat = accAssessment.Rhythm__Start_Date__c;
-                                    let dateformats = months[Number(dateformat.split('-')[1]) - 1] + '-' + dateformat.split('-')[2] + '-' + dateformat.split('-')[0];
-                                    statustrack.date = dateformats + ' 00:00:00';
-                                    statustrack.status = 'Start Date';
-                                    statustrack.classlist = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_default';
-                                    statustrack.name = accAssessment.Rhythm__Assessment__r.Rhythm__CreatedUser__c;
-                                    this.assessmentTimeline.push(statustrack);
-                                }
-                                else {
-                                    let statustrack = {};
-                                    if (typeof accAssessment.CreatedDate !== 'undefined') {
-                                        let date = accAssessment.Rhythm__Assessment__r.CreatedDate.split('T');
-                                        let time = date[1].split('.');
-                                        let dateformat = date[0];
+              
+                /* To get the assessment tracking history to update on timeline*/
+                getAssessmentStatus({ assessmentId: accountAssessmentRecord, objectName: 'AccountAssessmentRelation__c' }).then(statusResult => {
+                   
+                    this.assessmentTimeline = [];
+                    if (this.isRecordPage) {
+                        this.assessid = asmtResult[0].Rhythm__Assessment__r.Id;
+                    } else {
+                        this.assesstid = this.accountassessmentid;
+                    }
+                    if (asmtResult && asmtResult.length > 0) {
+                        asmtResult.forEach(accAssessment => {
+                            if (typeof accAssessment.Rhythm__Assessment__c !== 'undefined' && typeof accAssessment.Rhythm__Assessment__r.Id !== 'undefined') {
+                                //if (accAssessment.Rhythm__Assessment__r.Id === this.assessid) {
+                                if (typeof accAssessment.Rhythm__Status__c !== 'undefined') {
+                                    this.statusassessment = accAssessment.Rhythm__Status__c;
+                                    this.accountAssessmentStatus = this.statusassessment;
+                                    // if (this.statusassessment === 'Need More Information' || this.statusassessment === 'Review Completed') {
+                                    //     this.showstatus = true;
+                                    // }
+                                    this.assessmentName = accAssessment.Rhythm__Assessment__r.Name;
+                                    if (typeof accAssessment.Rhythm__Start_Date__c !== 'undefined') {
+                                        let statustrack = {};
+                                        let dateformat = accAssessment.Rhythm__Start_Date__c;
                                         let dateformats = months[Number(dateformat.split('-')[1]) - 1] + '-' + dateformat.split('-')[2] + '-' + dateformat.split('-')[0];
-                                        statustrack.date = dateformats + ' ' + time[0];
+                                        statustrack.date = dateformats + ' 00:00:00';
                                         statustrack.status = 'Start Date';
                                         statustrack.classlist = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_default';
                                         statustrack.name = accAssessment.Rhythm__Assessment__r.Rhythm__CreatedUser__c;
                                         this.assessmentTimeline.push(statustrack);
                                     }
+                                    else {
+                                        let statustrack = {};
+                                        if (typeof accAssessment.CreatedDate !== 'undefined') {
+                                            let date = accAssessment.Rhythm__Assessment__r.CreatedDate.split('T');
+                                            let time = date[1].split('.');
+                                            let dateformat = date[0];
+                                            let dateformats = months[Number(dateformat.split('-')[1]) - 1] + '-' + dateformat.split('-')[2] + '-' + dateformat.split('-')[0];
+                                            statustrack.date = dateformats + ' ' + time[0];
+                                            statustrack.status = 'Start Date';
+                                            statustrack.classlist = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_default';
+                                            statustrack.name = accAssessment.Rhythm__Assessment__r.Rhythm__CreatedUser__c;
+                                            this.assessmentTimeline.push(statustrack);
+                                        }
 
-                                }
-                                if (typeof accAssessment.Rhythm__End_Date__c !== 'undefined') {
-                                    let statustrack = {};
-                                    let dateformat = accAssessment.Rhythm__End_Date__c;
-                                    let dateformats = months[Number(dateformat.split('-')[1]) - 1] + '-' + dateformat.split('-')[2] + '-' + dateformat.split('-')[0];
-                                    statustrack.date = '(Due date ' + dateformats + ')';
-                                    this.endDate = statustrack.date;
-                                    statustrack.status = 'End Date';
-                                    statustrack.classlist = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_default';
-                                    statustrack.name = accAssessment.Rhythm__Assessment__r.Rhythm__CreatedUser__c;
-                                    //this.assessmentTimeline.push(statustrack);
+                                    }
+                                    if (typeof accAssessment.Rhythm__End_Date__c !== 'undefined') {
+                                        let statustrack = {};
+                                        let dateformat = accAssessment.Rhythm__End_Date__c;
+                                        let dateformats = months[Number(dateformat.split('-')[1]) - 1] + '-' + dateformat.split('-')[2] + '-' + dateformat.split('-')[0];
+                                        statustrack.date = '(Due date ' + dateformats + ')';
+                                        this.endDate = statustrack.date;
+                                        statustrack.status = 'End Date';
+                                        statustrack.classlist = 'cad-timeline_slidebase cad-timeline_customer cad-timeline_default';
+                                        statustrack.name = accAssessment.Rhythm__Assessment__r.Rhythm__CreatedUser__c;
+                                        //this.assessmentTimeline.push(statustrack);
+                                    }
                                 }
                             }
-                        }
-                        // }
-                    })
-                }
-                /* To get the assessment tracking history to update on timeline*/
-                getAssessmentStatus({ assessmentId: accountAssessmentRecord, objectName: 'AccountAssessmentRelation__c' }).then(statusResult => {
+                            // }
+                        })
+                    }
+
+
+                   
                     var assessmentStatus = statusResult;
                     if (typeof statusResult !== 'undefined') {
                         if (assessmentStatus && assessmentStatus !== null) {
@@ -226,6 +232,9 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
 
 
     }
+
+
+
      handleResponse(event)
     {
         let response=event.detail;
