@@ -56,14 +56,18 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
         if (this.responses && this.responses.length > 0) {
             this.responses.forEach(res => {
                 if (res.isCheckbox) {
-                    if (res.value === true)
+                    
+                    if (res.value === true){
                         this.checkedLabel = true;
+                        
+                    }
                     else {
                         this.checkedLabel = false;
                     }
                 }
             });
         }
+        console.log('checked',this.checkedLabel);
     }
     /* deleteForm is used to delete the CAPA form for a question by dispatching the questionId to its parent Component
        Questionnaire */
@@ -161,7 +165,7 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
 
     openReview(event) {
         var quesId = event.currentTarget.dataset.id;
-        var flagresponse;
+        var flagresponse = false;
         var flagbool = false;
         if (!this.issupplier) {
             if (this.responses && this.responses.length > 0) {

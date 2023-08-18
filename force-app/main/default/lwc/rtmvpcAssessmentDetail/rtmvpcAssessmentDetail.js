@@ -54,7 +54,7 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
     @track showResponseForm;
     @track showCapaForm = false;
     @track openReviewComments = false;
-    @track actionData;
+    @track actionData; 
     @track fileData;
     @track selectedchatData;
     @track accountassessmentFileId;
@@ -71,6 +71,9 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
         this.assaccId = this.accountid;
         if (this.templateId != undefined) {
             this.tempId = this.templateId;
+        }
+        if(typeof this.recordId!=='undefined'){
+            this.accountassessmentid  = this.recordId;
         }
         console.log('detaileddata------>', this.detaileddata);
         console.log('assaccId------>', this.assaccId);
