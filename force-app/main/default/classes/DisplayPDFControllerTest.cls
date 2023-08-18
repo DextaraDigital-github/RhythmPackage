@@ -34,7 +34,7 @@ private class DisplayPDFControllerTest {
             'Name'=>'Assessment 2023','Rhythm__Status__c'=>'New','Rhythm__Number_of_Questions__c'=>10};
             List<Assessment__c> asslist=TestDataFactory.createAssessment(1,true,assessmentattributes);
             
-            Map<String,Object> accountassesments = new Map<String,Object>{'Rhythm__Account__c'=>accts[0].Id,'Rhythm__PdfConvertor__c'=>'user','Rhythm__Assessment__c'=>asslist[0].Id,
+            Map<String,Object> accountassesments = new Map<String,Object>{'Rhythm__Account__c'=>accts[0].Id,'Rhythm__PdfConvertor__c'=>'{ "Section 2": [ { "questionId": "a086t000001jWQgAAM", "question": "Checkbox 2", "snumber": 3, "value": false, "conversationHistory": "", "files": "1" }, { "questionId": "a086t000001jWQgAAM", "question": "Checkbox 2", "snumber": 3, "value": false, "conversationHistory": "", "files": "1" }, { "questionId": "a086t000001jWQgAAM", "question": "Checkbox 2", "snumber": 3, "value": false, "conversationHistory": "", "files": "1" }, { "questionId": "a086t000001jWQqAAM", "question": "C2", "snumber": "3.1" } ], "Section 1": [ { "questionId": "a086t000001jWQ7AAM", "question": "Q1", "snumber": 1, "value": "No", "conversationHistory": "" }, { "questionId": "a086t000001jWQHAA2", "question": "C2", "snumber": "1.1" } ] }','Rhythm__Assessment__c'=>asslist[0].Id,
                 'Rhythm__Status__c'=>'New','Rhythm__End_Date__c'=>Date.newInstance(2030, 4, 26),'Rhythm__Number_of_Responses__c'=>10,
                     'Rhythm__Start_Date__c'=>Date.newInstance(2030, 3, 26)};
             TestDataFactory.createAccountAssessment(1,true,accountassesments);

@@ -44,16 +44,26 @@ public with sharing class UserService {
                                     LIMIT 1];
             string fName = '';
             string aliasName = '';
+            string userName = UserInfo.getOrganizationId()+'_'+contactRecord.Email;
             if(String.isNotBlank(contactRecord.FirstName)){
                 fName = contactRecord.FirstName.substring(0,1);
             }
             if(String.isNotBlank(fName)){
-                aliasName = fName+contactRecord.LastName.substring(0,3);
+                if(contactRecord.LastName.length() >=3){
+                    aliasName = fName+contactRecord.LastName.substring(0,3);
+                }else{
+                    aliasName = fName+contactRecord.LastName.substring(0,contactRecord.LastName.length());
+                }
             }else{
-                aliasName = fName+contactRecord.LastName.substring(0,4);
+                if(contactRecord.LastName.length() >=4){
+                    aliasName = fName+contactRecord.LastName.substring(0,4);
+                }else{
+                    aliasName = fName+contactRecord.LastName.substring(0,contactRecord.LastName.length());
+                }
             }
             User userRecord = new User();
-            userRecord.Username = contactRecord.Email;
+            
+            userRecord.Username = userName;
             userRecord.FirstName = fName;
             userRecord.LastName = contactRecord.LastName;
             userRecord.Alias = aliasName;
@@ -63,6 +73,14 @@ public with sharing class UserService {
             userRecord.EmailEncodingKey = 'ISO-8859-1';
             userRecord.ProfileId = standardPlatformProfileId;
             userRecord.LanguageLocaleKey = 'en_US';
+
+            Database.DMLOptions dmo = new Database.DMLOptions();
+            dmo.EmailHeader.triggerUserEmail = true;       
+            dmo.EmailHeader.triggerOtherEmail = true;
+            dmo.EmailHeader.triggerAutoResponseEmail = true;       
+            dmo.optAllOrNone = false;
+            userRecord.setOptions(dmo);
+
             userList.add(userRecord);
             if (sp == null){
                 sp = Database.setSavepoint();

@@ -937,9 +937,8 @@ public with sharing class AssessmentController {
                                                             WHERE ID IN:recordIdsSet
                                                             WITH SECURITY_ENFORCED];
             Set<Id> acctIds = new Set<Id>();
-            set<string> emailIds = new set<string>();
-            Map<string,Id> emailAccMap = new Map<string,Id>();
             Map<Id,List<User>> accUserMap = new Map<Id,List<User>>();
+            set<Id> conIds = new set<Id>();
             for(AccountAssessmentRelation__c ar:assRlnsList ){
                 if(string.isNotBlank(ar.Account__c)){
                     acctIds.add(ar.Account__c);
@@ -948,24 +947,18 @@ public with sharing class AssessmentController {
             
             if(acctIds.isEmpty() == false){
                 for(Contact con:[SELECT Id,AccountId,Email FROM Contact WHERE AccountId IN:acctIds AND Primary_Contact__c=true WITH SECURITY_ENFORCED]){
-                    if(string.isNotBlank(con.Email)){
-                        emailIds.add(con.Email);
-                        emailAccMap.put(con.Email,con.AccountId);
-                    }
+                    conIds.add(con.Id);
                 }
             }
-            if(emailIds.isEmpty() == false){
-                for(User us:[SELECT Id,Name,Email FROM User WHERE Email IN:emailIds WITH SECURITY_ENFORCED]){
-                    if(emailAccMap.containsKey(us.Email)){
-                        Id accId = emailAccMap.get(us.Email);
-                        if(accUserMap.containsKey(accId)){
-                            List<User> tempList = accUserMap.get(accId);
-                            tempList.add(us);
-                            accUserMap.put(accId,tempList);
-                        }else{
-                            List<User> tempList = new List<User>{us};
-                            accUserMap.put(accId,tempList);
-                        }
+            if(conIds.isEmpty() == false){
+                for(User us:[SELECT Id,Name,Contact.AccountId,Email FROM User WHERE ContactId IN:conIds WITH SECURITY_ENFORCED]){
+                    if(accUserMap.containsKey(us.Contact.AccountId)){
+                        List<User> tempList = accUserMap.get(us.Contact.AccountId);
+                        tempList.add(us);
+                        accUserMap.put(us.Contact.AccountId,tempList);
+                    }else{
+                        List<User> tempList = new List<User>{us};
+                        accUserMap.put(us.Contact.AccountId,tempList);
                     }
                 }
             }

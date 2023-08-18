@@ -4,10 +4,19 @@
             "path": "force-app",
             "package": "RhythmLabs",
             "versionName": "ver 0.1",
+            "versionNumber": "0.6.0.NEXT",
+            "ancestorVersion": "HIGHEST",
+            "default": false,
+            "definitionFile": "config/project-scratch-def.json"
+        },
+        {
+            "path": "force-app",
+            "package": "RhythmQATest",
+            "versionName": "ver 0.1",
             "versionNumber": "0.5.0.NEXT",
             "ancestorVersion": "HIGHEST",
-            "default": true,
-            "definitionFile": "config/project-scratch-def.json"
+            "definitionFile": "config/project-scratch-def.json",
+            "default": true
         }
     ],
     "name": "RythmProject",
@@ -17,6 +26,7 @@
     "packageAliases": {
         "RhythmDevTest": "0Ho5w000000PBDVCA4",
         "RhythmDevTest@0.1.0-0": "04t5w000004ckqSAAQ",
+        "RhythmQATest": "0HoDp0000004CMJKA2",
         "RhythmUnlocked": "0Ho5w000000PBDaCAO",
         "RhythmUnlocked@0.1.0-0": "04t5w000004ckpZAAQ",
         "RhythmLabs": "0HoDp0000004CMOKA2",
@@ -32,6 +42,11 @@
         "RhythmLabs@0.3.0-7": "04tDp000000J2SeIAK",
         "RhythmLabs@0.3.0-8": "04tDp000000J2SjIAK",
         "RhythmLabs@0.4.0-1": "04tDp000000J2SoIAK",
-        "RhythmLabs@0.5.0-1": "04tDp000000RgYRIA0"
+        "RhythmLabs@0.5.0-1": "04tDp000000RgYRIA0",
+        "RhythmQATest@0.1.0-0": "04tDp000000Rge0IAC",
+        "RhythmQATest@0.2.0-1": "04tDp000000RghJIAS",
+        "RhythmQATest@0.3.0-1": "04tDp000000RghOIAS",
+        "RhythmQATest@0.4.0-1": "04tDp000000RghTIAS",
+        "RhythmQATest@0.5.0-1": "04tDp000000RghYIAS"
     }
 }

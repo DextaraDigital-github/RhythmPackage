@@ -56,7 +56,7 @@ export default class RtmvpcAssessments extends NavigationMixin(LightningElement)
     }
 
     /* fetchingRecords is used to get accountAssessment data based on the account Id and URL navigation */
-    fetchingRecords() {
+    fetchingRecords(refreshData) {
         getAssessmentJunctionRecords({ accountId: this.accId }).then(result => {
             this.recList = result;
             this.show.grid = true;
@@ -75,6 +75,20 @@ export default class RtmvpcAssessments extends NavigationMixin(LightningElement)
             //        this.show.grid=false;
             //    }
             // }
+            if(typeof refreshData !== 'undefined' && refreshData === true){
+                this.show.survey = false;
+                this.assessmentId = undefined;
+                this.show.grid = true;
+                const pageRef = {
+                    type: 'comm__namedPage',
+                    attributes: {
+                        name: 'Home' // Replace with your community page name
+                    }
+
+                };
+                // Navigate to the community page
+                this[NavigationMixin.Navigate](pageRef);
+            }
 
         });
     }
@@ -100,20 +114,10 @@ export default class RtmvpcAssessments extends NavigationMixin(LightningElement)
 
     /* backClickHandler is used to show the custom table component and hide the assessment detail component when clicked on back button */
     backClickHandler() {
+        this.fetchingRecords(true);
         //this.recList =[];
-        this.show.survey = false;
-        this.assessmentId = undefined;
-        this.show.grid = true;
-        const pageRef = {
-            type: 'comm__namedPage',
-            attributes: {
-                name: 'Home' // Replace with your community page name
-            }
-
-        };
-        // Navigate to the community page
-        this[NavigationMixin.Navigate](pageRef);
-        this.fetchingRecords();
+        
+        
 
     }
 
