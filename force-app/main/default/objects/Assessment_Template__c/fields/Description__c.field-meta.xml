@@ -3,9 +3,8 @@
     <fullName>Description__c</fullName>
     <externalId>false</externalId>
     <label>Description</label>
-    <length>131072</length>
+    <required>false</required>
     <trackHistory>false</trackHistory>
     <trackTrending>false</trackTrending>
-    <type>LongTextArea</type>
-    <visibleLines>4</visibleLines>
+    <type>TextArea</type>
 </CustomField>

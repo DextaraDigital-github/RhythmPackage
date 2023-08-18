@@ -234,3 +234,30 @@ export function createChildHierarchy(queryResults, parentObj, savedResp, respAtt
         parentObj.Children = childlst;
     }
 }
+
+export function handleOnloadUtil(thistemp,tempchatterData){
+    if (typeof thistemp !== 'undefined') {
+        temp = thistemp;
+    }
+     //This loop is to iterate over the sections in the wrapper.
+        this.questionsAndAnswerss.forEach(questionAnswer => {
+            questionAnswer.questions.forEach(question => {
+                if (question.Id === tempchatterData.questionId) {
+                    question.Rhythm__Conversation_History__c = tempchatterData.conversationHistory;
+                    if (JSON.parse(tempchatterData.conversationHistory).length > 0) {
+                        question.chatColour = true;
+                    }
+                }
+                question.Children.forEach(subQuestion => {
+                    subQuestion.questions.forEach(ques => {
+                        if (ques.Id === tempchatterData.questionId) {
+                            ques.Rhythm__Conversation_History__c = tempchatterData.conversationHistory;
+                            if (JSON.parse(tempchatterData.conversationHistory).length > 0) {
+                                ques.chatColour = true;
+                            }
+                        }
+                    })
+                })
+            })
+        });
+}
