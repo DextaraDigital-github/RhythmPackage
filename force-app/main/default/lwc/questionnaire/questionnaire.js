@@ -1092,7 +1092,7 @@ export default class Questionnaire extends LightningElement {
             questionAnswer.questions.forEach(question => {
                 if (question.Children.length > 0) {
                     question.Children.forEach(respAttr => {
-                        if (question.type === 'Picklist (Multi-Select)') {
+                        if (question.type === 'Picklist (Multi-Select)' && typeof question.value!=='undefined') {
                             let lst = JSON.parse(question.value);
                             if (lst.includes(respAttr.optionValue) && respAttr.uploadrequired === 'Yes') {
                                 if (typeof question.Files__c === 'undefined' || question.Files__c === '0') {
@@ -1117,7 +1117,7 @@ export default class Questionnaire extends LightningElement {
                             respAttr.questions.forEach(childques => {
                                 if (childques.Children.length > 0) {
                                     childques.Children.forEach(ques => {
-                                        if (childques.type === 'Picklist (Multi-Select)') {
+                                        if (childques.type === 'Picklist (Multi-Select)' && typeof childques.value!=='undefined') {
                                             let childlst = JSON.parse(childques.value);
                                             if (childlst.includes(ques.optionValue) && ques.uploadrequired === 'Yes') {
                                                 if (typeof childques.Files__c === 'undefined' || childques.Files__c === '0') {
@@ -1125,7 +1125,7 @@ export default class Questionnaire extends LightningElement {
                                                 }
                                                 else {
                                                     childques.attachmentStyle = 'slds-button slds-button_icon slds-button_icon-border-filled rqt-attchbtn-black';
-                                                }
+                                                }   
                                             }
                                         }
                                         else {
@@ -1146,6 +1146,7 @@ export default class Questionnaire extends LightningElement {
                 }
             })
         });
+        console.log('Hello World');
     }
     handleFileUpload(event) {
         this.uploadingFile = true
