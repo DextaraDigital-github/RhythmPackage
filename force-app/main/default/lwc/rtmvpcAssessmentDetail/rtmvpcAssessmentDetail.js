@@ -172,7 +172,7 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
 
 
                    
-                    var assessmentStatus = statusResult;
+                    let assessmentStatus = statusResult;
                     if (typeof statusResult !== 'undefined') {
                         if (assessmentStatus && assessmentStatus !== null) {
                             assessmentStatus.forEach(assessStatus => {
