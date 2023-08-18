@@ -25,7 +25,7 @@ export default class RtmvpcAssessments extends NavigationMixin(LightningElement)
         { label: 'Assessment Name', fieldName: 'Name' },
         { label: 'Target Completion Date', fieldName: 'Rhythm__End_Date__c', type: 'date' },
         { label: 'Assessment Status', fieldName: 'Rhythm__Status__c' },
-        { label: '#Additional Requests', fieldName: 'Rhythm__Follow_Up_Requests__c' },
+        { label: '#Follow Up Requests', fieldName: 'Rhythm__Follow_Up_Requests__c' },
         { label: '% Completed', fieldName: 'Rhythm__Response_Percentage__c', type: 'progressBar' },
     ];
     /* connectedCallback is used to get accountAssessment data based on the account Id */
@@ -100,7 +100,7 @@ export default class RtmvpcAssessments extends NavigationMixin(LightningElement)
 
     /* backClickHandler is used to show the custom table component and hide the assessment detail component when clicked on back button */
     backClickHandler() {
-        this.fetchingRecords();
+        //this.recList =[];
         this.show.survey = false;
         this.assessmentId = undefined;
         this.show.grid = true;
@@ -113,6 +113,7 @@ export default class RtmvpcAssessments extends NavigationMixin(LightningElement)
         };
         // Navigate to the community page
         this[NavigationMixin.Navigate](pageRef);
+        this.fetchingRecords();
 
     }
 
@@ -214,11 +215,20 @@ export default class RtmvpcAssessments extends NavigationMixin(LightningElement)
                     if (typeof ques.value !== 'undefined') {
                         str = str + ques.value + '","';
                     }
+                     if (typeof ques.value === 'undefined') {
+                        str = str +''+ '","';
+                    }
                     if (typeof ques.files !== 'undefined') {
                         str = str + ques.files + '","';
                     }
+                     if (typeof ques.files === 'undefined') {
+                        str = str + '' + '","';
+                    }
                     if (typeof ques.conversationHistory !== 'undefined') {
                         str = str + ques.conversationHistory;
+                    }
+                     if (typeof ques.conversationHistory === 'undefined') {
+                        str = str + '' + '","';
                     }
                     str = str + '"\n"';
                 });
@@ -252,25 +262,34 @@ export default class RtmvpcAssessments extends NavigationMixin(LightningElement)
             for (const section in parseLst) {
                 count++;
                 let data = parseLst[section];
-                tableHtml += '<tr><td class="oddLeftTd" rowspan=' + data.length + '>' + section + '</td>';
+                tableHtml += '<tr><td class="oddLeftTd" rowspan=' + (data.length+1) + '>' + section + '</td>';
                 if (count % 2 === 0) {
                    // tableHtml += '<tr><td class="evenLeftTd" rowspan=' + section.length + '>' + section + '</td>';
                 }
                 else {
                     
                 }
-                
+                console.log('data',data);
                 data.forEach(ques => {
                     tableHtml += '<tr><td class="align-to-top">';
                     tableHtml = tableHtml + ques.snumber + '</td><td>' + ques.question + '</td>';
                     if (typeof ques.value !== 'undefined') {
                         tableHtml = tableHtml + '<td>' + ques.value + '</td>';
                     }
+                    if(typeof ques.value === 'undefined'){
+                         tableHtml = tableHtml + '<td>' + '' + '</td>';
+                    }
                     if (typeof ques.files !== 'undefined') {
                         tableHtml = tableHtml + '<td>' + ques.files + '</td>';
                     }
+                    if (typeof ques.files === 'undefined') {
+                        tableHtml = tableHtml + '<td>' + '' + '</td>';
+                    }
                     if (typeof ques.conversationHistory !== 'undefined') {
                         tableHtml = tableHtml + '<td>' + ques.conversationHistory + '</td>';
+                    }
+                    if (typeof ques.conversationHistory === 'undefined') {
+                        tableHtml = tableHtml + '<td>' + ''+ '</td>';
                     }
                     tableHtml = tableHtml +'</tr>';
                 });

@@ -514,11 +514,20 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
                     if (typeof ques.value !== 'undefined') {
                         tableHtml = tableHtml + '<td>' + ques.value + '</td>';
                     }
+                     if(typeof ques.value === 'undefined'){
+                         tableHtml = tableHtml + '<td>' + '' + '</td>';
+                    }
                     if (typeof ques.files !== 'undefined') {
                         tableHtml = tableHtml + '<td>' + ques.files + '</td>';
                     }
+                     if (typeof ques.files === 'undefined') {
+                        tableHtml = tableHtml + '<td>' + '' + '</td>';
+                    }
                     if (typeof ques.conversationHistory !== 'undefined') {
                         tableHtml = tableHtml + '<td>' + ques.conversationHistory + '</td>';
+                    }
+                    if (typeof ques.conversationHistory === 'undefined') {
+                        tableHtml = tableHtml + '<td>' + ''+ '</td>';
                     }
                     tableHtml = tableHtml +'</tr>';
                 });
@@ -559,11 +568,20 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
                     if (typeof ques.value !== 'undefined') {
                         str = str + ques.value + '","';
                     }
+                      if (typeof ques.value === 'undefined') {
+                        str = str +''+ '","';
+                    }
                     if (typeof ques.files !== 'undefined') {
                         str = str + ques.files + '","';
                     }
+                     if (typeof ques.files === 'undefined') {
+                        str = str + '' + '","';
+                    }
                     if (typeof ques.conversationHistory !== 'undefined') {
                         str = str + ques.conversationHistory;
+                    }
+                    if (typeof ques.conversationHistory === 'undefined') {
+                        str = str + '' + '","';
                     }
                     str = str + '"\n"';
                 });

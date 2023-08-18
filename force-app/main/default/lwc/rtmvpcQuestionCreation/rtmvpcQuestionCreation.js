@@ -265,7 +265,7 @@ export default class RtmvpcQuestionCreation extends LightningElement {
 
                     let preferredlst = this.responseAttributes.filter(res => res.Rhythm__preferred_Not_preferred__c === '');
                     let requiredupdatelst = this.responseAttributes.filter(res => res.Rhythm__Upload_Required__c === '');
-
+                    let responselst = this.responseAttributes.filter(res => res.Rhythm__Response_value__c === '');
                     let scorelst = this.responseAttributes.filter(res => res.Rhythm__Score__c < 0);
                     let weightlst = this.responseAttributes.filter(res => res.Rhythm__Weight__c < 0);
 
@@ -348,12 +348,19 @@ export default class RtmvpcQuestionCreation extends LightningElement {
                         });
                     }
                     else {
+                        let toastmessage = 'Preferred/Not Preferred and Upload Required fields are mandatory';
                         if (Array.from(set1).length !== this.responseAttributes.length) {
-                            this.configureToast('Some Error has occured', 'Enter unique response values', 'error');
+                            if(responselst.length!==0){
+                                 toastmessage = 'ResponseValue, Preferred/Not Preferred and Upload Required fields are mandatory';
+                            }
+                            else{
+                                 toastmessage ='Enter unique response values';
+                            }
                         }
                         else {
-                            this.configureToast('Some Error has occured', 'Preferred/Not Preferred and Upload Required fields are mandatory', 'error');
+                            toastmessage = 'Preferred/Not Preferred and Upload Required fields are mandatory';
                         }
+                        this.configureToast('Some Error has occured', toastmessage, 'error');
                         this.loading = false;
                     }
                 }

@@ -8,7 +8,7 @@
 
   IMAGE(&apos;/resource/Rhythm__greenFlag&apos;,&apos;green&apos;,20,20),
  IF(
-  TEXT(Status__c) == &apos;Expired&apos;, IMAGE(&apos;/resource/Rhythm__orangeFlag&apos;, &apos;orange&apos;,20,20), IMAGE(&apos;/resource/Rhythm__redFlag&apos;, &apos;red&apos;,20,20)
+  TEXT(Status__c) == &apos;Expired&apos;, IMAGE(&apos;/resource/Rhythm__redFlag&apos;, &apos;red&apos;,20,20),IMAGE(&apos;/resource/Rhythm__orangeFlag&apos;, &apos;orange&apos;,20,20)
 )
  
 )</formula>

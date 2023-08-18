@@ -151,7 +151,7 @@
 
 							<template for:each={questionsAndAnswerss} for:item="questionaryEntry">
 								<li class="slds-accordion__list-item" key={questionaryEntry.section}>
-									<section data-accordian={questionaryEntry.sectionId}>
+									<section class={questionaryEntry.showAccordian} data-accordian={questionaryEntry.sectionId}>
 
 										<div class="slds-accordion__summary">
 											<h2 class="slds-accordion__summary-heading">
