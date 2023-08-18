@@ -25,6 +25,7 @@ export default class RtmvpcAssessmentChatter extends LightningElement {
    @track responseWrapper = {};
    @track showData = false;
    @api timeline;
+   @track responseflag;
 
    @api
    displayConversation(chatmap) {
@@ -35,7 +36,11 @@ export default class RtmvpcAssessmentChatter extends LightningElement {
       if (typeof chatmap !== 'undefined' && chatmap) {
          this.chattermap = chatmap;
       }
+      if(typeof chatmap.responseflag!=='undefined'){
+         this.responseflag = chatmap.responseflag;
+      }
       this.showData = false;
+
       this.questionId = this.chattermap.questionId;
       this.assessmentId = this.chattermap.assesmentId;
       this.accountType = this.chattermap.accountType;
@@ -76,6 +81,7 @@ export default class RtmvpcAssessmentChatter extends LightningElement {
    callChatterResponse(response) {
       this.responseWrapper.responseList = response;
       saveChatterResponse({ chatWrapperstring: JSON.stringify(this.responseWrapper) }).then((result) => {
+         this.responseflag = true;
           const selectedEvent = new CustomEvent('sendresponse', {
             detail: result
          });
@@ -139,7 +145,6 @@ export default class RtmvpcAssessmentChatter extends LightningElement {
          }
 
          this.responseMap.Text = this.newChat;
-
          this.responseMap.Name = this.userName;
          let customerChatCSS = (typeof this.recordid !== 'undefined') ? 'cad-cd-customer' : 'cad-ad-customer';
          let supplierChatCSS = (typeof this.recordid !== 'undefined') ? 'cad-cd-supplier' : 'cad-ad-supplier';
@@ -170,9 +175,10 @@ export default class RtmvpcAssessmentChatter extends LightningElement {
 
          if (typeof this.responseMap.Text != 'undefined' && this.responseMap.Text !== '') {
             this.newResponse.push(this.responseMap);
+            this.callChatterResponse(this.newResponse);
          }
          if (this.newResponse.length > 0) {
-            this.callChatterResponse(this.newResponse);
+           // this.callChatterResponse(this.newResponse);
          }
          this.responseList = this.newResponse;
         // this.showData = true;
@@ -190,10 +196,12 @@ export default class RtmvpcAssessmentChatter extends LightningElement {
          this.chatDataMap.conversationHistory = JSON.stringify(this.responseList);
          this.chatDataMap.questionId = this.questionId;
          this.chatDataMap.accountassessmentId = this.accountassessmentId;
+         this.chatDataMap.flagResponse = this.responseflag;
          /* This dispatch event is used to assign the conversation data to the main wrapper (questionnaire) to update the data in the latest records. */
          const selectedEvent = new CustomEvent('chatconversation', {
             detail: this.chatDataMap
          });
+         console.log('selectedevent',selectedEvent);
          /* Dispatches the event.*/
          this.dispatchEvent(selectedEvent);
       }).catch((err) => {
