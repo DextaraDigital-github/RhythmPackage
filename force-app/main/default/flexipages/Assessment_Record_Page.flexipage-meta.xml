@@ -146,9 +146,6 @@
                         <valueListItems>
                             <value>Follow_Up_Requests__c</value>
                         </valueListItems>
-                        <valueListItems>
-                            <value>Customer_Review_Status__c</value>
-                        </valueListItems>
                     </valueList>
                 </componentInstanceProperties>
                 <componentInstanceProperties>

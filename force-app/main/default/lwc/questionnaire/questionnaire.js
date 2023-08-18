@@ -12,7 +12,7 @@ import getActionRecords from '@salesforce/apex/CAPAController.getActionRecords';
 import RTM_FONTS from '@salesforce/resourceUrl/rtmfonts';
 import CUS_STYLES from '@salesforce/resourceUrl/rtmcpcsldscustomstyles';
 import QUE_PLAT from '@salesforce/resourceUrl/rtmvpcquestionnaireplatform';
-import { constructMultilevelhierarchy, createChildHierarchy } from './questionnaireutil';
+import { constructMultilevelhierarchy, createChildHierarchy, handleOnloadUtil } from './questionnaireutil';
 import { loadStyle } from 'lightning/platformResourceLoader';
 import awsjssdk from '@salesforce/resourceUrl/AWSJSSDK';
 import { loadScript } from 'lightning/platformResourceLoader';
@@ -207,22 +207,26 @@ export default class Questionnaire extends LightningElement {
             })
         }
     }
-     @api handleChatResponse(responseData){
-         this.questionsAndAnswerss.forEach(questionAnswer => {
-                        questionAnswer.questions.forEach(question => {
-                            if (responseData.questionId === question.Id  && typeof question.ResponseId === 'undefined') {
-                                question.ResponseId = responseData.responseId;
-                            }
-                            if (question.Children.length > 0) {
-                                question.Children.forEach(childresp => {
-                                    if (childresp.isdisplay) {
-                                        childresp.questions.forEach(childques => {
-                                            if (responseData.questionId === childques.Id && typeof childques.ResponseId === 'undefined') {
-                                                childques.ResponseId = responseData.responseId;
-                                            }
-                                        })}})}})});
+    @api handleChatResponse(responseData) {
+        this.questionsAndAnswerss.forEach(questionAnswer => {
+            questionAnswer.questions.forEach(question => {
+                if (responseData.questionId === question.Id && typeof question.ResponseId === 'undefined') {
+                    question.ResponseId = responseData.responseId;
+                }
+                if (question.Children.length > 0) {
+                    question.Children.forEach(childresp => {
+                        if (childresp.isdisplay) {
+                            childresp.questions.forEach(childques => {
+                                if (responseData.questionId === childques.Id && typeof childques.ResponseId === 'undefined') {
+                                    childques.ResponseId = responseData.responseId;
+                                }
+                            })
+                        }
+                    })
+                }
+            })
+        });
     }
-    //Used /* handleAccordionSection is used to handle opening and closing of a disclosure */
     handleAccordionSection() {
         if (this.accordionFlag === false) {
             this.accordionFlag = true;
@@ -312,7 +316,7 @@ export default class Questionnaire extends LightningElement {
     connectedCallback() {
         try {
             this.accountsId = this.accid;
-            this.showAccordion ='slds-accordion__section slds-is-open';
+            this.showAccordion = 'slds-accordion__section slds-is-open';
             this.isTemplate = false;
             this.handleOnload();
         } catch (e) {
@@ -366,7 +370,7 @@ export default class Questionnaire extends LightningElement {
         const folderName = this.objectName + '/' + this.documentParentId + '/';
         this.s3.listObjects({ Bucket: this.bucketName, Prefix: folderName }, (err, data) => {
             if (err) {
-                
+
             } else {
                 const files = data.Contents;
                 let fileList = [];
@@ -525,7 +529,7 @@ export default class Questionnaire extends LightningElement {
                                     for (const seckey of this.questionMap.keys()) {
 
                                         sectionsList.push({ label: seckey, value: sectionName[seckey] });
-                                        this.questionsList.push({ "sectionId": seckey, "section": sectionName[seckey], "sequenceNumber": sectionSequenceMap[seckey], "questions": this.questionMap.get(seckey), "showNext": true, "show": false });
+                                        this.questionsList.push({ "sectionId": seckey, "section": sectionName[seckey], "sectionAccordian": "slds-accordion__section slds-is-close", "sequenceNumber": sectionSequenceMap[seckey], "questions": this.questionMap.get(seckey), "showNext": true, "show": false });
                                         count++;
                                     }
                                     //
@@ -624,7 +628,7 @@ export default class Questionnaire extends LightningElement {
                         let sectionsList = [];
                         for (const seckey of this.questionMap.keys()) {
                             sectionsList.push({ label: seckey, value: sectionName[seckey] });
-                            this.questionsList.push({ "sectionId": seckey, "section": sectionName[seckey], "sequenceNumber": sectionSequenceMap[seckey], "questions": this.questionMap.get(seckey), "showNext": true, "show": false });
+                            this.questionsList.push({ "sectionId": seckey, "section": sectionName[seckey], "sectionAccordian": "slds-accordion__section slds-is-close", "sequenceNumber": sectionSequenceMap[seckey], "questions": this.questionMap.get(seckey), "showNext": true, "show": false });
                             count++;
                         }
                         this.constructQuestionsAndAnswers(this.questionsList);
@@ -713,7 +717,7 @@ export default class Questionnaire extends LightningElement {
                             let sectionsList = [];
                             for (const seckey of this.questionMap.keys()) {
                                 sectionsList.push({ label: seckey, value: sectionName[seckey] });
-                                this.questionsList.push({ "sectionId": seckey, "section": sectionName[seckey], "sequenceNumber": sectionSequenceMap[seckey], "questions": this.questionMap.get(seckey), "showNext": true, "show": false });
+                                this.questionsList.push({ "sectionId": seckey, "section": sectionName[seckey], "sectionAccordian": "slds-accordion__section slds-is-close", "sequenceNumber": sectionSequenceMap[seckey], "questions": this.questionMap.get(seckey), "showNext": true, "show": false });
                                 count++;
                             }
                             this.showButtons.Summary = false;
@@ -1031,9 +1035,6 @@ export default class Questionnaire extends LightningElement {
                                             ques.Children.forEach(respAttr => {
                                                 if (respAttr.optionValue === ques.value) {
                                                     ques.showUpload = (respAttr.uploadrequired === 'Yes' || respAttr.uploadrequired === 'Optional') ? true : false;
-                                                    if (respAttr.uploadrequired === 'Yes') {
-                                                        // this.requiredFilesLst.push(question.Id);
-                                                    }
                                                 }
                                                 if (ques.type === 'Picklist (Multi-Select)') {
                                                     let lst = JSON.parse(ques.value);
@@ -1041,9 +1042,6 @@ export default class Questionnaire extends LightningElement {
                                                         if ((respAttr.uploadrequired === 'Yes' || respAttr.uploadrequired === 'Optional')) {
                                                             ques.showUpload = true;
                                                             childbool = true;
-                                                            if (respAttr.uploadrequired === 'Yes') {
-                                                                // this.requiredFilesLst.push(question.Id);
-                                                            }
                                                         }
                                                     }
                                                     if (!childbool) {
@@ -1088,23 +1086,56 @@ export default class Questionnaire extends LightningElement {
         }
     }
     handleRequiredCheck() {
+        console.log('this.questionsAndAnswerss',this.questionsAndAnswerss);
         this.requiredFilesLst = [];
         this.questionsAndAnswerss.forEach(questionAnswer => {
             questionAnswer.questions.forEach(question => {
                 if (question.Children.length > 0) {
                     question.Children.forEach(respAttr => {
-                        if (respAttr.optionValue === question.value && respAttr.uploadrequired === 'Yes') {
-                            if (typeof question.Files__c === 'undefined' || question.Files__c === '0') {
-                                this.requiredFilesLst.push(question.Id);
+                        if (question.type === 'Picklist (Multi-Select)') {
+                            let lst = JSON.parse(question.value);
+                            if (lst.includes(respAttr.optionValue) && respAttr.uploadrequired === 'Yes') {
+                                if (typeof question.Files__c === 'undefined' || question.Files__c === '0') {
+                                    this.requiredFilesLst.push(question.Id);
+                                }
+                                else {
+                                    question.attachmentStyle = 'slds-button slds-button_icon slds-button_icon-border-filled rqt-attchbtn-black';
+                                }
+                            }
+                        }
+                        else {
+                            if (respAttr.optionValue === question.value && respAttr.uploadrequired === 'Yes') {
+                                if (typeof question.Files__c === 'undefined' || question.Files__c === '0') {
+                                    this.requiredFilesLst.push(question.Id);
+                                }
+                                else {
+                                    question.attachmentStyle = 'slds-button slds-button_icon slds-button_icon-border-filled rqt-attchbtn-black';
+                                }
                             }
                         }
                         if (respAttr.isdisplay) {
                             respAttr.questions.forEach(childques => {
                                 if (childques.Children.length > 0) {
                                     childques.Children.forEach(ques => {
-                                        if (childques.value === ques.optionValue && ques.uploadrequired === 'Yes') {
-                                            if (typeof childques.Files__c === 'undefined' || childques.Files__c === '0') {
-                                                this.requiredFilesLst.push(childques.Id);
+                                        if (childques.type === 'Picklist (Multi-Select)') {
+                                            let childlst = JSON.parse(childques.value);
+                                            if (childlst.includes(ques.optionValue) && ques.uploadrequired === 'Yes') {
+                                                if (typeof childques.Files__c === 'undefined' || childques.Files__c === '0') {
+                                                    this.requiredFilesLst.push(childques.Id);
+                                                }
+                                                else {
+                                                    childques.attachmentStyle = 'slds-button slds-button_icon slds-button_icon-border-filled rqt-attchbtn-black';
+                                                }
+                                            }
+                                        }
+                                        else {
+                                            if (childques.value === ques.optionValue && ques.uploadrequired === 'Yes') {
+                                                if (typeof childques.Files__c === 'undefined' || childques.Files__c === '0') {
+                                                    this.requiredFilesLst.push(childques.Id);
+                                                }
+                                                else {
+                                                    childques.attachmentStyle = 'slds-button slds-button_icon slds-button_icon-border-filled rqt-attchbtn-black';
+                                                }
                                             }
                                         }
                                     })
@@ -1116,8 +1147,6 @@ export default class Questionnaire extends LightningElement {
             })
         });
     }
-
-    /*handleFileUpload method is used to store the uploaded attachments into response records */
     handleFileUpload(event) {
         this.uploadingFile = true
         this.fileResponseData = event.detail;
@@ -1143,6 +1172,7 @@ export default class Questionnaire extends LightningElement {
         this.questionsAndAnswerss = JSON.parse(JSON.stringify(this.filterQuestionsAndAnswers));
         if (flagFilter) {
             this.questionsAndAnswerss.forEach(questionAnswer => {
+                questionAnswer.sectionAccordian = "slds-accordion__section slds-is-open";
                 questionAnswer.questions = questionAnswer.questions.filter(item => (item.Rhythm__Flag__c));
                 questionAnswer.questions.forEach(question => {
                     question.Children.forEach(conditionalQuestion => {
@@ -1164,6 +1194,7 @@ export default class Questionnaire extends LightningElement {
     handleFilterRejected() {
         this.questionsAndAnswerss = JSON.parse(JSON.stringify(this.filterQuestionsAndAnswers));
         this.questionsAndAnswerss.forEach(questionAnswer => {
+            questionAnswer.sectionAccordian = "slds-accordion__section slds-is-open";
             questionAnswer.questions = questionAnswer.questions.filter(item => (item.rejectButton));
             questionAnswer.questions.forEach(question => {
                 question.Children.forEach(conditionalQuestion => {
@@ -1175,8 +1206,6 @@ export default class Questionnaire extends LightningElement {
         })
 
     }
-
-    /* getQuestionTemplate is used to create the basic question template for wrapper construction */
     getQuestionTemplate() {
         let question = {
             "question": "", "helptext": "", "isText": false, "isRadio": false, "isPicklist": false,
@@ -1195,7 +1224,6 @@ export default class Questionnaire extends LightningElement {
         };
         return question;
     }
-    /*handleSave method is used to save the responses for particular question */
     handleSave() {
         this.ishideToast = true;
         this.isAutoSave = false;
@@ -1235,8 +1263,6 @@ export default class Questionnaire extends LightningElement {
             questionAnswer.numberOfResponses = numberofResponses;
         });
     }
-
-    /* handleSubmit method is used to save the responses for particular question and update the assessment status to submit */
     handleSubmit() {
         this.isSupplierModalPopup = true;
     }
@@ -1277,10 +1303,8 @@ export default class Questionnaire extends LightningElement {
         for (const seckey of this.responseMap.keys()) {
             responseIdlist.push(seckey);
         }
-        //This loop is to iterate over the sections in the wrapper.
         this.questionsAndAnswerss.forEach(questionAnswer => {
             let rowdata = '';
-            //This loop is to iterate over the Questions for a particular sections in the wrapper.
             questionAnswer.questions.forEach(question => {
                 if (this.requiredQuestionList.includes(question.Id) &&
                     typeof question.value !== 'undefined') {
@@ -1319,7 +1343,6 @@ export default class Questionnaire extends LightningElement {
                 }
             });
         });
-
         let pdflst = [];
         let pdfwrapper = {};
         this.questionsAndAnswerss.forEach(questionWrap => {
@@ -1394,9 +1417,7 @@ export default class Questionnaire extends LightningElement {
         for (const questionkey of this.responseMap.keys()) {
             questionsId.push(questionkey);
         }
-        //This loop is to iterate over the sections in the wrapper.
         this.questionsAndAnswerss.forEach(questionAnswer => {
-            //This loop is to iterate over the Questions for a particular sections in the wrapper.
             questionAnswer.questions.forEach(question => {
                 if (questionsId.includes(question.Id)) {
                     if (typeof question.Rhythm__Flag__c !== 'undefined') {
@@ -1428,7 +1449,6 @@ export default class Questionnaire extends LightningElement {
                             this.totastmessage = 'Please enter the valid phone number in the format xxx-xxx-xxxx:';
                         }
                     }
-                    //This loop is to iterate over the Child Questions for a particular sections and Questions in the wrapper.
                     question.Children.forEach(conditionalQuestion => {
                         if (conditionalQuestion.isdisplay) {
                             conditionalQuestion.questions.forEach(subQuestion => {
@@ -1569,11 +1589,7 @@ export default class Questionnaire extends LightningElement {
             else {
                 responseQueryMap.submit = false;
             }
-
-            //pdflst.push(pdfwrapper);
             responseQueryMap.pdfContnet = JSON.stringify(pdfwrapper);
-
-            /* This method is used to create the response for the questions*/
             createSupplierResponse({ suppResponseList: responseList, paramMap: JSON.stringify(responseQueryMap) }).then((result) => {
                 result.forEach(res => {
                     this.responselstMap[res.Rhythm__Question__c] = res.Id;
@@ -1605,12 +1621,10 @@ export default class Questionnaire extends LightningElement {
                         })
                     });
                 }
-
-                //filemaplst.data = this.questionsAndAnswerss;
                 filemaplst.updateTimeline = true;
                 if (!this.isAutoSave) {
                     this.success = true;
-                    
+
                     const selectedEvent = new CustomEvent('updatetimeline', {
                         detail: filemaplst
                     });
@@ -1708,7 +1722,6 @@ export default class Questionnaire extends LightningElement {
                     this.showcustomerbuttons = true;
                     this.timeline.forEach(res => {
                         if (res.status === 'Need More Information') {
-                            //  quTemp.needData = true;
                             quTemp.capaAction = true;
                             quTemp.customerFlag = true;
                         }
@@ -1723,7 +1736,6 @@ export default class Questionnaire extends LightningElement {
                         quTemp.customerFlag = true;
                         quTemp.capaAction = true;
                         if (this.accountAssessmentStatus === 'Need More Information') {
-                            //quTemp.needData = true;
                             quTemp.disableReject = true;
                         }
                     }
@@ -1756,7 +1768,6 @@ export default class Questionnaire extends LightningElement {
                     else {
                         this.timeline.forEach(res => {
                             if (res.status === 'Need More Information') {
-                                //quTemp.customerFlag = true;
                                 quTemp.capaAction = true;
                             }
                         })
@@ -1967,11 +1978,9 @@ export default class Questionnaire extends LightningElement {
                         if (conditionalQuestion.isdisplay) {
                             conditionalQuestion.questions.forEach(subQuestion => {
                                 if (subQuestion.Id === rejectedMap.questionId && typeof rejectedMap.rejectResponse !== 'undefined') {
-                                    //bool = true;
                                     subQuestion.rejectButton = rejectedMap.rejectResponse;
                                 }
                                 if (subQuestion.Id === rejectedMap.questionId && typeof rejectedMap.needData !== 'undefined') {
-                                    // bool = true;
                                     subQuestion.needData = rejectedMap.needData;
                                 }
                             });
@@ -2054,27 +2063,7 @@ export default class Questionnaire extends LightningElement {
     }
     /* handleConversationData is used to Store the conversation in  the wrapper for a particular Question*/
     @api handleConversationData(chatterData) {
-        //This loop is to iterate over the sections in the wrapper.
-        this.questionsAndAnswerss.forEach(questionAnswer => {
-            questionAnswer.questions.forEach(question => {
-                if (question.Id === chatterData.questionId) {
-                    question.Rhythm__Conversation_History__c = chatterData.conversationHistory;
-                    if (JSON.parse(chatterData.conversationHistory).length > 0) {
-                        question.chatColour = true;
-                    }
-                }
-                question.Children.forEach(subQuestion => {
-                    subQuestion.questions.forEach(ques => {
-                        if (ques.Id === chatterData.questionId) {
-                            ques.Rhythm__Conversation_History__c = chatterData.conversationHistory;
-                            if (JSON.parse(chatterData.conversationHistory).length > 0) {
-                                ques.chatColour = true;
-                            }
-                        }
-                    })
-                })
-            })
-        });
+        handleOnloadUtil(this, chatterData);
     }
     /*This method is to update the AccountAssessmentStatus to In Review. And to display the flags in customer portal. */
     handleStartReview() {
@@ -2089,6 +2078,7 @@ export default class Questionnaire extends LightningElement {
             const selectedEvent = new CustomEvent('updatetimeline', {
                 detail: param
             });
+            console.log('HandleStart Review');
             this.dispatchEvent(selectedEvent);
             setTimeout(() => { this.handleOnload() }, 350);
         }).catch(error => {
