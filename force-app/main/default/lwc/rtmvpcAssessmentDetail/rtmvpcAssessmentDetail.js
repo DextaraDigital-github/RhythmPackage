@@ -21,6 +21,7 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
     @api assessmentid;
     @api recordId;
     @api objectApiName;
+    @track objectRecname;
     @track showflagquestions = true;
     @track userName;
     @track showSections;
@@ -62,7 +63,6 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
     @track responseId;
     @track showUpload = false;
     @track isdisabled = false;
-    @track objectApiName;
     @track openRightFile = false;
 
     connectedCallback() {
@@ -385,7 +385,7 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
         this.openRightFile = true;
         this.openReviewComments = false;
         this.showCapaForm = false;
-        this.objectApiName = event.detail.objectApiName;
+        this.objectRecname = event.detail.objectApiName;
         this.isdisabled = (event.detail.isEditable === "true") ? true : false;
         console.log('isdisable', event.detail);
         this.responseId = event.detail.response;
@@ -411,7 +411,7 @@ export default class RtmvpcAssessmentDetail extends LightningElement {
         this.openRightFile = true;
         this.openReviewComments = false;
         this.showCapaForm = false;
-        this.objectApiName = this.fileData.objectApiName;
+        this.objectRecname = this.fileData.objectApiName;
         this.isdisabled = (this.fileData.isEditable === "true") ? true : false;
         this.responseId = this.fileData.response;
         this.showUpload = (this.fileData.showUpload === "true") ? true : false;

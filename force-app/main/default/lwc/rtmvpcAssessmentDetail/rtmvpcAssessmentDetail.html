@@ -94,8 +94,9 @@
 								<div class="slds-scrollable_y" style="max-height:calc(100% - 40px);">
 									<div class="slds-text-align_center slds-text-heading_large">
 										<template if:true={showSections}>
-											<c-Questionnaire vendor={accountid} assessment={assessmentid} onsendresponse={handleResponse}
+											<c-Questionnaire vendor={accountid} assessment={assessmentid}
 												object-api-name={objectApiName} record-id={recordId} accid={assaccId}
+												object-name ={objectRecname}
 												onselectconversation={chatHistory} onshowsummary={showsummaryHandler}
 												account-assessment-status={accountAssessmentStatus} 
 												onupdatetimeline={handleupdatetimeline} onuploadfile={handleFileData}
@@ -140,7 +141,7 @@
 
 
 									<template if:true={openReviewComments}>
-										<c-rtmvpc-assessment-chatter chattermap={showChat}
+										<c-rtmvpc-assessment-chatter chattermap={showChat} onsendresponse={handleResponse}
 											onchatconversation={handleChat} recordid={customerId}
 											timeline={assessmentTimeline}>
 										</c-rtmvpc-assessment-chatter>
