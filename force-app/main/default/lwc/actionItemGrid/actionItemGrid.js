@@ -63,10 +63,10 @@ export default class ActionItemGrid extends NavigationMixin(LightningElement) {
                                     actionRecordMap.isFlag = true;
                                 }
                                 if(res['Rhythm__Status__c'] == 'Expired'){
-                                    actionRecordMap.isOrangeFlag = true;
+                                    actionRecordMap.isRedFlag = true;
                                 }
                                 else if(res['Rhythm__Status__c'] == 'Open'){
-                                    actionRecordMap.isRedFlag = true;
+                                    actionRecordMap.isOrangeFlag = true;
                                 }
                                 actionRecordList.push(actionRecordMap);
                             }

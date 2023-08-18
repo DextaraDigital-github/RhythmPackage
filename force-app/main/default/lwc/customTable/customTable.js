@@ -527,7 +527,7 @@ export default class CustomTable extends LightningElement {
         for (let colIndex = 0; colIndex < this.recList[0].record.length; colIndex++) {
             csvHeader = csvHeader + this.recList[0].record[colIndex].label + ',';
         }
-        csvHeader = csvHeader.substring(0, csvHeader.length - 1) + ',% completed,\n';
+         csvHeader = csvHeader.substring(0, csvHeader.length - 1) + '\n';
         let csvRows = '';
         for (let i = 0; i < this.recList.length; i++) {
             let recordDetails = this.recList[i];
@@ -536,7 +536,7 @@ export default class CustomTable extends LightningElement {
                 for (let j = 0; j < recordDetails.record.length; j++) {
                     csvRow += recordDetails.record[j].value + ',';
                 }
-                csvRow=csvRow+this.recList[i].progressBarValue;
+                //csvRow=csvRow+this.recList[i].progressBarValue;
                 csvRow = csvRow.substring(0, csvRow.length - 1) + '\n';
                 csvRows += csvRow;
             }
@@ -558,8 +558,8 @@ export default class CustomTable extends LightningElement {
         for (let i = 0; i < this.viewColList.length; i++) {
             tableHtml += '<th>' + this.viewColList[i].label + '</th>';
         }
-        tableHtml += '<th>% Completed</th>';
-        tableHtml += '</tr></thead><tbody>';
+        // tableHtml += '<th>% Completed</th>';
+        // tableHtml += '</tr></thead><tbody>';
         for (let i = 0; i < this.recList.length; i++) {
             tableHtml += '<tr>';
             for (let j = 0; j < this.recList[i].record.length; j++) {
@@ -574,8 +574,8 @@ export default class CustomTable extends LightningElement {
                 }
                  
             }
-            tableHtml += '<td>' + this.recList[i].progressBarValue + '</td>'; 
-            tableHtml += '</tr>';
+            // tableHtml += '<td>' + this.recList[i].progressBarValue + '</td>'; 
+            // tableHtml += '</tr>';
         }
         tableHtml += '</tbody></table>';
         let win = window.open('', '', 'width=' + (window.innerWidth * 0.9) + ',height=' + (window.innerHeight * 0.9) + ',location=no, top=' + (window.innerHeight * 0.1) + ', left=' + (window.innerWidth * 0.1));

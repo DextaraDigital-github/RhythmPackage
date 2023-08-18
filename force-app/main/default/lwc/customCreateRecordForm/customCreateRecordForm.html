@@ -1,12 +1,12 @@
 <template>
-	<lightning-record-edit-form object-api-name={objName} onsuccess={handleSuccess} onsubmit={handleSubmit}>
+	<lightning-record-edit-form object-api-name={objName} record-id={sectionId} onsuccess={handleSuccess} onsubmit={handleSubmit}>
 		<div class="slds-grid slds-wrap slds-p-bottom_small">
 			<template for:each={fieldsList} for:item="field">
 				<template if:false={field.hide}>
 					<div class={field.class} key={field}>
 						<lightning-layout-item >
 							<lightning-input-field  label={field.label}
-								field-name={field.fieldName} required={field.required}>
+								field-name={field.fieldName} value={sectionName} required={field.required}>
 							</lightning-input-field>
 						</lightning-layout-item>
 					</div>

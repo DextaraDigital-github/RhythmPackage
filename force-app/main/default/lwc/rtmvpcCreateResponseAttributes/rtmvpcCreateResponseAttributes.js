@@ -47,7 +47,7 @@ export default class RtmvpcCreateResponseAttributes extends LightningElement {
             Apex method is used to get the Response Attribute data in onload for particular question.
         */
         getQuestionRespAttributes({ questionlst: lst }).then(result => {
-            let cnt =0;
+            let cnt = 0;
             let len = result.length;
             result.forEach(res => {
                 let rowlabel = res.Rhythm__Response_value__c;
@@ -108,32 +108,42 @@ export default class RtmvpcCreateResponseAttributes extends LightningElement {
             }
         });
         this.tablerowlst.splice(index - 1, 1);
-        let cnt =0;
-        this.tablerowlst.forEach(tab=>{
+        let cnt = 0;
+        this.tablerowlst.forEach(tab => {
             cnt++
             tab.rownum = cnt;
-            tab.rowdata.forEach(row=>{
+            tab.rowdata.forEach(row => {
                 let key = row.key;
-                if(key.includes('responseValue')){
-                    row.key = 'responseValue-'+cnt;
+                if (key.includes('responseValue')) {
+                    row.key = 'responseValue-' + cnt;
                 }
-                else if(key.includes('preffered')){
-                    row.key = 'preffered-'+cnt;
+                else if (key.includes('preffered')) {
+                    row.key = 'preffered-' + cnt;
                 }
-                else if(key.includes('uploadrequired')){
-                    row.key = 'uploadrequired-'+cnt;
+                else if (key.includes('uploadrequired')) {
+                    row.key = 'uploadrequired-' + cnt;
                 }
-                else if(key.includes('score')){
-                    row.key = 'score-'+cnt;
+                else if (key.includes('score')) {
+                    row.key = 'score-' + cnt;
                 }
-                else if(key.includes('weight')){
-                    row.key = 'weight-'+cnt;
+                else if (key.includes('weight')) {
+                    row.key = 'weight-' + cnt;
                 }
             })
         });
         if (this.tablerowlst.length == 0) {
             this.constructNewWrapper();
         }
+        let responselst = [];
+        this.tablerowlst.forEach(rowinfo => {
+            let responsemap = { 'sobjectType': 'Rhythm__Response_Attribute__c' };
+            rowinfo.rowdata.forEach(item => {
+                responsemap[item.label] = item.value;
+            });
+            responselst.push(responsemap);
+        })
+        const selectedEvent = new CustomEvent('selectedvalue', { detail: responselst });
+        this.dispatchEvent(selectedEvent);
     }
     /*
         handleQuestionTypeChange method is used to change the wrapper based on response type change.
@@ -157,7 +167,7 @@ export default class RtmvpcCreateResponseAttributes extends LightningElement {
             { 'label': 'Rhythm__Score__c', 'rowlabel': '', 'value': '', 'ispicklist': false, 'isNumber': true, 'key': 'score-' + rownum, 'display': true, 'isEditable': false },
             { 'label': 'Rhythm__Weight__c', 'rowlabel': '', 'value': '', 'ispicklist': false, 'isNumber': true, 'key': 'weight-' + rownum, 'display': true, 'isEditable': false }];
             responsewrapper.rowdata = rowdata;
-        
+
             this.tablerowlst.push(responsewrapper);
             responsewrapper = {};
             rownum = this.tablerowlst.length + 1;
@@ -168,7 +178,7 @@ export default class RtmvpcCreateResponseAttributes extends LightningElement {
             { 'label': 'Rhythm__Score__c', 'rowlabel': '', 'value': '', 'ispicklist': false, 'isNumber': true, 'key': 'score-' + rownum, 'display': true, 'isEditable': false },
             { 'label': 'Rhythm__Weight__c', 'rowlabel': '', 'value': '', 'ispicklist': false, 'isNumber': true, 'key': 'weight-' + rownum, 'display': true, 'isEditable': false }];
             responsewrapper.rowdata = rowdata;
-            
+
             this.tablerowlst.push(responsewrapper);
             this.isCheckbox = true;
         }
@@ -183,7 +193,7 @@ export default class RtmvpcCreateResponseAttributes extends LightningElement {
             { 'label': 'Rhythm__Score__c', 'rowlabel': '', 'value': '', 'ispicklist': false, 'isNumber': true, 'key': 'score-' + rownum, 'display': true, 'isEditable': false },
             { 'label': 'Rhythm__Weight__c', 'rowlabel': '', 'value': '', 'ispicklist': false, 'isNumber': true, 'key': 'weight-' + rownum, 'display': true, 'isEditable': false }];
             responsewrapper.rowdata = rowdata;
-            
+
             this.tablerowlst.push(responsewrapper);
         }
     }
