@@ -1,6 +1,13 @@
 <!-- This HTML is used to load both section(tabluar report questionnaire) and Questions(Quesstionnaire) in same component based on the selection of sectionId and AssessmentId
 	-->
 <template>
+	<template if:true={showBack}>
+		<button class="slds-m-bottom_small slds-float_right" onclick={handleBackButton}>
+			<span >	
+				<i class="las la-chevron-circle-left"></i> Back
+			</span>
+		</button>
+	</template>
 	<div class="cad-cardbase slds-p-around_small">
 		<div class="cad-tbl">
 			<div class="cad-row">
