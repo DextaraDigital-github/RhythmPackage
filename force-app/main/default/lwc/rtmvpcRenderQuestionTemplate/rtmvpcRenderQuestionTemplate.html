@@ -238,7 +238,7 @@
 																icon-name="utility:edit_form" label="CAPA"
 																alternative-text="CAPA" title="CAPA"
 																class="slds-m-left_koushik slds-is-relative"
-																onclick={openActionForm} variant="neutral">
+																onclick={openActionForm} variant="brand">
 															</lightning-button-icon>
 															<!-- <lightning-icon data-id={questionary.Id} icon-name="utility:record_alt"
 															size="x-small" onclick={openActionForm}>
@@ -282,7 +282,7 @@
 												<template if:true={issupplier}>
 													<template if:true={questionary.customerFlag}>
 														<template if:true={questionary.rejectButton}>
-															<button class="slds-button slds-button_icon slds-button_icon-border-filled" style="cursor:no-drop;" 
+															<button class="slds-button slds-button_icon slds-button_icon-border-filled" style="cursor:no-drop; background: rgb(251 129 129);" 
 															data-label="Rejected" title="Rejected"
 																data-id={questionary.Id}>
 																<lightning-icon icon-name="utility:close" size="xx-small"></lightning-icon>
