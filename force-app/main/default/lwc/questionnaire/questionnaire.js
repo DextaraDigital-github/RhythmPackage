@@ -238,6 +238,7 @@ export default class Questionnaire extends LightningElement {
             })
             questionAnswer.displayFlag = flagcount;
         });
+        this.filterQuestionsAndAnswers = JSON.parse(JSON.stringify(this.questionsAndAnswerss));
     }
     handleAccordionSection() {
         if (this.accordionFlag === false) {
@@ -2118,6 +2119,7 @@ export default class Questionnaire extends LightningElement {
                 })
             })
         });
+        this.filterQuestionsAndAnswers = JSON.parse(JSON.stringify(this.questionsAndAnswerss));
     }
     /*This method is to update the AccountAssessmentStatus to In Review. And to display the flags in customer portal. */
     handleStartReview() {
