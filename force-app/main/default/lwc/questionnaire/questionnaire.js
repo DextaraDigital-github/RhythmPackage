@@ -484,7 +484,6 @@ export default class Questionnaire extends LightningElement {
         this.questions = [];
         let sectionSequenceMap = {};
         this.questionsAndAnswerss = [];
-        console.log('this.objectApiName', this.objectApiName);
         if (this.isTemplate) {
             this.isSupplier = false;
             if (this.objectApiName === 'Rhythm__AccountAssessmentRelation__c') {
@@ -831,20 +830,15 @@ export default class Questionnaire extends LightningElement {
                             });
                             this.loading = false;
                             this.filterQuestionsAndAnswers = JSON.parse(JSON.stringify(this.questionsAndAnswerss));
-                            console.log('this.questionsAndAnswers', this.questionsAndAnswerss);
 
                         }).catch(error => {
-
                             this.totastmessage = 'Error : ' + JSON.stringify(error);
                         });
                     }).catch(error => {
-
                     })
                 }).catch(error => {
-
                 })
             }).catch(error => {
-
             });
             this.showspinner = false;
         }
@@ -1088,7 +1082,6 @@ export default class Questionnaire extends LightningElement {
                 });
             });
             this.responseMap.set(this.questionresponseafterchange.questionId, this.questionresponseafterchange.option);
-            console.log('this.responseMap', this.responseMap);
             this.handleRequiredCheck();
             this.ishideToast = false;
             this.isAutoSave = true;
@@ -1099,7 +1092,6 @@ export default class Questionnaire extends LightningElement {
         }
     }
     handleRequiredCheck() {
-        console.log('this.questionsAndAnswerss', this.questionsAndAnswerss);
         this.requiredFilesLst = [];
         this.questionsAndAnswerss.forEach(questionAnswer => {
             questionAnswer.questions.forEach(question => {
@@ -2134,11 +2126,9 @@ export default class Questionnaire extends LightningElement {
             const selectedEvent = new CustomEvent('updatetimeline', {
                 detail: param
             });
-            console.log('HandleStart Review');
             this.dispatchEvent(selectedEvent);
             setTimeout(() => { this.handleOnload() }, 350);
         }).catch(error => {
-
         });
         this.showcustomerbuttons = true;
         this.showInReview = false;
