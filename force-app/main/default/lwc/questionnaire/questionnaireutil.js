@@ -27,15 +27,15 @@ export function constructMultilevelhierarchy(queryResults, savedResp, respAttr, 
     if (resQuestType.length > 0) {
         resQuestType.forEach(parentdata => {
             //if (!childQueslst.includes(parentdata.Id)) {
-            
+
             const hierarchyObj = temp.constructWrapperConditionalQuestion(parentdata, savedResp);
             responseValues = [];
-            respAttr.forEach(resp=>{
-                if(resp.Rhythm__QuestionId__c===hierarchyObj.Id){
+            respAttr.forEach(resp => {
+                if (resp.Rhythm__QuestionId__c === hierarchyObj.Id) {
                     responseValues.push(resp.Id);
                 }
             });
-            createChildHierarchy(children, hierarchyObj, savedResp, respAttr, temp,true);
+            createChildHierarchy(children, hierarchyObj, savedResp, respAttr, temp, true);
             temp.hierarchy.push(hierarchyObj);
             /*} else {
                 const hierarchyObj = temp.constructWrapperConditionalQuestion(parentdata, savedResp);
@@ -46,15 +46,16 @@ export function constructMultilevelhierarchy(queryResults, savedResp, respAttr, 
 
 }
 // createChildHierarchy method is used to construct nested questions wrapper for child questions accordingly with its parent Question 
-export function createChildHierarchy(queryResults, parentObj, savedResp, respAttr, thistemp,bool) {
+export function createChildHierarchy(queryResults, parentObj, savedResp, respAttr, thistemp, bool) {
     if (typeof thistemp !== 'undefined') {
         temp = thistemp;
     }
+    console.log('responseValues', responseValues);
     const child = queryResults.filter(result =>
         (result['Rhythm__Parent_Question__c'] === parentObj.Id));
     respAttr.forEach(resp => {
         if (parentObj.type === 'Checkbox' && parentObj.Id === resp.Rhythm__QuestionId__c) {
-            if (resp.Rhythm__Response_value__c === 'true' || resp.Rhythm__Response_value__c===true) {
+            if (resp.Rhythm__Response_value__c === 'true' || resp.Rhythm__Response_value__c === true) {
                 resp.Rhythm__Response_value__c = true;
             }
             else {
@@ -69,12 +70,12 @@ export function createChildHierarchy(queryResults, parentObj, savedResp, respAtt
             temp.parentQuestionList.push(parentObj.Id);
             if (childObj.type === 'Radio' || childObj.type === 'Picklist (Multi-Select)' || childObj.type === 'Checkbox' ||
                 childObj.type === 'Picklist') {
-                respAttr.forEach(resp=>{
-                if(resp.Rhythm__QuestionId__c===childObj.Id){
-                    responseValues.push(resp.Id);
-                }
-            });
-                createChildHierarchy(queryResults, childObj, savedResp, respAttr, thistemp,false);
+                respAttr.forEach(resp => {
+                    if (resp.Rhythm__QuestionId__c === childObj.Id) {
+                        responseValues.push(resp.Id);
+                    }
+                });
+                createChildHierarchy(queryResults, childObj, savedResp, respAttr, thistemp, false);
             }
             if (parentObj.type === 'Checkbox') {
                 if (childObj.conditional === 'true') {
@@ -90,7 +91,7 @@ export function createChildHierarchy(queryResults, parentObj, savedResp, respAtt
                 let childmp = {};
                 respAttr.forEach(resp => {
                     if (resp.Rhythm__Response_value__c === parentObj.value && resp.Rhythm__QuestionId__c === parentObj.Id &&
-                    responseValues.includes(resp.Id)) {
+                        responseValues.includes(resp.Id)) {
                         childmp.respAttrId = resp.Id;
                         childmp.uploadrequired = resp.Rhythm__Upload_Required__c;
                         childmp.ispreffered = resp.Rhythm__preferred_Not_preferred__c;
@@ -122,19 +123,6 @@ export function createChildHierarchy(queryResults, parentObj, savedResp, respAtt
                     }
                 }
                 else {
-                    let childmp = {};
-                    respAttr.forEach(resp => {
-                        if (resp.Rhythm__Response_value__c === childObj.conditional && resp.Rhythm__QuestionId__c === parentObj.Id
-                        && responseValues.includes(resp.Id)) {
-                            childmp.respAttrId = resp.Id;
-                            childmp.uploadrequired = resp.Rhythm__Upload_Required__c;
-                            childmp.ispreffered = resp.Rhythm__preferred_Not_preferred__c;
-                            childmp.score = resp.Rhythm__Score__c;
-                            childmp.weight = resp.Rhythm__Weight__c;
-                            let index = responseValues.indexOf(resp.Id);
-                            let del = responseValues.splice(index, 1);
-                        }
-                    });
                     childmp.isdisplay = true;
                     childmp.optionValue = childObj.conditional;
                     let lst = [];
@@ -152,6 +140,19 @@ export function createChildHierarchy(queryResults, parentObj, savedResp, respAtt
                 let bool = false;
                 let key = parentObj.question + '-' + parentObj.value;
                 temp.questionsvaluemap[key] = childObj;
+                let childmp = {};
+                respAttr.forEach(resp => {
+                    if (resp.Rhythm__Response_value__c === childObj.conditional && resp.Rhythm__QuestionId__c === parentObj.Id &&
+                        responseValues.includes(resp.Id)) {
+                        childmp.respAttrId = resp.Id;
+                        childmp.uploadrequired = resp.Rhythm__Upload_Required__c;
+                        childmp.ispreffered = resp.Rhythm__preferred_Not_preferred__c;
+                        childmp.score = resp.Rhythm__Score__c;
+                        childmp.weight = resp.Rhythm__Weight__c;
+                        let index = responseValues.indexOf(resp.Id);
+                        let del = responseValues.splice(index, 1);
+                    }
+                });
                 if (childlst.length > 0) {
                     childlst.forEach(lst => {
                         if (lst.optionValue === childObj.conditional) {
@@ -163,19 +164,6 @@ export function createChildHierarchy(queryResults, parentObj, savedResp, respAtt
                         parentObj.Children = childlst;
                     }
                     else {
-                        let childmp = {};
-                        respAttr.forEach(resp => {
-                            if (resp.Rhythm__Response_value__c === childObj.conditional && resp.Rhythm__QuestionId__c === parentObj.Id && 
-                            responseValues.includes(resp.Id)) {
-                                childmp.respAttrId = resp.Id;
-                                childmp.uploadrequired = resp.Rhythm__Upload_Required__c;
-                                childmp.ispreffered = resp.Rhythm__preferred_Not_preferred__c;
-                                childmp.score = resp.Rhythm__Score__c;
-                                childmp.weight = resp.Rhythm__Weight__c;
-                                let index = responseValues.indexOf(resp.Id);
-                                let del = responseValues.splice(index, 1);
-                            }
-                        });
                         childmp.isdisplay = displayval;
                         childmp.optionValue = childObj.conditional;
                         let lst = [];
@@ -185,19 +173,6 @@ export function createChildHierarchy(queryResults, parentObj, savedResp, respAtt
                     }
                 }
                 else {
-                    let childmp = {};
-                    respAttr.forEach(resp => {
-                        if (resp.Rhythm__Response_value__c === childObj.conditional && resp.Rhythm__QuestionId__c === parentObj.Id
-                        && responseValues.includes(resp.Id)) {
-                            childmp.respAttrId = resp.Id;
-                            childmp.uploadrequired = resp.Rhythm__Upload_Required__c;
-                            childmp.ispreffered = resp.Rhythm__preferred_Not_preferred__c;
-                            childmp.score = resp.Rhythm__Score__c;
-                            childmp.weight = resp.Rhythm__Weight__c;
-                            let index = responseValues.indexOf(resp.Id);
-                            let del =responseValues.splice(index,1);
-                        }
-                    });
                     childmp.isdisplay = displayval;
                     childmp.optionValue = childObj.conditional;
                     let lst = [];
@@ -207,17 +182,17 @@ export function createChildHierarchy(queryResults, parentObj, savedResp, respAtt
                 }
             }
         });
-        while(responseValues.length>0){
-            createChildHierarchy(queryResults,parentObj, savedResp, respAttr, thistemp  ,false);
+        while (responseValues.length > 0) {
+            createChildHierarchy(queryResults, parentObj, savedResp, respAttr, thistemp, false);
         }
     }
     else {
-        console.log('Into else',responseValues);
+        console.log('Into else', responseValues);
         let childlst = JSON.parse(JSON.stringify(parentObj.Children));
         respAttr.forEach(resp => {
             let childmp = {};
             if (resp.Rhythm__QuestionId__c === parentObj.Id && responseValues.includes(resp.Id)) {
-                console.log('resp',resp);
+                console.log('resp', resp);
                 childmp.respAttrId = resp.Id;
                 childmp.uploadrequired = resp.Rhythm__Upload_Required__c;
                 childmp.ispreffered = resp.Rhythm__preferred_Not_preferred__c;
@@ -228,24 +203,27 @@ export function createChildHierarchy(queryResults, parentObj, savedResp, respAtt
                 childmp.questions = [];
                 childlst.push(childmp);
                 let index = responseValues.indexOf(resp.Id);
-                let del =responseValues.splice(index,1);
+                let del = responseValues.splice(index, 1);
             }
         });
         parentObj.Children = childlst;
     }
 }
 
-export function handleOnloadUtil(thistemp,tempchatterData){
+export function handleOnloadUtil(thistemp, tempchatterData) {
     if (typeof thistemp !== 'undefined') {
         temp = thistemp;
     }
-     //This loop is to iterate over the sections in the wrapper.
-        this.questionsAndAnswerss.forEach(questionAnswer => {
+    //This loop is to iterate over the sections in the wrapper.
+   /* this.questionsAndAnswerss.forEach(questionAnswer => {
             questionAnswer.questions.forEach(question => {
                 if (question.Id === tempchatterData.questionId) {
                     question.Rhythm__Conversation_History__c = tempchatterData.conversationHistory;
                     if (JSON.parse(tempchatterData.conversationHistory).length > 0) {
                         question.chatColour = true;
+                        if (typeof tempchatterData.flagResponse !== 'undefined') {
+                            question.Rhythm__Flag__c = tempchatterData.flagResponse;
+                        }
                     }
                 }
                 question.Children.forEach(subQuestion => {
@@ -254,10 +232,13 @@ export function handleOnloadUtil(thistemp,tempchatterData){
                             ques.Rhythm__Conversation_History__c = tempchatterData.conversationHistory;
                             if (JSON.parse(tempchatterData.conversationHistory).length > 0) {
                                 ques.chatColour = true;
+                                if (typeof tempchatterData.flagResponse !== 'undefined') {
+                            ques.Rhythm__Flag__c = tempchatterData.flagResponse;
+                        }
                             }
                         }
                     })
                 })
             })
-        });
+        });*/
 }

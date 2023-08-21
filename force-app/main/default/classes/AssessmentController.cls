@@ -562,8 +562,11 @@ public with sharing class AssessmentController {
             }
             if(!responseRecords.isEmpty()){
                 responseRecords[0].put('Conversation_History__c',JSON.serialize(chatMap.get('responseList')));
+                responseRecords[0].put('Flag__c',true);
                 Database.SaveResult[] saveResult = safe.doUpdate(responseRecords);
                 List<String> errorList = SecurityCheckController.safeClassExceptionHandlerInsert(saveResult);
+                responseData.put('questionId',(String)chatMap.get('questionId'));
+                responseData.put('responseId',responseRecords[0].Id);
                 if(errorList.size()>0){
                     Database.rollback(sp);
                     throw new SecurityControllerException(String.join( errorList, ', ' ));
@@ -574,6 +577,7 @@ public with sharing class AssessmentController {
                 response.Conversation_History__c = JSON.serialize(chatMap.get('responseList'));
                 response.AccountAssessmentRelation__c=(String)chatMap.get('accountassessmentId');
                 response.Is_Latest_Response__c = true;
+                response.Flag__c=true;
                 List<Response__c> responseList = new List<Response__c>();
                 responseList.add(response);
                 Database.SaveResult[] results = safe.doInsert(responseList);
