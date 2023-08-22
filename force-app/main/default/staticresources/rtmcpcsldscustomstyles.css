@@ -145,6 +145,37 @@
 	*::-webkit-scrollbar-track { background:var(--sb-track); z-index:8; font-size:var(--fs-0); line-height:0; border-radius:5px; }
 	*::-webkit-scrollbar-thumb { background:var(--sb-thumb); border-radius:5px; border:1px solid var(--sb-thumbbdr); z-index:9; font-size:var(--fs-0); line-height:0; height:8px; }
 	
+    .rtmvpc { width:calc(100vw - 0px); height:calc(100vh - 0px);  overflow-x:hidden; overflow-y:auto; }
+	section.layoutContent .rtmvpc { width:calc(100vw - 0px); height:calc(100vh - 85px); background:var(--bg-section-rtmvpc); overflow-x:hidden; overflow-y:auto; margin:-11px; }
+	a, a:visited { color:var(--link-primary-n); }
+	a:hover, a:active, a:focus { color:var(--link-primary-h); }
+	.slds-button--brand, .slds-button_brand, .comm-login-form__login-button { background:var(--pbtn-bg)!important; border-color:var(--pbtn-bdr)!important; }
+	.slds-button--brand:active, .slds-button_brand:active, .slds-button--brand:focus, .slds-button_brand:focus, .slds-button--brand:hover, .slds-button_brand:hover, .slds-button--brand:visited, .slds-button_brand:visited,
+	.comm-login-form__login-button:active, .comm-login-form__login-button:active, .comm-login-form__login-button:focus, .comm-login-form__login-button:focus, .comm-login-form__login-button:hover, .comm-login-form__login-button:hover, .comm-login-form__login-button:visited, .comm-login-form__login-button:visited 
+	{ background:var(--pbtn-bgh)!important; border-color:var(--pbtn-bdrh)!important; }
+	
+	.slds-button--neutral, .slds-button_neutral { color:var(--dbtn-ico); background:var(--dbtn-bg); border:0px solid var(--dbtn-bdr); }
+	.slds-button--neutral:active, .slds-button_neutral:active, .slds-button--neutral:focus, .slds-button_neutral:focus, .slds-button--neutral:hover, .slds-button_neutral:hover, .slds-button--neutral:visited, .slds-button_neutral:visited { color:var(--dbtn-icoh); background:var(--dbtn-bgh); border:1px solid var(--dbtn-bdrh); }
+	.slds-button--neutral:disabled, .slds-button--neutral[disabled], .slds-button_neutral:disabled, .slds-button_neutral[disabled] { background:var(--dbtn-bgh); }
+	
+	.slds-button--icon-border, .slds-button--icon-border-filled, .slds-button_icon-border, .slds-button_icon-border-filled { color:var(--dbtn-ico); background:var(--dbtn-bg); border:1px solid var(--dbtn-bdr); }
+	.slds-button--icon-border:hover, .slds-button--icon-border-filled:hover, .slds-button_icon-border:hover, .slds-button_icon-border-filled:hover { color:var(--dbtn-icoh); background:var(--dbtn-bgh); border:1px solid var(--dbtn-bdrh); }
+	.slds-button--icon-border .slds-button__icon, .slds-button--icon-border-filled .slds-button__icon, .slds-button_icon-border .slds-button__icon, .slds-button_icon-border-filled .slds-button__icon{ fill:var(--dbtn-ico); }
+	.slds-button--icon-border:hover .slds-button__icon, .slds-button--icon-border-filled:hover .slds-button__icon, .slds-button_icon-border:hover .slds-button__icon, .slds-button_icon-border-filled:hover .slds-button__icon { fill:var(--dbtn-icoh); }
+
+	.slds-button--icon-more, .slds-button_icon-more { color:var(--dbtn-ico); }
+	.slds-button--icon-more:active, .slds-button_icon-more:active, .slds-button--icon-more:focus,
+	.slds-button_icon-more:focus, .slds-button--icon-more:hover, .slds-button_icon-more:hover,
+	.slds-button--icon-more:visited, .slds-button_icon-more:visited { color:var(--dbtn-icoh); background:var(--dbtn-bgh); border:1px solid var(--dbtn-bdrh); }
+	.slds-button--icon-more:active .slds-button__icon, .slds-button_icon-more:active .slds-button__icon,
+	.slds-button--icon-more:focus .slds-button__icon, .slds-button_icon-more:focus .slds-button__icon, 
+	.slds-button--icon-more:hover .slds-button__icon, .slds-button_icon-more:hover .slds-button__icon, 
+	.slds-button--icon-more:visited .slds-button__icon, .slds-button_icon-more:visited .slds-button__icon { color:var(--dbtn-icoh); }
+	.slds-button--icon-more:focus .slds-button__icon, .slds-button--icon-more:hover .slds-button__icon, .slds-button_icon-more:focus .slds-button__icon, .slds-button_icon-more:hover .slds-button__icon { fill:var(--dbtn-icoh); }
+	
+	.slds-icon-standard-budget { background:var(--sbtn-bg); }
+	.slds-brand-band, .slds-brand-band:before, .slds-brand-band:after { background-image:none; background:#F5EDF5; }
+                                
 	.slds-utility-bar li.slds-utility-bar__item:first-child {display:none;}
 	.utility-bar--right .utilitybar { height:18px; }
 	.utility-bar--right .utilitybar:after { content:'(C) 2023 Rhythm Innovations. All Rights Reserved.'; position:absolute; right: 15px; bottom:1px; font-size:12px; }

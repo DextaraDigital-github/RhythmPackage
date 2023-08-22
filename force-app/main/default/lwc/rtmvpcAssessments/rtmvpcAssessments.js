@@ -54,6 +54,10 @@ export default class RtmvpcAssessments extends NavigationMixin(LightningElement)
         this.show.survey = false;
         this.show.grid = true;
     }
+    handleurl(event){
+         this.show.survey = false;
+        this.show.grid = true;
+    }
 
     /* fetchingRecords is used to get accountAssessment data based on the account Id and URL navigation */
     fetchingRecords(refreshData) {
