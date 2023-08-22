@@ -70,7 +70,7 @@ text-align: left;
 .cad-sec_vcontainer2bdr { display:block; width:100%; position:absolute; height:calc(100% - 150px); margin:35px 0px 114px; overflow-y:auto; background:var(--bg-primary-color1); border:1px solid var(--cibcadcdg-bdr-color); border-bottom:0px; }
 .cad-sec_vcontainer2_1 { display:block; width:100%; position:absolute; height:calc(100% - 1px); margin:0px 0px 0px; overflow-y:auto; }
 .cad-sec_vcontainer2_2 { display:block; width:100%; position:absolute; height:calc(100% - 0px); margin:0px 0px 0px; overflow-y:auto; }
-.cad-sec_vcontainer3 { display:block; width:100%; position:absolute; bottom:0px; height:114px; background:rgba(0,0,0,0.05); border:1px solid var(--cibcadcdg-bdr-color);}
+.cad-sec_vcontainer3 { display:block; width:100%; position:absolute; bottom:0px; height:110px; background:rgba(0,0,0,0.05); border-top:1px solid var(--cibcadcdg-bdr-color);}
 .cad-top_menu_container{display:none; height:30px; background:#b5bec5;}
 .cad-top_back_container {display:none; background:#b5bec5;}
 .cad-type .cad-sec_header .cad_actions { display:inline-block; }
