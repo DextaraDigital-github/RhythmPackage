@@ -212,14 +212,23 @@
 														</lightning-button-icon>
 													</template>
 													<template if:true={questionary.chatColour}>
-														<lightning-button-icon variant="brand" label="Review & Comments"
+
+														<button class="slds-button slds-button_icon slds-button_icon-border-filled slds-m-left_koushik slds-is-relative" style="background-color: rgb(1, 118, 211); --sds-c-icon-color-foreground-default: rgb(255 255 255); " 
+															label="Review & Comments" alternative-text="Review & Comments" title="Review & Comments"
+															data-id={questionary.Id} onclick={handleQuestionHighlight} data-disable={questionary.isEditable}
+															data-response={questionary.ResponseId}
+															data-showupload={questionary.showUpload} >
+														<lightning-icon icon-name="utility:comments" size="xx-small" ></lightning-icon>
+														<span class="slds-assistive-text">Close</span>
+														</button>
+														<!-- <lightning-button-icon variant="brand" label="Review & Comments"
 															title="Review & Comments" data-id={questionary.Id}
 															icon-name="utility:comments"
 															onclick={handleQuestionHighlight}
 															data-disable={questionary.isEditable}
 															data-response={questionary.ResponseId}
 															data-showupload={questionary.showUpload}>
-														</lightning-button-icon>
+														</lightning-button-icon> -->
 													</template>
 												</template>
 
@@ -232,17 +241,20 @@
 										</div> -->
 
 												<template if:true={issupplier}>
-													<template if:true={questionary.capaAction}>
+													<template if:true={questionary.capaAction}>	
 														<template if:true={questionary.saveActionForm}>
-															<lightning-button-icon data-id={questionary.Id}
+															<button class="slds-button slds-button_icon slds-button_icon-border-filled slds-m-left_koushik slds-is-relative" style="background-color: rgb(1, 118, 211); --sds-c-icon-color-foreground-default: rgb(255 255 255); " 
+															label="CAPA" alternative-text="CAPA" title="CAPA"
+																data-id={questionary.Id} onclick={openActionForm}>
+																<lightning-icon icon-name="utility:edit_form" size="xx-small" ></lightning-icon>
+																<span class="slds-assistive-text">Close</span>
+														</button>
+															<!-- <lightning-button-icon data-id={questionary.Id}
 																icon-name="utility:edit_form" label="CAPA"
 																alternative-text="CAPA" title="CAPA"
 																class="slds-m-left_koushik slds-is-relative"
 																onclick={openActionForm} variant="brand">
-															</lightning-button-icon>
-															<!-- <lightning-icon data-id={questionary.Id} icon-name="utility:record_alt"
-															size="x-small" onclick={openActionForm}>
-														</lightning-icon> -->
+															</lightning-button-icon> -->
 														</template></template>
 												</template>
 												<template if:false={issupplier}>
@@ -282,7 +294,7 @@
 												<template if:true={issupplier}>
 													<template if:true={questionary.customerFlag}>
 														<template if:true={questionary.rejectButton}>
-															<button class="slds-button slds-button_icon slds-button_icon-border-filled" style="cursor:no-drop; background: rgb(251 129 129);" 
+															<button class="slds-button slds-button_icon slds-button_icon-border-filled" style="cursor:no-drop; background: rgb(251 129 129); --sds-c-icon-color-foreground-default: rgb(213 195 195);" 
 															data-label="Rejected" title="Rejected"
 																data-id={questionary.Id}>
 																<lightning-icon icon-name="utility:close" size="xx-small"></lightning-icon>
@@ -453,9 +465,14 @@
 						<template if:true={issupplier}>
 							<template if:true={questionary.capaAction}>
 								<template if:true={questionary.saveActionForm}>
-									<lightning-button data-id={questionary.Id} icon-name="utility:edit_form"
+									<button class="slds-button slds-button_icon slds-button_icon-border-filled slds-m-left_small" 
+									data-id={questionary.Id} label="CAPA" alternative-text="CAPA" title="CAPA" onclick={openActionForm}>
+										<lightning-icon icon-name="utility:edit_form" size="xx-small" style="background-color: rgb(1, 118, 211);"></lightning-icon>
+									<span class="slds-assistive-text">Close</span>
+									</button>
+									<!-- <lightning-button data-id={questionary.Id} icon-name="utility:edit_form"
 										label="CAPA" alternative-text="CAPA" title="CAPA" class="slds-m-left_small"
-										onclick={openActionForm} variant="brand"></lightning-button>
+										onclick={openActionForm} variant="brand" style="background-color: rgb(1, 118, 211);"></lightning-button> -->
 									<!-- <lightning-icon data-id={questionary.Id} icon-name="utility:record_alt"
 										size="x-small" onclick={openActionForm}>
 									</lightning-icon> -->
