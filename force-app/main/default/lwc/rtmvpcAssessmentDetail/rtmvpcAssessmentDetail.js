@@ -10,13 +10,13 @@ import getAccountAssessmentRecordData from '@salesforce/apex/AssessmentControlle
 import getUserName from '@salesforce/apex/AssessmentController.getUserName';
 import getPdfContent from '@salesforce/apex/AssessmentController.getPdfContent';
 import errorLogRecord from '@salesforce/apex/AssessmentController.errorLogRecord';
+import { NavigationMixin } from 'lightning/navigation';
 import getQuestionsList from '@salesforce/apex/AssessmentController.getQuestionsList'; //To fetch all the Questions from the Assessment_Template__c Id from the Supplier_Assessment__c record
 import getSupplierResponseList from '@salesforce/apex/AssessmentController.getSupplierResponseList'; //To fetch all the Supplier_Response__c records related to the Supplier_Assessment__c record
 import getSupplierAssessmentList from '@salesforce/apex/AssessmentController.getSupplierAssessmentList'; //To fetch the Assessment_Template__c Id from the Supplier_Assessment__c record
-import { NavigationMixin } from 'lightning/navigation';
 
 const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-export default class RtmvpcAssessmentDetail extends NavigationMixin(LightningElement)  {
+export default class RtmvpcAssessmentDetail extends NavigationMixin(LightningElement) {
     @track sectionid;
     @api accountid;
     @api assessmentid;
@@ -65,8 +65,8 @@ export default class RtmvpcAssessmentDetail extends NavigationMixin(LightningEle
     @track showUpload = false;
     @track isdisabled = false;
     @track openRightFile = false;
+    @track assessmentId;
     @track showBack=false;
-    assessmentId;
 
     connectedCallback() {
         this.customerId = this.recordId;
@@ -77,6 +77,7 @@ export default class RtmvpcAssessmentDetail extends NavigationMixin(LightningEle
         }
         if(typeof this.recordId!=='undefined'){
             this.accountassessmentid  = this.recordId;
+            this.showBack=true;
         }
         console.log('detaileddata------>', this.detaileddata);
         console.log('assaccId------>', this.assaccId);
@@ -86,6 +87,17 @@ export default class RtmvpcAssessmentDetail extends NavigationMixin(LightningEle
     }
     handleDeleteIcon(event) {
         this.template.querySelectorAll('c-Questionnaire')[0].removeDeleteButton(event.detail);
+    }
+    handleBackButton(){
+         this[NavigationMixin.Navigate]({
+            type: 'standard__recordPage',
+            attributes: {
+                recordId:this.assessmentId ,
+                objectApiName: 'Rhythm__Assessment__c',
+                actionName: 'view'
+            },
+        });
+
     }
 
     handleAccordian(event) {
@@ -120,7 +132,7 @@ export default class RtmvpcAssessmentDetail extends NavigationMixin(LightningEle
                     this.assessmentTimeline = [];
                     if (this.isRecordPage) {
                         this.assessid = asmtResult[0].Rhythm__Assessment__r.Id;
-                        this.assessmentId=asmtResult[0].Rhythm__Assessment__r.Id;
+                         this.assessmentId=asmtResult[0].Rhythm__Assessment__r.Id;
                     } else {
                         this.assesstid = this.accountassessmentid;
                     }
@@ -616,15 +628,4 @@ export default class RtmvpcAssessmentDetail extends NavigationMixin(LightningEle
 
         });
     }
-
-    handleBackButton(){
-        this[NavigationMixin.Navigate]({
-           type: 'standard__recordPage',
-           attributes: {
-               recordId:this.assessmentId ,
-               objectApiName: 'Rhythm__Assessment__c',
-               actionName: 'view'
-           },
-       });
-   }
 }
