@@ -247,8 +247,6 @@
         <field>Account.ShippingAddress</field>
         <readable>true</readable>
     </fieldPermissions>
-    
-    
     <fieldPermissions>
         <editable>true</editable>
         <field>Account.State__c</field>
@@ -259,13 +257,11 @@
         <field>Account.Supplier_Settings__c</field>
         <readable>true</readable>
     </fieldPermissions>
-    
     <fieldPermissions>
         <editable>true</editable>
         <field>Account.Trading_Name__c</field>
         <readable>true</readable>
     </fieldPermissions>
-    
     <fieldPermissions>
         <editable>true</editable>
         <field>Account.Zipcode__c</field>
@@ -641,7 +637,6 @@
         <field>Contact.City__c</field>
         <readable>true</readable>
     </fieldPermissions>
-    
     <fieldPermissions>
         <editable>true</editable>
         <field>Contact.Country__c</field>
@@ -657,7 +652,6 @@
         <field>Contact.Description</field>
         <readable>true</readable>
     </fieldPermissions>
-    
     <fieldPermissions>
         <editable>true</editable>
         <field>Contact.Email</field>
@@ -668,8 +662,6 @@
         <field>Contact.Fax</field>
         <readable>true</readable>
     </fieldPermissions>
-   
-    
     <fieldPermissions>
         <editable>true</editable>
         <field>Contact.MailingAddress</field>
@@ -917,12 +909,12 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>Response__c.Rejected__c</field>
+        <field>Response__c.Reject__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>Response__c.Reject__c</field>
+        <field>Response__c.Rejected__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -1119,6 +1111,10 @@
         <recordType>Account.Supplier</recordType>
         <visible>true</visible>
     </recordTypeVisibilities>
+    <tabSettings>
+        <tab>Action__c</tab>
+        <visibility>Visible</visibility>
+    </tabSettings>
     <tabSettings>
         <tab>Assessment_Template__c</tab>
         <visibility>Visible</visibility>
