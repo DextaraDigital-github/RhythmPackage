@@ -435,7 +435,7 @@ export default class RtmvpcAssessmentDetail extends NavigationMixin(LightningEle
         this.openRightFile = false;
         setTimeout(() => {
             this.template.querySelectorAll('c-action')[0].displayForm(this.actionData);
-        }, 500);
+        }, 800);
 
     }
     handleFileData(event) {

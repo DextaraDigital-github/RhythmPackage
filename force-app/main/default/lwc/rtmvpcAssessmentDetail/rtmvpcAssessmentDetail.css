@@ -114,11 +114,11 @@
 	.cad-pl8 { padding-left:0px;}  
     .cad-pr8 { padding-right:0px;} 
 	.cad-type{ display:block; position:absolute; left:-300px; height:100%; }
-    .cad-type.cadshowleft{ display:block; position:absolute; left:0px; z-index:9; height:100%; }
+    .cad-type.cadshowleft{ display:block; position:absolute; left:0px; z-index:7; height:100%; }
     .cad-cel { display:inline-block;}
     .cad-list{ display:block; position:relative; width:100%; height:100%; }
-    .cad-disc{ display:block; position:absolute; right:0px; top:0; width:300px; height:100%; z-index:10;}
-    .cad-disc.cadshowright {display:block; position:absolute; right:-320px; top:0; width:300px; height:100%; z-index:10; }
+    .cad-disc{ display:block; position:absolute; right:0px; top:0; width:300px; height:100%; z-index:8;}
+    .cad-disc.cadshowright {display:block; position:absolute; right:-320px; top:0; width:300px; height:100%; z-index:8; }
     .cad-top_back_container {display:block; height:30px;}
     .cad-tophead-details { border-bottom:0px solid rgba(0,0,0,0.2); margin-bottom:0px; }
     .cad-sec_vcontainer1 { display:block; position:relative; z-index:2; top:0px; height:63px; }
@@ -136,10 +136,10 @@
 	.cad-pl8 { padding-left:0px;}
     .cad-pr8 { padding-right:0px;} 
     .cad-type{ display:block; position:absolute; left:-300px; height:100%; }
-    .cad-type.cadshowleft{ display:block; position:absolute; left:0px; z-index:9; height:100%; }
+    .cad-type.cadshowleft{ display:block; position:absolute; left:0px; z-index:7; height:100%; }
     .cad-list{ display:block; position:relative; width:100%; height:100%; }
-    .cad-disc{ display:block; position:absolute; right:0px; top:0; width:100%; height:100%; z-index:10;}
-    .cad-disc.cadshowright {display:block; position:absolute; right:-115%; top:0; width:100%; height:100%; z-index:10; }
+    .cad-disc{ display:block; position:absolute; right:0px; top:0; width:100%; height:100%; z-index:8;}
+    .cad-disc.cadshowright {display:block; position:absolute; right:-115%; top:0; width:100%; height:100%; z-index:8; }
     .cad-top_menu_container{display:block; height:30px;}
     .cad-sec_bodyfull2 {height:calc(100% - 95px);}
     .cad-tophead-details { border-bottom:0px solid rgba(0,0,0,0.2); margin-bottom:0px; }
