@@ -2,7 +2,6 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Status__c</fullName>
     <defaultValue>&apos;Not Started&apos;</defaultValue>
-    <deprecated>false</deprecated>
     <externalId>false</externalId>
     <label>Status</label>
     <required>false</required>
@@ -29,11 +28,6 @@
                 <label>In Review</label>
             </value>
             <value>
-                <fullName>Accepted</fullName>
-                <default>false</default>
-                <label>Accepted</label>
-            </value>
-            <value>
                 <fullName>Need More Information</fullName>
                 <default>false</default>
                 <label>Need More Information</label>
@@ -52,6 +46,12 @@
                 <fullName>Cancel</fullName>
                 <default>false</default>
                 <label>Cancel</label>
+            </value>
+            <value>
+                <fullName>Accepted</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Accepted</label>
             </value>
             <value>
                 <fullName>Not Started</fullName>

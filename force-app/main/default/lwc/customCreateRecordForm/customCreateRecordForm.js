@@ -84,7 +84,7 @@ export default class CustomRecordForm extends LightningElement {
               this.dispatchEvent(
                 new ShowToastEvent({
                   title: 'Success',
-                  message: 'successfully created',
+                  message: 'Successfully Created',
                   variant: 'success',
                 }),
               );
@@ -116,7 +116,7 @@ export default class CustomRecordForm extends LightningElement {
             this.dispatchEvent(
               new ShowToastEvent({
                 title: 'Success',
-                message: 'successfully updated',
+                message: 'Successfully Updated',
                 variant: 'success',
               }),
             );
@@ -125,7 +125,7 @@ export default class CustomRecordForm extends LightningElement {
             this.dispatchEvent(
               new ShowToastEvent({
                 title: 'Success',
-                message: 'successfully created',
+                message: 'Successfully Created',
                 variant: 'success',
               }),
             );
