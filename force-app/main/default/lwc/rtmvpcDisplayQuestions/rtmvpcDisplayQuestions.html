@@ -1,28 +1,45 @@
 <template>
 	<div class="slds-card" style="border: 1px solid rgb(201, 201, 201)">
 		<div class="rdm-grey-bg slds-card__header slds-grid slds-m-bottom_none">
-			<header class="slds-media slds-media_center slds-has-flexi-truncate slds-p-around_medium">
-				<div class="slds-media__figure">
-					<lightning-icon icon-name="custom:custom61" size="small"></lightning-icon>
-				</div>
-				<div class="slds-media__body">
-					<h2 class="slds-card__header-title">
-						<a href="#" class="slds-card__header-link slds-truncate" title="Accounts">
-							<span>Questions</span>
-						</a>
-					</h2>
-				</div>
-				<div class="slds-no-flex">
-					<template if:true={tempStatus}>
-						<lightning-button-group>
-							<lightning-button variant="brand" label="New Question" icon-name="utility:add" title="New"
-								onclick={handleNewClick}></lightning-button>
-							<template lwc:if={show.childReorderBtn}>
-								<lightning-button label="Reorder Conditional Questions" onclick={cQuesReorderHandler}>
-								</lightning-button>
-							</template>
-						</lightning-button-group>
-					</template>
+
+
+
+			<header class="slds-has-flexi-truncate ">
+
+				<div class="cdgtitletoolbar slds-grid slds-wrap">
+					<div class="slds-col slds-small-size_12-of-12 slds-medium-size_6-of-12 slds-large-size_6-of-12">
+
+						<div class="slds-grid slds-wrap">
+							<div class="slds-text-left">
+								<lightning-icon icon-name="standard:question_feed" size="small" title="">
+								</lightning-icon>
+							</div>
+							<div class="slds-text-left slds-col_bump-right slds-p-left_small">
+								<h4 style="min-width:fit-content;font-weight: bold;font-size: large;">
+									<p>Questions</p>
+								</h4>
+							</div>
+						</div>
+					</div>
+					<div class="slds-col slds-small-size_12-of-12 slds-medium-size_6-of-12 slds-large-size_6-of-12">
+						<div class="slds-grid slds-wrap slds-gutters_small">
+							<div class="slds-col slds-text-align_right slds-size_1-of-1 ">
+								<template if:true={tempStatus}>
+
+
+									<template lwc:if={show.childReorderBtn}>
+										<lightning-button style="font-size: small;color: white;"
+											label="Reorder Conditional Questions" onclick={cQuesReorderHandler}>
+										</lightning-button>
+									</template>
+									<lightning-button style="font-size: small;color: white;" label="New"
+										title="New Question" onclick={handleNewClick} class="slds-p-left_xxx-small">
+									</lightning-button>
+
+								</template>
+							</div>
+						</div>
+					</div>
 				</div>
 			</header>
 		</div>
@@ -36,6 +53,7 @@
 					</lightning-tree-grid>
 				</div>
 			</template>
+			
 			<template if:true={viewQuestions}>
 				<c-rtmvpc-question-creation onhandleaftersave={handlesave} onhandlecancel={handleCancel}
 					template-id={tempId} question-id={questionId} section-name={sectionName} tempstatus={tempStatus}>

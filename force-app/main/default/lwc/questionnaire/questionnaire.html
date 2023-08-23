@@ -29,8 +29,8 @@
 					</div>
 					<!-- Displays button and picklist for navigations --END-->
 
-					<div class="slds-grid slds-grid_align-end slds-grid_vetical-align-end slds-m-bottom_xx-small"
-						style="width:100%">
+					<div class="slds-grid slds-grid_align-end slds-grid_vetical-align-end cad-btn_bck1"
+						style="float:right;">
 
 						<template if:true={showRefreshbutton}>
 							<template if:true={isTemplate}>
@@ -52,32 +52,23 @@
 					<template if:true={isTemplate}>
 						<div>
 							<template if:true={showFiles}>
-								<lightning-layout multiple-rows="true">
+								<div class="slds-grid slds-wrap slds-p-vertical_x-small">
 									<template for:each={keyList} for:item="item" for:index="index">
-										<lightning-layout-item size={layoutItemSize} key={item.key}>
-											<table style="table-layout: fixed;">
-												<tr hidden>
-													<td>
-													</td>
-													<td>
-													</td>
-												</tr>
-												<tr>
-													<td width="10px">
-														<lightning-icon data-id={item.key} onclick={handleDownload}
-															title={item.url} icon-name={item.icon}
-															alternative-text="File" size="xx-small"
-															class="slds-p-around_x-small">
-														</lightning-icon>
-													</td>
-													<td width="90px">
-														{item.value}
-													</td>
-												</tr>
-											</table>
-										</lightning-layout-item>
+										<div class="slds-col slds-small-size_10-of-12 slds-medium-size_6-of-12 slds-large-size_4-of-12" style="overflow:auto;" key={item.key}>
+											<div class="slds-grid slds-wrap slds-p-top_x-small slds-grid_vertical-align-center" title={item.value}>
+												<div class="" style="width:30px; display:inline-block">
+													<lightning-icon data-id={item.key} onclick={handleDownload}
+														title={item.url} icon-name={item.icon} alternative-text="File"
+														size="xx-small" class="slds-p-around_xx-small">
+													</lightning-icon>
+												</div>
+												<div class="" style="width:calc(100% - 35px); display:inline-block">
+													<div class="slds-truncate">{item.value}</div>													
+												</div>
+											</div>
+										</div>
 									</template>
-								</lightning-layout>
+								</div>
 							</template>
 						</div>
 					</template>
@@ -151,7 +142,8 @@
 
 							<template for:each={questionsAndAnswerss} for:item="questionaryEntry">
 								<li class="slds-accordion__list-item" key={questionaryEntry.section}>
-									<section class={questionaryEntry.sectionAccordian} data-accordian={questionaryEntry.sectionId}>
+									<section class={questionaryEntry.sectionAccordian}
+										data-accordian={questionaryEntry.sectionId}>
 
 										<div class="slds-accordion__summary">
 											<h2 class="slds-accordion__summary-heading">

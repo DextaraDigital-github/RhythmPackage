@@ -8,7 +8,7 @@ import getTemplateRecord from '@salesforce/apex/QuestionController.getTemplateRe
 import errorLogRecord from '@salesforce/apex/AssessmentController.errorLogRecord';
 
 const columns = [
-    { label: 'Section', fieldName: 'Rhythm__SectionName__c', type: "text" },
+    { label: 'Section', fieldName: 'Rhythm__SectionName__c', type: "text",  initialWidth:250 },
     {
         label: 'Question Number', type: "button", typeAttributes: {
             label: { fieldName: 'Name' },
