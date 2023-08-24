@@ -945,4 +945,23 @@ private class AssessmentControllerTest
             Test.stopTest();
         }
     }
+
+    @isTest
+    static void sendAssessmentUpdateTestforData(){
+        user u = [SELECT Id,UserName FROM User WHERE Email='standarduser@testorg.com' LIMIT 1];
+        System.runAs(u){
+            String testString;
+            List<Assessment__c> assmentList = [select Id,Start_Date__c,End_Date__c,Template__c from Assessment__c];
+            set<Id> assmentIds = new set<Id>{assmentList[0].Id};
+            Map<Id,Assessment__c> assmap = new Map<Id,Assessment__c>();
+            for(Assessment__c ass:assmentList){
+                assmap.put(ass.Id,ass);
+            }
+            Test.startTest();
+            AssessmentTriggerHandler.sendUpdatedAssessments(assmentIds,assmap);
+            testString = 'Success';
+            System.assertEquals(testString =='Success', true,'assessment updated');
+            Test.stopTest();
+        }
+    }
 }

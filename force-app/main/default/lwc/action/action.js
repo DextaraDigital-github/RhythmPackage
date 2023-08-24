@@ -402,7 +402,6 @@ export default class Action extends LightningElement {
     getActionResponse({ actionResponse: response[0] }).then((result) => {
       if (typeof result != 'undefined' && result.length > 0) {
         
-        console.log('samp', result);
         this.resultdata = result[0];
         this.showUpdate = true;
         this.showCustom = true;
@@ -437,6 +436,7 @@ export default class Action extends LightningElement {
             let keydata = res.key;
             
              res.onLoadValue = result[0][keydata];
+             console.log('keydata',keydata,result[0][keydata]);
             if (res.onLoadValue === 'Open' || res.onLoadValue === 'Closed') {
               if (res.onLoadValue === 'Closed') {
                 this.isSave = true;
@@ -446,7 +446,6 @@ export default class Action extends LightningElement {
               res.options = JSON.parse(JSON.stringify(this.optionsData));
               }
             }
-            console.log('Koushik');
             if (res.onLoadValue === 'Expired') {
               let optionMap = {};
               optionMap.label = 'Expired';
@@ -573,7 +572,6 @@ export default class Action extends LightningElement {
     this.saveActionResponse[name] = changedData;
     this.showresponse = [];
     this.showresponse.push(this.saveActionResponse);
-    console.log('changeddata', changedData);
     if (name === 'Rhythm__Status__c') {
       this.onloadPicklist.forEach(res => {
         console.log('res.options');
