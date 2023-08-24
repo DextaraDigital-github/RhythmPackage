@@ -222,38 +222,44 @@ export default class AWSS3FileOperations extends LightningElement {
         });
     }
 
+    handleUploadFiles() {
+        filesUpload({
+            recId: this.recordId, objectName: this.objectApiName, pathRecId: null, deleteFlag: true, userId: this.userId
+        }).then(result => {
+            if (result) {
+                this.renderFlag = true;
+                this.showToastMessage('Uploaded', 'Uploaded Successfully', 'success');
+            }
+            else {
+                this.showToastMessage('Exceeded File Limit', 'The maximum file size you can upload is 10 MB', 'error');
+            }
+        })
+            .catch(error => {
+                window.console.log(error);
+            });
+    }
 
     //Upload files to AWS after uploaded successfully to salesforce
     handleUploadFinished() {
-        getTemplateDetails({ templateId: this.recordId })
-            .then(result => {
-                this.disableFlag = result;
-                if (result === true) {
-                    this.heightStyle = 'height:387px;';
-                    deleteContentDocument({ recordId: this.recordId })
-                        .then(result => {
-                            this.showToastMessage('Error', 'Template status is changed to active, further changes cannot be made to it.', 'error');
-                        });
-                }
-                else {
-                    filesUpload({
-                        recId: this.recordId, objectName: this.objectApiName, pathRecId: null, deleteFlag: true, userId: this.userId
-                    }).then(result => {
-                        if (result) {
-                            this.renderFlag = true;
-                            this.showToastMessage('Uploaded', 'Uploaded Successfully', 'success');
-                        }
-                        else {
-                            this.showToastMessage('Exceeded File Limit', 'The maximum file size you can upload is 10 MB', 'error');
-                        }
-                    })
-                        .catch(error => {
-                            window.console.log(error);
-                        });
-                }
-
-            });
-
+        if (this.objectApiName === 'Rhythm__Assessment_Template__c') {
+            getTemplateDetails({ templateId: this.recordId })
+                .then(result => {
+                    this.disableFlag = result;
+                    if (result === true) {
+                        this.heightStyle = 'height:387px;';
+                        deleteContentDocument({ recordId: this.recordId })
+                            .then(result => {
+                                this.showToastMessage('Error', 'Template status is changed to active, further changes cannot be made to it.', 'error');
+                            });
+                    }
+                    else {
+                        this.handleUploadFiles();
+                    }
+                });
+        }
+        else {
+            this.handleUploadFiles();
+        }
     }
 
     //Toast Message handler

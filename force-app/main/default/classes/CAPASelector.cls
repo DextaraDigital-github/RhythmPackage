@@ -18,7 +18,7 @@ public with sharing class CAPASelector {
     * @return
     */
     public List<user> getRecordsList(string userName){
-        return [SELECT Name from user WHERE Name LIKE : userName WITH SECURITY_ENFORCED];
+        return [SELECT Name from user WHERE Name LIKE : '%'+userName+'%' WITH SECURITY_ENFORCED];
     }
 
     /**
