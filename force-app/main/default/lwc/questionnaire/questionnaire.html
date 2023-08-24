@@ -302,10 +302,12 @@
 						<lightning-button variant="Brand" label="Save" title="Save Response"
 							onclick={handleSaveCustomer} flexibility="auto" class=" slds-m-around_xxx-small">
 						</lightning-button>
+						<template if:false={showFollowButton}>
 						<lightning-button variant="Brand" label="Submit & Follow-Up" title="Save Response"
-							disabled={showFollowButton} onclick={handleSubmitCustomer} flexibility="auto"
+							 onclick={handleSubmitCustomer} flexibility="auto"
 							class="slds-m-around_xxx-small">
 						</lightning-button>
+						</template>
 						<lightning-button variant="Brand" label="Submit & Close Review" title="Save Response"
 							onclick={submitResponse} flexibility="auto" class="slds-m-around_xxx-small">
 						</lightning-button>

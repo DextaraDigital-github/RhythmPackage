@@ -946,7 +946,8 @@ export default class Questionnaire extends LightningElement {
     onResponseChange(event) {
         this.requiredQuestionList = [];
         this.questionresponseafterchange = event.detail;
-        if ((typeof this.questionresponseafterchange.cancel==='undefined'|| this.questionresponseafterchange.cancel !== true) && this.questionresponseafterchange !== null) {
+        console.log(this.questionresponseafterchange);
+        if (typeof this.questionresponseafterchange!=='undefined' && this.questionresponseafterchange !== null) {
             this.questionsAndAnswerss.forEach(questionAnswer => {
                 //This loop is to iterate over the Questions for a particular sections in the wrapper.
                 questionAnswer.questions.forEach(question => {
