@@ -183,12 +183,13 @@ export default class Questionnaire extends LightningElement {
     @api
     handleDeleteFile(filedeletemap) {
         let deletemap = filedeletemap.value;
+        console.log('deletemap',deletemap);
         if (typeof deletemap.questionId !== 'undefined' && deletemap.questionId !== null) {
             this.questionsAndAnswerss.forEach(questionAnswer => {
                 questionAnswer.questions.forEach(question => {
                     if (question.Id === deletemap.questionId) {
                         if (typeof question.Files__c !== 'undefined') {
-                            question.Files__c = deletemap.numberoffiles;
+                            question.Files__c = deletemap.numberoffiles+'';
                         }
                     }
                     if (question.Children.length > 0) {
@@ -197,7 +198,7 @@ export default class Questionnaire extends LightningElement {
                                 childAttr.questions.forEach(ques => {
                                     if (ques.Id === deletemap.questionId) {
                                         if (typeof ques.Files__c !== 'undefined') {
-                                            ques.Files__c = deletemap.numberoffiles;
+                                            ques.Files__c = deletemap.numberoffiles +'';
                                         }
                                     }
                                 })

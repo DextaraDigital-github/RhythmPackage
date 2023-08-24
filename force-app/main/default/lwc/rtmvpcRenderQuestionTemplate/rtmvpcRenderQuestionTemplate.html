@@ -157,6 +157,7 @@
 													style="max-width:150px;" name={questionary.question}
 													data-key={questionary.Id} data-questiontype="phone"
 													disabled={questionary.isEditable} onblur={handleChange}
+													onkeyup={handleChange} onkeydown={handleChange}
 													pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" onclick={openChatHandler}>
 												</lightning-input>
 											</template>
@@ -213,7 +214,7 @@
 													</template>
 													<template if:true={questionary.chatColour}>
 
-														<button class="slds-button slds-button_icon slds-button_icon-border-filled slds-m-left_koushik slds-is-relative" style="background-color: rgb(1, 118, 211); --sds-c-icon-color-foreground-default: rgb(255 255 255); " 
+														<button class="slds-button slds-button_icon slds-button_icon-border-filled slds-m-left_koushik slds-is-relative" style="background-color: rgb(1, 118, 211); --sds-c-icon-color-foreground-default: rgb(255 255 255); "
 															label="Review & Comments" alternative-text="Review & Comments" title="Review & Comments"
 															data-id={questionary.Id} onclick={handleQuestionHighlight} data-disable={questionary.isEditable}
 															data-response={questionary.ResponseId}
@@ -241,9 +242,9 @@
 										</div> -->
 
 												<template if:true={issupplier}>
-													<template if:true={questionary.capaAction}>	
+													<template if:true={questionary.capaAction}>
 														<template if:true={questionary.saveActionForm}>
-															<button class="slds-button slds-button_icon slds-button_icon-border-filled slds-m-left_koushik slds-is-relative" style="background-color: rgb(1, 118, 211); --sds-c-icon-color-foreground-default: rgb(255 255 255); " 
+															<button class="slds-button slds-button_icon slds-button_icon-border-filled slds-m-left_koushik slds-is-relative" style="background-color: rgb(1, 118, 211); --sds-c-icon-color-foreground-default: rgb(255 255 255); "
 															label="CAPA" alternative-text="CAPA" title="CAPA"
 																data-id={questionary.Id} onclick={openActionForm}>
 																<lightning-icon icon-name="utility:edit_form" size="xx-small" ></lightning-icon>
@@ -294,7 +295,7 @@
 												<template if:true={issupplier}>
 													<template if:true={questionary.customerFlag}>
 														<template if:true={questionary.rejectButton}>
-															<button class="slds-button slds-button_icon slds-button_icon-border-filled" style="cursor:no-drop; background: rgb(251 129 129); --sds-c-icon-color-foreground-default: rgb(213 195 195);" 
+															<button class="slds-button slds-button_icon slds-button_icon-border-filled" style="cursor:no-drop; background: rgb(251 129 129); --sds-c-icon-color-foreground-default: rgb(213 195 195);"
 															data-label="Rejected" title="Rejected"
 																data-id={questionary.Id}>
 																<lightning-icon icon-name="utility:close" size="xx-small"></lightning-icon>
@@ -464,7 +465,7 @@
 						<template if:true={issupplier}>
 							<template if:true={questionary.capaAction}>
 								<template if:true={questionary.saveActionForm}>
-									<button class="slds-button slds-button_icon slds-button_icon-border-filled slds-m-left_small" 
+									<button class="slds-button slds-button_icon slds-button_icon-border-filled slds-m-left_small"
 									data-id={questionary.Id} label="CAPA" alternative-text="CAPA" title="CAPA" onclick={openActionForm}>
 										<lightning-icon icon-name="utility:edit_form" size="xx-small" style="background-color: rgb(1, 118, 211);"></lightning-icon>
 									<span class="slds-assistive-text">Close</span>
@@ -509,7 +510,7 @@
 				</div>
 
 				<!-- File upload -->
-				
+
 
 				<template if:true={questionary.Children}>
 					<template for:each={questionary.Children} for:item="childquestion">

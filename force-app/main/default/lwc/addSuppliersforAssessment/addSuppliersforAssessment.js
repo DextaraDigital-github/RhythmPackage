@@ -5,6 +5,7 @@ import getAssessmentRecord from '@salesforce/apex/AssessmentController.getAssess
 import { NavigationMixin } from 'lightning/navigation';
 import getTodayDate from '@salesforce/apex/AssessmentController.getTodayDate';
 import { CurrentPageReference } from 'lightning/navigation';
+import { RefreshEvent } from 'lightning/refresh';
 export default class AddSuppliersforAssessment extends NavigationMixin(LightningElement) {
     @api recordId;
     @track suppliersList=[];
@@ -20,6 +21,10 @@ export default class AddSuppliersforAssessment extends NavigationMixin(Lightning
 
     handleSuppliers(){
         this.showManageSuppliers = true;
+    }
+
+    handleRefresh() {
+        this.dispatchEvent(new RefreshEvent());
     }
 
     @wire(CurrentPageReference)
@@ -130,7 +135,7 @@ export default class AddSuppliersforAssessment extends NavigationMixin(Lightning
         }else{
             this.showManageSuppliers = false;
         }
-        this.navigateToRecordPage();
+        this.handleRefresh();
     }
     navigateToRecordPage(){
         this[NavigationMixin.Navigate]({
