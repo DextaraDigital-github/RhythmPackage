@@ -72,6 +72,7 @@ export default class Questionnaire extends LightningElement {
     assessmentStatus;
     @api objectApiName;
     @api objectName;
+    previewObjectName;
     @api accid;
     @track accountsId;
     @track isAccountAssessment;
@@ -206,6 +207,7 @@ export default class Questionnaire extends LightningElement {
                 })
             })
         }
+        this.handleRequiredCheck();
     }
     @api handleChatResponse(responseData) {
         this.questionsAndAnswerss.forEach(questionAnswer => {
@@ -378,7 +380,7 @@ export default class Questionnaire extends LightningElement {
         }
     }
     async retrieveFilesFromS3() {
-        const folderName = this.objectName + '/' + this.documentParentId + '/';
+        const folderName = this.previewObjectName + '/' + this.documentParentId + '/';
         this.s3.listObjects({ Bucket: this.bucketName, Prefix: folderName }, (err, data) => {
             if (err) {
 
@@ -442,7 +444,7 @@ export default class Questionnaire extends LightningElement {
             this.assessment = this.recordId;
             this.documentParentId = this.recordId;
             this.isTemplate = true;
-            this.objectName = 'Rhythm__Assessment_Template__c';
+            this.previewObjectName = 'Rhythm__Assessment_Template__c';
         } else {
             this.layoutItemSize = 12;
             this.assessment = this.accountassessmentid;
@@ -450,7 +452,7 @@ export default class Questionnaire extends LightningElement {
                 if (typeof result[0].Rhythm__Assessment__r !== 'undefined' && typeof result[0].Rhythm__Assessment__r.Rhythm__Template__c !== 'undefined') {
                     this.documentParentId = result[0].Rhythm__Assessment__r.Rhythm__Template__c;
                     this.objectApiName = 'Rhythm__Assessment_Template__c';
-                    this.objectName = 'Rhythm__Assessment_Template__c';
+                    this.previewObjectName = 'Rhythm__Assessment_Template__c';
                 }
             }).catch(error => {
 
@@ -946,7 +948,6 @@ export default class Questionnaire extends LightningElement {
     onResponseChange(event) {
         this.requiredQuestionList = [];
         this.questionresponseafterchange = event.detail;
-        console.log(this.questionresponseafterchange);
         if (typeof this.questionresponseafterchange!=='undefined' && this.questionresponseafterchange !== null) {
             this.questionsAndAnswerss.forEach(questionAnswer => {
                 //This loop is to iterate over the Questions for a particular sections in the wrapper.
@@ -1241,7 +1242,7 @@ export default class Questionnaire extends LightningElement {
     handleSave() {
         this.ishideToast = true;
         this.isAutoSave = false;
-        this.totastmessage = 'Responses Saved successfully';
+        this.totastmessage = 'Responses Saved Successfully';
         this.success = true;
         this.showToast = true;
         this.questionsAndAnswerss.forEach(questionAnswer => {

@@ -577,7 +577,7 @@ export default class Action extends LightningElement {
     if (name === 'Rhythm__Status__c') {
       this.onloadPicklist.forEach(res => {
         console.log('res.options');
-        if (res.key === 'Rhythm__Status__c') {
+        if (res.key === 'Rhythm__Status__c' && typeof this.optionsData !=='undefined') {
           res.options = JSON.parse(JSON.stringify(this.optionsData));
         }
       });

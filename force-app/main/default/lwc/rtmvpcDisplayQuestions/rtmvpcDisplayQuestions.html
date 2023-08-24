@@ -1,9 +1,6 @@
 <template>
 	<div class="slds-card" style="border: 1px solid rgb(201, 201, 201)">
 		<div class="rdm-grey-bg slds-card__header slds-grid slds-m-bottom_none">
-
-
-
 			<header class="slds-has-flexi-truncate ">
 
 				<div class="cdgtitletoolbar slds-grid slds-wrap">
@@ -24,19 +21,29 @@
 					<div class="slds-col slds-small-size_12-of-12 slds-medium-size_6-of-12 slds-large-size_6-of-12">
 						<div class="slds-grid slds-wrap slds-gutters_small">
 							<div class="slds-col slds-text-align_right slds-size_1-of-1 ">
-								<template if:true={tempStatus}>
-
-
-									<template lwc:if={show.childReorderBtn}>
-										<lightning-button style="font-size: small;color: white;"
-											label="Reorder Conditional Questions" onclick={cQuesReorderHandler}>
-										</lightning-button>
+								<div
+									class="slds-grid slds-wrap slds-grid_align-end slds-gutters_x-small slds-p-right_xx-small">
+									<template if:true={tempStatus}>
+										<div class="slds-p-left_xxx-small">
+											<lightning-button-icon icon-name="utility:refresh"
+												style="font-size: small;color: white;" onclick={handleRefresh}
+												alternative-text="Refresh" title="Refresh">
+											</lightning-button-icon>
+										</div>
+										<template lwc:if={show.childReorderBtn}>
+											<div class="slds-p-left_xxx-small">
+												<lightning-button style="font-size: small;color: white;"
+													label="Reorder Conditional Questions" onclick={cQuesReorderHandler}>
+												</lightning-button>
+											</div>
+										</template>
+										<div class="slds-p-left_xxx-small">
+											<lightning-button style="font-size: small;color: white;" label="New"
+												title="New Question" onclick={handleNewClick}>
+											</lightning-button>
+										</div>
 									</template>
-									<lightning-button style="font-size: small;color: white;" label="New"
-										title="New Question" onclick={handleNewClick} class="slds-p-left_xxx-small">
-									</lightning-button>
-
-								</template>
+								</div>
 							</div>
 						</div>
 					</div>
@@ -53,7 +60,7 @@
 					</lightning-tree-grid>
 				</div>
 			</template>
-			
+
 			<template if:true={viewQuestions}>
 				<c-rtmvpc-question-creation onhandleaftersave={handlesave} onhandlecancel={handleCancel}
 					template-id={tempId} question-id={questionId} section-name={sectionName} tempstatus={tempStatus}>
