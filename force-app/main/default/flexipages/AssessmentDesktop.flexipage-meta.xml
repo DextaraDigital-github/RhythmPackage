@@ -43,6 +43,12 @@
     <flexiPageRegions>
         <itemInstances>
             <componentInstance>
+                <componentName>addSuppliersforAssessment</componentName>
+                <identifier>Rhythm_addSuppliersforAssessment</identifier>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
                 <componentInstanceProperties>
                     <name>parentFieldApiName</name>
                     <value>Assessment__c.Id</value>
@@ -77,7 +83,7 @@
                     <name>actionNames</name>
                     <valueList>
                         <valueListItems>
-                            <value>New</value>
+                            <value>CustomButton.AccountAssessmentRelation__c.Send_Email</value>
                         </valueListItems>
                     </valueList>
                 </componentInstanceProperties>
