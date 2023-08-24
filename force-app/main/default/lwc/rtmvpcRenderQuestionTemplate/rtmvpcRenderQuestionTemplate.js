@@ -197,11 +197,9 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
                 this.chatterMap.disableSendButton = true;
             }
             if (this.chatterMap.responseflag === true && flagbool === true) {
-                console.log('sampledata');
                 this.showPopup = true;
             }
             else {
-                console.log('sampledata123');
                 const selectedEvent = new CustomEvent('flagchange', {
                     detail: this.chatterMap
                 });
@@ -211,12 +209,13 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
     }
     handleCancelButton() {
         this.showPopup = false;
-        this.showSupplierPopup = false;     
+        this.showSupplierPopup = false; 
+        this.responsemap.cancel = false;
+        console.log('this.responsemap',this.responsemap);
         const selectedEvent = new CustomEvent('valuechange', {
             bubbles: true,
             detail: undefined
         });
-        //dispatches event
         this.dispatchEvent(selectedEvent);
 
     }
@@ -314,6 +313,7 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
         this.responsemap.SectionId = this.sectionid;
         this.responsemap.option = changedvalue;
         this.responsemap.questionId = questionId;
+        this.responsemap.event = event;
 
         /*This dispatch event is used to send the data to questionnaire on onchange to perform saving.*/
         if( this.showSupplierPopup === false){
@@ -322,12 +322,14 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
             detail: this.responsemap
         });
         //dispatches event
+        console.log('this.responsemap in handleChange',this.responsemap);
         this.dispatchEvent(selectedEvent);
         }
     }
     handleResponseChange()
     {
         this.showSupplierPopup = false;
+        this.responsemap.cancel = false;
          const selectedEvent = new CustomEvent('valuechange', {
             bubbles: true,
             detail: this.responsemap

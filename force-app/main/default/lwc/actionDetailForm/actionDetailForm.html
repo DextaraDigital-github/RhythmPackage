@@ -149,9 +149,16 @@
 					</lightning-layout-item>
 				</template>
 			</lightning-layout>
-			<template if:true={isSave}>
+			<div class="slds-grid slds-grid_align-center">
+			<template if:true={isButton}>
+			<template if:true={isSubmit}>
 				<button class="slds-button slds-button_brand slds-float_right" onclick={handleSave}>Submit</button>
 			</template>
+			<template if:false={isSubmit}>
+				<button class="slds-button slds-button_brand slds-float_right" onclick={handleCommentSave}>Save</button>
+			</template>
+			</template>
+			</div>
 			</template>
 			<template if:true={showForm}>
 	<!-- S3 Code -->

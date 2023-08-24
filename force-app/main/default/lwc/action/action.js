@@ -36,6 +36,7 @@ export default class Action extends LightningElement {
   @track isSupplier;
   @track isSave = false;
   @track showAction = false;
+  @track loading=false;
 
   @track lookupLabel = ['Ownership', 'Assigned To'];
   @track options = [{ label: 'Open', value: 'Open' },
@@ -63,6 +64,7 @@ export default class Action extends LightningElement {
   @track newFlag = false;
   @track relatedRecordName;
   @track optionsData;
+  @track isLabel;
   previewUrl;
   keyString;
   fileKey;
@@ -358,6 +360,7 @@ export default class Action extends LightningElement {
 
   @api displayForm(response) {
     this.showAction = true;
+    this.loading=true;
      this.isSupplier = response[0].isSupplier;
     console.log('jjj', response);
     if (typeof response !== 'undefined' && this.isSupplier !== true) {
@@ -382,6 +385,9 @@ export default class Action extends LightningElement {
     this.relatedRecordName = response[0].relatedRecordName;
     this.responseMap = {};
     this.resultdata = {};
+    
+    if(typeof this.onloadPicklist !== 'undefined')
+    {
     this.onloadPicklist.forEach(res => {
       if (res.key === 'Rhythm__Status__c') {
         this.optionsData = JSON.parse(JSON.stringify(res.options));
@@ -391,6 +397,7 @@ export default class Action extends LightningElement {
         res.onLoadValue = '';
       }
     })
+    }
 
     getActionResponse({ actionResponse: response[0] }).then((result) => {
       if (typeof result != 'undefined' && result.length > 0) {
@@ -421,18 +428,25 @@ export default class Action extends LightningElement {
         if (typeof result[0].Rhythm__Supplier__c !== 'undefined') {
           this.responseMap.Rhythm__Supplier__c = result[0].Rhythm__Supplier__c;
         }
-
+        console.log('sample>>>>');
+       if(typeof this.onloadPicklist !== 'undefined'){
+         console.log('this.onloadPicklist',this.onloadPicklist);
         this.onloadPicklist.forEach(res => {
           if (typeof result[0].Rhythm__Related_module__c !== 'undefined' || typeof result[0].Rhythm__Status__c !== 'undefined'
             || typeof result[0].Rhythm__Priority__c !== 'undefined') {
             let keydata = res.key;
-            res.onLoadValue = result[0][keydata];
+            
+             res.onLoadValue = result[0][keydata];
             if (res.onLoadValue === 'Open' || res.onLoadValue === 'Closed') {
               if (res.onLoadValue === 'Closed') {
                 this.isSave = true;
               }
+              this.isLabel='Save';
+              if(typeof this.optionsData !=='undefined'){
               res.options = JSON.parse(JSON.stringify(this.optionsData));
+              }
             }
+            console.log('Koushik');
             if (res.onLoadValue === 'Expired') {
               let optionMap = {};
               optionMap.label = 'Expired';
@@ -445,9 +459,12 @@ export default class Action extends LightningElement {
             this.responseMap[keydata] = result[0][keydata];
           }
         });
+       }
+       console.log('sample123');
         if (typeof result[0].Rhythm__Assigned_To__c !== 'undefined') {
           this.responseMap.Rhythm__Assigned_To__c = result[0].Rhythm__Assigned_To__c;
         }
+        console.log('sample');
         if (typeof result[0].Rhythm__Ownership__c !== 'undefined') {
           this.responseMap.Rhythm__Ownership__c = result[0].Rhythm__Ownership__c;
         }
@@ -455,6 +472,7 @@ export default class Action extends LightningElement {
         console.log('reposnedata', this.responseMap.Rhythm__Status__c);
         this.showresponse = [];
         this.showresponse.push(this.saveActionResponse);
+        this.loading=false;
       }
       else {
         if (this.isSupplier === true) {
@@ -475,6 +493,7 @@ export default class Action extends LightningElement {
         this.saveActionResponse.Rhythm__Ownership__c = response[0].ownershipId;
         //this.responseMap.Rhythm__Related_Record__Name=response[0].Rhythm__Related_Record__Name;
         // console.log('jjjfk',this.responseMap.Rhythm__Related_Record__Name);
+         if(typeof this.onloadPicklist !== 'undefined'){
         this.onloadPicklist.forEach(res => {
           if (res.key === 'Rhythm__Related_module__c') {
             res.onLoadValue = 'Assessments';
@@ -482,6 +501,7 @@ export default class Action extends LightningElement {
             this.saveActionResponse.Rhythm__Related_module__c = 'Assessments';
           }
         });
+         }
 
         userMap.Name = response[0].ownershipName;
         this.resultdata.Rhythm__Ownership__r = userMap;
@@ -491,6 +511,7 @@ export default class Action extends LightningElement {
         this.showresponse = [];
         this.showresponse.push(this.saveActionResponse);
         console.log('kkkk', this.saveActionResponse);
+        this.loading=false;
 
       }
     }).catch(error => {
@@ -547,6 +568,7 @@ export default class Action extends LightningElement {
 
   handleChange(event) {
     let changedData = event.target.value;
+    this.isLabel='Save';
     let name = event.currentTarget.dataset.id;
     this.saveActionResponse[name] = changedData;
     this.showresponse = [];
@@ -559,6 +581,9 @@ export default class Action extends LightningElement {
           res.options = JSON.parse(JSON.stringify(this.optionsData));
         }
       });
+    }
+     if(name === 'Rhythm__Status__c' && changedData === 'Closed'){
+      this.isLabel='Submit';
     }
   }
   handleSelectedValue(event) {
@@ -607,7 +632,11 @@ export default class Action extends LightningElement {
             // }).catch(error => {
             //   console.log('ggfgf', error);
             // });
-
+            if (this.saveActionResponse.Rhythm__Status__c === 'Open' && this.isSupplier === true) {
+              this.showToast = true;
+              this.success = true;
+              this.totastmessage = 'Comment saved Successfully';
+            }
             if (this.saveActionResponse.Rhythm__Status__c === 'Closed' && this.isSupplier === true) {
               this.showToast = true;
               this.success = true;

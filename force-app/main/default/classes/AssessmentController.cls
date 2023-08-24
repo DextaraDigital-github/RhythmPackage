@@ -306,6 +306,7 @@ public with sharing class AssessmentController {
             String errorMsg = e.getMessage();
             throw new AuraHandledException(errorMsg);
         }
+        //return null;
     }
 
     /**
@@ -367,7 +368,7 @@ public with sharing class AssessmentController {
     @AuraEnabled
     public static string getCommunityURL(){
         try{
-            String relativeUrlBase = URL.getSalesforceBaseUrl().toExternalForm()+'/login';
+            String relativeUrlBase = URL.getSalesforceBaseUrl().toExternalForm()+'/s'+'/login';
             return relativeUrlBase;
         }catch(exception e){
             String errorMsg = e.getMessage();

@@ -23,6 +23,10 @@ export default class ActionDetailForm extends LightningElement {
   @track showPopup = false;
   @track expired = false;
   @track showForm = false;
+  @track isButton=true;
+  @track isSubmit=false;
+  @track success=false;
+  @track showToast=false;
   @track options = [{ label: 'Open', value: 'Open' },
   { label: 'Closed', value: 'Closed' }
   ];
@@ -39,6 +43,7 @@ export default class ActionDetailForm extends LightningElement {
       console.log('sampletest', this.actionFormData);
       if (this.actionFormData[0].Rhythm__Status__c === 'Closed' || this.actionFormData[0].Rhythm__Status__c === 'Expired') {
         this.isSave = false;
+        this.isButton=false;
         if (this.actionFormData[0].Rhythm__Status__c === 'Expired') {
           this.expired = true;
           console.log('sampletest12', this.expired);
@@ -55,10 +60,22 @@ export default class ActionDetailForm extends LightningElement {
   }
   handleChange(event) {
     let changedData = event.target.value;
+     this.isSubmit=false;
     let name = event.currentTarget.dataset.id;
     this.actionFormData[0][name] = changedData;
+    if(name === 'Rhythm__Status__c' && changedData === 'Closed'){
+      this.isSubmit=true;
+    }
     this.showresponse = [];
     this.showresponse.push(this.actionFormData[0]);
+  }
+  handleCommentSave()
+  { 
+    saveActionResponse({ actionResponse: this.showresponse, isUpdate: true }).then(() => {
+    this.showToast = true;
+     this.success = true;
+     this.totastmessage = 'Comment Saved Successfully.';
+    });
   }
   handleSave() {
     this.showPopup = true;
@@ -82,6 +99,7 @@ export default class ActionDetailForm extends LightningElement {
           console.log('ggfgf', error);
         })
         this.isSave = false;
+        this.isButton=false;
       }
 
     })

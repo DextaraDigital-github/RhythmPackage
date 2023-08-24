@@ -335,7 +335,7 @@ export default class CustomTable extends LightningElement {
                                 recJson.classList = 'status-completed';
                             else if (recJson.value.toLowerCase() === 'deferred' || recJson.value.toLowerCase() === 'overdue' || recJson.value.toLowerCase() === 'inactive')
                                 recJson.classList = 'status-deferred';
-                            else if (recJson.value.toLowerCase() === 'In Progress')
+                            else if (recJson.value === 'In Progress')
                                 recJson.classList = 'cad-timeline_pending';
                             else if (recJson.value.toLowerCase() === 'waiting on someone else' || recJson.value.toLowerCase() === 'on hold' || recJson.value.toLowerCase() === 'new')
                                 recJson.classList = 'status-waitingonsomeoneelse';
