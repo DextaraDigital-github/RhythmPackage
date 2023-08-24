@@ -358,7 +358,8 @@ export default class CustomTable extends LightningElement {
                         if (colList[j].fieldName === 'Rhythm__Status__c') {
                             if (typeof relatedListRecords[i].Rhythm__Status__c !== 'undefined')
                                 if (relatedListRecords[i].Rhythm__Status__c === 'Submitted' ||
-                                relatedListRecords[i].Rhythm__Status__c ==='Review Completed') {
+                                relatedListRecords[i].Rhythm__Status__c ==='Review Completed'
+                                || relatedListRecords[i].Rhythm__Status__c ==='In Review') {
                                     recJson.surveySymbol = 'utility:lock';
                                 }
                                 else {
@@ -379,8 +380,8 @@ export default class CustomTable extends LightningElement {
             }
             recDetails.record = recArray;
             recDataList.push(recDetails);
-            console.log('cData---->',JSON.stringify(recDataList));
         }
+        console.log('cData---->',(recDataList));
         return recDataList;
     }
 

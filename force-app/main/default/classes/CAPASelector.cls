@@ -70,10 +70,14 @@ public with sharing class CAPASelector {
     */
     public List<Action__c> actionRecords(){
         String userId = userinfo.getuserid();
+        List<User> userList =  [SELECT Contact.AccountId
+                                    FROM User
+                                    WHERE Id=:userId
+                                    WITH SECURITY_ENFORCED];
         return [SELECT Name,Due_Date__c,Related_Record__c,Related_Record__r.Name,Ownership__r.Name,Status__c,OwnershipName__c,
                 Priority__c,Assigned_To__r.Name,Flag_Status__c 
                 FROM Action__c 
-                WHERE Assigned_To__c=:userId
+                WHERE Assigned_To__c=:userId AND Supplier__c=:userList[0].Contact.AccountId
                 WITH SECURITY_ENFORCED
                ORDER BY CreatedDate DESC];
     }

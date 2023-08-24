@@ -162,8 +162,8 @@
 	.comm-login-form__login-button:active, .comm-login-form__login-button:active, .comm-login-form__login-button:focus, .comm-login-form__login-button:focus, .comm-login-form__login-button:hover, .comm-login-form__login-button:hover, .comm-login-form__login-button:visited, .comm-login-form__login-button:visited 
 	{ background:var(--pbtn-bgh)!important; border-color:var(--pbtn-bdrh)!important; }
 	
-	.slds-button--neutral, .slds-button_neutral { color:var(--dbtn-ico); background:var(--dbtn-bg); border:1px solid var(--dbtn-bdr); }
-	.slds-button--neutral:active, .slds-button_neutral:active, .slds-button--neutral:focus, .slds-button_neutral:focus, .slds-button--neutral:hover, .slds-button_neutral:hover, .slds-button--neutral:visited, .slds-button_neutral:visited { color:var(--dbtn-icoh); background:var(--dbtn-bgh); border:1px solid var(--dbtn-bdrh); }
+	.slds-button--neutral, .slds-button_neutral { background:var(--dbtn-bg); border:1px solid var(--dbtn-bdr); }
+	.slds-button--neutral:active, .slds-button_neutral:active, .slds-button--neutral:focus, .slds-button_neutral:focus, .slds-button--neutral:hover, .slds-button_neutral:hover, .slds-button--neutral:visited, .slds-button_neutral:visited { background:var(--dbtn-bgh); border:1px solid var(--dbtn-bdrh); }
 	.slds-button--neutral:disabled, .slds-button--neutral[disabled], .slds-button_neutral:disabled, .slds-button_neutral[disabled] { background:var(--dbtn-bgh); }
 	
 	.slds-button--icon-border, .slds-button--icon-border-filled, .slds-button_icon-border, .slds-button_icon-border-filled { color:var(--dbtn-ico); background:/*var(--dbtn-bg)*/transparent; border:1px solid var(--dbtn-bdr); }
@@ -192,7 +192,8 @@
 	.slds-accordion__list-item {border-top:0px none; }
     .slds-accordion__summary-heading, .slds-accordion__summary-heading .slds-button { font-size:14px;text-transform: uppercase; }
     .slds-accordion__summary-heading .slds-button:focus { text-decoration:none; }
-	.slds-form-element__control .slds-radio, .slds-form-element__control .slds-checkbox { display: inline-block; }
+	.slds-form-element__control .slds-radio, .slds-form-element__control .slds-checkbox { display:block; }
+	.changeRecordTypeRightColumn .slds-form-element__control .slds-radio, .changeRecordTypeRightColumn .slds-form-element__control .slds-checkbox { display:block!important; }
 	.column.region-main {width:75%!important; max-width:100%;}
 	.column.region-sidebar-right {width:25%!important; max-width:25%;}
 	.column.region-sidebar-right article.slds-card {background:#e6eef6; }
