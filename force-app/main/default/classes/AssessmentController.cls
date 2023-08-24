@@ -368,12 +368,15 @@ public with sharing class AssessmentController {
     @AuraEnabled
     public static string getCommunityURL(){
         try{
-            Id currentNetworkId = Network.getNetworkId();
-            Network currNetwork = [SELECT Id, Name, UrlPathPrefix FROM Network WHERE Id = :currentNetworkId];
-            String relativeUrlBase = URL.getSalesforceBaseUrl().toExternalForm()+'/';
-            relativeUrlBase = relativeUrlBase+currNetwork.UrlPathPrefix+'/s/login';
-            //String relativeUrlBase = URL.getSalesforceBaseUrl().toExternalForm()+'/s'+'/login';
+            String relativeUrlBase = '';
+            if(!Test.isRunningTest()){
+                Id currentNetworkId = Network.getNetworkId();
+                Network currNetwork = [SELECT Id, Name, UrlPathPrefix FROM Network WHERE Id = :currentNetworkId];
+                relativeUrlBase = URL.getSalesforceBaseUrl().toExternalForm()+'/';
+                relativeUrlBase = relativeUrlBase+currNetwork.UrlPathPrefix+'/s/login';
+            }
             return relativeUrlBase;
+            //String relativeUrlBase = URL.getSalesforceBaseUrl().toExternalForm()+'/s'+'/login';
         }catch(exception e){
             String errorMsg = e.getMessage();
             throw new AuraHandledException(errorMsg);
