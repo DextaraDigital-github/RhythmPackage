@@ -50,4 +50,14 @@ public with sharing class EmailController {
     public static List<sObject> fetchEmailMessages(String parameterMap) {
         return service.fetchEmailMessages(parameterMap);
     }
+    
+    /**
+    * @description Fetches the User records based on search string and other parameters
+    * @param parameterMap It is a stringified JSON of parameters required to fetch User records
+    * @return List of User records
+    */
+    @AuraEnabled
+    public static Map<Id,User> fetchUsers(String parameterMap) {
+        return service.fetchUsers(parameterMap);
+    }
 }

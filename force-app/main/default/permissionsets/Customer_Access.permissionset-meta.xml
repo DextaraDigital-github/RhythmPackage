@@ -125,13 +125,11 @@
         <field>Account.AccountNumber</field>
         <readable>true</readable>
     </fieldPermissions>
-    
     <fieldPermissions>
         <editable>true</editable>
         <field>Account.Address_Line_2__c</field>
         <readable>true</readable>
     </fieldPermissions>
-   
     <fieldPermissions>
         <editable>true</editable>
         <field>Account.BillingAddress</field>
@@ -142,7 +140,6 @@
         <field>Account.City__c</field>
         <readable>true</readable>
     </fieldPermissions>
-    
     <fieldPermissions>
         <editable>true</editable>
         <field>Account.Company_Description__c</field>
@@ -168,7 +165,6 @@
         <field>Account.D_B_Number__c</field>
         <readable>true</readable>
     </fieldPermissions>
-    
     <fieldPermissions>
         <editable>true</editable>
         <field>Account.Description</field>
@@ -179,7 +175,6 @@
         <field>Account.Diversity_Classifications__c</field>
         <readable>true</readable>
     </fieldPermissions>
-   
     <fieldPermissions>
         <editable>true</editable>
         <field>Account.Email__c</field>

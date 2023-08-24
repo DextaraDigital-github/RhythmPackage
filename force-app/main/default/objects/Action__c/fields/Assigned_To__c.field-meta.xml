@@ -4,6 +4,15 @@
     <deleteConstraint>SetNull</deleteConstraint>
     <externalId>false</externalId>
     <label>Assigned To</label>
+    <lookupFilter>
+        <active>true</active>
+        <filterItems>
+            <field>User.ProfileId</field>
+            <operation>equals</operation>
+            <value>00e8H000000tAVfQAM</value>
+        </filterItems>
+        <isOptional>false</isOptional>
+    </lookupFilter>
     <referenceTo>User</referenceTo>
     <relationshipName>Action_Items1</relationshipName>
     <required>false</required>
