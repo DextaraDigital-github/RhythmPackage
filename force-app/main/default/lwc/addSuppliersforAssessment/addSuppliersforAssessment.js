@@ -77,38 +77,26 @@ export default class AddSuppliersforAssessment extends NavigationMixin(Lightning
             }
             let todayDate =  new Date(this.todayDate).toISOString().substring(0, 10);
             let save = false;
-            if(this.endDate !== undefined){
-                if(new Date(todayDate)>=new Date(this.startDate) &&  new Date(todayDate) <=new Date(this.endDate)){
-                    save = true;
-                }
-            }else if(new Date(todayDate)>=new Date(this.startDate)){
-                save = true;
+            if(this.suppliersList.length > 0 || this.delList.length>0){
+                addSuppliers({assessmentRecord:this.assessmentRecord,operationType:'update',suppliers:JSON.stringify(this.suppliersList),existingSups:exSupListStr,deleteList:deleteListStr})
+                .then(result => {
+                    if(result.isSuccess === true){
+                        this.showManageSuppliers = false;
+                        this.source = false;
+                        this.showLWC = false;
+                        this.showNotification('Success','Suppliers Added to Assessments Successfully.','success');
+                        this.closeModal();
+                        this.navigateToRecordPage();
+                    }else{
+                        //this.showNotification('Error',result.message,'error');
+                    }
+                })
+                .catch(error => {
+                    //console.log('erroDetails----->',error);
+                    this.showNotification('Error',error.body.message,'error');
+                });
             }
-            if(save){
-                if(this.suppliersList.length > 0 || this.delList.length>0){
-                    addSuppliers({assessmentRecord:this.assessmentRecord,operationType:'update',suppliers:JSON.stringify(this.suppliersList),existingSups:exSupListStr,deleteList:deleteListStr})
-                    .then(result => {
-                        if(result.isSuccess === true){
-                            this.showManageSuppliers = false;
-                            this.source = false;
-                            this.showLWC = false;
-                            this.showNotification('Success','Suppliers Added to Assessments Successfully.','success');
-                            this.closeModal();
-                            this.navigateToRecordPage();
-                        }else{
-                            //this.showNotification('Error',result.message,'error');
-                        }
-                    })
-                    .catch(error => {
-                        //console.log('erroDetails----->',error);
-                        this.showNotification('Error',error.body.message,'error');
-                    });
-                }else{
-                    this.showNotification('Error','Select at least one Supplier to create the Assessment Program','error');
-                }
-            }else{
-                this.showNotification('Error','Suppliers who received the Assessment cannot be removed from the Assessment Program.','error');
-            }
+            
         }catch(e){
             //console.log(e);
         }

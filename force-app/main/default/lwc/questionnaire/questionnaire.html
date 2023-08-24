@@ -122,7 +122,11 @@
 																			<a data-id={item.key} title={item.url}
 																				onclick={handleDownload}
 																				href={previewUrl}
-																				target="_blank">{item.value}</a>
+																				target="_blank">
+																				<div class="" style="width:calc(100% - 35px); display:inline-block">
+																					<div class="slds-truncate">{item.value}</div>													
+																				</div>
+																			</a>
 																		</td>
 																	</tr>
 																</table>
