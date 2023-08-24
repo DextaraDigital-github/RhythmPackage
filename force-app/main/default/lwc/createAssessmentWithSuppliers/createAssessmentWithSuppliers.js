@@ -116,6 +116,9 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
 
     updateValuesHandler(event){
         this.values[event.currentTarget.dataset.id] = event.target.value;
+        if(event.currentTarget.dataset.id == 'startdate'){
+            this.todayDate = event.target.value;
+        }
     }
     
     handleNext(event){

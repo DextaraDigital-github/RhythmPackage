@@ -20,6 +20,9 @@ export default class AddSuppliers extends LightningElement {
     @api recordId;
     newAccounts = [];
     delAccounts = [];
+    @api startDate;
+    @api endDate;
+    @api todayDate;
     
     connectedCallback() {
         if (this.recordId !== undefined) {
@@ -93,10 +96,18 @@ export default class AddSuppliers extends LightningElement {
                         }
                     }
                     else if (selectedValues.indexOf(suppData.value) === -1 && this.existingSuppList.indexOf(suppData.value) !== -1) {
-                        if (this.existingSuppListtemp.includes(suppData.value)) {
-                            this.values = JSON.parse(JSON.stringify(this.existingSuppList));
-                            this.showNotification('Error', 'Suppliers who received the Assessment cannot be removed from the Assessment Program.', 'error');
-                            return;
+                       
+                        let todayDate =  new Date(this.todayDate).toISOString().substring(0, 10);
+                        let showError = true;
+                        if(new Date(this.startDate) > new Date(todayDate)){
+                            showError = false;
+                        }
+                        if(showError){
+                            if (this.existingSuppListtemp.includes(suppData.value)) {
+                                this.values = JSON.parse(JSON.stringify(this.existingSuppList));
+                                this.showNotification('Error', 'Suppliers who received the Assessment cannot be removed from the Assessment Program.', 'error');
+                                return;
+                            }
                         }
                         this.delAccounts.push(suppData.value);
                         this.existingSuppList.splice(this.existingSuppList.indexOf(suppData.value), 1);
