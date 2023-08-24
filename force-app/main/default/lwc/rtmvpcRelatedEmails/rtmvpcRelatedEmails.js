@@ -2,6 +2,7 @@ import { LightningElement, api, track } from 'lwc';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { loadStyle } from 'lightning/platformResourceLoader';
 import fetchEmailMessages from '@salesforce/apex/EmailController.fetchEmailMessages';
+import fetchUsers from '@salesforce/apex/EmailController.fetchUsers';
 import ComponentStylesheet from '@salesforce/resourceUrl/ComponentStyleSheet';
 import { subscribe, unsubscribe } from 'lightning/empApi';
 
@@ -18,6 +19,14 @@ export default class RtmvpcRelatedEmails extends LightningElement {
     emailsDataMap;
     subscription;
 
+    @api
+    get showRecords() {
+        if(typeof this.emailsData !== 'undefined' && this.emailsData.length > 0) {
+            return true;
+        }
+        return false;
+    }
+
     connectedCallback() {
         this.fetchEmailMsgsData();
         this.subscribeToPlatformEvent('/event/SendEmailEvent__e');
@@ -33,7 +42,6 @@ export default class RtmvpcRelatedEmails extends LightningElement {
         let _this = this;
         const messageCallback = function (response) {
             if (response.data.payload.Rhythm__Source__c === 'Refresh Emails' && response.data.payload.Rhythm__Type__c === 'RefreshEmails') {
-                console.log('Hi');
                 _this.fetchEmailMsgsData();
             }
         };
@@ -49,54 +57,78 @@ export default class RtmvpcRelatedEmails extends LightningElement {
     fetchEmailMsgsData() {
         let _parameterMap = JSON.stringify({ assessmentId: this.recordId });
         fetchEmailMessages({ parameterMap: _parameterMap }).then(result => {
-            this.emailsDataMap = this.formatEmailMsgsMap(result);
-            this.emailsData = this.formatEmailMsgsData(this.emailsDataMap);
-            //this.assignPageProp();
+            let resultList = JSON.parse(JSON.stringify(result));
+            let userIds = [];
+            if (typeof resultList != 'undefined' && resultList.length > 0) {
+                resultList.forEach(em => {
+                    if (typeof em.EmailMessageRelations != 'undefined' && em.EmailMessageRelations.length > 0) {
+                        let usersList = em.EmailMessageRelations.map(i => { return i.RelationId; });
+                        userIds.push(...usersList);
+                    }
+                });
+            }
+            _parameterMap = JSON.stringify({ userIds: userIds });
+            fetchUsers({ parameterMap: _parameterMap }).then(result => {
+                this.emailsDataMap = this.formatEmailMsgsMap(resultList, result);
+                this.emailsData = this.formatEmailMsgsData(this.emailsDataMap);
+            }).catch(error => {
+                this.configureToast('Unable to load Email Communications', 'Please contact your Administrator.', 'error');
+            });
         }).catch(error => {
-            console.log(error);
-            this.configureToast('Error loading Accounts', 'Please contact your Administrator.', 'error');
+            this.configureToast('Unable to load Email Communications', 'Please contact your Administrator.', 'error');
         });
     }
     /* Prepares a Map of EmailMessages */
-    formatEmailMsgsMap(result) {
+    formatEmailMsgsMap(result, userMap) {
         let emailMap = new Map();
         if (typeof result != 'undefined') {
-            result.forEach(user => {
-                if (typeof user.EmailMessageRelations != 'undefined') {
-                    user.EmailMessageRelations.forEach(email => {
-                        let emailJson = {};
-                        if (!emailMap.has(email.EmailMessageId)) {
-                            emailJson.whatId = this.recordId;
-                            emailJson.isBuilderContent = true;
-                            emailJson.emailMessageId = email.EmailMessageId;
-                            emailJson.fromName = email.EmailMessage.FromName + ' <' + email.EmailMessage.FromAddress + '>';
-                            let monthMap = new Map([['01', 'Jan'], ['02', 'Feb'], ['03', 'Mar'], ['04', 'Apr'], ['05', 'May'], ['06', 'Jun'], ['07', 'Jul'], ['08', 'Aug'], ['09', 'Sep'], ['10', 'Oct'], ['11', 'Nov'], ['12', 'Dec']]);
-                            let hh = Number(email.EmailMessage.CreatedDate.split('T')[1].split(':')[0]);
-                            let mm = email.EmailMessage.CreatedDate.split('T')[1].split(':')[1];
-                            emailJson.sentDate = (email.EmailMessage.CreatedDate.split('T')[0].split('-')[2] + ' ' + monthMap.get(email.EmailMessage.CreatedDate.split('T')[0].split('-')[1]) + ', ' + email.EmailMessage.CreatedDate.split('T')[0].split('-')[0]) + ' ' + ((hh < 10 ? '0' : '') + (hh > 12 ? (hh - 12 < 10 ? '0' : '') + (hh - 12) : hh) + ':' + (mm) + (hh > 12 ? 'PM' : 'AM'));
-                            emailJson.whatName = email.EmailMessage.RelatedTo.Name;
-                            emailJson.subject = email.EmailMessage.Subject;
-                            emailJson.body = email.EmailMessage.HtmlBody;
-                            emailJson.templateId = (typeof email.EmailMessage.EmailTemplate != 'undefined') ? email.EmailMessage.EmailTemplate.Name : '--None--';
-                            emailJson.emailTemplatesOpt = [{ label: emailJson.templateId, value: emailJson.templateId }];
-                            emailJson.recipientsData = emailJson.selectedRecipientsData = (typeof email.EmailMessage.Rhythm__Failed_Recipients__c != 'undefined' && email.EmailMessage.Rhythm__Failed_Recipients__c !== null && email.EmailMessage.Rhythm__Failed_Recipients__c !== '[]' && email.EmailMessage.Rhythm__Failed_Recipients__c !== '') ? JSON.parse(email.EmailMessage.Rhythm__Failed_Recipients__c) : [];
-                            emailJson.failedRecipientsCount = 0;
-                            if (emailJson.recipientsData !== 'undefined' && emailJson.recipientsData.length > 0) {
-                                emailJson.recipientsData.forEach(rec => {
-                                    rec.status = 'Failed';
-                                });
-                                emailJson.failedRecipientsCount = emailJson.recipientsData.length;
-                            }
+            result.forEach(em => {
+                let emailJson = {};
+                emailJson.whatId = this.recordId;
+                emailJson.isBuilderContent = true;
+                emailJson.emailMessageId = em.Id;
+                emailJson.fromName = em.FromName + ' <' + em.FromAddress + '>';
+                let monthMap = new Map([['01', 'Jan'], ['02', 'Feb'], ['03', 'Mar'], ['04', 'Apr'], ['05', 'May'], ['06', 'Jun'], ['07', 'Jul'], ['08', 'Aug'], ['09', 'Sep'], ['10', 'Oct'], ['11', 'Nov'], ['12', 'Dec']]);
+                let hh = Number(em.CreatedDate.split('T')[1].split(':')[0]);
+                let mm = em.CreatedDate.split('T')[1].split(':')[1];
+                emailJson.sentDate = (em.CreatedDate.split('T')[0].split('-')[2] + ' ' + monthMap.get(em.CreatedDate.split('T')[0].split('-')[1]) + ' ' + em.CreatedDate.split('T')[0].split('-')[0]) + ', ' + ((hh < 10 ? '0' : '') + (hh > 12 ? (hh - 12 < 10 ? '0' : '') + (hh - 12) : hh) + ':' + (mm) + (hh > 12 ? 'PM' : 'AM'));
+                emailJson.whatName = em.RelatedTo.Name;
+                emailJson.subject = em.Subject;
+                emailJson.body = em.HtmlBody;
+                emailJson.templateId = (typeof em.EmailTemplate != 'undefined') ? em.EmailTemplate.Name : '--None--';
+                emailJson.emailTemplatesOpt = [{ label: emailJson.templateId, value: emailJson.templateId }];
+                emailJson.recipientsData = [];
+                let failedRecipientsData = (typeof em.Rhythm__Failed_Recipients__c != 'undefined' && em.Rhythm__Failed_Recipients__c !== null && em.Rhythm__Failed_Recipients__c !== '[]' && em.Rhythm__Failed_Recipients__c !== '') ? JSON.parse(em.Rhythm__Failed_Recipients__c) : [];
+                emailJson.failedRecipientsCount = 0;
+                if (typeof failedRecipientsData !== 'undefined' && failedRecipientsData.length > 0) {
+                    failedRecipientsData.forEach(rec => {
+                        emailJson.recipientsData.push({ Id: rec.id, Name: rec.name, Email: rec.email, Status: 'Failed' });
+                    });
+                    emailJson.failedRecipientsCount = emailJson.recipientsData.length;
+                }
+                if (typeof em.EmailMessageRelations !== 'undefined' && em.EmailMessageRelations.length > 0) {
+                    let successRecipientsData = [];
+                    let accList = [];
+                    em.EmailMessageRelations.forEach(emr => {
+                        if (accList.includes(userMap[emr.RelationId].Contact.AccountId)) {
+                            successRecipientsData = successRecipientsData.map(x => {
+                                if (x.Id === userMap[emr.RelationId].Contact.AccountId) {
+                                    return { Id: x.Id, Name: x.Name, Email: x.Email + ', ' + userMap[emr.RelationId].Email, Status: 'Sent' };
+                                }
+                                else {
+                                    return x;
+                                }
+                            });
                         }
                         else {
-                            emailJson = emailMap.get(email.EmailMessageId);
-                        }
-                        if (typeof user.Contact != 'undefined' && typeof user.Contact.AccountId != 'undefined' && typeof user.Contact.Account != 'undefined' && typeof user.Contact.Account.Name != 'undefined') {
-                            emailJson.recipientsData.push({ Id: user.Contact.AccountId, Name: user.Contact.Account.Name, Email: user.Email, status: 'Sent' });
-                            emailMap.set(email.EmailMessageId, emailJson);
+                            accList.push(userMap[emr.RelationId].Contact.AccountId);
+                            successRecipientsData.push({ Id: userMap[emr.RelationId].Contact.AccountId, Name: userMap[emr.RelationId].Contact.Account.Name, Email: userMap[emr.RelationId].Email, Status: 'Sent' });
                         }
                     });
+                    emailJson.recipientsData.push(...successRecipientsData);
                 }
+                emailJson.selectedRecipientsData = emailJson.recipientsData;
+                emailMap.set(em.Id, emailJson);
             });
         }
         return emailMap;

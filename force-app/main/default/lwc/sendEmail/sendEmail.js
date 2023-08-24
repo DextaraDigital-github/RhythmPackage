@@ -121,7 +121,7 @@ export default class SendEmail extends NavigationMixin(LightningElement) {
                                             ((rec).type === 'txt') ? 'doctype:txt' :
                                                 ((rec).type === 'docx' || (rec).type === 'doc') ? 'doctype:word' : 'doctype:flash';
                 });
-                if(typeof this.keyList != 'undefined' && this.keyList.length > 0) {
+                if (typeof this.keyList != 'undefined' && this.keyList.length > 0) {
                     this.show.showAttachments = true;
                 }
             }
@@ -206,7 +206,7 @@ export default class SendEmail extends NavigationMixin(LightningElement) {
                     }
                 }
             }
-            this.columns = [{ fieldName: 'Name', label: 'Name', sortable: true }, { fieldName: 'Email', label: 'Email', sortable: true }, { fieldName: 'status', label: 'Email Status', sortable: true }]
+            this.columns = [{ fieldName: 'Name', label: 'Name', sortable: true }, { fieldName: 'Email', label: 'Email', sortable: true }, { fieldName: 'Status', label: 'Email Status', sortable: true }]
         }
         else {
             this.pagesList = ['chooseRecipients', 'composeEmail'];
@@ -432,10 +432,15 @@ export default class SendEmail extends NavigationMixin(LightningElement) {
                     case 'png':
                     case 'jpg':
                     case 'jpeg': a.iconName = 'doctype:image'; break;
-                    case 'docs': a.iconName = 'doctype:word'; break;
+                    case 'docs':
+                    case 'doc':
+                    case 'docx': a.iconName = 'doctype:word'; break;
+                    case 'xlsx':
+                    case 'xls': a.iconName = 'doctype:excel'; break;
+                    case 'txt': a.iconName = 'doctype:txt'; break;
                     case 'pdf': a.iconName = 'doctype:pdf'; break;
                     case 'csv': a.iconName = 'doctype:csv'; break;
-                    default: a.iconName = 'doctype:attachment'; break;
+                    default: a.iconName = 'doctype:flash'; break;
                 }
                 this.email.attachmentsData.attachments.push(a);
             });

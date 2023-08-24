@@ -155,7 +155,7 @@
 												<lightning-input type="tel" value={questionary.value}
 													data-con={questionary.conditional} variant="label-hidden"
 													style="max-width:150px;" name={questionary.question}
-													data-key={questionary.Id} placeholder="xxx-xxx-xxxx"
+													data-key={questionary.Id} data-questiontype="phone"
 													disabled={questionary.isEditable} onblur={handleChange}
 													pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" onclick={openChatHandler}>
 												</lightning-input>
@@ -183,7 +183,7 @@
 													data-con={questionary.conditional} variant="label-hidden"
 													name={questionary.question} data-key={questionary.Id}
 													disabled={questionary.isEditable} onblur={handleChange}
-													placeholder="abc@gmail.com" onclick={openChatHandler}>
+													onclick={openChatHandler}>
 												</lightning-input>
 											</template>
 											<template if:true={questionary.isRadio}>

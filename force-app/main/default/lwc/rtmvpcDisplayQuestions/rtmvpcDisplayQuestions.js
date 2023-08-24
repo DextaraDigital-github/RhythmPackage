@@ -80,6 +80,9 @@ export default class RtmvpcDisplayQuestions extends LightningElement {
         }, 200);
 
     }
+    handleRefresh(){
+        this.handleOnload();
+    }
     connectedCallback() {
         this.tempId = this.recordId;
         this.handleOnload();

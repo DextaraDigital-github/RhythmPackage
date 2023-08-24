@@ -63,7 +63,18 @@ public with sharing class AssessmentTriggerHandler implements ITriggerHandler{
       @param oldMap This is the old map of records.
     */
     public void afterUpdate(List<sObject> newList, Map<Id, sObject> newMap,  List<sObject> oldList, Map<Id, sObject> oldMap) {
-      return;
+      Set<Id> assmentIdSet = new Set<Id>();
+      Map<Id, Assessment__c> oldAssmtsMap = (Map<Id, Assessment__c>)oldMap;
+      
+      for(Assessment__c assmt:(List<Assessment__c>)newList){
+        if((assmt.Start_Date__c != oldAssmtsMap.get(assmt.Id).Start_Date__c) && assmt.Start_Date__c == Date.Today()){
+          assmentIdSet.add(assmt.Id);
+        }
+      }
+      if(assmentIdSet.isEmpty() == false){
+        sendUpdatedAssessments(assmentIdSet,newMap);
+      }
+      
     }
     
     /**
@@ -177,6 +188,51 @@ public with sharing class AssessmentTriggerHandler implements ITriggerHandler{
         }
     }
 
+    /**
+    * @description To send assessment emails
+    * @param assmentIdSet This is the set of ids.
+    * @param newMap This is the new map of records.
+    */
+    public static void sendUpdatedAssessments(Set<Id> assmentIdSet,Map<Id, sObject> newMap){
+      try{
+        Map<Id, Assessment__c> assmtMap = (Map<Id, Assessment__c>)newMap;
+        List<AccountAssessmentRelation__c> accountAssessRelnsList = new List<AccountAssessmentRelation__c>();
+        for(Assessment_Supplier__c assSup:[SELECT Id,Account__r.Name,Account__c,Assessment__c,Status__c FROM Assessment_Supplier__c WHERE Assessment__c IN:assmentIdSet WITH SECURITY_ENFORCED]){
+          AccountAssessmentRelation__c accAssessReln = new AccountAssessmentRelation__c();
+
+          accAssessReln.Name = assSup.Account__r.Name;
+          accAssessReln.Account__c = assSup.Account__c;
+          accAssessReln.Assessment__c =assSup.Assessment__c;
+          accAssessReln.Start_Date__c = assmtMap.get(assSup.Assessment__c).Start_Date__c;
+          if(assmtMap.get(assSup.Assessment__c).End_Date__c != null){
+              accAssessReln.End_Date__c = assmtMap.get(assSup.Assessment__c).End_Date__c;
+          }
+          accAssessReln.Status__c = 'New';
+          accountAssessRelnsList.add(accAssessReln);
+        }
+        Set<Id> successRecordsIdSet = new Set<Id>();
+        List<String> errorsList = new List<String>();
+        if(accountAssessRelnsList.isEmpty() == false){
+            Database.SaveResult[] results = safe.doInsert(accountAssessRelnsList);
+            errorsList = SecurityCheckController.safeClassExceptionHandlerInsert(results);
+            for(Database.SaveResult result : results){
+                if(result.isSuccess()){
+                    successRecordsIdSet.add(result.getId());
+                }
+            }
+        }
+        if(errorsList.size()>0){
+          Database.rollback(sp);
+          throw new SecurityControllerException(String.join(errorsList, ', ' ));
+        }
+        if(successRecordsIdSet.isEmpty() == false){
+          AssessmentController.sendEmails(successRecordsIdSet,'');
+        }
+      }catch(Exception e){
+        String errorMsg = e.getMessage();
+        throw new AuraHandledException(errorMsg);
+      }
+    }
      /**
     * @description It is used to throw the exception
     */
