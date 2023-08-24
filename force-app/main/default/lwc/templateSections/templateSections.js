@@ -133,14 +133,17 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
             this.handleRefresh();
         }
     }
-    handlesave() {
-        this.dispatchEvent(
-            new ShowToastEvent({
-                title: 'Success',
-                message: 'Reordered Sections Successfully',
-                variant: 'success'
-            })
-        );
+    handlesave(event) {
+        if (typeof event.detail !== 'undefined' && event.detail!==null) {
+            this.dispatchEvent(
+                new ShowToastEvent({
+                    title: 'Success',
+                    message: 'Reordered Sections Successfully',
+                    variant: 'success'
+                })
+            );
+        }
+
         this.viewQuestions = false;
         this.handleRefresh();
     }
@@ -151,25 +154,24 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
         this.questionId = row.Id;
         this.sectionName = row.sectionName;
         let bool = false;
-        if(typeof row.Rhythm__No_of_Questions__c!=='undefined'){
+        if (typeof row.Rhythm__No_of_Questions__c !== 'undefined') {
             bool = true;
         }
-        console.log('row', row);
         switch (actionName) {
             case 'view':
                 this.viewQuestions = true;
                 break;
             case 'edit':
-                if(bool){
-                   
+                if (bool) {
+
                     this.selectedSectionName = row.sectionName;
                     this.selectedRecordId = row.Id;
                     this.showModal.editModal = true;
                 }
-                else{
-                      this.viewQuestions = true;
+                else {
+                    this.viewQuestions = true;
                 }
-                
+
                 break;
             case 'delete':
                 this.selectedRows = [];
@@ -408,17 +410,17 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
                     this.tempid = data[0].Rhythm__Assessment_Template__r.Id;
                 }
             }
-                console.log('questionData', questionData);
-                let parent = questionData.filter(res => typeof res.Rhythm__Parent_Question__c === 'undefined');
-                this.questionsList = parent;
-                getSectionRecsCount({ templateId: this.recordId, objName: this.objLabel }).then(secData => {
-                    this.totalRecsCount = secData;
-                    this.recsCount = secData;
-                    this.handleSectionsData(JSON.parse(JSON.stringify(secData)));
-                }).catch(error => {
-                    console.log(error);
-                });
-            
+            console.log('questionData', questionData);
+            let parent = questionData.filter(res => typeof res.Rhythm__Parent_Question__c === 'undefined');
+            this.questionsList = parent;
+            getSectionRecsCount({ templateId: this.recordId, objName: this.objLabel }).then(secData => {
+                this.totalRecsCount = secData;
+                this.recsCount = secData;
+                this.handleSectionsData(JSON.parse(JSON.stringify(secData)));
+            }).catch(error => {
+                console.log(error);
+            });
+
         }).catch(error => {
             console.log(error);
         });

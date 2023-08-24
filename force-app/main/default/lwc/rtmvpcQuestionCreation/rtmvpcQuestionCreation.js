@@ -52,7 +52,7 @@ export default class RtmvpcQuestionCreation extends LightningElement {
     */
     @api
     getParentQuestionCondition(conditionValue) {
-        
+
         if (typeof conditionValue !== 'undefined') {
             this.questionWrapper['Rhythm__Conditional_Response__c'] = conditionValue.conditionalResponse;
             //this.questionWrapper['Rhythm__Section__c'] = 
@@ -85,12 +85,12 @@ export default class RtmvpcQuestionCreation extends LightningElement {
     }
     renderedCallback() {
         Promise.all([
-            loadStyle(this,ComponentStylesheet)
+            loadStyle(this, ComponentStylesheet)
         ]);
     }
     handleOnLoad() {
         this.questionWrapper.Rhythm__Question__c = '';
-        console.log('this.assessmentTemplate',this.assessmentTemplate);
+        console.log('this.assessmentTemplate', this.assessmentTemplate);
         if (typeof this.assessmentTemplate !== 'undefined') {
             this.createQues = true;
         }
@@ -196,7 +196,7 @@ export default class RtmvpcQuestionCreation extends LightningElement {
         This method method is used to Select the sections value (custom lookup).
     */
     handleSelectedValue(event) {
-        console.log('In update',event.detail);
+        console.log('In update', event.detail);
         this.questionWrapper['Rhythm__Section__c'] = event.detail;
         if (typeof this.assessmentTemplate !== 'undefined') {
             this.questionWrapper['Rhythm__Assessment_Template__c'] = this.assessmentTemplate;
@@ -350,11 +350,11 @@ export default class RtmvpcQuestionCreation extends LightningElement {
                     else {
                         let toastmessage = 'Preferred/Not Preferred and Upload Required fields are mandatory';
                         if (Array.from(set1).length !== this.responseAttributes.length) {
-                            if(responselst.length!==0){
-                                 toastmessage = 'ResponseValue, Preferred/Not Preferred and Upload Required fields are mandatory';
+                            if (responselst.length !== 0) {
+                                toastmessage = 'ResponseValue, Preferred/Not Preferred and Upload Required fields are mandatory';
                             }
-                            else{
-                                 toastmessage ='Enter unique response values';
+                            else {
+                                toastmessage = 'Enter unique response values';
                             }
                         }
                         else {
@@ -377,7 +377,7 @@ export default class RtmvpcQuestionCreation extends LightningElement {
                                     detail: this.totastmessage
                                 });
                                 this.dispatchEvent(selectedEvent);
-                            }).catch(error=>{
+                            }).catch(error => {
                                 this.configureToast('Some Error has occured', 'Response value,Preferred/Not Preferred and Upload Required fields are mandatory', 'error');
                                 this.loading = false;
                             });
@@ -402,6 +402,10 @@ export default class RtmvpcQuestionCreation extends LightningElement {
                                 this.configureToast('Some Error has occured', 'Before changing the Response type, please delete Condtional questions', 'error');
                                 this.createQues = false;
                                 this.loading = false;
+                                const selectedEvent = new CustomEvent('handleaftersave', {
+                                    detail: undefined
+                                });
+                                this.dispatchEvent(selectedEvent);
                             }
                             else {
                                 this.questionWrapper['Rhythm__OptionValueSet__c'] = '';

@@ -41,7 +41,7 @@ public with sharing class ActionItemHandler implements ITriggerHandler{
     public void beforeUpdate(List<sObject> newList, Map<Id, sObject> newMap, List<sObject> oldList, Map<Id, sObject> oldMap) {
       Map<Id,Action__c> oldRecordsMap = (Map<Id,Action__c>)oldMap;
       for(Action__c aar:(List<Action__c>)newList) {
-            if(aar.Due_Date__c != oldRecordsMap.get(aar.Id).get('Rhythm__Due_Date__c') && (aar.Due_Date__c > Date.Today()) && (oldRecordsMap.get(aar.Id).get('Rhythm__Status__c') != 'Closed')) {
+            if(aar.Due_Date__c != oldRecordsMap.get(aar.Id).get('Rhythm__Due_Date__c') && (aar.Due_Date__c >= Date.Today()) && (oldRecordsMap.get(aar.Id).get('Rhythm__Status__c') != 'Closed')) {
                 aar.Status__c='Open';
             }
         }
