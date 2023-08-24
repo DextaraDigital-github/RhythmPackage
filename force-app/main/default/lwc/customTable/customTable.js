@@ -357,7 +357,8 @@ export default class CustomTable extends LightningElement {
                         }
                         if (colList[j].fieldName === 'Rhythm__Status__c') {
                             if (typeof relatedListRecords[i].Rhythm__Status__c !== 'undefined')
-                                if (relatedListRecords[i].Rhythm__Status__c === 'Submitted') {
+                                if (relatedListRecords[i].Rhythm__Status__c === 'Submitted' ||
+                                relatedListRecords[i].Rhythm__Status__c ==='Review Completed') {
                                     recJson.surveySymbol = 'utility:lock';
                                 }
                                 else {
