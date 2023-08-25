@@ -118,10 +118,18 @@
 						</td>
 						<td colspan="16" class="slds-p-around_x-small" data-id={item.key} title={item.url}
 							onclick={handleDownload} style="overflow: auto;word-break: break-word;">
-							<p data-id={item.key} title={item.url} onclick={handleDownload}>{item.value}</p>
+							<p data-id={item.key} title={item.url} >{item.value}</p>
 						</td>
 						<td colspan="16">
+							<template if:true={isSupplier}>
 							<template if:false={isSave}>
+							<lightning-icon icon-name="utility:delete" size='x-small' alternative-text="Delete"
+								class="slds-p-around_x-small slds-m-left_xx-small" key={item.key} name={item.key}
+								title="Delete" onclick={handleDeletePopup}>
+							</lightning-icon>
+							</template>
+							</template>
+							<template if:false={isSupplier}>
 							<lightning-icon icon-name="utility:delete" size='x-small' alternative-text="Delete"
 								class="slds-p-around_x-small slds-m-left_xx-small" key={item.key} name={item.key}
 								title="Delete" onclick={handleDeletePopup}>
