@@ -12,7 +12,7 @@ import getActionRecords from '@salesforce/apex/CAPAController.getActionRecords';
 import RTM_FONTS from '@salesforce/resourceUrl/rtmfonts';
 import CUS_STYLES from '@salesforce/resourceUrl/rtmcpcsldscustomstyles';
 import QUE_PLAT from '@salesforce/resourceUrl/rtmvpcquestionnaireplatform';
-import { constructMultilevelhierarchy, createChildHierarchy, handleOnloadUtil } from './questionnaireutil';
+import { constructMultilevelhierarchy, createChildHierarchy} from './questionnaireutil';
 import { loadStyle } from 'lightning/platformResourceLoader';
 import awsjssdk from '@salesforce/resourceUrl/AWSJSSDK';
 import { loadScript } from 'lightning/platformResourceLoader';
@@ -454,7 +454,7 @@ export default class Questionnaire extends LightningElement {
                     this.objectApiName = 'Rhythm__Assessment_Template__c';
                     this.previewObjectName = 'Rhythm__Assessment_Template__c';
                 }
-            }).catch(error => {
+            }).catch(err => {
             });
         }
         if (this.documentParentId != undefined) {
@@ -467,7 +467,7 @@ export default class Questionnaire extends LightningElement {
             ]).then(() => {
                 this.configAWS();
             })
-                .catch(error => {
+                .catch(err => {
                 });
         }
         getActionRecords({ accountAssessment: this.assessment }).then((result) => {
@@ -598,15 +598,14 @@ export default class Questionnaire extends LightningElement {
                                     });
                                     this.loading = false;
                                     this.filterQuestionsAndAnswers = JSON.parse(JSON.stringify(this.questionsAndAnswerss));
-
-                                }).catch(error => {
+                                }).catch(err => {
                                 });
-                            }).catch(error => {
+                            }).catch(err => {
                             });
-                        }).catch(error => {
+                        }).catch(err => {
                         });
                     }
-                }).catch(error => {
+                }).catch(err => {
                 });
             }
             else {
@@ -658,12 +657,10 @@ export default class Questionnaire extends LightningElement {
                             this.ishideToast = false;
                             this.showRefreshbutton = true;
                         });
-                    }).catch(error => {
+                    }).catch(err => {
                     });
                     this.loading = false;
-
-                }).catch(error => {
-                });
+                }).catch(err => { });
             }
         }
         else {
@@ -820,11 +817,11 @@ export default class Questionnaire extends LightningElement {
                         }).catch(error => {
                             this.totastmessage = 'Error : ' + JSON.stringify(error);
                         });
-                    }).catch(error => {
+                    }).catch(err => {
                     })
-                }).catch(error => {
+                }).catch(err => {
                 })
-            }).catch(error => {
+            }).catch(err => {
             });
             this.showspinner = false;
         }
@@ -1624,22 +1621,22 @@ export default class Questionnaire extends LightningElement {
                 filemaplst.updateTimeline = true;
                 if (!this.isAutoSave) {
                     this.success = true;
-
                     const selectedEvent = new CustomEvent('updatetimeline', {
                         detail: filemaplst
                     });
-                    if (this.countAutoSave !== 1) {
+                    if (this.countAutoSave > 1 && !isSubmit) {
                         this.dispatchEvent(selectedEvent);
                     }
                     else {
                         if (isSubmit) {
                             setTimeout(() => {
                                 this.dispatchEvent(selectedEvent);
+                                this.handleOnload();
                             }, 200);
                         }
                     }
                 }
-            }).catch(error => {
+            }).catch(err => {
                 this.totastmessage = 'Error : Something went wrong, Please contact admin.';
             });
         }
@@ -1713,7 +1710,6 @@ export default class Questionnaire extends LightningElement {
                     quTemp.needData = false;
                     quTemp.rejectButton = false;
                     quTemp.rejectedData = 'WithHold';
-
                 }
                 if (savedResp.get(qu.Id).Reject__c === '') {
                     quTemp.needData = false;
@@ -1860,7 +1856,6 @@ export default class Questionnaire extends LightningElement {
             quTemp.showUpload = qu.Rhythm__Requires_File_Upload__c;
             if (typeof savedResp.get(qu.Id) !== 'undefined' && typeof savedResp.get(qu.Id).Files__c !== 'undefined') {
                 let responsedData = savedResp.get(qu.Id).Files__c;
-
                 quTemp.Files__c = responsedData;
             }
             quTemp.showUploadProgress = false;
@@ -1993,7 +1988,6 @@ export default class Questionnaire extends LightningElement {
                                 }
                                 if (subQuestion.Id === rejectedMap.questionId && typeof rejectedMap.needData !== 'undefined') {
                                     subQuestion.needData = rejectedMap.needData;
-
                                 }
                             });
                         }
@@ -2113,7 +2107,7 @@ export default class Questionnaire extends LightningElement {
             this.dispatchEvent(selectedEvent);
             this.accountAssessmentStatus = 'In Review';
             this.handleOnload();
-        }).catch(error => {
+        }).catch(err => {
         });
         this.showcustomerbuttons = true;
         this.showInReview = false;
@@ -2268,10 +2262,7 @@ export default class Questionnaire extends LightningElement {
                                 if (count > 1 && (typeof subQuestion.ResponseId !== 'undefined' && subQuestion.rejectedData === '')) {
                                     subQuestion.needData = true;
                                 }
-
-                            });
-                        }
-                    });
+                            });} });   
                 }
             });
         });
@@ -2294,9 +2285,7 @@ export default class Questionnaire extends LightningElement {
                 setTimeout(() => {
                     this.handleOnload();
                 }, 350);
-            }).catch(error => {
-
-            });
+            }).catch(err => {});          
             this.ishideToast = true;
             this.showToast = true;
             this.success = true;
@@ -2313,7 +2302,6 @@ export default class Questionnaire extends LightningElement {
         param.recId = this.recordId;
         this.handleAprroveReject();
         updateAccountAssessmentStatus({ paramMap: JSON.stringify(param) }).then(() => {
-            
             const selectedEvent = new CustomEvent('updatetimeline', {
                 detail: param
             });
@@ -2322,9 +2310,7 @@ export default class Questionnaire extends LightningElement {
             setTimeout(() => {
                 this.handleOnload();
             }, 350);
-        }).catch(error => {
-
-        });
+        }).catch(err => {});
         this.ishideToast = true;
         this.showToast = true;
         this.success = true;
