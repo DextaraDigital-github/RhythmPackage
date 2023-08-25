@@ -567,8 +567,11 @@ export default class Action extends LightningElement {
 
   handleChange(event) {
     let changedData = event.target.value;
-    this.isLabel='Save';
+   
     let name = event.currentTarget.dataset.id;
+     if(name === 'Rhythm__Status__c' && changedData === 'Open'){
+      this.isLabel='Save';
+    }
     this.saveActionResponse[name] = changedData;
     this.showresponse = [];
     this.showresponse.push(this.saveActionResponse);

@@ -387,10 +387,15 @@ public with sharing class AWSS3Service extends AWS {
     public void updateRespFilesCount(String responseId, Integer filesCount) {
         try {
             List<Response__c> srList = new List<Response__c>();
-            if(String.isNotBlank(responseId) && filesCount > 0) {
+            if(String.isNotBlank(responseId)) { 
                 Response__c res=new Response__c();
                 res.Id= responseId;
+                if(filesCount > 0){
                 res.Files__c = String.valueOf(filesCount);
+                }
+                else {
+                 res.Files__c = '0';
+                }
                 srList.add(res);
                 safe.doUpdate(srList);
             }

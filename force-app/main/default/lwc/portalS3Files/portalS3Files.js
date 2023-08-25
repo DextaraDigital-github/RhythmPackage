@@ -197,11 +197,18 @@ export default class AWSS3FileOperations extends LightningElement {
             Bucket: this.bucketName,
             Key: this.keyString
         };
+         let filesCount;
+        if(this.keyList.length > 0) {
+           filesCount =  this.keyList.length - 1 ;
+        }
+        else {
+           filesCount = 0; 
+        }
         this.s3.deleteObject(params, (error, data) => {
             if (data) {
                 updateRespFilesCount({
                     responseId: this.responseRecId,
-                    filesCount: this.keyList.length - 1
+                    filesCount: filesCount
                 }).then(reco => {
                     let fileName = this.fileKey.substring(this.fileKey.lastIndexOf("/") + 1);
                     this.showToastMessage('Deleted', fileName.substring(fileName.indexOf("_") + 1) + ' - Deleted Successfully', 'success');
@@ -212,7 +219,7 @@ export default class AWSS3FileOperations extends LightningElement {
                     let rmp = {};
                     rmp.responseId = this.responseRecId;
                     rmp.questionId = this.questionId;
-                    rmp.numberoffiles = this.keyList.length - 1;
+                    rmp.numberoffiles = filesCount;
                     const selectedEvent = new CustomEvent('deletefile', {
                         detail: {value : rmp}
                     });

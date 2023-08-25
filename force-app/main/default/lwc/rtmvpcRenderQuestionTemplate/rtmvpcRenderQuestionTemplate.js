@@ -35,7 +35,7 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
     @track showPopup = false;
     @track showSupplierPopup = false;
     connectedCallback() {
-
+       
         console.log('qtype', this.qtype);
         if (typeof this.conditionaval !== 'undefined' && typeof this.qtype !== 'undefined') {
             this.conditionaldisplay = true;
@@ -56,10 +56,10 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
         if (this.responses && this.responses.length > 0) {
             this.responses.forEach(res => {
                 if (res.isCheckbox) {
-
-                    if (res.value === true) {
+                    
+                    if (res.value === true){
                         this.checkedLabel = true;
-
+                        
                     }
                     else {
                         this.checkedLabel = false;
@@ -67,7 +67,7 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
                 }
             });
         }
-        console.log('checked', this.checkedLabel);
+        console.log('checked',this.checkedLabel);
     }
     /* deleteForm is used to delete the CAPA form for a question by dispatching the questionId to its parent Component
        Questionnaire */
@@ -209,15 +209,28 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
     }
     handleCancelButton() {
         this.showPopup = false;
-        this.showSupplierPopup = false;
+        this.showSupplierPopup = false; 
         this.responsemap.cancel = false;
-        console.log('this.responsemap',this.responsemap);
         const selectedEvent = new CustomEvent('valuechange', {
             bubbles: true,
-            detail: undefined
+            detail:undefined
         });
         this.dispatchEvent(selectedEvent);
-
+        //dispatches event
+        this.responses = JSON.parse(JSON.stringify(this.responses));
+        // this.responses.forEach(question=>{
+        //     if(question.Id=== this.responsemap.questionId){
+        //         this.responsemap.event.target.value = question.value;
+        //         var x ={};
+                // var y={};
+                // y['key']=question.Id;
+                //  console.log('y',y);
+                //  x['dataset']=y;
+                // console.log('x',x);
+                // this.responsemap.event.currentTarget = x;
+        //         // console.log('x',this.responsemap.event.currentTarget.dataset.key);
+        //     }
+        // })
     }
     handleFlagButton() {
         this.showPopup = false;
@@ -270,31 +283,23 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
     /*handleChange is used to dispatch an event to its parent component(Questionnaire) and change the response and send back to the parent component*/
     handleChange(event) {
         console.log('sampe');
-        this.showSupplierPopup = false;
+        this.showSupplierPopup=false;
         var changedvalue = event.target.value;
         let questionId = event.currentTarget.dataset.key;
         let parentQuestionId;
-        let questionType = event.currentTarget.dataset.questiontype;
-        if (typeof questionType !== 'undefined' && questionType === 'phone' && typeof changedvalue !== 'undefined') {
-            let numberList = changedvalue.split('-');
-            if (!(numberList.length === 3 && numberList[0].length === 3 && numberList[1].length === 3 && numberList[2].length === 4)) {
-                changedvalue = numberList.join('');
-                changedvalue = changedvalue.substring(0,3) + changedvalue.substring(3,6) + changedvalue.substring(6,changedvalue.length);
-            }
-        }
         if (this.responses && this.responses.length > 0) {
             this.responses.forEach(res => {
                 res.Children.forEach(conditional => {
                     if (conditional.questions.length > 0) {
-                        this.timeline.forEach(result => {
-                            if (result.status === 'In Review') {
-                                this.showSupplierPopup = true;
+                        this.timeline.forEach(result=>{
+                            if(result.status === 'In Review'){
+                                 this.showSupplierPopup=true;
                             }
                         })
-
+                       
                     }
                 })
-                if ((typeof changedvalue === 'undefined' || changedvalue === '' || changedvalue === '[]') && res.Id === questionId) {
+                if ((typeof changedvalue === 'undefined' || changedvalue === '' || changedvalue === '[]' ) && res.Id === questionId ) {
                     if (typeof res.defaultValue !== 'undefined') {
                         console.log('handlechange');
                         changedvalue = res.defaultValue;
@@ -313,7 +318,7 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
                         }
                     }
                 }
-
+                
             });
         }
         console.log('parentQuestionId', parentQuestionId);
@@ -324,20 +329,20 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
         this.responsemap.event = event;
 
         /*This dispatch event is used to send the data to questionnaire on onchange to perform saving.*/
-        if (this.showSupplierPopup === false) {
-            const selectedEvent = new CustomEvent('valuechange', {
-                bubbles: true,
-                detail: this.responsemap
-            });
-            //dispatches event
-            console.log('this.responsemap in handleChange', this.responsemap);
-            this.dispatchEvent(selectedEvent);
+        if( this.showSupplierPopup === false){
+        const selectedEvent = new CustomEvent('valuechange', {
+            bubbles: true,
+            detail: this.responsemap
+        });
+        //dispatches event
+        console.log('this.responsemap in handleChange',this.responsemap);
+        this.dispatchEvent(selectedEvent);
         }
     }
-    handleResponseChange() {
+    handleResponseChange()
+    {
         this.showSupplierPopup = false;
-        this.responsemap.cancel = false;
-        const selectedEvent = new CustomEvent('valuechange', {
+         const selectedEvent = new CustomEvent('valuechange', {
             bubbles: true,
             detail: this.responsemap
         });

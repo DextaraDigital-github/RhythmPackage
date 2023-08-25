@@ -64,6 +64,8 @@
 		--slds-c-button-text-color-hover:rgb(86, 45, 109)!important;
 		--slds-c-tabs-item-color-border-hover:rgb(107, 56, 136)!important;
 		--slds-c-tabs-item-color-border-active:rgb(86, 45, 109)!important;
+		--lwc-brandAccessible:#562d6d!important;
+		--lwc-brandAccessibleActive:#3b194f!important;
 		/* Purple */
 		--pbtn-bg:rgb(107, 56, 136); /* rgba(107,56,136,1); */
 		--pbtn-bgh:rgb(86, 45, 109); /* rgba(86,45,109,1); */
@@ -131,12 +133,12 @@
 		--cibcad-txt: ;
 		--cibcad-txthlt: ;
 		--cibcad-hlt: ;	
-		.cad-cardbase {position:relative; width:100%; height:calc(100vh - 200px)!important; border-radius:0px; overflow:hidden;}
+		.cad-cardbase {position:relative; width:100%; height:calc(100vh - 180px)!important; border-radius:0px; overflow:hidden;}
 		.cad-titlebutton_more .slds-button--icon-more, .cad-titlebutton_more .slds-button_icon-more { background-color:transparent!important; border-color:transparent!important; margin-top: -4px; }
 
             
 		--box-shadow:0 5px 15px 0 rgba(0,0,0,.07), 0 15px 35px 0 rgba(49,105,193,.1);
-        .slds-tabs_card {padding-top:5px!important; min-height: calc(100vh - 200px); }
+        .slds-tabs_card {padding-top:5px!important; min-height: calc(100vh - 180px); }
 		.slds-tabs_card .slds-tabs_default__nav { height:33px; }
         .slds-tabs_card .slds-tabs_default__link, .slds-tabs_card .slds-tabs--default__link { height: 2rem!important; line-height: 1.8rem; }
         
@@ -208,3 +210,8 @@
 	.cdg .slds-scrollable_x { overflow-x:none; }
 	.cdg th[aria-label="Section Name"], .cdg th[data-label="Section Name"], .cdg th[aria-label="Section"], .cdg th[data-label="Section"] {min-width:170px!important;}
 	.lwcAppFlexipage app_flexipage-header { display:none !important;}
+
+	@media screen and (max-width:992px) {
+	.cad-cardbase { height:50vh;}
+	.slds-tabs_card { min-height:60vh; }
+	}

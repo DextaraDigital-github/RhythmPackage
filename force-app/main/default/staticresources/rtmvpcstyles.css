@@ -66,6 +66,8 @@
 		--slds-c-button-text-color-hover:rgb(86, 45, 109)!important;
 		--slds-c-tabs-item-color-border-hover:rgb(107, 56, 136)!important;
 		--slds-c-tabs-item-color-border-active:rgb(86, 45, 109)!important;
+		--lwc-brandAccessible:#562d6d!important;
+		--lwc-brandAccessibleActive:#3b194f!important;
 		/* Purple */
 		--pbtn-bg:rgb(107, 56, 136); /* rgba(107,56,136,1); */
 		--pbtn-bgh:rgb(86, 45, 109); /* rgba(86,45,109,1); */
@@ -455,7 +457,7 @@
 	}
 
 .comm-login-form__container, .comm-forgot-password__container, .salesforceIdentityLoginBody2 .cCenterPanel .siteforceContentArea {padding:45px 30px 16px !important; background:#f3f3f3!important; box-shadow:0px 0px 6px rgba(0,0,0,0.2); border:none; border-radius:10px; font-size:16px !important;width:350px; position:absolute; left:50%; top:50%; transform:translate(-50%, -50%); }
-	.comm-login-form__container:before, .comm-forgot-password__container:before, .salesforceIdentityLoginBody2 .cCenterPanel .siteforceContentArea:before {content:''; position:absolute; width:220px; height:60px; top:-30px; left:50%; transform:translatex(-50%); z-index:9; background:#ffffff url(/rhythm/resource/Rhythm__rtmlogofull) no-repeat; background-position:center 10px; border-width: var(--slds-c-card-sizing-border,var(--sds-c-card-sizing-border,1px));
+	.comm-login-form__container:before, .comm-forgot-password__container:before, .salesforceIdentityLoginBody2 .cCenterPanel .siteforceContentArea:before {content:''; position:absolute; width:220px; height:60px; top:-30px; left:50%; transform:translatex(-50%); z-index:9; background:#ffffff url(Rhythm__rtmlogofull) no-repeat; background-position:center 10px; border-width: var(--slds-c-card-sizing-border,var(--sds-c-card-sizing-border,1px));
     border-radius:8px; box-shadow:0px 0px 6px rgba(0,0,0,0.2); }
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
 	.comm-login-form__container .slds-form-element__label { font-size:unset;}
@@ -465,6 +467,7 @@
 
 	.cCenterPanel, .contentRegion.comm-layout-column, .comm-content-header.comm-layout-column, .comm-content-footer.comm-layout-column {
          /* Adjust the width as needed */
+		width:auto;
         max-width: 800px; /* Set a maximum width if desired */
         margin: 0 auto;
         padding: 0;
