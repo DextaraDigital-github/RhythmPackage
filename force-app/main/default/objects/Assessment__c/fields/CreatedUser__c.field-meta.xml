@@ -2,7 +2,7 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>CreatedUser__c</fullName>
     <externalId>false</externalId>
-    <formula>CreatedBy.LastName +  CreatedBy.FirstName</formula>
+    <formula>CreatedBy.FirstName+&apos; &apos;+ CreatedBy.LastName</formula>
     <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
     <inlineHelpText>Record created User Name</inlineHelpText>
     <label>CreatedUser</label>
