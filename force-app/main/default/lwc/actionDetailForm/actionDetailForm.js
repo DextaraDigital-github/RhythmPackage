@@ -40,6 +40,9 @@ export default class ActionDetailForm extends LightningElement {
   connectedCallback() {
     selectedActionRecord({ actionid: this.actionid }).then(res => {
       this.actionFormData = res;
+      // if(typeof this.actionFormData[0].Rhythm__Supplier__r === 'undefined'){
+      //   this.actionFormData[0].Rhythm__Supplier__r.Name='sampple';
+      // }
       console.log('sampletest', this.actionFormData);
       if (this.actionFormData[0].Rhythm__Status__c === 'Closed' || this.actionFormData[0].Rhythm__Status__c === 'Expired') {
         this.isSave = false;
@@ -60,8 +63,10 @@ export default class ActionDetailForm extends LightningElement {
   }
   handleChange(event) {
     let changedData = event.target.value;
-     this.isSubmit=false;
     let name = event.currentTarget.dataset.id;
+        if(name === 'Rhythm__Status__c' && changedData === 'Open'){
+      this.isSubmit=false;
+    }
     this.actionFormData[0][name] = changedData;
     if(name === 'Rhythm__Status__c' && changedData === 'Closed'){
       this.isSubmit=true;

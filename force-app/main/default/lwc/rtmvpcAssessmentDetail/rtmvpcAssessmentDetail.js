@@ -71,11 +71,11 @@ export default class RtmvpcAssessmentDetail extends NavigationMixin(LightningEle
     @track showBack = false;
 
     connectedCallback() {
+        
         let pageurl = window.location.href;
         let id = pageurl.split('=');
         let urlaccountid = '';
-        console.log('id', id[1]);
-        if (typeof id[1] !== 'undefined') {
+        if (typeof id[1] !== 'undefined' && id[1].length===18) {
             getAccountAssessmentRecordData({ assrecordId: id[1] }).then(asmtResult => {
                 urlaccountid = asmtResult[0].Rhythm__Account__c;
                 if (urlaccountid === this.accountid || typeof this.recordId !== 'undefined') {
@@ -165,7 +165,7 @@ export default class RtmvpcAssessmentDetail extends NavigationMixin(LightningEle
             }
             /* */
             getAccountAssessmentRecordData({ assrecordId: accountAssessmentRecord }).then(asmtResult => {
-
+                console.log('asmtResult',asmtResult);
                 /* To get the assessment tracking history to update on timeline*/
                 getAssessmentStatus({ assessmentId: accountAssessmentRecord, objectName: 'AccountAssessmentRelation__c' }).then(statusResult => {
 
@@ -291,9 +291,6 @@ export default class RtmvpcAssessmentDetail extends NavigationMixin(LightningEle
 
 
     }
-
-
-
     handleResponse(event) {
         let response = event.detail;
         console.log('sampledata');

@@ -6,8 +6,6 @@ import getTemplateData from '@salesforce/apex/AssessmentController.getTemplateDa
 import fetchAssessmentTemplates from '@salesforce/apex/AssessmentController.fetchAssessmentTemplates';
 import getTodayDate from '@salesforce/apex/AssessmentController.getTodayDate';
 import errorLogRecord from '@salesforce/apex/AssessmentController.errorLogRecord';
-import TIME_ZONE from '@salesforce/i18n/timeZone';
-import LOCALE_DATA from '@salesforce/i18n/locale';
 
 
 export default class CreateAssessmentWithSuppliers extends NavigationMixin(LightningElement) {
@@ -20,14 +18,12 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
     assessmentId ='';
     @api values = { name: '', template: '', frequencyvalue: 'One Time', startdate: '', enddate:'', category:'', disclosure:'', description:'' };
     @api templateId;
-    dateValue;
     frequencyValue = 'One Time';
     @track assessmentRecord;
-    timeZone = TIME_ZONE;
-    locale = LOCALE_DATA;
     todayDate;
     templateStatus ='';
     @track templateOptions = [];
+    startDate
 
     connectedCallback() {
         this.getTodayDate();
@@ -73,7 +69,9 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
         getTodayDate()
         .then(result => {
             if(result){
+                console.log(result);
                 this.todayDate = result;
+                this.startDate = result;
             }
         })
         .catch(() => {
@@ -107,17 +105,10 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
         });
     }
 
-    get startDate(){
-        if(typeof this.dateValue === 'undefined'){
-            this.dateValue= new Date().toLocaleString(this.locale, {timeZone: this.timeZone})
-        }
-        return this.dateValue;
-    }
-
     updateValuesHandler(event){
         this.values[event.currentTarget.dataset.id] = event.target.value;
         if(event.currentTarget.dataset.id == 'startdate'){
-            this.todayDate = event.target.value;
+            this.startDate = event.target.value;
         }
     }
     
@@ -148,6 +139,9 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
         let startDate = this.template.querySelector(`[data-id="startdate"]`).value;
         let endDate = this.template.querySelector(`[data-id="enddate"]`).value;
         let todayDate =  new Date(this.todayDate).toISOString().substring(0, 10);
+
+        console.log('startDate------>',startDate);
+        console.log('todayDate------>',todayDate);
         if(this.templateStatus !== undefined && (this.templateStatus ==='New' || this.templateStatus ==='Inactive')){
             validatedDetails.isSave = false;
             validatedDetails.message = 'Assessment Program can be created only using an Active Template';
