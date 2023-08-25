@@ -121,10 +121,12 @@
 							<p data-id={item.key} title={item.url} onclick={handleDownload}>{item.value}</p>
 						</td>
 						<td colspan="16">
+							<template if:false={isSave}>
 							<lightning-icon icon-name="utility:delete" size='x-small' alternative-text="Delete"
 								class="slds-p-around_x-small slds-m-left_xx-small" key={item.key} name={item.key}
 								title="Delete" onclick={handleDeletePopup}>
 							</lightning-icon>
+							</template>
 						</td>
 					</tr>
 				</template>
@@ -150,7 +152,7 @@
 				class="slds-modal slds-fade-in-open">
 				<div class="slds-modal__container">
 					<div class="slds-modal__header">
-						<h1 id="modal-heading-01" class="slds-modal__title slds-hyphenate">Action Form
+						<h1 id="modal-heading-01" class="slds-modal__title slds-hyphenate">Action Item
 							Deletion
 						</h1>
 					</div>

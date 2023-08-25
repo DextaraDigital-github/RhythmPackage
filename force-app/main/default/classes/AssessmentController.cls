@@ -558,6 +558,7 @@ public with sharing class AssessmentController {
             Map<string,string> responseData=new Map<string,string>();
             String quesId = (String)chatMap.get('questionId');
             String accAssmtId = (String)chatMap.get('accountassessmentId');
+            string accType=(String)chatMap.get('accountData');
             accAssmtId = String.escapeSingleQuotes(accAssmtId);
             List<Response__c> responseRecords = [SELECT Conversation_History__c,createdDate
                                                 FROM Response__c
@@ -570,7 +571,9 @@ public with sharing class AssessmentController {
             }
             if(!responseRecords.isEmpty()){
                 responseRecords[0].put('Conversation_History__c',JSON.serialize(chatMap.get('responseList')));
+                if(accType !='supplier'){
                 responseRecords[0].put('Flag__c',true);
+                }
                 Database.SaveResult[] saveResult = safe.doUpdate(responseRecords);
                 List<String> errorList = SecurityCheckController.safeClassExceptionHandlerInsert(saveResult);
                 responseData.put('questionId',(String)chatMap.get('questionId'));
@@ -585,7 +588,9 @@ public with sharing class AssessmentController {
                 response.Conversation_History__c = JSON.serialize(chatMap.get('responseList'));
                 response.AccountAssessmentRelation__c=(String)chatMap.get('accountassessmentId');
                 response.Is_Latest_Response__c = true;
+                if(accType !='supplier'){
                 response.Flag__c=true;
+                }
                 List<Response__c> responseList = new List<Response__c>();
                 responseList.add(response);
                 Database.SaveResult[] results = safe.doInsert(responseList);

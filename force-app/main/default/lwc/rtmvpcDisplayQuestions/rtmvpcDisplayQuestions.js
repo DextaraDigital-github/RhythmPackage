@@ -8,7 +8,7 @@ import getTemplateRecord from '@salesforce/apex/QuestionController.getTemplateRe
 import errorLogRecord from '@salesforce/apex/AssessmentController.errorLogRecord';
 
 const columns = [
-    { label: 'Section', fieldName: 'Rhythm__SectionName__c', type: "text",  initialWidth:250 },
+    { label: 'Section', fieldName: 'Rhythm__SectionName__c', type: "text", initialWidth: 250 },
     {
         label: 'Question Number', type: "button", typeAttributes: {
             label: { fieldName: 'Name' },
@@ -80,7 +80,7 @@ export default class RtmvpcDisplayQuestions extends LightningElement {
         }, 200);
 
     }
-    handleRefresh(){
+    handleRefresh() {
         this.handleOnload();
     }
     connectedCallback() {
@@ -100,6 +100,9 @@ export default class RtmvpcDisplayQuestions extends LightningElement {
         getTemplateRecord({ templateId: this.recordId }).then(tempresult => {
             if (tempresult[0].Rhythm__Status__c === 'New') {
                 this.tempStatus = true;
+            }
+            else {
+                this.tempStatus = false;
             }
             getQuestions({ templateId: this.recordId }).then(result => {
                 let questionData = JSON.parse(JSON.stringify(result));
@@ -122,21 +125,21 @@ export default class RtmvpcDisplayQuestions extends LightningElement {
                     }
                     parentdata.Name = parentnumber;
                     //parentdata.Name = qnumber[1];
-                    let childMp ={};
+                    let childMp = {};
                     children.forEach(child => {
                         if (parentdata.Id === child.Rhythm__Parent_Question__c) {
                             snumber++;
-                            let x='';
-                            if(parentdata.Rhythm__Question_Type__c==='Checkbox'){
-                                if(child.Rhythm__Conditional_Response__c==='true'){
+                            let x = '';
+                            if (parentdata.Rhythm__Question_Type__c === 'Checkbox') {
+                                if (child.Rhythm__Conditional_Response__c === 'true') {
                                     x = '↳ [' + 'Checked' + '] : ' + child.Rhythm__Question__c;
                                 }
-                                else{
-                                     x = '↳ [' + 'Unchecked' + '] : ' + child.Rhythm__Question__c;
+                                else {
+                                    x = '↳ [' + 'Unchecked' + '] : ' + child.Rhythm__Question__c;
                                 }
                                 child.Rhythm__Question__c = x;
                             }
-                            else{
+                            else {
                                 x = '↳ [' + child.Rhythm__Conditional_Response__c + '] : ' + child.Rhythm__Question__c;
                                 child.Rhythm__Question__c = x;
                             }
@@ -157,25 +160,25 @@ export default class RtmvpcDisplayQuestions extends LightningElement {
                                     child.Rhythm__OptionValueSet__c = child.Rhythm__OptionValueSet__c.replaceAll('\r\n', ', ');
                                 }
                             }
-                            if(typeof childMp[child.Rhythm__Conditional_Response__c]!=='undefined'){
-                                let lst =childMp[child.Rhythm__Conditional_Response__c];
+                            if (typeof childMp[child.Rhythm__Conditional_Response__c] !== 'undefined') {
+                                let lst = childMp[child.Rhythm__Conditional_Response__c];
                                 lst.push(child);
                                 childMp[child.Rhythm__Conditional_Response__c] = lst;
                             }
-                            else{
-                                let lst =[];
+                            else {
+                                let lst = [];
                                 lst.push(child);
-                                childMp[child.Rhythm__Conditional_Response__c]=lst
+                                childMp[child.Rhythm__Conditional_Response__c] = lst
                             }
                             //childlst.push(child);
                         }
-                        
+
                     });
-                    for(let key in childMp){
-                       let lst = childMp[key];
-                       lst.forEach(childrenlst=>{
-                           childlst.push(childrenlst);
-                       });
+                    for (let key in childMp) {
+                        let lst = childMp[key];
+                        lst.forEach(childrenlst => {
+                            childlst.push(childrenlst);
+                        });
                     }
                     if (childlst.length > 0) {
                         parentdata['_children'] = childlst;
@@ -228,7 +231,7 @@ export default class RtmvpcDisplayQuestions extends LightningElement {
         this.viewQuestions = true;
     }
     handleCancel(event) {
-        
+
         if (typeof event.detail !== 'undefined') {
             this.viewQuestions = false;
             this.createNewQues = false;
@@ -313,7 +316,7 @@ export default class RtmvpcDisplayQuestions extends LightningElement {
 
     }
     handlesave(event) {
-        
+
         if (typeof event.detail !== 'undefined') {
             this.createChildQues = false;
             this.viewQuestions = false;
@@ -344,22 +347,34 @@ export default class RtmvpcDisplayQuestions extends LightningElement {
 
     /* Opens the modal popup for child questions reordering when only 1 question is selected */
     cQuesReorderHandler() {
-        if (this.selectedRows.length > 1) {
-            this.configureToast('Multiple questions selected', 'Select only 1 question to continue.', 'error');
-        }
-        else if (this.selectedRows.length === 0) {
-            this.configureToast('No questions selected', 'Select a question to continue.', 'error');
-        }
-        else if (this.selectedRows.length === 1) {
-            if (this.selectedRows[0].hasChildren) {
-                this.selectedRow = this.selectedRows[0];
-                this.show.cQuesReorderModal = true;
-                // this.childQuestions = this.data.filter(question => (question.Id === this.selectedRows[0].Id))[0]._children;
+        getTemplateRecord({ templateId: this.recordId }).then(tempresult => {
+            if (tempresult[0].Rhythm__Status__c === 'New') {
+                this.tempStatus = true;
             }
             else {
-                this.configureToast('No conditional questions to reorder', 'Selected question doesn\'t have any conditional questions to reorder.', 'error');
+                this.tempStatus = false;
             }
-        }
+            if (!this.tempStatus) {
+                this.configureToast('Can\'t reorder as template is active', 'Conditional Questions can\'t be reordered with the Template is Active', 'error');
+            }
+            else if (this.selectedRows.length > 1) {
+                this.configureToast('Multiple questions selected', 'Select only 1 question to continue.', 'error');
+            }
+            else if (this.selectedRows.length === 0) {
+                this.configureToast('No questions selected', 'Select a question to continue.', 'error');
+            }
+            else if (this.selectedRows.length === 1) {
+                if (this.selectedRows[0].hasChildren) {
+                    this.selectedRow = this.selectedRows[0];
+                    this.show.cQuesReorderModal = true;
+                    // this.childQuestions = this.data.filter(question => (question.Id === this.selectedRows[0].Id))[0]._children;
+                }
+                else {
+                    this.configureToast('No conditional questions to reorder', 'Selected question doesn\'t have any conditional questions to reorder.', 'error');
+                }
+            }
+        })
+
     }
 
     /* Handles the closure of the modal where child questions can be reordered */
