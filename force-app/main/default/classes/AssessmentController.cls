@@ -846,6 +846,7 @@ public with sharing class AssessmentController {
                 List<Assessment_Supplier__c> assSuppList=  [SELECT Id
                                                             FROM Assessment_Supplier__c
                                                             WHERE Account__c IN:deleteSupList
+                                                            AND Assessment__c=:assessmentId
                                                             WITH SECURITY_ENFORCED];
                 if(assSuppList.isEmpty() == false){
                     List<Database.DeleteResult> deleteResult = safe.doDelete(assSuppList);

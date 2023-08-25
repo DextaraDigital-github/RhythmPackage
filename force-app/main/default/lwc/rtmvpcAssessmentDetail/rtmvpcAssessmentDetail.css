@@ -74,7 +74,7 @@
 
 .cad-approved, .cad-timeline_approved .cad-timeline_content {background:#d1f7c4; border:1px solid #a6cf98;}
 .cad-rejected, .cad-timeline_rejected .cad-timeline_content {background:#ffbdc7; border:1px solid #e0a2ab;}
-.cad-inprogress, .cad-timeline_submited .cad-timeline_content {background:#a6cf98; border:1px solid #a6cf98;}
+.cad-inprogress, .cad-timeline_submited .cad-timeline_content {background:#d1f7c4; border:1px solid #d1f7c4;}
 .cad-default, .cad-timeline_default .cad-timeline_content {background:#e5e4e4; border:1px solid #b9b9b9;}
 .cad-pending, .cad-timeline_pending .cad-timeline_content {background:#ffebb3; border:1px solid #dbc790;}
 .cad-needmoreinfo, .cad-timeline_needmoreinfo .cad-timeline_content {background:#d3b0e4; border:1px solid #b18ec2;}
