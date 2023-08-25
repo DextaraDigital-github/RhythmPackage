@@ -29,7 +29,6 @@ export default class RtmvpcAssessmentChatter extends LightningElement {
 
    @api
    displayConversation(chatmap) {
-      console.log('catmap',chatmap);
       this.newChat = '';
       this.responseWrapper = {};
       this.showData = chatmap.openChat;
@@ -59,7 +58,6 @@ export default class RtmvpcAssessmentChatter extends LightningElement {
       }
       this.newResponse = [];
       let bool = false;
-      console.log('timeline',this.timeline);
       this.timeline.forEach(item=>{
          if(item.status==='In Review'){
             bool = true;
@@ -80,6 +78,7 @@ export default class RtmvpcAssessmentChatter extends LightningElement {
    /*callChatterResponse is used to save the conversation history between vendor and customer in the response record */
    callChatterResponse(response) {
       this.responseWrapper.responseList = response;
+       this.responseWrapper.accountData=response[0].accountType;
       saveChatterResponse({ chatWrapperstring: JSON.stringify(this.responseWrapper) }).then((result) => {
          this.responseflag = true;
           const selectedEvent = new CustomEvent('sendresponse', {
@@ -201,7 +200,6 @@ export default class RtmvpcAssessmentChatter extends LightningElement {
          const selectedEvent = new CustomEvent('chatconversation', {
             detail: this.chatDataMap
          });
-         console.log('selectedevent',selectedEvent);
          /* Dispatches the event.*/
          this.dispatchEvent(selectedEvent);
       }).catch((err) => {
