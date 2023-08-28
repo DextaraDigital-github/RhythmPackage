@@ -4,12 +4,53 @@
         <itemInstances>
             <componentInstance>
                 <componentInstanceProperties>
+                    <name>actionNames</name>
+                    <valueList>
+                        <valueListItems>
+                            <value>Contact.Create_User</value>
+                            <visibilityRule>
+                                <criteria>
+                                    <leftValue>{!Record.Account.RecordType.Name}</leftValue>
+                                    <operator>EQUAL</operator>
+                                    <rightValue>Customer</rightValue>
+                                </criteria>
+                            </visibilityRule>
+                        </valueListItems>
+                        <valueListItems>
+                            <value>Edit</value>
+                        </valueListItems>
+                        <valueListItems>
+                            <value>Delete</value>
+                        </valueListItems>
+                        <valueListItems>
+                            <value>EnableCustomerPortal</value>
+                            <visibilityRule>
+                                <criteria>
+                                    <leftValue>{!Record.Account.RecordType.Name}</leftValue>
+                                    <operator>EQUAL</operator>
+                                    <rightValue>Supplier</rightValue>
+                                </criteria>
+                            </visibilityRule>
+                        </valueListItems>
+                        <valueListItems>
+                            <value>DisableCustomerPortal</value>
+                            <visibilityRule>
+                                <criteria>
+                                    <leftValue>{!Record.Account.RecordType.Name}</leftValue>
+                                    <operator>EQUAL</operator>
+                                    <rightValue>Supplier</rightValue>
+                                </criteria>
+                            </visibilityRule>
+                        </valueListItems>
+                    </valueList>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
                     <name>collapsed</name>
                     <value>false</value>
                 </componentInstanceProperties>
                 <componentInstanceProperties>
                     <name>enableActionsConfiguration</name>
-                    <value>false</value>
+                    <value>true</value>
                 </componentInstanceProperties>
                 <componentInstanceProperties>
                     <name>enableActionsInNative</name>

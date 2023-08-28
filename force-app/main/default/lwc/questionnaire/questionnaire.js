@@ -210,7 +210,7 @@ export default class Questionnaire extends LightningElement {
         this.handleRequiredCheck();
     }
     @api handleChatResponse(responseData) {
-        this.questionsAndAnswerss = JSON.parse(JSON.stringify(this.filterQuestionsAndAnswers));
+        //this.questionsAndAnswerss = JSON.parse(JSON.stringify(this.filterQuestionsAndAnswers));
         this.questionsAndAnswerss.forEach(questionAnswer => {
             let flagcount = 0;
             questionAnswer.questions.forEach(question => {
@@ -1064,7 +1064,7 @@ export default class Questionnaire extends LightningElement {
             this.isAutoSave = true;
             this.startAutoSave();
         }
-        else {
+        else { 
         this.handleOnload();            
         }
     }
@@ -2068,7 +2068,7 @@ export default class Questionnaire extends LightningElement {
         }
     }
     @api handleConversationData(chatterData) {
-        this.questionsAndAnswerss = JSON.parse(JSON.stringify(this.filterQuestionsAndAnswers));
+        //this.questionsAndAnswerss = JSON.parse(JSON.stringify(this.filterQuestionsAndAnswers));
         this.questionsAndAnswerss.forEach(questionAnswer => {
             questionAnswer.questions.forEach(question => {
                 if (question.Id === chatterData.questionId) {
