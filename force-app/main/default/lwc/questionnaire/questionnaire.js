@@ -210,7 +210,7 @@ export default class Questionnaire extends LightningElement {
         this.handleRequiredCheck();
     }
     @api handleChatResponse(responseData) {
-        //this.questionsAndAnswerss = JSON.parse(JSON.stringify(this.filterQuestionsAndAnswers));
+        this.questionsAndAnswerss = JSON.parse(JSON.stringify(this.filterQuestionsAndAnswers));
         this.questionsAndAnswerss.forEach(questionAnswer => {
             let flagcount = 0;
             questionAnswer.questions.forEach(question => {
@@ -1059,6 +1059,7 @@ export default class Questionnaire extends LightningElement {
                 });
             });
             this.responseMap.set(this.questionresponseafterchange.questionId, this.questionresponseafterchange.option);
+            this.filterQuestionsAndAnswers = JSON.parse(JSON.stringify(this.questionsAndAnswerss));
             this.handleRequiredCheck();
             this.ishideToast = false;
             this.isAutoSave = true;
@@ -1975,6 +1976,7 @@ export default class Questionnaire extends LightningElement {
     handleReject(event) {
         let rejectedMap = event.detail;
         this.saveBool = false;
+        this.questionsAndAnswerss = JSON.parse(JSON.stringify(this.filterQuestionsAndAnswers));
         this.questionsAndAnswerss.forEach(questionAnswer => {
             questionAnswer.questions.forEach(question => {
                 if (question.Id === rejectedMap.questionId && typeof rejectedMap.rejectResponse !== 'undefined') {
@@ -2068,7 +2070,7 @@ export default class Questionnaire extends LightningElement {
         }
     }
     @api handleConversationData(chatterData) {
-        //this.questionsAndAnswerss = JSON.parse(JSON.stringify(this.filterQuestionsAndAnswers));
+        this.questionsAndAnswerss = JSON.parse(JSON.stringify(this.filterQuestionsAndAnswers));
         this.questionsAndAnswerss.forEach(questionAnswer => {
             questionAnswer.questions.forEach(question => {
                 if (question.Id === chatterData.questionId) {
