@@ -355,8 +355,13 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
         if (this.selectedRows.length !== 0) {
             if (this.sectionListData && typeof this.sectionListData !== 'undefined') {
                 this.sectionListData.forEach(rec => {
-                    if (this.selectedRows[0] === rec.Id) {
+                    if (this.selectedRows[0] === rec.Id ) {
+                        if(rec["_children"] != null) {
                         this.deletePopupMessage = 'Are you sure you want to delete the Section and Quetions in it?';
+                        }
+                        else {
+                           this.deletePopupMessage = 'Are you sure you want to delete the Section?';
+                        }
                     }
                 });
             }

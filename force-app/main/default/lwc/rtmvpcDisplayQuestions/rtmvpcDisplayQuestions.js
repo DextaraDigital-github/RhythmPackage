@@ -6,6 +6,7 @@ import getQuestions from '@salesforce/apex/QuestionController.getQuestions';
 import deleteQuestion from '@salesforce/apex/QuestionController.deleteQuestion';
 import getTemplateRecord from '@salesforce/apex/QuestionController.getTemplateRecord';
 import errorLogRecord from '@salesforce/apex/AssessmentController.errorLogRecord';
+import CUS_STYLES from '@salesforce/resourceUrl/rtmcpcsldscustomstyles';
 
 const columns = [
     { label: 'Section', fieldName: 'Rhythm__SectionName__c', type: "text", initialWidth: 250 },
@@ -36,7 +37,7 @@ const columns = [
 export default class RtmvpcDisplayQuestions extends LightningElement {
     @track gridcolumns = columns;
     @track data;
-    @track showToast = false;
+    @track showToast = false; 
     @track viewQuestions = false;
     @api recordId;
     @track totastmessage;
@@ -89,8 +90,12 @@ export default class RtmvpcDisplayQuestions extends LightningElement {
     }
     renderedCallback() {
         Promise.all([
-            loadStyle(this, componentStyleSheet)
-        ]);
+            loadStyle(this, componentStyleSheet),
+            loadStyle(this, CUS_STYLES),
+        ]).then(() => {
+        })
+            .catch(error => {
+            });
     }
     closeToastHandler() {
         this.showToast = false;
