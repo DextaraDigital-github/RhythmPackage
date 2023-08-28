@@ -11,6 +11,8 @@ import getUserName from '@salesforce/apex/AssessmentController.getUserName';
 import getPdfContent from '@salesforce/apex/AssessmentController.getPdfContent';
 import errorLogRecord from '@salesforce/apex/AssessmentController.errorLogRecord';
 import { NavigationMixin } from 'lightning/navigation';
+import CUS_STYLES from '@salesforce/resourceUrl/rtmcpcsldscustomstyles';
+import { loadStyle } from 'lightning/platformResourceLoader';
 import getCommunityURL from '@salesforce/apex/AssessmentController.getCommunityURL';
 
 import getQuestionsList from '@salesforce/apex/AssessmentController.getQuestionsList'; //To fetch all the Questions from the Assessment_Template__c Id from the Supplier_Assessment__c record
@@ -123,6 +125,14 @@ export default class RtmvpcAssessmentDetail extends NavigationMixin(LightningEle
             this.handleTimeLine();
         }
 
+    this.handleRefresh();
+
+        Promise.all([
+            loadStyle(this, CUS_STYLES),
+        ]).then(() => {
+        })
+            .catch(error => {
+            });
 
     }
     handleDeleteIcon(event) {
@@ -529,10 +539,10 @@ export default class RtmvpcAssessmentDetail extends NavigationMixin(LightningEle
         if (this.recordId !== null && typeof this.recordId !== 'undefined') {
             let pageurl = window.location.href;
             if (typeof this.recordId != 'undefined') {
-                let baseurl = pageurl.split('.com')[0] + '.com/apex/RenderAsPdf?id=' + this.recordId;
+                let baseurl = pageurl.split('.com')[0] + '.com/apex/Rhythm__RenderAsPdf?id=' + this.recordId;
                 window.open(baseurl);
             } else {
-                let baseurl = pageurl.split('.com')[0] + '.com/apex/RenderAsPdf?id=' + this.accountassessmentid;
+                let baseurl = pageurl.split('.com')[0] + '.com/apex/Rhythm__RenderAsPdf?id=' + this.accountassessmentid;
                 window.open(baseurl);
             }
         }

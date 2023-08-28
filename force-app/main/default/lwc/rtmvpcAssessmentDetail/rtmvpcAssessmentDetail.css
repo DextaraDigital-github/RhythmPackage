@@ -110,7 +110,7 @@
 .cad-btn_bck1 { margin-top:-45px; }
 
 @media screen and (max-width:992px) {
-    .cad-cardbase { height:calc(100vh - 0px); }
+    .cad-cardbase { height:calc(100vh - 115px); }
     .cad-row { display:block; height:100%; position:relative; } 
 	.cad-pl8 { padding-left:0px;}  
     .cad-pr8 { padding-right:0px;} 

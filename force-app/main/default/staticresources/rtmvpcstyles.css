@@ -180,7 +180,6 @@
         color: var(--lwc-colorTextInverse,rgb(107, 56, 136))!important;
     }
     
-    
     .loginbg { min-width:100vw; min-height:100vh; width:100%; max-width:auto; position:absolute; top:0px; left:0px; z-index:0;}
 	
 	.slds-button--neutral, .slds-button_neutral { color:var(--dbtn-ico); background:var(--dbtn-bg); border:1px solid var(--dbtn-bdr); }
@@ -396,7 +395,6 @@
 	.slds-path__nav .slds-is-current:first-child:before, .slds-path__nav .slds-is-current:first-child:after { background:var(--pbtn-bg);}
 
 	
-	
 	@keyframes edit-in { from { opacity:0; transform:rotateZ(-70deg); }
 	 to { opacity:1; transform:rotateZ(0deg); }
 	}
@@ -447,7 +445,7 @@
 	div.cib-details .slds-button__icon--left, div.cib-details .slds-button__icon_left { margin-right:0rem; }
 	.slds-utility-bar li.slds-utility-bar__item:first-child {display:none;}
 	@media screen and (max-width:992px) { 
-		.cdgWrapper { padding-bottom:20px; }
+		.cdgWrapper { padding-bottom:10px; }
 		.cdgWrapperinner { max-width:calc(100vw - 28px); overflow-x:auto; }
 		.rtmvpc-leftmenu { left:-150px; width:150px; }
 		.rtmvpc-leftmenu.show { left:0px; width:150px; }
@@ -461,20 +459,9 @@
     border-radius:8px; box-shadow:0px 0px 6px rgba(0,0,0,0.2); }
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
 	.comm-login-form__container .slds-form-element__label { font-size:unset;}
-
-
-
-
-	.cCenterPanel, .contentRegion.comm-layout-column, .comm-content-header.comm-layout-column, .comm-content-footer.comm-layout-column {
-         /* Adjust the width as needed */
-		width:auto;
-        max-width: 800px; /* Set a maximum width if desired */
-        margin: 0 auto;
-        padding: 0;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        flex-direction: column;
+	.siteforceContentArea .comm-layout-column:not(:empty) {padding-top:0px; padding-bottom:0px; }
+	.cCenterPanel, .contentRegion.comm-layout-column, .comm-content-header.comm-layout-column, .comm-content-footer.comm-layout-column { 
+		width:auto; max-width: 800px; /* Set a maximum width if desired */ padding: 0; display: flex; justify-content: center; /*margin: 0 auto; align-items: center;*/ flex-direction: column;
     }
     .comm-content-header.comm-layout-column, .comm-content-footer.comm-layout-column {
         display: none;
@@ -485,4 +472,7 @@
     }
     .rtmvpc { width:calc(100vw - 0px); height:calc(100vh - 0px);  overflow-x: hidden; overflow-y: auto; position: absolute!important; top: 0px!important; left: 0px!important; }
     .cCenterPanel.slds-m-top--x-large.slds-p-horizontal--medium{margin-top:0px!important; }
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+
+
+
+
