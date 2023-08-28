@@ -41,6 +41,9 @@ export default class AddSuppliers extends LightningElement {
                         this.existingSuppList = JSON.parse(JSON.stringify(tempList));
                         this.existingSuppListtemp = JSON.parse(JSON.stringify(tempList));
                     }
+                     if(this.existingSuppList.length >0){
+                    this.countRecords();
+                    }
                 }
             })
             .catch(error => {
@@ -72,7 +75,10 @@ export default class AddSuppliers extends LightningElement {
             if (typeof tempList != 'undefined') {
                 this.supplierData = JSON.parse(JSON.stringify(tempList));
                 if (!this.renderedAllSuppliers) {
+                    if(this.existingSuppList.length >0){
                     this.countRecords();
+                    }
+                    
                     this.renderedAllSuppliers = true;
                 }
             }
