@@ -125,7 +125,7 @@ export default class RtmvpcAssessmentDetail extends NavigationMixin(LightningEle
             this.handleTimeLine();
         }
 
-    this.handleRefresh();
+   // this.handleRefresh();
 
         Promise.all([
             loadStyle(this, CUS_STYLES),
