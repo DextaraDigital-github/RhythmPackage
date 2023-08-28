@@ -117,6 +117,7 @@ export default class Questionnaire extends LightningElement {
     @track saveBool = false;
     filesdata = [];
     displayDisclosure = false;
+    isfiltername;
     previewUrl;
     @api handleGetRespRecord(quesid) {
         if (typeof quesid.response !== 'undefined' && quesid.response !== '') {
@@ -209,6 +210,7 @@ export default class Questionnaire extends LightningElement {
         this.handleRequiredCheck();
     }
     @api handleChatResponse(responseData) {
+        this.questionsAndAnswerss = JSON.parse(JSON.stringify(this.filterQuestionsAndAnswers));
         this.questionsAndAnswerss.forEach(questionAnswer => {
             let flagcount = 0;
             questionAnswer.questions.forEach(question => {
@@ -244,6 +246,11 @@ export default class Questionnaire extends LightningElement {
             questionAnswer.displayFlag = flagcount;
         });
         this.filterQuestionsAndAnswers = JSON.parse(JSON.stringify(this.questionsAndAnswerss));
+        if(typeof this.isfiltername!=='undefined'){
+            if(this.isfiltername ==='reject'){this.handleFilterRejected();}
+            else{if(this.isfiltername==='flag'){this.handleFilterFlag(true);}
+            else{this.handleFilterFlag(false);}}
+        }
     }
     handleAccordionSection() {
         if (this.accordionFlag === false) {
@@ -513,10 +520,7 @@ export default class Questionnaire extends LightningElement {
                             questionResult.forEach(query => {
                                 allQuesId.push(query.Id);
                             });
-                            const resQuestType = questionResult.filter(query => query.Rhythm__Question_Type__c === 'Picklist' || query.Rhythm__Question_Type__c === 'Radio'
-                                || query.Rhythm__Question_Type__c === 'Checkbox' || query.Rhythm__Question_Type__c === 'Picklist (Multi-Select)');
-                            const ques = questionResult.filter(query => query.Rhythm__Question_Type__c !== 'Picklist' && query.Rhythm__Question_Type__c !== 'Radio'
-                                && query.Rhythm__Question_Type__c !== 'Checkbox' && query.Rhythm__Question_Type__c !== 'Picklist (Multi-Select)');
+                            
                             getSupplierResponseList({ assessmentId: assessmentJunctionId }).then(suppResult => {
                                 if (suppResult && suppResult.length > 0 && suppResult[0] && suppResult[0].CreatedBy && suppResult[0].CreatedDate) {
                                     this.supplierAssessmentName = suppResult[0].CreatedBy.Name;
@@ -693,10 +697,7 @@ export default class Questionnaire extends LightningElement {
                     questionResult.forEach(query => {
                         allQuesId.push(query.Id);
                     });
-                    const resQuestType = questionResult.filter(query => query.Rhythm__Question_Type__c === 'Picklist' || query.Rhythm__Question_Type__c === 'Radio'
-                        || query.Rhythm__Question_Type__c === 'Checkbox' || query.Rhythm__Question_Type__c === 'Picklist (Multi-Select)');
-                    const ques = questionResult.filter(query => query.Rhythm__Question_Type__c !== 'Picklist' && query.Rhythm__Question_Type__c !== 'Radio'
-                        && query.Rhythm__Question_Type__c !== 'Checkbox' && query.Rhythm__Question_Type__c !== 'Picklist (Multi-Select)');
+                   
                     getSupplierResponseList({ assessmentId: this.accountassessmentid }).then(suppResult => {
                         if (suppResult && suppResult.length > 0 && suppResult[0] && suppResult[0].CreatedBy && suppResult[0].CreatedDate) {
                             this.supplierAssessmentName = suppResult[0].CreatedBy.Name;
@@ -1157,6 +1158,7 @@ export default class Questionnaire extends LightningElement {
     handleFilterFlag(flagFilter) {
         this.questionsAndAnswerss = JSON.parse(JSON.stringify(this.filterQuestionsAndAnswers));
         if (flagFilter) {
+            this.isfiltername='flag';
             this.questionsAndAnswerss.forEach(questionAnswer => {
                 questionAnswer.sectionAccordian = "slds-accordion__section slds-is-open";
                 questionAnswer.questions.forEach(question => {
@@ -1173,6 +1175,7 @@ export default class Questionnaire extends LightningElement {
             })
         }
         else {
+            this.isfiltername='all';
             this.questionsAndAnswerss.forEach(questionAnswer => {
                 questionAnswer.sectionAccordian = "slds-accordion__section slds-is-open";
             });
@@ -1180,6 +1183,7 @@ export default class Questionnaire extends LightningElement {
     }
     @api
     handleFilterRejected() {
+        this.isfiltername = 'reject';
         this.questionsAndAnswerss = JSON.parse(JSON.stringify(this.filterQuestionsAndAnswers));
         this.questionsAndAnswerss.forEach(questionAnswer => {
             questionAnswer.sectionAccordian = "slds-accordion__section slds-is-open";
@@ -1188,14 +1192,13 @@ export default class Questionnaire extends LightningElement {
                     if (conditionalQuestion.isdisplay) {
                         conditionalQuestion.questions = conditionalQuestion.questions.filter(item => (item.rejectButton));
                         if (conditionalQuestion.questions.length > 0) {
-                            question.valueChange = true;
+                            question.rejectFilter = true;
                         }
                     }
                 });
             });
-            questionAnswer.questions = questionAnswer.questions.filter(item => (item.rejectButton || item.valueChange));
+            questionAnswer.questions = questionAnswer.questions.filter(item => (item.rejectButton || item.rejectFilter));
         })
-
     }
     getQuestionTemplate() {
         let question = {
@@ -1666,6 +1669,7 @@ export default class Questionnaire extends LightningElement {
         quTemp.isEmail = ('Email' === qtype);
         quTemp.isTextArea = ('Text Area (Rich)' === qtype);
         quTemp.type = qtype;
+        quTemp.rejectFilter = false;
         quTemp.valueChange = false;
         quTemp.required = qu.Rhythm__Required__c;
         quTemp.inputId = qu.Id + '_inputId';
@@ -2064,6 +2068,7 @@ export default class Questionnaire extends LightningElement {
         }
     }
     @api handleConversationData(chatterData) {
+        this.questionsAndAnswerss = JSON.parse(JSON.stringify(this.filterQuestionsAndAnswers));
         this.questionsAndAnswerss.forEach(questionAnswer => {
             questionAnswer.questions.forEach(question => {
                 if (question.Id === chatterData.questionId) {
@@ -2091,6 +2096,11 @@ export default class Questionnaire extends LightningElement {
             })
         });
         this.filterQuestionsAndAnswers = JSON.parse(JSON.stringify(this.questionsAndAnswerss));
+        if(typeof this.isfiltername!=='undefined'){
+            if(this.isfiltername ==='reject'){this.handleFilterRejected();}
+            else{if(this.isfiltername==='flag'){this.handleFilterFlag(true);}
+            else{this.handleFilterFlag(false);}}
+        }
     }
     handleStartReview() {
         let param = {};
