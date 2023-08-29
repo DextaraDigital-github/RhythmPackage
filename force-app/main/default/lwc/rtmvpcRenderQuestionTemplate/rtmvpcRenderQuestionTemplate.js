@@ -301,14 +301,17 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
             }
         }
         if (this.responses && this.responses.length > 0) {
+            
             this.responses.forEach(res => {
                 res.Children.forEach(conditional => {
-                    if (conditional.questions.length > 0) {
+                    if (conditional.questions.length > 0 && res.Id===questionId) {  
+                        console.log('conditional');        
                         this.timeline.forEach(result => {
                             if (result.status === 'In Review') {
                                 this.showSupplierPopup = true;
                             }
                         })
+                        
 
                     }
                 })

@@ -6,6 +6,9 @@ import { NavigationMixin } from 'lightning/navigation';
 import getTodayDate from '@salesforce/apex/AssessmentController.getTodayDate';
 import { CurrentPageReference } from 'lightning/navigation';
 import { RefreshEvent } from 'lightning/refresh';
+import { loadStyle } from 'lightning/platformResourceLoader';
+import CUS_STYLES from '@salesforce/resourceUrl/rtmcpcsldscustomstyles';
+
 export default class AddSuppliersforAssessment extends NavigationMixin(LightningElement) {
     @api recordId;
     @track suppliersList=[];
@@ -40,6 +43,12 @@ export default class AddSuppliersforAssessment extends NavigationMixin(Lightning
         if(typeof this.source === 'undefined'){
             this.showLWC = true;
         }
+        Promise.all([
+            loadStyle(this, CUS_STYLES),
+        ]).then(() => {
+        })
+            .catch(error => {
+            });
     }
 
     getTodayDate(){
