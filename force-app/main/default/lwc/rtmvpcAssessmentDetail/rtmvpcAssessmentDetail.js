@@ -429,10 +429,12 @@ export default class RtmvpcAssessmentDetail extends NavigationMixin(LightningEle
             }
         })
         console.log('sample', this.fileData);
+        if(typeof this.showChat !== 'undefined'){
         setTimeout(() => {
-            console.log('chatter===>', this.template.querySelectorAll('c-rtmvpc-assessment-chatter'));
+            //console.log('chatter===>', this.template.querySelectorAll('c-rtmvpc-assessment-chatter'));
             this.template.querySelectorAll('c-rtmvpc-assessment-chatter')[0].displayConversation(this.showChat);
         }, 300);
+        }
 
 
     }
@@ -440,6 +442,7 @@ export default class RtmvpcAssessmentDetail extends NavigationMixin(LightningEle
         this.openReviewComments = false;
         this.showCapaForm = true;
         this.openRightFile = false;
+       // this.template.querySelectorAll('c-action')[0].displayForm(this.actionData);
         setTimeout(() => {
             this.template.querySelectorAll('c-action')[0].displayForm(this.actionData);
         }, 800);
@@ -468,7 +471,7 @@ export default class RtmvpcAssessmentDetail extends NavigationMixin(LightningEle
         this.openRightFile = false;
         setTimeout(() => {
             this.template.querySelectorAll('c-rtmvpc-assessment-chatter')[0].displayConversation(this.selectedchatData);
-        }, 300);
+        }, 200);
     }
     handleSelectedFile() {
         console.log('this.filedata', this.fileData);
