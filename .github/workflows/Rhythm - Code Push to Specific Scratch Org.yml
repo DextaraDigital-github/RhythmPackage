@@ -88,6 +88,5 @@ jobs:
           to: akamanasf@gmail.com
           from: Rhythm Package Repository Actions Hub	
           body: ${{github.event.name}} pipeline got executed successfully!\n PFA			
-          convert_markdown: true	
-          attachments: .github/ViolationReport.csv
+          convert_markdown: true
           priority: normal
