@@ -75,16 +75,13 @@ jobs:
       - name: 'code push'
         run: sfdx force:source:push --targetusername=${{github.event.inputs.scratch-org_username}} --wait 20 -f --loglevel debug
        
-    # Generate Violation Report
-      - name: 'Scan for Violations and Generate report'
-        run: sfdx scanner:run:dfa --target "./**/*.cls" --projectdir "./" --outfile "./.github/ViolationReport.csv"
-
     # Send Violation Report Mail 
       - name: 'Send mail'
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: mail.smtp2go.com
           server_port: 2525
+          secure: true
           username: ${{secrets.MAIL_USERNAME}}
           password: ${{secrets.MAIL_PASSWORD}}
           subject: Github Actions workflow result 
