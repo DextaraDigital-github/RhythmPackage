@@ -77,7 +77,7 @@ jobs:
        
     # Generate Violation Report
       - name: 'Scan for Violations and Generate report'
-        run: sfdx scanner:run:dfa --target "./**/*.cls" --projectdir "./" --outfile ".github/ViolationReport.csv"
+        run: sfdx scanner:run:dfa --target "./**/*.cls" --projectdir "./" --outfile ".github/ViolationReport" --format "csv"
 
     # Send Violation Report Mail 
       - name: 'Send mail'
