@@ -92,5 +92,5 @@ jobs:
           from: Rhythm Package Repository Actions Hub	
           body: ${{github.event.name}} pipeline got executed successfully!\n PFA			
           convert_markdown: true	
-          attachments: ViolationReport.csv
+          attachments: .github/ViolationReport.csv
           priority: normal
