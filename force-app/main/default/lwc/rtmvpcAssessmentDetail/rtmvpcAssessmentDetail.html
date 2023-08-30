@@ -15,7 +15,8 @@
 					<div class="cad-sec_container">
 						<div class="cad-sec_header">
 							<button class="cad_actions" onclick={handleLeftButtonClick} title="Close Timeline Panel" style="z-index:1; position:inherit;">
-								<i class="las la-chevron-circle-left"></i>
+								<!-- <i class="las la-chevron-circle-left"></i> -->
+								<i class="las la-indent" style="transform:rotate(0deg);"></i>
 							</button><span>Time Line</span>
 						</div>
 						<div class="cad-sec_bodyfull1">
@@ -49,7 +50,7 @@
 							</div>
 
 							<div class="slds-float_left slds-is-relative">
-								<button class="cad_actions" onclick={handleLeftButtonClick} title="Show / Hide Timeline Panel"><i class="las la-indent" style="transform:rotate(0deg);"></i></button>
+								<button class="cad_actions" onclick={handleLeftButtonClick} title="Show / Hide Timeline Panel"><i class="las la-indent" style="transform:rotate(180deg);"></i></button>
 							</div>
 
 							<div class="slds-float_right slds-is-relative">
@@ -93,7 +94,7 @@
 										<!-- <lightning-menu-item label="Excel" title="Excel" value="Excel"></lightning-menu-item> -->
 									</lightning-button-menu>
 								</template>
-								<button class="cad_actions" onclick={handleRightButtonClick} title="Show / Hide Info Panel"><i class="las la-indent" style="transform:rotate(180deg);"></i></button>
+								<button class="cad_actions" onclick={handleRightButtonClick} title="Show / Hide Info Panel"><i class="las la-indent" style="transform:rotate(0deg);"></i></button>
 							</div>
 						</div>
 						<div class="cad-sec_bodyfull1 cad-titlebutton_more">
@@ -124,7 +125,10 @@
 					<div class="cad-sec_container">
 						<div class="cad-sec_header cad-titlebutton_more">
 							<div class="slds-float_right slds-is-relative">
-								<button class="cad_actions " onclick={handleRightButtonClick} title="Show / Hide Timeline Panel"><i class=" las la-chevron-circle-right" style="transform:rotate(0deg);"></i></button>
+								<button class="cad_actions slds-m-left_x-small" onclick={handleRightButtonClick} title="Show / Hide Timeline Panel">
+								<i class="las la-indent" style="transform:rotate(180deg);"></i>
+								<!-- <i class=" las la-chevron-circle-right" style="transform:rotate(0deg);"></i> -->
+								</button>
 							</div>
 							<div>
 								<lightning-button-icon class="cad_actions slds-float_right slds-is-absolute"
@@ -143,8 +147,7 @@
 						</div>
 						<div class="cad-sec_bodyfull1 cad-titlebutton_more">
 							<div class="cad-sec_vcontainer2_2" style="height:calc(100% - 0px);">
-								<div class="slds-scrollable_y"
-									style="max-height:calc(100% - 40px); --slds-c-input-color-border: rgb(187 187 187);">
+								
 
 
 									<template if:true={openReviewComments}>
@@ -167,7 +170,7 @@
 											</c-portal-s3-files>
 										</template>
 									</template>
-								</div>
+								
 							</div>
 
 						</div>
