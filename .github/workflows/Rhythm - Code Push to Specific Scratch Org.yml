@@ -77,4 +77,20 @@ jobs:
        
     # Generate Violation Report
       - name: 'Scan for Violations and Generate report'
-        run: sfdx scanner:run:dfa --target "./**/*.cls" --projectdir "./"
+        run: sfdx scanner:run:dfa --target "./**/*.cls" --projectdir "./" --format "csv" --outfile ".github/ViolationReport.csv"
+
+    # Send Violation Report Mail 
+      - name: 'Send mail'
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: mail.smtp2go.com
+          server_port: 2525
+          username: ${{secrets.MAIL_USERNAME}}
+          password: ${{secrets.MAIL_PASSWORD}}
+          subject: Github Actions workflow result 
+          to: ashishk@dextara.com
+          from: Rhythm Package Repository Actions Hub	
+          body: ${{github.event.name}} pipeline got executed successfully!\n PFA			
+          convert_markdown: true	
+          attachments: ViolationReport.csv
+          priority: normal
