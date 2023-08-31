@@ -16,8 +16,7 @@
             .rap-table tbody tr td:nth-child(1){ color: rgb(107, 56, 136); }
             .rap-th{ padding: 10px; }
             .rap-td{ background-color: white; padding: 10px; }
-        	.rap-td-even{ background-color: rgb(246 246 246); }
-        	.rap-td-odd{ background-color: rgb(240 240 240); }
+        	.rap-td-odd{ background-color: rgb(246 246 246); }
         </style>
     </head>
     <body>
