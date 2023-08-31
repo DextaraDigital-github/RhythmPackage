@@ -69,7 +69,7 @@ export default class Questionnaire extends LightningElement {
     @track responselstMap = {};
     @track saveCustomermap = {};
     sectionidslist = [];
-    @track buttonlabel = '[ + ]';
+    @track buttonlabel = '[+]';
     assessmentStatus;
     @api objectApiName;
     @api objectName;
@@ -266,21 +266,21 @@ export default class Questionnaire extends LightningElement {
     }
     @api
     handleCollapseExpand(accordianId) {
-        let isdispatch = (accordianId === '[ - ]' || accordianId === '[ + ]');
+        let isdispatch = (accordianId === '[-]' || accordianId === '[+]');
         if (isdispatch) {
             this.buttonlabel = accordianId;
         }
-        if (this.buttonlabel === '[ - ]') {
+        if (this.buttonlabel === '[-]') {
             this.sectionidslist.forEach(secId => {
                 this.template.querySelector('[data-accordian="' + secId + '"]').classList = 'slds-accordion__section slds-is-close';
             });
-            this.buttonlabel = '[ + ]';
+            this.buttonlabel = '[+]';
         }
-        else if (this.buttonlabel === '[ + ]') {
+        else if (this.buttonlabel === '[+]') {
             this.sectionidslist.forEach(secId => {
                 this.template.querySelector('[data-accordian="' + secId + '"]').classList = 'slds-accordion__section slds-is-open';
             });
-            this.buttonlabel = '[ - ]';
+            this.buttonlabel = '[-]';
         }
         if (isdispatch) {
             const selectedEvent = new CustomEvent('expandcollapse', {
@@ -1135,6 +1135,8 @@ export default class Questionnaire extends LightningElement {
                 }
             })
         });
+        this.filterQuestionsAndAnswers = JSON.parse(JSON.stringify(this.questionsAndAnswerss));
+
     }
     handleFileUpload(event) {
         this.uploadingFile = true

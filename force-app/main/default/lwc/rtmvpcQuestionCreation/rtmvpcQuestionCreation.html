@@ -223,14 +223,7 @@
 				</template>
 			</lightning-layout>
 		</div>
-		<div style="height: 100px; width: 100%;">
-
-		</div>
-		<div class="slds-modal__footer" style="position: absolute; width: 100%; bottom: 0px; z-index: 2;">
-			<button class="slds-button slds-button_neutral" aria-label="Cancel and close" onclick={handleClose}>Cancel</button>
-			<lightning-button class="slds-button" variant="brand" label="Save" title="Save" onclick={handlesave}>
-			</lightning-button>
-		</div>
+		<div style="height: 100px; width: 100%;"></div>
 	</template>
 	<template if:true={showToast}>
 		<c-Show-Toast-Message message-from-component={totastmessage} is-show-modal={showToast} is-sucess={success}

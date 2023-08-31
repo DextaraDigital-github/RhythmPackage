@@ -36,6 +36,14 @@ export default class RtmvpcChildQuestionCreation extends LightningElement {
         
 
     }
+
+    handleClose(){
+        this.template.querySelector('c-rtmvpc-question-creation').handleClosedChild();
+    }
+    handlesave(){
+        this.template.querySelector('c-rtmvpc-question-creation').handlesaveChild();
+    }
+
     hideModalBox()
     {
         this.showcreateChild = false;
