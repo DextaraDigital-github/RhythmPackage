@@ -14,6 +14,7 @@ public with sharing class EmailService {
     static AccountAssessmentRelationSelector accAssselector = AccountAssessmentRelationSelector.getInstance();
     static UserSelector usSelector = UserSelector.getInstance();
     static EmailMessageSelector emSelector = EmailMessageSelector.getInstance();
+    static AssessmentSelector assselector = AssessmentSelector.getInstance();
     private static EmailService service = null; //private static instance of the class
     
     /**
@@ -127,5 +128,27 @@ public with sharing class EmailService {
         Map<String,Object> inpParameterMap = new Map<String,Object>{'fields'=>fields, 'filter'=>filter};
         Map<Id,User> dataMap = usSelector.fetchUsers(inpParameterMap);
         return dataMap;
+    }
+    
+    /**
+    * @description Fetches the Assessment records based on search string and other parameters
+    * @param parameterMap It is a stringified JSON of parameters required to fetch Assessment records
+    * @return List of Assessment records
+    */
+    public List<sObject> fetchAssessments(String parameterMap) {
+        Map<String,Object> newParameterMap = (Map<String,Object>)JSON.deserializeUntyped(parameterMap);
+        String recordId = (String)newParameterMap.get('recordId');
+        
+        List<String> fields = new List<String>{'Id', 'Name'};
+        String filter = ' WHERE Id = \'' + String.escapeSingleQuotes(recordId) + '\' ';
+        Map<String,Object> inpParameterMap = new Map<String,Object>{'fields'=>fields, 'filter'=>filter};
+        Map<Id,Assessment__c> dataMap = assselector.fetchAssessments(inpParameterMap);
+        if(dataMap != null) {
+            List<Assessment__c> dataList = dataMap.values();
+        	if(dataList != null) {
+            	return dataList;
+            }
+        }
+        return null;
     }
 }

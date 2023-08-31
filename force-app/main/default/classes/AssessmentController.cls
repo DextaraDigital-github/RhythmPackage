@@ -1318,7 +1318,7 @@ public with sharing class AssessmentController {
             tableHtml += '<tr><td height="5px" bgcolor="rgb(107, 56, 136)"></td><td height="5px" bgcolor="rgb(239, 104, 55)"></td></tr>';
             tableHtml += '<tr><td bgcolor="white" colspan="2"><span><font color="#535353" size=3><b>&nbsp;&nbsp;RHYTHM</b></font></span><br/><span><font color="#535353" size=1><b>&nbsp;&nbsp;&nbsp;INNOVATIONS</b></font></span></td></tr>';
             tableHtml += '<tr><td colspan="2" height="5px"></td></tr>';
-            tableHtml += '<tr><td colspan="2" bgcolor="#f5f7fa"><table cellpadding="5"><tr>';
+            tableHtml += '<tr><td colspan="2"><table cellpadding="5"><tr>';
             for (integer i = 0; i < pdfColumns.size(); i++) {
                 tableHtml += '<th bgcolor="#d6dbde"><font color="rgb(60 60 60)" size=1 face="sans-serif"><b>' + pdfColumns[i].label + '</b></font></th>';
             }

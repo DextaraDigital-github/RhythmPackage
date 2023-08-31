@@ -60,4 +60,14 @@ public with sharing class EmailController {
     public static Map<Id,User> fetchUsers(String parameterMap) {
         return service.fetchUsers(parameterMap);
     }
+    
+    /**
+    * @description Fetches the Assessment records based on search string and other parameters
+    * @param parameterMap It is a stringified JSON of parameters required to fetch Assessment records
+    * @return List of Assessment records
+    */
+    @AuraEnabled
+    public static List<sObject> fetchAssessments(String parameterMap) {
+        return service.fetchAssessments(parameterMap);
+    }
 }
