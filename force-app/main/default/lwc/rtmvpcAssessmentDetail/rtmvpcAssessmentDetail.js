@@ -557,8 +557,8 @@ export default class RtmvpcAssessmentDetail extends NavigationMixin(LightningEle
     handleExportPDF() {
         if (this.recordId !== null && typeof this.recordId !== 'undefined') {
             if (typeof this.recordId != 'undefined') {
-                let url = result.split('=');
-                let pageurl = url[1].substring(0, url[1].length - 2);
+                // let url = result.split('=');
+                let pageurl = window.location.href;
                 let baseurl = pageurl.split('.com')[0] + '.com/apex/Rhythm__RenderAsPdf?id=' + this.recordId;
                 window.open(baseurl);
 
@@ -571,7 +571,10 @@ export default class RtmvpcAssessmentDetail extends NavigationMixin(LightningEle
             }
         }
         else {
-            this.handlepdf(this.accountassessmentid);
+            //this.handlepdf(this.accountassessmentid);
+            let pageurl = window.location.href;
+            let baseurl = pageurl.split('.com')[0] + '.com/apex/Rhythm__RenderAsPdf?id=' + this.accountassessmentid;
+            window.open(baseurl);
         }
     }
 
