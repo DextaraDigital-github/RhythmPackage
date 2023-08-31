@@ -293,7 +293,7 @@ public with sharing class AssessmentController {
     @AuraEnabled
     public static String getAccountId()
     {
-        /*try{
+        try{
             String userId = userinfo.getuserid();
             userId = String.escapeSingleQuotes(userId);
             List<User> userList =  [SELECT Contact.AccountId
@@ -309,10 +309,9 @@ public with sharing class AssessmentController {
         }catch(exception e){
             String errorMsg = e.getMessage();
             throw new AuraHandledException(errorMsg);
-        }*/
-        return null;
+        }
+        //return null;
     }
-
     /**
     * @description To update the rejected flag.
     * @param updateRejectFlagList This is the list of records.  
@@ -377,7 +376,13 @@ public with sharing class AssessmentController {
                 Id currentNetworkId = Network.getNetworkId();
                 Network currNetwork = [SELECT Id, Name, UrlPathPrefix FROM Network WHERE Id = :currentNetworkId];
                 relativeUrlBase = URL.getSalesforceBaseUrl().toExternalForm()+'/';
-                relativeUrlBase = relativeUrlBase+currNetwork.UrlPathPrefix+'/s/login';
+               if(currNetwork.UrlPathPrefix != null)
+                {
+                    relativeUrlBase = relativeUrlBase+currNetwork.UrlPathPrefix+'/s/login';
+                }
+                else{
+                    relativeUrlBase = relativeUrlBase+'/s/login';
+                }
             }
             return relativeUrlBase;
             //String relativeUrlBase = URL.getSalesforceBaseUrl().toExternalForm()+'/s'+'/login';
@@ -972,7 +977,7 @@ public with sharing class AssessmentController {
                     conIds.add(con.Id);
                 }
             }
-            if(conIds.isEmpty() == false){
+           /* if(conIds.isEmpty() == false){
                 for(User us:[SELECT Id,Name,Contact.AccountId,Email FROM User WHERE ContactId IN:conIds WITH SECURITY_ENFORCED]){
                     if(accUserMap.containsKey(us.Contact.AccountId)){
                         List<User> tempList = accUserMap.get(us.Contact.AccountId);
@@ -983,7 +988,7 @@ public with sharing class AssessmentController {
                         accUserMap.put(us.Contact.AccountId,tempList);
                     }
                 }
-            }
+            }*/
             if(assRlnsList.isEmpty() == false && accUserMap.isEmpty() == false && siteData != null){
                 if(string.isBlank(source)){
                     for(AccountAssessmentRelation__c assRelRec:assRlnsList){

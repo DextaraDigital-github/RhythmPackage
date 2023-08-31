@@ -89,7 +89,7 @@
 				<template if:true={showSuppliers}>
 					<div class="slds-modal__content slds-p-horizontal_large slds-p-vertical_medium"
 						id="modal-content-id-2" style="height:365px;">
-						<c-add-suppliers onupdatedsupliers={updateSupplierData}></c-add-suppliers>
+						<c-add-suppliers onupdatedsupliers={updateSupplierData} today-date={todayDate} start-date={startDate} end-date={endDate}></c-add-suppliers>
 					</div>
 				</template>
 				<template if:true={isTemplateInactive}>
