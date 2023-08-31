@@ -353,9 +353,9 @@ export default class RtmvpcAssessmentDetail extends NavigationMixin(LightningEle
 
     }
     handleAction(event) {
-        if (!this.isOpened) {
-            this.handleRightButtonClick();
-        }
+        // if (!this.isOpened) {
+        //     this.handleRightButtonClick();
+        // }
 
         console.log('hhh', event.detail);
         this.showResponseForm = event.detail.action;
@@ -410,9 +410,9 @@ export default class RtmvpcAssessmentDetail extends NavigationMixin(LightningEle
     }
     /* chatHistory is used to get the question id, assessment id and flag boolean from the child component (Questionnaire) and pass it to the child component(AssessmentChatter)*/
     chatHistory(event) {
-        if (!this.isOpened) {
-            this.handleRightButtonClick();
-        }
+        // if (!this.isOpened) {
+        //     this.handleRightButtonClick();
+        // }
 
         this.showChat = event.detail.chat;
         //this.showCapaForm=event.detail.showCapaForm;
@@ -458,9 +458,9 @@ export default class RtmvpcAssessmentDetail extends NavigationMixin(LightningEle
 
     }
     handleFileData(event) {
-        if (!this.isOpened) {
-            this.handleRightButtonClick();
-        }
+        // if (!this.isOpened) {
+        //     this.handleRightButtonClick();
+        // }
 
         this.openRightFile = true;
         this.openReviewComments = false;
