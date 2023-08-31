@@ -1,6 +1,6 @@
 /**
 * Class Name         : DisplayPDFController
-* Developer          : Sai Koushik Nimmaturi and Reethika Velpula           
+* Developer          : Sri Kushal Reddy N           
 * Created Date       : 
 * @description       : It is used to display the pdf.
 * Last Modified Date : 
@@ -32,21 +32,21 @@ public with sharing class DisplayPDFController {
             columnWr.name = column;
         	columns.add(columnWr);
         }
-        System.debug(columns);
         
         data = new List<QuestionWrapper>();
         Map<String,List<QuestionWrapper>> inputMap = (Map<String,List<QuestionWrapper>>)JSON.deserialize(table, Map<String,List<QuestionWrapper>>.class);
-        System.debug(inputMap);
+        Integer count = 0;
         for(String section:new List<String>(inputMap.keySet())) {
             List<QuestionWrapper> questionsList = inputMap.get(section);
             for(Integer i = 0; i < questionsList.size(); i++) {
                 QuestionWrapper questionWr = new QuestionWrapper();
                 questionWr = questionsList[i];
                 questionWr.section = section;
+                questionWr.className = (Math.mod(count, 2) == 0) ? 'rap-td-even' : 'rap-td-odd';
+                count++;
                 data.add(questionWr);
             }
         }
-        System.debug(data);
     }
     
     public class QuestionWrapper {
@@ -56,6 +56,7 @@ public with sharing class DisplayPDFController {
         public String snumber{get;set;}
         public String value{get;set;}
         public String conversationHistory{get;set;}
+        public String className{get;set;}
     }
     public class ColumnWrapper {
         public String label{get;set;}
