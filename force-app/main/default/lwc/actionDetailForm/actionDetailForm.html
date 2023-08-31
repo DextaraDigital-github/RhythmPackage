@@ -12,58 +12,58 @@
 						is-sucess={success} onclosetoast={closeToastHandler}></c-Show-Toast-Message>
 				</template>
 				<template for:each={actionFormData} for:item="rec">
-					<lightning-layout-item size="6" padding="around-small" key={rec}>
+					<lightning-layout-item size="12" medium-device-size="6" padding="around-small" key={rec}>
 						<div class="slds-grid">
-							<h1 class="slds-col slds-size_1-of-3 slds-form-element__label" title="Field2">Action Item
+							<h1 class="slds-col slds-size_5-of-12 slds-form-element__label" title="Field2">Action Item
 								Name
 							</h1>
-							<h1 class="slds-col slds-size_2-of-3 slds-form-element__control">{rec.Name}</h1>
+							<h1 class="slds-col slds-size_7-of-12 slds-form-element__control">{rec.Name}</h1>
 						</div>
 					</lightning-layout-item>
-					<lightning-layout-item size="6" padding="around-small" key={rec}>
+					<lightning-layout-item size="12" medium-device-size="6" padding="around-small" key={rec}>
 						<div class="slds-grid">
-							<h1 class="slds-col slds-size_1-of-3 slds-form-element__label" title="Field2">Supplier Name
+							<h1 class="slds-col slds-size_5-of-12 slds-form-element__label" title="Field2">Supplier Name
 							</h1>
-							<h1 class="slds-col slds-size_2-of-3 slds-form-element__control">
+							<h1 class="slds-col slds-size_7-of-12 slds-form-element__control">
 								{rec.Rhythm__Supplier__r.Name}</h1>
 						</div>
 					</lightning-layout-item>
-					<lightning-layout-item size="6" padding="around-small " key={rec}>
+					<lightning-layout-item size="12" medium-device-size="6" padding="around-small " key={rec}>
 						<div class="slds-grid ">
-							<h1 class="slds-col slds-size_1-of-3 slds-form-element__label" title="Field 1">Related
+							<h1 class="slds-col slds-size_5-of-12 slds-form-element__label" title="Field 1">Related
 								Record</h1>
-							<p class="slds-col slds-size_2-of-3 slds-form-element__control">
+							<p class="slds-col slds-size_7-of-12 slds-form-element__control">
 								{rec.Rhythm__Related_Record__r.Name}</p>
 						</div>
 					</lightning-layout-item>
-					<lightning-layout-item size="6" padding="around-small" key={rec}>
+					<lightning-layout-item size="12" medium-device-size="6" padding="around-small" key={rec}>
 						<div class="slds-grid ">
-							<h1 class="slds-col slds-size_1-of-3 slds-form-element__label" title="Field2">Action Item
+							<h1 class="slds-col slds-size_5-of-12 slds-form-element__label" title="Field2">Action Item
 								Description
 							</h1>
-							<p class="slds-col slds-size_2-of-3 slds-form-element__control">
+							<p class="slds-col slds-size_7-of-12 slds-form-element__control">
 								{rec.Rhythm__Action_Item_Description__c}</p>
 						</div>
 					</lightning-layout-item>
-					<lightning-layout-item size="6" padding="around-small" key={rec}>
+					<lightning-layout-item size="12" medium-device-size="6" padding="around-small" key={rec}>
 						<div class="slds-grid ">
-							<h1 class="slds-col slds-size_1-of-3 slds-form-element__label" title="Field2">Due Date
+							<h1 class="slds-col slds-size_5-of-12 slds-form-element__label" title="Field2">Due Date
 							</h1>
-							<p class="slds-col slds-size_2-of-3 slds-form-element__control">{rec.Rhythm__Due_Date__c}
+							<p class="slds-col slds-size_7-of-12 slds-form-element__control">{rec.Rhythm__Due_Date__c}
 							</p>
 						</div>
 					</lightning-layout-item>
-					<lightning-layout-item size="6" padding="around-small" key={rec}>
+					<lightning-layout-item size="12" medium-device-size="6" padding="around-small" key={rec}>
 						<div class="slds-grid ">
-							<h1 class="slds-col slds-size_1-of-3 slds-form-element__label" title="Field2">Priority
+							<h1 class="slds-col slds-size_5-of-12 slds-form-element__label" title="Field2">Priority
 							</h1>
-							<p class="slds-col slds-size_2-of-3 slds-form-element__control">{rec.Rhythm__Priority__c}
+							<p class="slds-col slds-size_7-of-12 slds-form-element__control">{rec.Rhythm__Priority__c}
 							</p>
 						</div>
 					</lightning-layout-item>
-					<lightning-layout-item size="6" padding="around-small" key={rec}>
+					<lightning-layout-item size="12" medium-device-size="6" padding="around-small" key={rec}>
 						<div class="slds-grid ">
-							<h1 class="slds-col slds-size_1-of-3 slds-form-element__label" title="Field2">Flag Status
+							<h1 class="slds-col slds-size_5-of-12 slds-form-element__label" title="Field2">Flag Status
 							</h1>
 							<template if:false={isSave}>
 								<template if:false={expired}>
@@ -78,42 +78,42 @@
                     </template>
 						</div>
 					</lightning-layout-item>
-					<lightning-layout-item size="6" padding="around-small" key={rec}>
+					<lightning-layout-item size="12" medium-device-size="6" padding="around-small" key={rec}>
 						<div class="slds-grid ">
-							<h1 class="slds-col slds-size_1-of-3 slds-form-element__label" title="Field2">Related Module
+							<h1 class="slds-col slds-size_5-of-12 slds-form-element__label" title="Field2">Related Module
 							</h1>
-							<p class="slds-col slds-size_2-of-3 slds-form-element__control">
+							<p class="slds-col slds-size_7-of-12 slds-form-element__control">
 								{rec.Rhythm__Related_module__c}</p>
 						</div>
 					</lightning-layout-item>
-					<lightning-layout-item size="6" padding="around-small" key={rec}>
+					<lightning-layout-item size="12" medium-device-size="6" padding="around-small" key={rec}>
 						<div class="slds-grid ">
-							<h1 class=" slds-col slds-size_1-of-3 slds-form-element__label" title="Field2">Ownership
+							<h1 class=" slds-col slds-size_5-of-12 slds-form-element__label" title="Field2">Ownership
 							</h1>
-							<p class="slds-col slds-size_2-of-3 slds-form-element__control">
+							<p class="slds-col slds-size_7-of-12 slds-form-element__control">
 								{rec.Rhythm__OwnershipName__c}</p>
 						</div>
 					</lightning-layout-item>
-					<lightning-layout-item size="6" padding="around-small" key={rec}>
+					<lightning-layout-item size="12" medium-device-size="6" padding="around-small" key={rec}>
 						<div class="slds-grid">
-							<h1 class=" slds-col slds-size_1-of-3 slds-form-element__label" title="Field2">Assigned To
+							<h1 class=" slds-col slds-size_5-of-12 slds-form-element__label" title="Field2">Assigned To
 							</h1>
-							<p class="slds-col slds-size_2-of-3 slds-form-element__control">
+							<p class="slds-col slds-size_7-of-12 slds-form-element__control">
 								{rec.Rhythm__Assigned_To__r.Name}</p>
-						</div>
+						</div> 
 					</lightning-layout-item>
-					<lightning-layout-item size="6" padding="around-small" key={rec}>
+					<lightning-layout-item size="12" medium-device-size="6" padding="around-small" key={rec}>
 						<div class="slds-grid ">
-							<h1 class="slds-col slds-size_1-of-3 slds-form-element__label" title="Field2">Status
+							<h1 class="slds-col slds-size_5-of-12 slds-form-element__label" title="Field2">Status
 							</h1>
-							<div class="slds-col slds-size_1-of-3 slds-form-element__control">
+							<div class="slds-col slds-size_6-of-12 slds-form-element__control">
 								<template if:true={isSave}>
 									<lightning-combobox options={options} data-id="Rhythm__Status__c"
 										onchange={handleChange} value={rec.Rhythm__Status__c} variant="label-hidden">
 									</lightning-combobox>
 								</template>
 								<template if:false={isSave}>
-									<lightning-combobox options={options} data-id="Rhythm__Status__c"
+									<lightning-combobox options={options} data-id="Rhythm__Status__c" style="width:100%;"
 										variant="label-hidden" onchange={handleChange} value={rec.Rhythm__Status__c}
 										disabled="true"></lightning-combobox>
 								</template>
@@ -121,25 +121,25 @@
 
 						</div>
 					</lightning-layout-item>
-					<lightning-layout-item size="6" padding="around-small" key={rec}>
+					<lightning-layout-item size="12" medium-device-size="6" padding="around-small" key={rec}>
                 <div class="slds-grid ">
-                    <h1 class="slds-col slds-size_1-of-3 slds-form-element__label" title="Field2">Created by
+                    <h1 class="slds-col slds-size_5-of-12 slds-form-element__label" title="Field2">Created by
                     </h1>
-                    <p class="slds-col slds-size_2-of-3 slds-form-element__control">{rec.Rhythm__created__c}</p>
+                    <p class="slds-col slds-size_7-of-12 slds-form-element__control">{rec.Rhythm__created__c}</p>
                 </div>
             </lightning-layout-item>
-					<lightning-layout-item size="6" padding="around-small" key={rec}>
+					<lightning-layout-item size="12" medium-device-size="6" padding="around-small" key={rec}>
 						<div class="slds-grid ">
-							<h1 class=" slds-col slds-size_1-of-3 slds-form-element__label" title="Field2">Comments
+							<h1 class=" slds-col slds-size_5-of-12 slds-form-element__label" title="Field2">Comments
 							</h1>
-							<div class="slds-col slds-size_1-of-3 slds-form-element__control">
+							<div class="slds-col slds-size_6-of-12 slds-form-element__control">
 								<template if:true={isSave}>
-									<lightning-textarea  type="text" onchange={handleChange} variant="label-hidden"
+									<lightning-textarea  type="text" onchange={handleChange} variant="label-hidden" style="width:100%;"
 										value={rec.Rhythm__Comments__c} data-id="Rhythm__Comments__c">
 									</lightning-textarea >
 								</template>
 								<template if:false={isSave}>
-									<lightning-textarea type="text" onchange={handleChange} variant="label-hidden"
+									<lightning-textarea type="text" onchange={handleChange} variant="label-hidden" style="width:100%;"
 										value={rec.Rhythm__Comments__c} data-id="Rhythm__Comments__c" disabled="true">
 									</lightning-textarea>
 								</template>
