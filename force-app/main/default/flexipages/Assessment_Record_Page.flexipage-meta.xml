@@ -8,13 +8,6 @@
                     <valueList>
                         <valueListItems>
                             <value>Edit</value>
-                            <visibilityRule>
-                                <criteria>
-                                    <leftValue>{!Record.Number_of_invited_Suppliers__c}</leftValue>
-                                    <operator>EQUAL</operator>
-                                    <rightValue>0</rightValue>
-                                </criteria>
-                            </visibilityRule>
                         </valueListItems>
                         <valueListItems>
                             <value>Rhythm__Assessment__c.Delete</value>
@@ -102,6 +95,12 @@
         <type>Facet</type>
     </flexiPageRegions>
     <flexiPageRegions>
+        <itemInstances>
+            <componentInstance>
+                <componentName>sendEmailLWCButton</componentName>
+                <identifier>Rhythm_sendEmailLWCButton</identifier>
+            </componentInstance>
+        </itemInstances>
         <itemInstances>
             <componentInstance>
                 <componentInstanceProperties>
