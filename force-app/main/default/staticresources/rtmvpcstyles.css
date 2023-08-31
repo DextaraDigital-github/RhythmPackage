@@ -330,6 +330,8 @@
 	
 	.cdgWrapper {position:relative; }
 	button.cdg_actions { border-radius:4px; box-shadow:1px 1px 3px rgba(0,0,0,0.6); border:1px solid var(--cibcadcdg-bdr-color); word-break:keep-all;position:absolute; right:16px; top:-33px; }
+		.rtmvpc-contentbg .cdgWrapper button.cdg_actions { top:-35px; }
+	.rtmvpc-contentbg .slds-p-around_small .cdgWrapper button.cdg_actions { top:-45px; right:8px; }
 	.cdgWrapperinner button.slds-button_icon-border { border:0px solid transparent; z-index:99; }
 	div.cdg .slds-dropdown__item>a { padding:0px 0.75rem; }
 	.cdgWrapper .td .slds-dropdown-trigger_click .slds-dropdown, .cdgWrapper .td .slds-dropdown-trigger_click:hover .slds-dropdown { right:33px; top:-3px; }
