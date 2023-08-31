@@ -8,6 +8,7 @@ import getTodayDate from '@salesforce/apex/AssessmentController.getTodayDate';
 import errorLogRecord from '@salesforce/apex/AssessmentController.errorLogRecord';
 
 
+
 export default class CreateAssessmentWithSuppliers extends NavigationMixin(LightningElement) {
     showModal = true;
     showNewAssessment=false;
@@ -191,6 +192,7 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
 
     updateSupplierData(event){
         this.suppliersList = event.detail.newSuppliers;
+        
     }
 
     closeModal(){
@@ -200,7 +202,7 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
         }else{
             this.navigateToObjectHome();
         }
-        eval("$A.get('e.force:refreshView').fire();");//Todo Prudvi please check this
+        //eval("$A.get('e.force:refreshView').fire();");//Todo Prudvi please check this
     }
     showNotification(title,message,variant) {
         const evt = new ShowToastEvent({
@@ -247,5 +249,16 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
     {
         this.showSuppliers = false;
         this.showNewAssessment = true;
+    }
+    getTodayDate(){
+        getTodayDate()
+        .then(result => {
+                this.todayDate = result;
+                console.log('this.todayDate==>',JSON.stringify(this.todayDate));
+            //}
+        })
+        .catch(error => {
+            //console.log(error);
+        });
     }
 }
