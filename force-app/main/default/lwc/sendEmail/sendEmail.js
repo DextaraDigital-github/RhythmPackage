@@ -324,6 +324,8 @@ export default class SendEmail extends NavigationMixin(LightningElement) {
             this.open = false;
         }
         else {
+            const close = new CustomEvent('close', {});
+            this.dispatchEvent(close);
             this[NavigationMixin.Navigate]({
                 type: 'standard__recordPage',
                 attributes: {
