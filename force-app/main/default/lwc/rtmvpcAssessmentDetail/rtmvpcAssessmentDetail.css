@@ -128,7 +128,7 @@
     .cad-sec_vcontainer2_1 { display:block; width:100%; position:absolute; height:calc(100% - 1px); margin:0px 0px 0px; overflow-y:auto; }
     .cad-sec_vcontainer2_2 { display:block; width:100%; position:absolute; height:calc(100% - 0px); margin:0px 0px 0px; overflow-y:auto; }
     .cad-sec_vcontainer2bdr { margin:0px 0px 114px;}   
-    .cad-btn_bck1 { margin-top:0px; margin-bottom:4px; } 
+    .cad-btn_bck1 { margin-top:-38px; margin-bottom:0px; z-index:9; position: relative; } 
 }
 
 @media screen and (max-width:600px) {

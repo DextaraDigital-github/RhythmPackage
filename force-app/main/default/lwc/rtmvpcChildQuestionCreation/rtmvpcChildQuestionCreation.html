@@ -2,8 +2,8 @@
 
 	<template if:true={showcreateChild}>
 		<template if:true={loading}>
-		<lightning-spinner alternative-text="Loading" size="large"></lightning-spinner>
-	</template>
+			<lightning-spinner alternative-text="Loading" size="large"></lightning-spinner>
+		</template>
 		<section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="modal-heading-01"
 			class="slds-modal slds-fade-in-open slds-modal_small">
 			<div class="slds-modal__container">
@@ -19,8 +19,8 @@
 					</h1>
 				</div>
 				<div class="slds-modal__content slds-scrollable_none" id="modal-content-id-1"
-					style="height: 100%; position: relative;">
-						<div class="slds-scrollable" style="height:calc(100% - 60px)">	
+					style="height:80%; position: relative;">
+					<div class="slds-scrollable" style="height:calc(100% - 60px)">
 						<template if:true={loadCmp}>
 							<div class="cqr-head slds-p-around_small slds-grid">
 								<div>1.&nbsp;</div>
@@ -31,11 +31,14 @@
 							</div>
 							<div class="slds-p-top_x-small slds-p-horizontal_medium">
 								<lightning-layout multiple-rows>
-									<lightning-layout-item size="12" class="slds-p-left_medium slds-p-right_medium slds-p-bottom_x-small" small-device-size="12"
-										medium-device-size="12" large-device-size="12">
-										<lightning-combobox style="--slds-c-input-color-border: rgb(201, 201, 201);" name="Question Type" label="Response Options"
+									<lightning-layout-item size="12"
+										class="slds-p-left_medium slds-p-right_medium slds-p-bottom_x-small"
+										small-device-size="12" medium-device-size="12" large-device-size="12">
+										<lightning-combobox style="--slds-c-input-color-border: rgb(201, 201, 201);"
+											name="Question Type" label="Response Options"
 											value={questionnaire.Rhythm__Question_Type__c} options={options}
-											data-id="Response_Options" onchange={handleChange} required=true></lightning-combobox>
+											data-id="Response_Options" onchange={handleChange} required=true>
+										</lightning-combobox>
 									</lightning-layout-item>
 								</lightning-layout>
 							</div>
@@ -44,9 +47,19 @@
 									onhandlecancel={handleclose} child-ques-creation={childQuesCreation}
 									childwrapper={childwrapper}>
 								</c-rtmvpc-question-creation>
+								
 							</template>
 						</template>
 					</div>
+					<template if:true={createQues}>
+						<div class="slds-modal__footer"
+							style="position: absolute; width: 100%; bottom:0px; z-index:99;">
+							<button class="slds-button slds-button_neutral" aria-label="Cancel and close" onclick={handleClose}>Cancel</button>
+							<lightning-button class="slds-button" variant="brand" label="Save" title="Save"
+								onclick={handlesave}>
+							</lightning-button>
+						</div>
+					</template>
 				</div>
 			</div>
 		</section>

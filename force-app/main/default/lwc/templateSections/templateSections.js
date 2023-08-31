@@ -50,7 +50,7 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
             initialWidth: 150,
         },
         {
-            type: "action", typeAttributes: { rowActions: actions }
+            type: "action", typeAttributes: { rowActions: actions }, label: "Actions"
         }
     ];
     columns = this.sectionColumns;
@@ -90,6 +90,7 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
         this.disableButtons = result.data;
         if (this.disableButtons === false) {
             this.columns = [...this.sectionColumns].filter(col => col.type !== 'action');
+           
         }
     }
 
@@ -100,9 +101,9 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
 
     //Save and New Functionality for New Record
     reOpenCreateModal() {
-        setTimeout(() => {
+       
             this.handleNew();
-        }, 500);
+      
     }
 
     //Save the record and Open new reocrd creation
@@ -503,6 +504,7 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
             console.log('result', result);
             if (this.disableButtons === false) {
                 this.columns = [...this.sectionColumns].filter(col => col.type !== 'action');
+                 
                 if (this.actionName != '') {
                     location.reload();
                     this.dispatchEvent(

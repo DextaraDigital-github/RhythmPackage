@@ -135,7 +135,7 @@
 		--cibcad-hlt:;	
 		
     --box-shadow:0 5px 15px 0 rgba(0,0,0,.07), 0 15px 35px 0 rgba(49,105,193,.1);
-		 
+	--slds-c-input-radius-border:4px!important;
 	}
 	
 	.cad-titlebutton_more .slds-button--icon-more, .cad-titlebutton_more .slds-button_icon-more { background-color:transparent!important; border-color:transparent!important; margin-top:-4px; }
@@ -242,6 +242,7 @@
 		
 	.cdg lightning-tree-grid table.slds-table tbody tr th:before,
 	.cdg lightning-tree-grid table.slds-table tbody tr td:before { color:#454545;text-transform:uppercase; position:absolute; z-index:12; font-size:12px; top:5px; left:0px; padding-left:10px; }
+	.cdg lightning-tree-grid table.slds-table tbody tr td[data-label="Actions"] { position:absolute; top:15px; right:15px; padding:5px; }
 	/*.cdg lightning-tree-grid table.slds-table tbody tr td:last-child { position:absolute; top:15px; right:15px; }*/
 	
 
@@ -269,7 +270,7 @@
 	
 	.cdg.questions .slds-scrollable_y { width:100%!important; }
 	.cdg.questions lightning-tree-grid table.slds-table tbody tr td:first-child { position:absolute; top:15px; left:0px; padding:5px; }
-	.cdg.questions lightning-tree-grid table.slds-table tbody tr td:nth-child(2) { position:absolute; top:15px; left:45px; padding:5px; }
+	.cdg.questions lightning-tree-grid table.slds-table tbody tr td:nth-child(2) { position:absolute; top:15px; left:45px; padding:5px;z-index:2; }
 	.cdg.questions lightning-tree-grid table.slds-table tbody tr td:last-child { position:absolute; top:15px; right:15px; padding:5px; }
 
 
@@ -312,9 +313,10 @@
 
 	}
 @media screen and (max-width:600px) {
-	.cdg .slds-scrollable_y { width:100%!important; }
-	.rtm-qcontent, .listViewContainer, .listDisplays { min-height:calc(100vh - 60px); }
-	.slds-modal__container { padding:0px!important; margin:0px 1rem!important;}
+	.cdg .slds-scrollable_y { width:100%!important; overflow-y: auto; height:calc(100vh - 150px); }
+	.cdg .slds-table_header-fixed_container, .cdg .slds-table--header-fixed_container { padding-top:0px; }
+	.rtm-qcontent, .listViewContainer, .listDisplays { /*min-height:calc(100vh - 140px);*/ }
+	.slds-modal__container { padding:2rem 0!important; margin:0px 1rem!important;}
 	.cdg.questions .slds-scrollable_y { width:100%!important; }
 	.cdg lightning-tree-grid table.slds-table tbody tr { display:inline-block; width:calc(100% - 0px); position:relative!important; padding:15px; margin:18px -3px -3px; background:rgb(227 212 235); border-radius:5px; /*box-shadow:0 0 5px rgba(0,0,0,0.2);*/ }
 	.cdg lightning-tree-grid table.slds-table tbody tr[aria-level="2"] { display:block; width:calc(100% - 0px); position:relative!important; padding:15px; margin:-7px -3px -7px -3px; background:rgb(227 212 235); border-radius:5px; /*box-shadow:0 0 5px rgba(0,0,0,0.2);*/ }

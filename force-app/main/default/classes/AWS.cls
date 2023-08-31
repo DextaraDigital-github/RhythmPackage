@@ -236,7 +236,7 @@ public abstract class AWS {
             setHeader('Content-Length', String.valueOf(payload.size()));
             setHeader('Content-Type', contType);
             //setHeader('ACL', 'public-read');
-            if(contType == '.docx') {
+            if(contType == '.docx' || contType == '.doc' || contType == '.xlsx'|| contType == '.xls') {
                 setHeader('Content-Disposition', 'attachment');  
                 
             }

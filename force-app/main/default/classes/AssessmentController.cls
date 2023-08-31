@@ -33,7 +33,11 @@ public with sharing class AssessmentController {
             throw new AuraHandledException(errorMsg);
         }
     }
-    
+    @AuraEnabled	
+    public static String getSalesforceDomainURL(){
+        String url= System.Url.getOrgDomainUrl()+'/';
+        return url;
+    }
     /**
     * @description Gets the Question__c,Section__c information of a particular Assessment_Template__c.
     * @param templateId This is a record id of an Assessment_Template__c.
@@ -289,7 +293,7 @@ public with sharing class AssessmentController {
     @AuraEnabled
     public static String getAccountId()
     {
-        try{
+        /*try{
             String userId = userinfo.getuserid();
             userId = String.escapeSingleQuotes(userId);
             List<User> userList =  [SELECT Contact.AccountId
@@ -305,13 +309,13 @@ public with sharing class AssessmentController {
         }catch(exception e){
             String errorMsg = e.getMessage();
             throw new AuraHandledException(errorMsg);
-        }
-        //return null;
+        }*/
+        return null;
     }
 
     /**
     * @description To update the rejected flag.
-    * @param updateRejectFlagList This is the list of records. 
+    * @param updateRejectFlagList This is the list of records.  
     * @return 
     */
     @AuraEnabled
@@ -1295,6 +1299,62 @@ public with sharing class AssessmentController {
     }
     
     /**
+    * @description To download the assessments as the PDF
+    * @recordData List of assessments as string to print.
+    * @columnsData List of columns as string to print.
+    */
+    @AuraEnabled
+    public static String getPDFData(String recordData, String columnsData){
+        try{
+            List<ColumnData> pdfColumns = (List<ColumnData>) JSON.deserialize(columnsData, List<ColumnData>.class);
+            List<PDFWrapper> pdfData = (List<PDFWrapper>) JSON.deserialize(recordData, List<PDFWrapper>.class);
+            string tableHtml = '';
+            tableHtml += '<html><body><div><table style="page-break-inside: auto">';
+            tableHtml += '<tr><td height="5px" bgcolor="rgb(107, 56, 136)"></td><td height="5px" bgcolor="rgb(239, 104, 55)"></td></tr>';
+            tableHtml += '<tr><td bgcolor="white" colspan="2"><span><font color="#535353" size=3><b>&nbsp;&nbsp;RHYTHM</b></font></span><br/><span><font color="#535353" size=1><b>&nbsp;&nbsp;&nbsp;INNOVATIONS</b></font></span></td></tr>';
+            tableHtml += '<tr><td colspan="2" height="5px"></td></tr>';
+            tableHtml += '<tr><td colspan="2" bgcolor="#f5f7fa"><table cellpadding="5"><tr>';
+            for (integer i = 0; i < pdfColumns.size(); i++) {
+                tableHtml += '<th bgcolor="#d6dbde"><font color="rgb(60 60 60)" size=1 face="sans-serif"><b>' + pdfColumns[i].label + '</b></font></th>';
+            }
+            tableHtml += '<th bgcolor="#d6dbde"><font color="rgb(60 60 60)" size=0.5><b>% Completed</b></p></th>';
+            tableHtml += '</tr></table></td></tr>';
+            for (integer i = 0; i < pdfData.size(); i++) {
+                tableHtml += '<tr><td colspan="2"><table cellpadding="5"><tr>';
+                for (integer j = 0; j < pdfData[i].record.size(); j++) {
+                    string dataValue = '';
+                    if(pdfData[i].record[j].value != null){
+                        dataValue = pdfData[i].record[j].value;
+                    }
+                    if(Math.mod(i,2) == 0) {
+                    	tableHtml += '<td bgcolor="white">' + dataValue + '</td>';
+                    }
+                    else {
+                    	tableHtml += '<td bgcolor="rgb(246 246 246)">' + dataValue + '</td>';
+                    }
+                }
+                string dataValue = '';
+                if(pdfData[i].progressBarValue != null){
+                    dataValue = pdfData[i].progressBarValue;
+                }
+                if(Math.mod(i,2) == 0) {
+                	tableHtml += '<td bgcolor="white">' + dataValue + '</td>';
+                }
+                else {
+                    tableHtml += '<td bgcolor="rgb(246 246 246)">' + dataValue + '</td>';
+                }
+                tableHtml += '</tr></table></td></tr>';
+            }
+            tableHtml += '</table></div></body></html>';
+            Blob pdfContent = Blob.toPdf(tableHtml);
+            return EncodingUtil.base64Encode(pdfContent);
+        }catch(Exception e){
+            String errorMsg = e.getMessage();
+            throw new AuraHandledException(errorMsg);
+        }
+    }
+    
+    /**
     * @description It is used to store the response from server
     */
     public class ResultWrapper{
@@ -1317,12 +1377,39 @@ public with sharing class AssessmentController {
         @AuraEnabled public string recordId;
     }
     
+    /**
+    * @description It is used to store the PDFData from server
+    */
+    public class PDFWrapper{
+        @AuraEnabled public string templateId;
+        @AuraEnabled public string id;
+        @AuraEnabled public string progressBarValue;
+        @AuraEnabled public List<RecordData> record;
+    }
+
+    /**
+    * @description It is used to store the RecordData from server
+    */
+    public class RecordData{
+        @AuraEnabled public string fieldName;
+        @AuraEnabled public string label;
+        @AuraEnabled public string value;
+        @AuraEnabled public string classList;
+        @AuraEnabled public string surveySymbol;
+    }
     
-   
+    /**
+    * @description It is used to store the ColumnData from server
+    */
+    public class ColumnData{
+        @AuraEnabled public string label;
+        @AuraEnabled public string fieldName;
+        @AuraEnabled public string type;
+    }
+    
     /**
     * @description It is used to throw the exception
     */
     public class SecurityControllerException extends Exception{
     }
-    
 }
