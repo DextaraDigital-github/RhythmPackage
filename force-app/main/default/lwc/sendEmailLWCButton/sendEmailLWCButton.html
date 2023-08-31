@@ -1,0 +1,8 @@
+<template>
+	<div class="slds-float_right">
+		<lightning-button label="Send Email" onclick={sendEmailHandler}></lightning-button>
+	</div>
+	<template if:true={show.sendEmail}>
+		<c-send-email-to-contacts assessment-id={recordId} assessment-name={recordName}></c-send-email-to-contacts>
+	</template>
+</template>
