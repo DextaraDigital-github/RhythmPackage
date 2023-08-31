@@ -28,4 +28,8 @@ export default class SendEmailLWCButton extends LightningElement {
             this.configureToast('Some error has occured', 'Please contact your Administrator.', 'error');
         });
     }
+
+    closeHandler() {
+        this.show.sendEmail = false;
+    }
 }
