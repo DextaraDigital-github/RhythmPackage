@@ -977,7 +977,7 @@ public with sharing class AssessmentController {
                     conIds.add(con.Id);
                 }
             }
-           /* if(conIds.isEmpty() == false){
+           if(conIds.isEmpty() == false){
                 for(User us:[SELECT Id,Name,Contact.AccountId,Email FROM User WHERE ContactId IN:conIds WITH SECURITY_ENFORCED]){
                     if(accUserMap.containsKey(us.Contact.AccountId)){
                         List<User> tempList = accUserMap.get(us.Contact.AccountId);
@@ -988,7 +988,7 @@ public with sharing class AssessmentController {
                         accUserMap.put(us.Contact.AccountId,tempList);
                     }
                 }
-            }*/
+            }
             if(assRlnsList.isEmpty() == false && accUserMap.isEmpty() == false && siteData != null){
                 if(string.isBlank(source)){
                     for(AccountAssessmentRelation__c assRelRec:assRlnsList){
