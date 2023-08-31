@@ -70,6 +70,7 @@ export default class RtmvpcAssessmentDetail extends NavigationMixin(LightningEle
     @track openRightFile = false;
     @track assessmentId;
     @track showBack = false;
+    @track isOpened = false;
 
     connectedCallback() {
 
@@ -352,6 +353,10 @@ export default class RtmvpcAssessmentDetail extends NavigationMixin(LightningEle
 
     }
     handleAction(event) {
+        if (!this.isOpened) {
+            this.handleRightButtonClick();
+        }
+
         console.log('hhh', event.detail);
         this.showResponseForm = event.detail.action;
         this.showCapaForm = this.showResponseForm[0].showCapaForm;
@@ -392,6 +397,7 @@ export default class RtmvpcAssessmentDetail extends NavigationMixin(LightningEle
     handleRightButtonClick() {
         var cadtype = this.template.querySelector('[data-id="caddisc"]');
         cadtype.classList.toggle('cadshowright');
+        this.isOpened = !this.isOpened;
     }
 
     /* showQuestionnaire is used to get section id and send it to the child component*/
@@ -404,6 +410,10 @@ export default class RtmvpcAssessmentDetail extends NavigationMixin(LightningEle
     }
     /* chatHistory is used to get the question id, assessment id and flag boolean from the child component (Questionnaire) and pass it to the child component(AssessmentChatter)*/
     chatHistory(event) {
+        if (!this.isOpened) {
+            this.handleRightButtonClick();
+        }
+
         this.showChat = event.detail.chat;
         //this.showCapaForm=event.detail.showCapaForm;
         this.openReviewComments = this.showChat.openReviewComments;
@@ -448,6 +458,10 @@ export default class RtmvpcAssessmentDetail extends NavigationMixin(LightningEle
 
     }
     handleFileData(event) {
+        if (!this.isOpened) {
+            this.handleRightButtonClick();
+        }
+
         this.openRightFile = true;
         this.openReviewComments = false;
         this.showCapaForm = false;
