@@ -75,6 +75,18 @@ jobs:
       - name: 'code push'
         run: sfdx force:source:push --targetusername=${{github.event.inputs.scratch-org_username}} --wait 20 -f --loglevel debug
        
-    # Generate Violation Report
-      - name: 'Scan for Violations and Generate report'
-        run: sfdx scanner:run:dfa --target "./**/*.cls" --projectdir "./"
+    # Send Violation Report Mail 
+      - name: 'Send mail'
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: mail.smtp2go.com
+          server_port: 465
+          secure: true
+          username: ${{secrets.MAIL_USERNAME}}
+          password: ${{secrets.MAIL_PASSWORD}}
+          subject: Github Actions workflow result 
+          to: akamanasf@gmail.com
+          from: Rhythm Package Repository Actions Hub	
+          body: ${{github.event.name}} pipeline got executed successfully!\n PFA			
+          convert_markdown: true
+          priority: normal

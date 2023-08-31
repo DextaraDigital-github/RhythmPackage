@@ -209,6 +209,20 @@ export default class RtmvpcQuestionCreation extends LightningElement {
         this.responseAttributes = event.detail;
 
     }
+    @api
+    handleClosedChild() {
+        this.createQues = false;
+        this.childQuesCreation = false;
+        const selectedEvent = new CustomEvent('handlecancel', {
+            detail: this.createQues
+        });
+        this.dispatchEvent(selectedEvent);
+
+    }
+    @api handlesaveChild(){
+        console.log('this.handlesave');
+        this.handlesave();
+    }
     /* 
         This method method is used to display the toast messages.
     */

@@ -43,9 +43,12 @@
 									</div>
 								</div>
 							</template>
-							<lightning-button-icon icon-name="utility:refresh" size="small" onclick={handleOnload}
+							<!-- <lightning-button-icon icon-name="utility:refresh" size="small" onclick={handleOnload}
 								alternative-text="Refresh" title="Refresh">
-							</lightning-button-icon>
+							</lightning-button-icon> -->
+							<button class="cad_actions" style="z-index: 99;" onclick={handleOnload} title="Refresh">
+								<i class="las la-sync"></i>
+							</button>
 						</template>
 					</div>
 
@@ -210,7 +213,7 @@
 												onuploadfile={handleuploadFile} onflagchange={handleFlagResponseMethod}
 												uploading-file={uploadingFile} onactionchange={handleActionResponse}
 												onrejectchange={handleReject} timeline={timeline}
-												is-preview-component={isPreviewComponent}>
+												is-preview-component={isPreviewComponent} onopenrightpanel={handleopenrightchatter}>
 											</c-rtmvpc-render-question-template>
 										</div>
 
@@ -226,18 +229,6 @@
 
 				</div>
 			</div>
-			<!-- <template if:true={showspinner}>
-				<div class="exampleHolder">
-					<lightning-spinner alternative-text="Loading" size="large"></lightning-spinner>
-				</div>
-			</template> -->
-			<!-- Footer --START-->
-			<!-- <div class="slds-p-horizontal_large slds-p-top_small">
-                <span>SUBMITTED BY: &nbsp;&nbsp;<b>{supplierAssessmentName}</b></span><br/>
-                <span>SUBMITTED DATE: &nbsp;&nbsp;<b>{supplierAssCreatedDate}</b>
-                </span>
-            </div> -->
-			<!-- Footer --END-->
 		</div>
 	</div>
 	<template if:false={isTemplate}>

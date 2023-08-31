@@ -52,7 +52,7 @@ div.cdg .slds-resizable__divider:after {height: calc(100% + 220px); background:l
    .cdgWrapper {}
    .cdgWrapperinner {max-width:calc(100vw - 28px); overflow-x:auto;}
     div.cdg { padding:5px 0px; display:flex; width:100%; flex-wrap:wrap; align-items:flex-start; background:transparent; border-left:0px solid transparent; } 
-    div.cdg div.tr:first-child,div.cdg div.tr:nth-child(2) {display:none;}
+    div.cdg div.tr:first-child,div.cdg div.tr:nth-child(2) {display:block;}
     div.cdg div.tr { position:relative; display:block; flex:auto; padding:10px;border:1px solid var(--cdg-bdrcell-color); background:var(--bg-primary-color1); border-radius:5px; margin:5px 0px;  }
     /* div.cdg div.tr:before {content:' '; position:absolute; width:100%; height:100%; margin:10px; border:1px solid var(--cdg-bdrcell-color); background:var(--bg-primary-color1);} */
     div.cdg div.th { display:none; border:0px solid transparent; max-width:100%;}
