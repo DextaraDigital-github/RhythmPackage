@@ -1322,7 +1322,6 @@ public with sharing class AssessmentController {
             for (integer i = 0; i < pdfColumns.size(); i++) {
                 tableHtml += '<th bgcolor="#d6dbde"><font color="rgb(60 60 60)" size=1 face="sans-serif"><b>' + pdfColumns[i].label + '</b></font></th>';
             }
-            tableHtml += '<th bgcolor="#d6dbde"><font color="rgb(60 60 60)" size=0.5><b>% Completed</b></p></th>';
             tableHtml += '</tr></table></td></tr>';
             for (integer i = 0; i < pdfData.size(); i++) {
                 tableHtml += '<tr><td colspan="2"><table cellpadding="5"><tr>';
@@ -1330,6 +1329,9 @@ public with sharing class AssessmentController {
                     string dataValue = '';
                     if(pdfData[i].record[j].value != null){
                         dataValue = pdfData[i].record[j].value;
+                        if(pdfData[i].record[j].fieldName == 'Rhythm__Response_Percentage__c' && dataValue != null) {
+                            dataValue += '%';
+                        }
                     }
                     if(Math.mod(i,2) == 0) {
                     	tableHtml += '<td bgcolor="white">' + dataValue + '</td>';
@@ -1337,16 +1339,6 @@ public with sharing class AssessmentController {
                     else {
                     	tableHtml += '<td bgcolor="rgb(246 246 246)">' + dataValue + '</td>';
                     }
-                }
-                string dataValue = '';
-                if(pdfData[i].progressBarValue != null){
-                    dataValue = pdfData[i].progressBarValue;
-                }
-                if(Math.mod(i,2) == 0) {
-                	tableHtml += '<td bgcolor="white">' + dataValue + '</td>';
-                }
-                else {
-                    tableHtml += '<td bgcolor="rgb(246 246 246)">' + dataValue + '</td>';
                 }
                 tableHtml += '</tr></table></td></tr>';
             }

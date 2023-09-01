@@ -573,7 +573,7 @@ export default class RtmvpcAssessmentDetail extends NavigationMixin(LightningEle
         else {
             //this.handlepdf(this.accountassessmentid);
             let pageurl = window.location.href;
-            let baseurl = pageurl.split('.com')[0] + '.com/apex/Rhythm__RenderAsPdf?id=' + this.accountassessmentid;
+            let baseurl = pageurl.split('/s/')[0] + '/apex/Rhythm__RenderAsPdf?id=' + this.accountassessmentid;
             window.open(baseurl);
         }
     }
@@ -658,7 +658,7 @@ export default class RtmvpcAssessmentDetail extends NavigationMixin(LightningEle
             name = result[0].Rhythm__Assessment__r.Name;
             let attachmentstr = attachment.replaceAll('&quot;', '\"');
             let parseLst = JSON.parse(attachmentstr);
-            let str = 'Section,Question,Answer,NumberOfAttachments,ConversationHistory\n';
+            let str = 'Section,Question,Response,NumberOfAttachments,ConversationHistory\n';
             for (const section in parseLst) {
                 str = str + section + '"\n"';
                 let data = parseLst[section];
@@ -707,7 +707,7 @@ export default class RtmvpcAssessmentDetail extends NavigationMixin(LightningEle
             name = result[0].Rhythm__Assessment__r.Name;
             let attachmentstr = attachment.replaceAll('&quot;', '\"');
             let parseLst = JSON.parse(attachmentstr);
-            let str = 'Section,Question,Answer,NumberOfAttachments,ConversationHistory\n';
+            let str = 'Section,Question,Response,NumberOfAttachments,ConversationHistory\n';
             for (const section in parseLst) {
                 str = str + section + '"\n"';
                 let data = parseLst[section];

@@ -12,7 +12,7 @@ import getActionRecords from '@salesforce/apex/CAPAController.getActionRecords';
 import RTM_FONTS from '@salesforce/resourceUrl/rtmfonts';
 import CUS_STYLES from '@salesforce/resourceUrl/rtmcpcsldscustomstyles';
 import QUE_PLAT from '@salesforce/resourceUrl/rtmvpcquestionnaireplatform';
-import { constructMultilevelhierarchy, createChildHierarchy} from './questionnaireutil';
+import { constructMultilevelhierarchy, createChildHierarchy } from './questionnaireutil';
 import { loadStyle } from 'lightning/platformResourceLoader';
 import awsjssdk from '@salesforce/resourceUrl/AWSJSSDK';
 import { loadScript } from 'lightning/platformResourceLoader';
@@ -178,7 +178,6 @@ export default class Questionnaire extends LightningElement {
                     }
                 })
             })
-
         }
         this.handleRequiredCheck();
     }
@@ -200,7 +199,9 @@ export default class Questionnaire extends LightningElement {
                                     if (ques.Id === deletemap.questionId) {
                                         if (typeof ques.Files__c !== 'undefined') {
                                             ques.Files__c = deletemap.numberoffiles + '';
-                                        }} })                            
+                                        }
+                                    }
+                                })
                             }
                         })
                     }
@@ -215,9 +216,9 @@ export default class Questionnaire extends LightningElement {
             let flagcount = 0;
             questionAnswer.questions.forEach(question => {
                 if (responseData.questionId === question.Id) {
-                    if(this.isSupplier !== true){
-                    question.Rhythm__Flag__c = true;
-                    this.showFollowButton = false;
+                    if (this.isSupplier !== true) {
+                        question.Rhythm__Flag__c = true;
+                        this.showFollowButton = false;
                     }
                     if (typeof question.ResponseId === 'undefined') {
                         question.ResponseId = responseData.responseId;
@@ -229,9 +230,9 @@ export default class Questionnaire extends LightningElement {
                         if (childresp.isdisplay) {
                             childresp.questions.forEach(childques => {
                                 if (responseData.questionId === childques.Id) {
-                                    if(this.isSupplier !== true){
-                                    childques.Rhythm__Flag__c = true;
-                                    this.showFollowButton = false;
+                                    if (this.isSupplier !== true) {
+                                        childques.Rhythm__Flag__c = true;
+                                        this.showFollowButton = false;
                                     }
                                     if (typeof childques.ResponseId === 'undefined') {
                                         childques.ResponseId = responseData.responseId;
@@ -245,11 +246,13 @@ export default class Questionnaire extends LightningElement {
             })
             questionAnswer.displayFlag = flagcount;
         });
-        this.filterQuestionsAndAnswers = JSON.parse(JSON.stringify(this.questionsAndAnswerss));
-        if(typeof this.isfiltername!=='undefined'){
-            if(this.isfiltername ==='reject'){this.handleFilterRejected();}
-            else{if(this.isfiltername==='flag'){this.handleFilterFlag(true);}
-            else{this.handleFilterFlag(false);}}
+       this.filterQuestionsAndAnswers = JSON.parse(JSON.stringify(this.questionsAndAnswerss));
+        if (typeof this.isfiltername !== 'undefined') {
+            if (this.isfiltername === 'reject') { this.handleFilterRejected(); }
+            else {
+                if (this.isfiltername === 'flag') { this.handleFilterFlag(true); }
+                else { this.handleFilterFlag(false); }
+            }
         }
     }
     handleAccordionSection() {
@@ -259,7 +262,8 @@ export default class Questionnaire extends LightningElement {
         }
         else {
             this.accordionFlag = false;
-            this.showAccordion = 'slds-accordion__section slds-is-close';}
+            this.showAccordion = 'slds-accordion__section slds-is-close';
+        }
     }
     @api gethandleTimeline(assessmenttimeLine) {
         this.timeline = assessmenttimeLine;
@@ -349,7 +353,8 @@ export default class Questionnaire extends LightningElement {
             loadScript(this, awsjssdk),
         ])
             .then(() => {
-                setTimeout(() => {this.configAWS();}, 100);});     
+                setTimeout(() => { this.configAWS(); }, 100);
+            });
     }
     configAWS() {
         if (this.renderFlag == true) {
@@ -520,14 +525,14 @@ export default class Questionnaire extends LightningElement {
                             questionResult.forEach(query => {
                                 allQuesId.push(query.Id);
                             });
-                            
+
                             getSupplierResponseList({ assessmentId: assessmentJunctionId }).then(suppResult => {
                                 if (suppResult && suppResult.length > 0 && suppResult[0] && suppResult[0].CreatedBy && suppResult[0].CreatedDate) {
                                     this.supplierAssessmentName = suppResult[0].CreatedBy.Name;
                                     this.supplierAssCreatedDate = suppResult[0].CreatedDate;
                                     let x = this.supplierAssCreatedDate.split('T')[0];
                                     let months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-                                    this.supplierAssCreatedDate = months[Number(x.split('-')[1]) - 1] + '-' + x.split('-')[2] + '-' + x.split('-')[0];                                    
+                                    this.supplierAssCreatedDate = months[Number(x.split('-')[1]) - 1] + '-' + x.split('-')[2] + '-' + x.split('-')[0];
                                 }
                                 if (this.assessmentStatus !== 'New' && this.assessmentStatus !== 'In Progress') {
                                     suppResult.forEach(qres => {
@@ -544,7 +549,7 @@ export default class Questionnaire extends LightningElement {
                                         sectionsList.push({ label: seckey, value: sectionName[seckey] });
                                         this.questionsList.push({ "sectionId": seckey, "section": sectionName[seckey], "sectionAccordian": "slds-accordion__section slds-is-close", "sequenceNumber": sectionSequenceMap[seckey], "questions": this.questionMap.get(seckey), "showNext": true, "show": false });
                                         count++;
-                                    }                                  
+                                    }
                                     this.showButtons.Summary = false;
                                     this.showButtons.Section_Navigation.show = false;
                                     this.showButtons.Save_Submit = false;
@@ -589,9 +594,7 @@ export default class Questionnaire extends LightningElement {
                                                                             ques.showUpload = true;
                                                                         }
                                                                     }
-                                                                }
-                                                            })
-                                                        }
+                                                                }})}
                                                         ques.snumber = sequence + '.' + (++childsequence);
                                                     });
                                                 });
@@ -602,15 +605,11 @@ export default class Questionnaire extends LightningElement {
                                     });
                                     this.loading = false;
                                     this.filterQuestionsAndAnswers = JSON.parse(JSON.stringify(this.questionsAndAnswerss));
-                                }).catch(err => {
-                                });
-                            }).catch(err => {
-                            });
-                        }).catch(err => {
-                        });
+                                }).catch(err => { });
+                            }).catch(err => { });
+                        }).catch(err => { });
                     }
-                }).catch(err => {
-                });
+                }).catch(err => { });
             }
             else {
                 this.loading = true;
@@ -697,14 +696,14 @@ export default class Questionnaire extends LightningElement {
                     questionResult.forEach(query => {
                         allQuesId.push(query.Id);
                     });
-                   
+
                     getSupplierResponseList({ assessmentId: this.accountassessmentid }).then(suppResult => {
                         if (suppResult && suppResult.length > 0 && suppResult[0] && suppResult[0].CreatedBy && suppResult[0].CreatedDate) {
                             this.supplierAssessmentName = suppResult[0].CreatedBy.Name;
                             this.supplierAssCreatedDate = suppResult[0].CreatedDate;
                             let x = this.supplierAssCreatedDate.split('T')[0];
                             let months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-                            this.supplierAssCreatedDate = months[Number(x.split('-')[1]) - 1] + '-' + x.split('-')[2] + '-' + x.split('-')[0];                           
+                            this.supplierAssCreatedDate = months[Number(x.split('-')[1]) - 1] + '-' + x.split('-')[2] + '-' + x.split('-')[0];
                         }
                         suppResult.forEach(qres => {
                             if (typeof qres.Rhythm__Question__r !== 'undefined') {
@@ -740,7 +739,7 @@ export default class Questionnaire extends LightningElement {
                             this.questionsAndAnswerss = this.questionsAndAnswerss.sort(this.compare_sort);
                             this.questionsList.forEach(questionWrap => {
                                 questionWrap.questions = questionWrap.questions.sort(this.compare_sort);
-                            });               
+                            });
                             this.questionsAndAnswerss.forEach(questionWrap => {
                                 let sequence = 0;
                                 questionWrap.questions.forEach(question => {
@@ -798,12 +797,7 @@ export default class Questionnaire extends LightningElement {
                                                                     ques.showUpload = true;
                                                                     if (respAttr.uploadrequired === 'Yes') {
                                                                         if (typeof ques.Files__c === 'undefined' || ques.Files__c === '0') {
-                                                                            this.requiredFilesLst.push(ques.Id);
-                                                                        }
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
+                                                                            this.requiredFilesLst.push(ques.Id);}}}}}
                                                     })
                                                 }
                                                 ques.snumber = sequence + '.' + (++childsequence);
@@ -815,15 +809,10 @@ export default class Questionnaire extends LightningElement {
                             });
                             this.loading = false;
                             this.filterQuestionsAndAnswers = JSON.parse(JSON.stringify(this.questionsAndAnswerss));
-                        }).catch(error => {
-                            this.totastmessage = 'Error : ' + JSON.stringify(error);
-                        });
-                    }).catch(err => {
-                    })
-                }).catch(err => {
-                })
-            }).catch(err => {
-            });
+                        }).catch(error => {this.totastmessage = 'Error : ' + JSON.stringify(error);});
+                    }).catch(err => {})
+                }).catch(err => {})
+            }).catch(err => {});
             this.showspinner = false;
         }
     }
@@ -910,7 +899,7 @@ export default class Questionnaire extends LightningElement {
                         if (bool) {
                             questionsList[i].displayFlag = displayFlag;
                         }
-                        else { questionsList[i].displayFlag = 0;}
+                        else { questionsList[i].displayFlag = 0; }
                     }
                     if (this.isSupplier === false) {
                         questionsList[i].displayFlag = displayFlag;
@@ -929,6 +918,7 @@ export default class Questionnaire extends LightningElement {
     onResponseChange(event) {
         this.requiredQuestionList = [];
         this.questionresponseafterchange = event.detail;
+        this.questionsAndAnswerss = JSON.parse(JSON.stringify(this.filterQuestionsAndAnswers));
         if (this.questionresponseafterchange !== 'undefined' && this.questionresponseafterchange !== null) {
             this.questionsAndAnswerss.forEach(questionAnswer => {
                 questionAnswer.questions.forEach(question => {
@@ -1059,14 +1049,13 @@ export default class Questionnaire extends LightningElement {
                 });
             });
             this.responseMap.set(this.questionresponseafterchange.questionId, this.questionresponseafterchange.option);
-            this.filterQuestionsAndAnswers = JSON.parse(JSON.stringify(this.questionsAndAnswerss));
             this.handleRequiredCheck();
             this.ishideToast = false;
             this.isAutoSave = true;
             this.startAutoSave();
         }
-        else { 
-        this.handleOnload();            
+        else {
+            this.handleOnload();
         }
     }
     handleRequiredCheck() {
@@ -1136,7 +1125,6 @@ export default class Questionnaire extends LightningElement {
             })
         });
         this.filterQuestionsAndAnswers = JSON.parse(JSON.stringify(this.questionsAndAnswerss));
-
     }
     handleFileUpload(event) {
         this.uploadingFile = true
@@ -1154,14 +1142,12 @@ export default class Questionnaire extends LightningElement {
         deletefile.accountAssessmentId = this.accountassessmentid;
         deletefile.questionId = deletefileData.questionId;
         deletefile.name = deletefileData.name;
-
     }
-
     @api
     handleFilterFlag(flagFilter) {
         this.questionsAndAnswerss = JSON.parse(JSON.stringify(this.filterQuestionsAndAnswers));
         if (flagFilter) {
-            this.isfiltername='flag';
+            this.isfiltername = 'flag';
             this.questionsAndAnswerss.forEach(questionAnswer => {
                 questionAnswer.sectionAccordian = "slds-accordion__section slds-is-open";
                 questionAnswer.questions.forEach(question => {
@@ -1178,7 +1164,7 @@ export default class Questionnaire extends LightningElement {
             })
         }
         else {
-            this.isfiltername='all';
+            this.isfiltername = 'all';
             this.questionsAndAnswerss.forEach(questionAnswer => {
                 questionAnswer.sectionAccordian = "slds-accordion__section slds-is-open";
             });
@@ -1196,10 +1182,7 @@ export default class Questionnaire extends LightningElement {
                         conditionalQuestion.questions = conditionalQuestion.questions.filter(item => (item.rejectButton));
                         if (conditionalQuestion.questions.length > 0) {
                             question.rejectFilter = true;
-                        }
-                    }
-                });
-            });
+                        }}});});
             questionAnswer.questions = questionAnswer.questions.filter(item => (item.rejectButton || item.rejectFilter));
         })
     }
@@ -1342,8 +1325,8 @@ export default class Questionnaire extends LightningElement {
         let pdfwrapper = {};
         this.questionsAndAnswerss.forEach(questionWrap => {
             let pdfwrapperlst = [];
-            let numberofQuestions =0;
-            let numberofResponses =0;
+            let numberofQuestions = 0;
+            let numberofResponses = 0;
             questionWrap.questions.forEach(ques => {
                 let quesWrap = {};
                 quesWrap.questionId = ques.Id;
@@ -1593,6 +1576,14 @@ export default class Questionnaire extends LightningElement {
                 responseQueryMap.submit = false;
             }
             responseQueryMap.pdfContnet = JSON.stringify(pdfwrapper);
+            this.filterQuestionsAndAnswers = JSON.parse(JSON.stringify(this.questionsAndAnswerss));
+            if (typeof this.isfiltername !== 'undefined') {
+                if (this.isfiltername === 'reject') { this.handleFilterRejected(); }
+                else {
+                    if (this.isfiltername === 'flag') { this.handleFilterFlag(true); }
+                    else { this.handleFilterFlag(false); }
+                }
+            }
             createSupplierResponse({ suppResponseList: responseList, paramMap: JSON.stringify(responseQueryMap) }).then((result) => {
                 result.forEach(res => {
                     this.responselstMap[res.Rhythm__Question__c] = res.Id;
@@ -1645,6 +1636,7 @@ export default class Questionnaire extends LightningElement {
             }).catch(err => {
                 this.totastmessage = 'Error : Something went wrong, Please contact admin.';
             });
+
         }
     }
     closeToastHandler(event) {
@@ -2004,7 +1996,6 @@ export default class Questionnaire extends LightningElement {
             })
         });
         this.saveBool = true;
-        this.filterQuestionsAndAnswers = JSON.parse(JSON.stringify(this.questionsAndAnswerss));
         this.handleSaveCustomer();
     }
     handleActionResponse(event) {
@@ -2080,7 +2071,7 @@ export default class Questionnaire extends LightningElement {
                     if (JSON.parse(chatterData.conversationHistory).length > 0) {
                         question.chatColour = true;
                         if (typeof chatterData.flagResponse !== 'undefined') {
-                            if(this.isSupplier !== true){question.Rhythm__Flag__c = chatterData.flagResponse;}                           
+                            if (this.isSupplier !== true) { question.Rhythm__Flag__c = chatterData.flagResponse; }
                         }
                     }
                 }
@@ -2091,7 +2082,7 @@ export default class Questionnaire extends LightningElement {
                             if (JSON.parse(chatterData.conversationHistory).length > 0) {
                                 ques.chatColour = true;
                                 if (typeof chatterData.flagResponse !== 'undefined') {
-                                    if(this.isSupplier !== true){ques.Rhythm__Flag__c = chatterData.flagResponse;}
+                                    if (this.isSupplier !== true) { ques.Rhythm__Flag__c = chatterData.flagResponse; }
                                 }
                             }
                         }
@@ -2100,10 +2091,12 @@ export default class Questionnaire extends LightningElement {
             })
         });
         this.filterQuestionsAndAnswers = JSON.parse(JSON.stringify(this.questionsAndAnswerss));
-        if(typeof this.isfiltername!=='undefined'){
-            if(this.isfiltername ==='reject'){this.handleFilterRejected();}
-            else{if(this.isfiltername==='flag'){this.handleFilterFlag(true);}
-            else{this.handleFilterFlag(false);}}
+        if (typeof this.isfiltername !== 'undefined') {
+            if (this.isfiltername === 'reject') { this.handleFilterRejected(); }
+            else {
+                if (this.isfiltername === 'flag') { this.handleFilterFlag(true); }
+                else { this.handleFilterFlag(false); }
+            }
         }
     }
     handleStartReview() {
@@ -2211,6 +2204,7 @@ export default class Questionnaire extends LightningElement {
             updateRejectFlag({ updateRejectFlagList: updateRejectFlagList, accountAssessment: this.recordId }).then({
             })
         }
+        this.filterQuestionsAndAnswers = JSON.parse(JSON.stringify(this.questionsAndAnswerss));
         if (insertRejectFlagList.length > 0) {
             insertRejectFlag({ insertRejectFlagList: insertRejectFlagList, accountAssessment: this.recordId }).then(result => {
                 getSupplierResponseList({ assessmentId: this.recordId }).then(suppResult => {
@@ -2253,10 +2247,10 @@ export default class Questionnaire extends LightningElement {
     customerCloseModal() {
         this.isCustomerModalPopup = false;
     }
-    handleAprroveReject(){
+    handleAprroveReject() {
         let count = 0;
         this.timeline.forEach(res => {
-            if (res.status === 'In Review') {count++;}   
+            if (res.status === 'In Review') { count++; }
         })
         this.questionsAndAnswerss.forEach(questionAnswer => {
             questionAnswer.questions.forEach(item => {
@@ -2276,7 +2270,9 @@ export default class Questionnaire extends LightningElement {
                                 if (count > 1 && (typeof subQuestion.ResponseId !== 'undefined' && subQuestion.rejectedData === '')) {
                                     subQuestion.needData = true;
                                 }
-                            });} });   
+                            });
+                        }
+                    });
                 }
             });
         });
@@ -2285,7 +2281,7 @@ export default class Questionnaire extends LightningElement {
         let param = {};
         let boolflag = false;
         let isNeedMoreInfo = false;
-       this.handleAprroveReject();
+        this.handleAprroveReject();
         param.assessmentStatus = 'Need More Information';
         isNeedMoreInfo = true;
         if (isNeedMoreInfo && boolflag === false) {
@@ -2299,7 +2295,7 @@ export default class Questionnaire extends LightningElement {
                 setTimeout(() => {
                     this.handleOnload();
                 }, 350);
-            }).catch(err => {});          
+            }).catch(err => { });
             this.ishideToast = true;
             this.showToast = true;
             this.success = true;
@@ -2324,7 +2320,7 @@ export default class Questionnaire extends LightningElement {
             setTimeout(() => {
                 this.handleOnload();
             }, 350);
-        }).catch(err => {});
+        }).catch(err => { });
         this.ishideToast = true;
         this.showToast = true;
         this.success = true;
