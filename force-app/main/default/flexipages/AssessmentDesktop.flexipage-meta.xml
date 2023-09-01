@@ -113,7 +113,7 @@
                             <value>NAME</value>
                         </valueListItems>
                         <valueListItems>
-                            <value>Completed__c</value>
+                            <value>Response_Percentage__c</value>
                         </valueListItems>
                         <valueListItems>
                             <value>Status__c</value>

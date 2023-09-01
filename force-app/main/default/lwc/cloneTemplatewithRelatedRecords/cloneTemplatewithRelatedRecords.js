@@ -7,6 +7,7 @@ import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 export default class CloneTemplatewithRelatedRecords extends NavigationMixin(LightningElement) {
     templateId;
     templateName;
+    templateDescription;
     objectApiName = 'Rhythm__Assessment_Template__c';
     @track templateRecord;
     clonedTemplateId;
@@ -45,7 +46,11 @@ export default class CloneTemplatewithRelatedRecords extends NavigationMixin(Lig
     }
 
     fieldChangeHandler(event){
-        this.templateName = event.detail.value;
+        if(event.detail.name == 'name'){
+            this.templateName = event.detail.value;
+        }else if(event.detail.name == 'description'){
+            this.templateDescription = event.detail.value;
+        }
     }
     closeModal(){
         this.dispatchEvent(new CloseActionScreenEvent());
