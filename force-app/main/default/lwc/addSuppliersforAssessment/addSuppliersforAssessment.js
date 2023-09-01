@@ -84,12 +84,13 @@ export default class AddSuppliersforAssessment extends NavigationMixin(Lightning
             if(this.existingSuppList.length>0){
                 exSupListStr = JSON.stringify(this.existingSuppList);
             }
-             if(this.delList.length>0){
+             if(typeof this.delList !== 'undefined' && this.delList.length>0){
                 deleteListStr = JSON.stringify(this.delList);
             }
             let todayDate =  new Date(this.todayDate).toISOString().substring(0, 10);
             let save = false;
-            if(this.suppliersList.length > 0 || this.delList.length>0){
+           
+            if(this.suppliersList.length > 0 || (typeof this.delList !== 'undefined' && this.delList.length>0)){
                 addSuppliers({assessmentRecord:this.assessmentRecord,operationType:'update',suppliers:JSON.stringify(this.suppliersList),existingSups:exSupListStr,deleteList:deleteListStr})
                 .then(result => {
                     if(result.isSuccess === true){
@@ -107,10 +108,13 @@ export default class AddSuppliersforAssessment extends NavigationMixin(Lightning
                     //console.log('erroDetails----->',error);
                     this.showNotification('Error',error.body.message,'error');
                 });
+            }else{
+                this.closeModal();
             }
             
         }catch(e){
-            //console.log(e);
+            let errString = e.name+' '+e.message;
+            this.showNotification('Error',errString,'error');
         }
     }
 

@@ -9,6 +9,10 @@
                 <lightning-layout-item size="6" padding="around-small">
                     <lightning-input-field field-name="Rhythm__Status__c" data-id="status" name="status" value="New" disabled required></lightning-input-field>
                 </lightning-layout-item>
+
+                <lightning-layout-item size="6" padding="around-small">
+                    <lightning-input-field field-name="Rhythm__Template_Description__c" data-id="description" onchange={fieldChangeHandler} name="description" value={templateDescription}></lightning-input-field>
+                </lightning-layout-item>
             </lightning-layout>
             <div class="slds-align_absolute-center">
                 <lightning-button label="Cancel" title="Cancel" onclick={closeModal}></lightning-button>
