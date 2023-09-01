@@ -2,6 +2,6 @@
 <ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>DueDate</fullName>
     <active>true</active>
-    <errorConditionFormula>AND(Due_Date__c &lt; Today() ,OR(ISCHANGED(Due_Date__c),ISNEW(),Due_Date__c &lt; Today()))</errorConditionFormula>
+    <errorConditionFormula>OR(AND(ISNEW(),Due_Date__c &lt; Today()),AND(ISCHANGED(Due_Date__c),Due_Date__c &lt; Today()))</errorConditionFormula>
     <errorMessage>Due date cannot be set to a past date</errorMessage>
 </ValidationRule>
