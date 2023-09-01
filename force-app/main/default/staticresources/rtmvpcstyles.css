@@ -308,8 +308,10 @@
 	.rtmvpc .slds-form-element__label {font-size:var(--fs-12); text-transform:uppercase; color:unset !important; min-width: 22px; max-width:96%; }
 	.rtmvpc .slds-form-element__labelttnor {font-size:var(--fs-14); text-transform:unset !important; color:unset !important; min-width: 22px; max-width:96%; }
 	.rtmvpc .slds-form-element__label.no-wordbreak{ word-break:keep-all; }
-	.rtmvpc .slds-form-element__icon { padding-top:0.1rem!important; }
+	.rtmvpc .slds-form-element__icon { padding-top:0rem!important; padding-left:5px; }
 	.rtmvpc .slds-form-element__static {font-size:var(--fs-14); font-weight:var(--fw-600); }
+	.slds-popover--tooltip, .slds-popover_tooltip { color:var(--lwc-colorTextButtonBrand); background:var(--pbtn-bg); }
+	.slds-popover--tooltip .slds-popover__body, .slds-popover_tooltip .slds-popover__body {color:var(--lwc-colorTextButtonBrand); background:var(--pbtn-bg);}
 	.slds-section-title--divider, .slds-section-title_divider { text-transform:unset; }
 	
 	.status-notstarted, .status-inprogress, .status-completed, .status-deferred, .status-waitingonsomeoneelse, .status-draft,
