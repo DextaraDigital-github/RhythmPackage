@@ -7,7 +7,7 @@
 */
 public with sharing class DisplayPDFController {
     public static SecurityCheckController safe = new SecurityCheckController();
-    public static Map<String,String> columnsMap = new Map<String,String>{'section'=>'Section Name','snumber'=>'Sno.','question'=>'Question','value'=>'Response','conversationHistory'=>'Conversation History'};
+    public static Map<String,String> columnsMap = new Map<String,String>{'section'=>'Section','snumber'=>'Sno.','question'=>'Question','value'=>'Response','files'=>'Number Of Attachments','conversationHistory'=>'Conversation History'};
     public static String table;
     // public static String table='{"Section2": [{"questionId": "a087g0000085EJhAAM","question": "Q1","snumber": 1,"value": false,"conversationHistory": "[]"},{"questionId": "a087g0000085EJrAAM","question": "C2","snumber": "1.1","value": "2023-08-16","conversationHistory": "[]"},{"questionId": "a087g0000085EJwAAM","question": "Multi Picklist","snumber": 2,"value": "UR","conversationHistory": "[]"}],"Section3": [{"questionId": "a087g0000085EJhAAM","question": "Q1","snumber": 1,"value": false,"conversationHistory": "[]"},{"questionId": "a087g0000085EJrAAM","question": "C2","snumber": "1.1","value": "2023-08-16","conversationHistory": "[]"},{"questionId": "a087g0000085EJwAAM","question": "Multi Picklist","snumber": 2,"value": "UR","conversationHistory": "[]"}]}';
     
@@ -56,6 +56,7 @@ public with sharing class DisplayPDFController {
         public String snumber{get;set;}
         public String value{get;set;}
         public String conversationHistory{get;set;}
+        public String files{get;set;}
         public String className{get;set;}
     }
     public class ColumnWrapper {

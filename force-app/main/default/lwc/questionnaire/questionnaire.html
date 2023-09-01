@@ -8,84 +8,82 @@
 	<template if:true={loading}>
 		<lightning-spinner alternative-text="Loading" size="large"></lightning-spinner>
 	</template>
-	<div class="" style="margin-bottom:32px;">
-		<div class="">
-			<div class="">
+	<div class="" style="padding-bottom:40px;">
 
 
-				<!-- Displays status message when an assessment is saved/ submitted --END-->
+		<!-- Displays status message when an assessment is saved/ submitted --END-->
 
-				<div class="rtmvpc-card slds-p-around_x-small">
-					<!-- Displays button and picklist for navigations --START-->
-					<div class="temp_flexbox_space-between">
-						<div>
-							<template lwc:if={showButtons.Section_Navigation.show}>
+		<div class="rtmvpc-card slds-p-around_x-small">
+			<!-- Displays button and picklist for navigations --START-->
+			<div class="temp_flexbox_space-between">
+				<div>
+					<template lwc:if={showButtons.Section_Navigation.show}>
 
-							</template>
+					</template>
+				</div>
+				<div>
+
+				</div>
+			</div>
+			<!-- Displays button and picklist for navigations --END-->
+
+			<div class="slds-grid slds-grid_align-end slds-grid_vetical-align-end cad-btn_bck1" style="float:right;">
+
+				<template if:true={showRefreshbutton}>
+					<template if:true={isTemplate}>
+						<div class="slds-col slds-grid slds-grid_vertical-align-center" style="font-weight:bold;">
+							<div class="slds-p-bottom_xx-small slds-p-horizontal_small">
+								<a class="slds-button slds-button_icon slds-accordion__summary-action"
+									title="Expand All / Collapse All" onclick={handleCollapseExpand}
+									aria-controls="referenceId-21" aria-expanded="true">{buttonlabel}</a>
+							</div>
 						</div>
-						<div>
-
-						</div>
-					</div>
-					<!-- Displays button and picklist for navigations --END-->
-
-					<div class="slds-grid slds-grid_align-end slds-grid_vetical-align-end cad-btn_bck1"
-						style="float:right;">
-
-						<template if:true={showRefreshbutton}>
-							<template if:true={isTemplate}>
-								<div class="slds-col slds-grid slds-grid_vertical-align-center"
-									style="font-weight:bold;">
-									<div class="slds-p-bottom_xx-small slds-p-horizontal_small">
-										<a class="slds-button slds-button_icon slds-accordion__summary-action"
-											title="Expand All / Collapse All" onclick={handleCollapseExpand}
-											aria-controls="referenceId-21" aria-expanded="true">{buttonlabel}</a>
-									</div>
-								</div>
-							</template>
-							<!-- <lightning-button-icon icon-name="utility:refresh" size="small" onclick={handleOnload}
+					</template>
+					<!-- <lightning-button-icon icon-name="utility:refresh" size="small" onclick={handleOnload}
 								alternative-text="Refresh" title="Refresh">
 							</lightning-button-icon> -->
-							<button class="cad_actions" style="z-index: 99;" onclick={handleOnload} title="Refresh">
+					<button class="cad_actions" style="z-index: 99;" onclick={handleOnload} title="Refresh">
 								<i class="las la-sync"></i>
 							</button>
-						</template>
-					</div>
+				</template>
+			</div>
 
-					<template if:true={isTemplate}>
-						<div>
-							<template if:true={showFiles}>
-								<div class="slds-grid slds-wrap slds-p-vertical_x-small">
-									<template for:each={keyList} for:item="item" for:index="index">
-										<div class="slds-col slds-small-size_10-of-12 slds-medium-size_6-of-12 slds-large-size_4-of-12" style="overflow:auto;" key={item.key}>
-											<div class="slds-grid slds-wrap slds-p-top_x-small slds-grid_vertical-align-center" title={item.value}>
-												<div class="" style="width:30px; display:inline-block">
-													<lightning-icon data-id={item.key} onclick={handleDownload}
-														title={item.url} icon-name={item.icon} alternative-text="File"
-														size="xx-small" class="slds-p-around_xx-small">
-													</lightning-icon>
-												</div>
-												<div class="" style="width:calc(100% - 35px); display:inline-block">
-													<div class="slds-truncate">{item.value}</div>													
-												</div>
-											</div>
+			<template if:true={isTemplate}>
+				<div>
+					<template if:true={showFiles}>
+						<div class="slds-grid slds-wrap slds-p-vertical_x-small">
+							<template for:each={keyList} for:item="item" for:index="index">
+								<div class="slds-col slds-small-size_10-of-12 slds-medium-size_6-of-12 slds-large-size_4-of-12"
+									style="overflow:auto;" key={item.key}>
+									<div class="slds-grid slds-wrap slds-p-top_x-small slds-grid_vertical-align-center"
+										title={item.value}>
+										<div class="" style="width:30px; display:inline-block">
+											<lightning-icon data-id={item.key} onclick={handleDownload} title={item.url}
+												icon-name={item.icon} alternative-text="File" size="xx-small"
+												class="slds-p-around_xx-small">
+											</lightning-icon>
 										</div>
-									</template>
+										<div class="" style="width:calc(100% - 35px); display:inline-block">
+											<div class="slds-truncate">{item.value}</div>
+										</div>
+									</div>
 								</div>
 							</template>
 						</div>
 					</template>
+				</div>
+			</template>
 
 
-					<div>
-						<ul class="slds-accordion">
-							<li class="slds-accordion__list-item">
-								<template if:false={isTemplate}>
-									<template if:true={displayDisclosure}>
-										<section class={showAccordion}>
-											<div class="slds-accordion__summary">
-												<h2 class="slds-accordion__summary-heading">
-													<button class="slds-button slds-button_reset slds-accordion__summary-action" onclick={handleAccordionSection} aria-controls="referenceId-21" aria-expanded="true">
+			<div>
+				<ul class="slds-accordion">
+					<li class="slds-accordion__list-item">
+						<template if:false={isTemplate}>
+							<template if:true={displayDisclosure}>
+								<section class={showAccordion}>
+									<div class="slds-accordion__summary">
+										<h2 class="slds-accordion__summary-heading">
+											<button class="slds-button slds-button_reset slds-accordion__summary-action" onclick={handleAccordionSection} aria-controls="referenceId-21" aria-expanded="true">
                                             <span class="slds-accordion__summary-action-icon slds-button__icon slds-button__icon_left" aria-hidden="true">
                                                 <lightning-icon icon-name="utility:chevrondown" size="x-small"></lightning-icon>
                                                 </span>
@@ -95,145 +93,139 @@
                                                     </div>
                                                 </span>
                                             </button>
-												</h2>
-											</div>
-											<div class="slds-accordion__content" id="referenceId-21">{showDisclosure}
-											</div>
+										</h2>
+									</div>
+									<div class="slds-accordion__content" id="referenceId-21">{showDisclosure}
+									</div>
 
-											<div class="slds-accordion__content">
-												<template if:true={showFiles}>
-													<lightning-layout multiple-rows="true">
-														<template for:each={keyList} for:item="item" for:index="index">
-															<lightning-layout-item size={layoutItemSize} key={item.key}>
-																<table style="table-layout: fixed;">
-																	<tr hidden>
-																		<td>
-																		</td>
-																		<td>
-																		</td>
-																	</tr>
-																	<tr>
-																		<td width="5px">
-																			<lightning-icon data-id={item.key}
-																				onclick={handleDownload}
-																				title={item.url} icon-name={item.icon}
-																				alternative-text="File" size="xx-small"
-																				class="slds-p-around_x-small">
-																			</lightning-icon>
-																		</td>
-																		<td width="90px">
-																			<a data-id={item.key} title={item.url}
-																				onclick={handleDownload}
-																				target="_blank">
-																				<div class="" style="width:calc(100% - 35px); display:inline-block">
+									<div class="slds-accordion__content">
+										<template if:true={showFiles}>
+											<lightning-layout multiple-rows="true">
+												<template for:each={keyList} for:item="item" for:index="index">
+													<lightning-layout-item size={layoutItemSize} key={item.key}>
+														<table style="table-layout: fixed;">
+															<tr hidden>
+																<td>
+																</td>
+																<td>
+																</td>
+															</tr>
+															<tr>
+																<td width="5px">
+																	<lightning-icon data-id={item.key}
+																		onclick={handleDownload} title={item.url}
+																		icon-name={item.icon} alternative-text="File"
+																		size="xx-small" class="slds-p-around_x-small">
+																	</lightning-icon>
+																</td>
+																<td width="90px">
+																	<a data-id={item.key} title={item.url}
+																		onclick={handleDownload} target="_blank">
+																		<div class=""
+																			style="width:calc(100% - 35px); display:inline-block">
 
-                                                                                    <div data-id={item.key} title={item.url} class="slds-truncate">{item.value}</div>                                                   
+																			<div data-id={item.key} title={item.url}
+																				class="slds-truncate">
+																				{item.value}</div>
 
-                                                                                </div>
-																				</a>
-																		</td>
-																	</tr>
-																</table>
-															</lightning-layout-item>
-														</template>
-													</lightning-layout>
+																		</div>
+																	</a>
+																</td>
+															</tr>
+														</table>
+													</lightning-layout-item>
 												</template>
-											</div>
-										</section>
-									</template>
-								</template>
-								<!-- <template if:true={isTemplate}>
-                                    <button class="slds-button slds-button_reset slds-accordion__summary-action" onclick={closeAccordionSection} aria-controls="referenceId-21" aria-expanded="true">{buttonlabel}</button>
-                                    </br></br></br>
-                                </template> -->
-							</li>
-
-							<template for:each={questionsAndAnswerss} for:item="questionaryEntry">
-								<li class="slds-accordion__list-item" key={questionaryEntry.section}>
-									<section class={questionaryEntry.sectionAccordian}
-										data-accordian={questionaryEntry.sectionId}>
-
-										<div class="slds-accordion__summary">
-											<h2 class="slds-accordion__summary-heading">
-												<button  class="slds-button slds-button_reset slds-accordion__summary-action" data-id={questionaryEntry.sectionId} onclick={handleAccordionQuestion} aria-controls="referenceId-22" aria-expanded="true">
-                                                    <span class="slds-accordion__summary-action-icon slds-button__icon slds-button__icon_left" aria-hidden="true">
-                                                        <lightning-icon icon-name="utility:chevrondown" size="x-small"></lightning-icon>
-                                                    </span>
-                                                    <span class="slds-accordion__summary-content" style="width:100%">
-                                                        <div style="width:100%; display:flex; justify-content:space-between">
-                                                            <div>{questionaryEntry.section}</div>
-                                                            <div class="slds-accordion__summary-contentrht">
-                                                            <template if:false={isTemplate}>
-                                                                <div class="slds-grid slds-wrap">
-                                                                    <div class="slds-col slds-text-align_left cad-mw60" title="Responses">
-                                                                        <lightning-icon icon-name="utility:number_input" alternative-text="Responses" size="x-small" title="Responses"></lightning-icon>
-                                                                        &nbsp;<span>: {questionaryEntry.numberOfResponses}/{questionaryEntry.numberOfQuestions}</span>
-                                                                    </div>
-                                                                    <div class="slds-col slds-text-align_left cad-mw65" title="% Completed">
-                                                                        <lightning-icon icon-name="utility:success" alternative-text="% Completed" size="x-small" title="% Completed"></lightning-icon>
-                                                                        &nbsp;<span>: {questionaryEntry.responsesPercentage}%</span>
-                                                                    </div>
-                                                                    <div class="slds-col cib-flag slds-text-align_left cad-mw50" title="Additional Requests">
-                                                                        <lightning-icon icon-name="utility:priority" alternative-text="Additional Requests" size="x-small" title="Additional Requests"></lightning-icon>
-                                                                        &nbsp;<span>: {questionaryEntry.displayFlag}</span>
-                                                                    </div>
-                                                                </div>
-                                                            </template>
-                                                            <template if:true={isTemplate}>
-                                                            <template if:true={isAccountAssessment}>
-                                                                <div class="slds-grid slds-wrap">
-                                                                    <div class="slds-col slds-text-align_left cad-mw60" title="Responses">
-                                                                        <lightning-icon icon-name="utility:number_input" alternative-text="Responses" size="x-small" title="Responses"></lightning-icon>
-                                                                        &nbsp;<span>: {questionaryEntry.numberOfResponses}/{questionaryEntry.numberOfQuestions}</span>
-                                                                    </div>
-                                                                    <div class="slds-col slds-text-align_left cad-mw65" title="% Completed">
-                                                                        <lightning-icon icon-name="utility:success" alternative-text="% Completed" size="x-small" title="% Completed"></lightning-icon>
-                                                                        &nbsp;<span>: {questionaryEntry.responsesPercentage}%</span>
-                                                                    </div>
-                                                                    <div class="slds-col cib-flag slds-text-align_left cad-mw50" title="Additional Requests">
-                                                                        <lightning-icon icon-name="utility:priority" alternative-text="Additional Requests" size="x-small" title="Additional Requests"></lightning-icon>
-                                                                        &nbsp;<span>: {questionaryEntry.displayFlag}</span>
-                                                                    </div>
-                                                                </div></template>
-                                                            </template>
-                                                            </div>
-                                                        </div>
-                                                    </span>
-                                                </button>
-											</h2>
-										</div>
-										<div class="slds-accordion__content">
-											<c-rtmvpc-render-question-template responses={questionaryEntry.questions}
-												issupplier={isSupplier} sectionid={questionaryEntry.sectionId}
-												assessmentid={assessment} onvaluechange={onResponseChange}
-												onfileupload={handleFileUpload} onselectchange={handlechatHistory}
-												ondeleteattachment={handledeletefile} ongetdata={handleGetRespRecord}
-												onselectquestion={selectquestionHandler} recid={recordId}
-												accountassessmentid={accountassessmentid}
-												onuploadfile={handleuploadFile} onflagchange={handleFlagResponseMethod}
-												uploading-file={uploadingFile} onactionchange={handleActionResponse}
-												onrejectchange={handleReject} timeline={timeline}
-												is-preview-component={isPreviewComponent} onopenrightpanel={handleopenrightchatter}>
-											</c-rtmvpc-render-question-template>
-										</div>
-
-									</section>
-								</li>
+											</lightning-layout>
+										</template>
+									</div>
+								</section>
 							</template>
+						</template>
+						<!-- <template if:true={isTemplate}>
+								<button class="slds-button slds-button_reset slds-accordion__summary-action" onclick={closeAccordionSection} aria-controls="referenceId-21" aria-expanded="true">{buttonlabel}</button>
+								</br></br></br>
+							</template> -->
+					</li>
 
-						</ul>
-					</div>
+					<template for:each={questionsAndAnswerss} for:item="questionaryEntry">
+						<li class="slds-accordion__list-item" key={questionaryEntry.section}>
+							<section class={questionaryEntry.sectionAccordian}
+								data-accordian={questionaryEntry.sectionId}>
 
+								<div class="slds-accordion__summary">
+									<h2 class="slds-accordion__summary-heading">
+										<button  class="slds-button slds-button_reset slds-accordion__summary-action" data-id={questionaryEntry.sectionId} onclick={handleAccordionQuestion} aria-controls="referenceId-22" aria-expanded="true">
+											<span class="slds-accordion__summary-action-icon slds-button__icon slds-button__icon_left" aria-hidden="true">
+												<lightning-icon icon-name="utility:chevrondown" size="x-small"></lightning-icon>
+											</span>
+											<span class="slds-accordion__summary-content" style="width:100%">
+												<div style="width:100%; display:flex; justify-content:space-between">
+													<div>{questionaryEntry.section}</div>
+													<div class="slds-accordion__summary-contentrht">
+													<template if:false={isTemplate}>
+														<div class="slds-grid slds-wrap">
+															<div class="slds-col slds-text-align_left cad-mw60" title="Responses">
+																<lightning-icon icon-name="utility:number_input" alternative-text="Responses" size="x-small" title="Responses"></lightning-icon>
+																&nbsp;<span>: {questionaryEntry.numberOfResponses}/{questionaryEntry.numberOfQuestions}</span>
+															</div>
+															<div class="slds-col slds-text-align_left cad-mw65" title="% Completed">
+																<lightning-icon icon-name="utility:success" alternative-text="% Completed" size="x-small" title="% Completed"></lightning-icon>
+																&nbsp;<span>: {questionaryEntry.responsesPercentage}%</span>
+															</div>
+															<div class="slds-col cib-flag slds-text-align_left cad-mw50" title="Additional Requests">
+																<lightning-icon icon-name="utility:priority" alternative-text="Additional Requests" size="x-small" title="Additional Requests"></lightning-icon>
+																&nbsp;<span>: {questionaryEntry.displayFlag}</span>
+															</div>
+														</div>
+													</template>
+													<template if:true={isTemplate}>
+													<template if:true={isAccountAssessment}>
+														<div class="slds-grid slds-wrap">
+															<div class="slds-col slds-text-align_left cad-mw60" title="Responses">
+																<lightning-icon icon-name="utility:number_input" alternative-text="Responses" size="x-small" title="Responses"></lightning-icon>
+																&nbsp;<span>: {questionaryEntry.numberOfResponses}/{questionaryEntry.numberOfQuestions}</span>
+															</div>
+															<div class="slds-col slds-text-align_left cad-mw65" title="% Completed">
+																<lightning-icon icon-name="utility:success" alternative-text="% Completed" size="x-small" title="% Completed"></lightning-icon>
+																&nbsp;<span>: {questionaryEntry.responsesPercentage}%</span>
+															</div>
+															<div class="slds-col cib-flag slds-text-align_left cad-mw50" title="Additional Requests">
+																<lightning-icon icon-name="utility:priority" alternative-text="Additional Requests" size="x-small" title="Additional Requests"></lightning-icon>
+																&nbsp;<span>: {questionaryEntry.displayFlag}</span>
+															</div>
+														</div></template>
+													</template>
+													</div>
+												</div>
+											</span>
+										</button>
+									</h2>
+								</div>
+								<div class="slds-accordion__content">
+									<c-rtmvpc-render-question-template responses={questionaryEntry.questions}
+										issupplier={isSupplier} sectionid={questionaryEntry.sectionId}
+										assessmentid={assessment} onvaluechange={onResponseChange}
+										onfileupload={handleFileUpload} onselectchange={handlechatHistory}
+										ondeleteattachment={handledeletefile} ongetdata={handleGetRespRecord}
+										onselectquestion={selectquestionHandler} recid={recordId}
+										accountassessmentid={accountassessmentid} onuploadfile={handleuploadFile}
+										onflagchange={handleFlagResponseMethod} uploading-file={uploadingFile}
+										onactionchange={handleActionResponse} onrejectchange={handleReject}
+										timeline={timeline} is-preview-component={isPreviewComponent}
+										onopenrightpanel={handleopenrightchatter}>
+									</c-rtmvpc-render-question-template>
+								</div>
 
-
-
-				</div>
+							</section>
+						</li>
+					</template>
+				</ul>
 			</div>
 		</div>
 	</div>
 	<template if:false={isTemplate}>
-		<div class="slds-p-horizontal_medium slds-p-vertical_x-small slds-border-top"
-			style="position:absolute; width:100%; height:40px; bottom:0px; text-align:right; background:#e8eaed; border-top:1px solid #c9c9c9;">
+		<div class="slds-p-horizontal_medium slds-p-top_xx-small slds-border-top"
+			style="position:absolute; width:100%; min-height:41px; bottom:0px; left:0px; text-align:right; background:#e8eaed; border-top:1px solid #c9c9c9;">
 			<!-- Displays Save, Save & Submit buttons if the Assessment is not Submitted --START-->
 			<template lwc:if={showButtons.Save_Submit}>
 				<lightning-button variant="Brand" label="Save & Submit" title="Save Response" onclick={handleSubmit}
@@ -244,7 +236,6 @@
 					flexibility="auto" class="slds-float--right" style="margin-right:5px;"></lightning-button>
 				&nbsp;&nbsp;
 			</template>
-
 			<!-- Displays Save, Save & Submit buttons if the Assessment is not Submitted --END-->
 		</div>
 		<template if:true={isSupplierModalPopup}>
@@ -281,28 +272,26 @@
 		</template>
 	</template>
 	<template if:true={isTemplate}>
-
 		<template if:true={showcustomerbuttons}>
 			<template if:true={showInReview}>
 				<div class="slds-p-horizontal_medium slds-p-top_xx-small slds-border-top"
-					style="position:absolute; width:100%; height:40px; bottom:0px; text-align:right; background:#e8eaed; border-top:1px solid #c9c9c9;">
+					style="position:absolute; width:100%; min-height:41px; bottom:0px; left:0px; text-align:right; background:#e8eaed; border-top:1px solid #c9c9c9;">
 					<lightning-button variant="Brand" label="Start Review" title="Save Response"
 						onclick={handleStartReview} flexibility="auto" class="slds-float--right slds-button_neutral">
 					</lightning-button>
 				</div>
 			</template>
 			<template if:true={showSaveAndSubmit}>
-				<div class="slds-p-horizontal_medium slds-p-top_xxx-small slds-border-top"
-					style="position:absolute; width:100%; height:40px; bottom:0px; text-align:right; background:#e8eaed; border-top:1px solid #c9c9c9;">
+				<div class="slds-p-horizontal_medium slds-p-top_xx-small slds-border-top"
+					style="position:absolute; width:100%; min-height:41px; bottom:0px; left:0px; text-align:right; background:#e8eaed; border-top:1px solid #c9c9c9;">
 					<lightning-button-group>
 						<lightning-button variant="Brand" label="Save" title="Save Response"
 							onclick={handleSaveCustomer} flexibility="auto" class=" slds-m-around_xxx-small">
 						</lightning-button>
 						<template if:false={showFollowButton}>
-						<lightning-button variant="Brand" label="Submit & Follow-Up" title="Save Response"
-							 onclick={handleSubmitCustomer} flexibility="auto"
-							class="slds-m-around_xxx-small">
-						</lightning-button>
+							<lightning-button variant="Brand" label="Submit & Follow-Up" title="Save Response"
+								onclick={handleSubmitCustomer} flexibility="auto" class="slds-m-around_xxx-small">
+							</lightning-button>
 						</template>
 						<lightning-button variant="Brand" label="Submit & Close Review" title="Save Response"
 							onclick={submitResponse} flexibility="auto" class="slds-m-around_xxx-small">
@@ -313,13 +302,8 @@
                 <lightning-button variant="Brand" label="Save" title="Save Response" onclick={handleSaveCustomer}
                     flexibility="auto" class="slds-float--right" style="margin-right:5px;"></lightning-button>
                 &nbsp;&nbsp; -->
-
-
 			</template>
-
 		</template>
-
-
 	</template>
 	<template if:true={isCustomerModalPopup}>
 		<!-- Modal/Popup Box LWC starts here -->
