@@ -250,7 +250,6 @@ export default class RtmvpcDisplayQuestions extends LightningElement {
         }
     }
     handleRowSelection(event) {
-        console.log('selected row', event.detail.selectedRows);
     }
     handleCellClick(event) {
         const cellData = event.detail.fieldName;
@@ -326,12 +325,13 @@ export default class RtmvpcDisplayQuestions extends LightningElement {
             this.createChildQues = false;
             this.viewQuestions = false;
             this.createNewQues = false;
+            this.configureToast('Success', event.detail, 'success');
             this.handleOnload();
         }
         // this.totastmessage = event.detail;
         // this.success = true;
         // this.showToast = true;
-        this.configureToast('Success', event.detail, 'success');
+       
 
     }
 

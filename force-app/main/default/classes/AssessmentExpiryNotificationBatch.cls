@@ -37,7 +37,6 @@ global with sharing class AssessmentExpiryNotificationBatch implements Database.
                 AssessmentController.sendEmails(assmtRelIds,'ExpiryNotification');
             }
         }catch(exception e){
-            system.debug('messageexception------>'+e.getMessage());
             ErrorTransactionLog__c errorRec = new ErrorTransactionLog__c();
             errorRec.Class_Name__c = 'AssessmentExpiryNotificationBatch';
             errorRec.Error_Stack_Trace__c = e.getStackTraceString();

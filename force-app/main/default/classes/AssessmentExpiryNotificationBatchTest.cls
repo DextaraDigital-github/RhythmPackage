@@ -73,7 +73,7 @@ private with sharing class AssessmentExpiryNotificationBatchTest {
                 System.assertEquals(count>0,true,'available assessment for reminder');
             }
         }catch(exception e){
-            system.debug('message----->'+e.getMessage());
+           
             System.assertEquals(e.getMessage()!=null,true,'error catched.');
         }
     }

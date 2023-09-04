@@ -371,7 +371,7 @@ export default class RtmvpcQuestionCreation extends LightningElement {
                             }
                         }
                         else {
-                            toastmessage = 'Preferred/Not Preferred and Upload Required fields are mandatory';
+                            toastmessage = 'ResponseValue, Preferred/Not Preferred and Upload Required fields are mandatory';
                         }
                         this.configureToast('Some Error has occured', toastmessage, 'error');
                         this.loading = false;

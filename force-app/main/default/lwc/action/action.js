@@ -135,7 +135,6 @@ export default class Action extends LightningElement {
     const folderName = this.objectApiName + '/' + this.responseMap.Id + '/';
     this.s3.listObjects({ Bucket: this.bucketName, Prefix: folderName }, (err, data) => {
       if (err) {
-        //console.error(err);
       } else {
         const files = data.Contents;
         let fileList = [];
@@ -236,7 +235,6 @@ export default class Action extends LightningElement {
         }
       })
         .catch(error => {
-         // window.console.log(error);
         });
     }
     else {
@@ -269,7 +267,6 @@ export default class Action extends LightningElement {
           }
         })
           .catch(error => {
-            //window.console.log(error);
           });
       }).catch(error => {
       });
@@ -345,7 +342,6 @@ export default class Action extends LightningElement {
   //       this.pickListNames.push(obj);
   //     }
   //     this.onloadPicklist = this.pickListNames;
-  //     console.log('picklist', this.onloadPicklist);
   //   } else if (error) {
   //     let errormap = {};
   //     errormap.componentName = 'Action';
@@ -360,6 +356,7 @@ export default class Action extends LightningElement {
     this.showAction = true;
     this.loading=true;
      this.isSupplier = response[0].isSupplier;
+
     if (typeof response !== 'undefined' && this.isSupplier !== true) {
       this.showAction = false;
     }
@@ -479,7 +476,6 @@ export default class Action extends LightningElement {
         this.saveActionResponse.Rhythm__Assigned_To__c = response[0].assignedToId;
         this.saveActionResponse.Rhythm__Ownership__c = response[0].ownershipId;
         //this.responseMap.Rhythm__Related_Record__Name=response[0].Rhythm__Related_Record__Name;
-        // console.log('jjjfk',this.responseMap.Rhythm__Related_Record__Name);
          if(typeof this.onloadPicklist !== 'undefined'){
         this.onloadPicklist.forEach(res => {
           if (res.key === 'Rhythm__Related_module__c') {
@@ -532,12 +528,6 @@ export default class Action extends LightningElement {
       this.showToast = true;
       this.success = true;
       this.totastmessage = 'Action Item has been deleted successfully';
-      // send({ subject: (result[0].Name), body: 'Action Item has been deleted successfully', userList: userlist }).then(() => {
-
-      // }).catch(error => {
-      //   console.log('ggfgf', error);
-      // })
-
       const selectedAction = new CustomEvent('removedeleteicon', {
         detail: this.questionId
       });
@@ -597,11 +587,6 @@ export default class Action extends LightningElement {
             this.showToast = true;
             this.success = true;
             this.totastmessage = 'Action Item has been created successfully';
-            // send({ subject: (this.showresponse[0].Name), body: 'Action Item has been created successfully', userList: userlist }).then(() => {
-
-            // }).catch(error => {
-            //   console.log('ggfgf', error);
-            // })
             this.displayForm(this.updateData);
             this.saveActionResponse.saveActionForm = true;
             const selectedAction = new CustomEvent('closeform', {
@@ -613,11 +598,6 @@ export default class Action extends LightningElement {
             this.showToast = true;
             this.success = true;
             this.totastmessage = 'Action Item has been updated successfully';
-            // send({ subject: (this.showresponse[0].Name), body: 'Action Item has been updated successfully', userList: userlist }).then(() => {
-
-            // }).catch(error => {
-            //   console.log('ggfgf', error);
-            // });
             if (this.saveActionResponse.Rhythm__Status__c === 'Open' && this.isSupplier === true) {
               this.showToast = true;
               this.success = true;
@@ -635,6 +615,7 @@ export default class Action extends LightningElement {
               })
               this.isSave = true;
             }
+            this.displayForm(this.updateData);
           }
         })
           .catch((error) => {
