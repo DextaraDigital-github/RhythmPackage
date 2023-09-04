@@ -46,12 +46,13 @@ public with sharing class SectionSelector {
     * @return
     */
     public List<Sobject> getSections(String templateId, String sectionName){
-        sectionName = '\'%'+sectionName+'%\'';
+        String secName = String.escapeSingleQuotes(sectionName);
+        secName = '\'%'+secName+'%\'';
         try{
             String query =  'SELECT Id,Name,Assessment_Template__c'
                             + ' FROM section__c'
-                            + ' WHERE Assessment_Template__c=\'' + templateId + '\''
-                            + ' AND Name LIKE ' + sectionName
+                            + ' WHERE Assessment_Template__c=\'' + String.escapeSingleQuotes(templateId) + '\''
+                            + ' AND Name LIKE '+secName
                             + ' WITH SECURITY_ENFORCED'
                             + ' ORDER BY CreatedDate DESC';
             return safe.doQuery(query);
