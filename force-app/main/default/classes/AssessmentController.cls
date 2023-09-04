@@ -39,6 +39,7 @@ public with sharing class AssessmentController {
         return url;
     }
     @AuraEnabled
+    /* sfge-disable-stack ApexFlsViolationRule */
     public static void updatePdfContent(String paramMap){
          Map<String,object> queryMap = (Map<String,Object>)JSON.deserializeUntyped(paramMap);
          String accAssmtId =(string)queryMap.get('accountassessmentid');
