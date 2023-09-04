@@ -140,7 +140,7 @@
 	
 	.cad-titlebutton_more .slds-button--icon-more, .cad-titlebutton_more .slds-button_icon-more { background-color:transparent!important; border-color:transparent!important; margin-top:-4px; }
 
-    .slds-tabs_card {padding-top:5px!important; min-height:calc(100vh - 194px); }
+    .slds-tabs_card { padding:5px 10px 10px!important; min-height:calc(100vh - 194px); }
     .slds-tabs_card .slds-tabs_default__nav { height:33px; }
     .slds-tabs_card .slds-tabs_default__link, .slds-tabs_card .slds-tabs--default__link { height:2rem!important; line-height:1.8rem; }
 	.forceStyle.desktop .simpleRecordHomeTemplate .region-header .flexipageComponent:not(:empty), .forceStyle.desktop .simpleRecordHomeTemplate .region-header flexipage-component2:not(:empty) {
@@ -185,7 +185,7 @@
 	.slds-button--icon-more:hover .slds-button__icon, .slds-button_icon-more:hover .slds-button__icon, 
 	.slds-button--icon-more:visited .slds-button__icon, .slds-button_icon-more:visited .slds-button__icon { color:var(--dbtn-icoh); }
 	.slds-button--icon-more:focus .slds-button__icon, .slds-button--icon-more:hover .slds-button__icon, .slds-button_icon-more:focus .slds-button__icon, .slds-button_icon-more:hover .slds-button__icon { fill:var(--dbtn-icoh); }
-	lightning-button.slds-button; lightning-button.slds-button:hover; lightning-button.slds-button:actve; lightning-button.slds-button:focus {border:0px solid transparent; }	
+	lightning-button.slds-button, lightning-button.slds-button:hover, lightning-button.slds-button:actve, lightning-button.slds-button:focus {border:0px solid transparent; }	
 
 	.slds-icon-standard-budget { background:var(--sbtn-bg); }
 	.slds-brand-band, .slds-brand-band:before, .slds-brand-band:after { background-image:none; background:#F5EDF5; }
@@ -197,7 +197,7 @@
 	.utility-bar--right .utilitybar { height:18px; }
 	.utility-bar--right .utilitybar:after { content:'(C) 2023 Rhythm Innovations. All Rights Reserved.'; position:absolute; right:15px; bottom:1px; font-size:12px; }
 	.slds-utility-bar__item { height:18px; }
-	.slds-tabs_card .cad-cardbase {position:relative; width:100%; height:calc(100vh - 180px)!important; border-radius:0px; overflow:hidden;}
+	.slds-tabs_card .cad-cardbase {position:relative; width:100%; height:calc(100vh - 176px); border-radius:0px; overflow:hidden;}
 	.slds-tabs_card .cad-cardbase.slds-p-around_small { padding:0px; }
 	.slds-tabs_card .slds-accordion__list-item {border-top:0px none; }
     .slds-accordion__summary-heading, .slds-accordion__summary-heading .slds-button { font-size:14px;text-transform:uppercase; }
@@ -228,7 +228,10 @@
 
 	@media screen and (max-width:992px) {
 	/*.forceStyle.desktop .viewport .stage { height:100vh!important;}*/
-	.slds-tabs_card .cad-cardbase { height:calc(100vh - 45px)!important}
+	
+	.slds-tabs_default__content .cad-cardbase { height:calc(100vh - 45px)!important; }
+	.cad-cardbase { height:calc(100vh - 45px); }
+    .comm-page-home .cad-cardbase { height:calc(100vh - 115px)!important; }
 	/*.slds-tabs_card { min-height:calc(100vh - 60px) }*/
 	.cdg lightning-tree-grid { width:100%; }
 

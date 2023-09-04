@@ -1,4 +1,4 @@
-.cad-cardbase {position:relative; width:100%; height:calc(100vh - 120px); border-radius:0px; overflow:hidden;}
+.cad-cardbase {position:relative; width:100%; height:calc(100vh - 115px); border-radius:0px; overflow:hidden;}
 
 .cad-tbl { display:table; width:100%; height:100%;}
 .cad-row { display:table-row; }
@@ -110,7 +110,8 @@
 .cad-btn_bck1 { margin-top:-45px; }
 
 @media screen and (max-width:992px) {
-    .cad-cardbase { height:calc(100vh - 115px); }
+    .cad-cardbase { height:calc(100vh - 45px); }
+    .comm-page-home .cad-cardbase { height:calc(100vh - 115px)!important; }
     .cad-row { display:block; height:100%; position:relative; } 
 	.cad-pl8 { padding-left:0px;}  
     .cad-pr8 { padding-right:0px;} 
