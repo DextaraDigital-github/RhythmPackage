@@ -408,7 +408,7 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
         refreshApex(this.wiredRecsData);
         this.tempRecsLimit = this.recsLimit;
         getQuestionsList({ templateId: this.recordId }).then(data => {
-            console.log('data>>>', data);
+            
             let questionData = JSON.parse(JSON.stringify(data));
             if (data.length > 0) {
                 if (typeof data[0].Rhythm__Assessment_Template__r !== 'undefined') {
@@ -416,7 +416,7 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
                     this.tempid = data[0].Rhythm__Assessment_Template__r.Id;
                 }
             }
-            console.log('questionData', questionData);
+            
             let parent = questionData.filter(res => typeof res.Rhythm__Parent_Question__c === 'undefined');
             this.questionsList = parent;
             getSectionRecsCount({ templateId: this.recordId, objName: this.objLabel }).then(secData => {
@@ -424,11 +424,11 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
                 this.recsCount = secData;
                 this.handleSectionsData(JSON.parse(JSON.stringify(secData)));
             }).catch(error => {
-                console.log(error);
+                
             });
 
         }).catch(error => {
-            console.log(error);
+            
         });
     }
 
@@ -480,7 +480,7 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
             this.recsCount = this.sectionList.length;
         }
         this.sectionListData = JSON.parse(JSON.stringify(this.sectionList));
-        console.log('this.sectionListData', this.sectionListData);
+        
     }
 
     //record form onsuccess
@@ -501,7 +501,7 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
     handleTemplateDetails() {
         getTemplateDetails({ templateId: this.recordId }).then(result => {
             this.disableButtons = result;
-            console.log('result', result);
+            
             if (this.disableButtons === false) {
                 this.columns = [...this.sectionColumns].filter(col => col.type !== 'action');
                  

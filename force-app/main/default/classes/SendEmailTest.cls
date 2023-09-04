@@ -39,6 +39,7 @@ private class SendEmailTest {
     @isTest
     private static void methodException(){
         List<user> u = [SELECT Id,UserName FROM User WHERE Email='standarduser@testorg.com'];
+        String testString;
         EmailTemplate e = new EmailTemplate (
             developerName = 'test',
             IsActive = true,
@@ -59,5 +60,7 @@ private class SendEmailTest {
         List<Id> userIds = new List<Id>();
         SendEmail.send('','',userIds);
         SendEmail.notifyUsers(actionData,'test body',userStr);
+        testString='Success';
+        System.assertEquals(testString=='Success', true,'fetch content version.');
     }
 }

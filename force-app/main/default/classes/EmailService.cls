@@ -121,12 +121,7 @@ public with sharing class EmailService {
     public Map<Id,User> fetchUsers(String parameterMap) {
         Map<String,Object> newParameterMap = (Map<String,Object>)JSON.deserializeUntyped(parameterMap);
         List<String> userIds = (List<String>)JSON.deserialize(JSON.serialize(newParameterMap.get('userIds')),List<String>.class);
-        String userIdsFilter = String.join(userIds, '\',\'');
-        
-        List<String> fields = new List<String>{'Id', 'Email', 'Contact.AccountId', 'Contact.Account.Name'};
-        String filter=' WHERE Id IN (\'' + userIdsFilter + '\')';
-        Map<String,Object> inpParameterMap = new Map<String,Object>{'fields'=>fields, 'filter'=>filter};
-        Map<Id,User> dataMap = usSelector.fetchUsers(inpParameterMap);
+        Map<Id,User> dataMap = usSelector.fetchUsers(userIds);//inpParameterMap);
         return dataMap;
     }
     

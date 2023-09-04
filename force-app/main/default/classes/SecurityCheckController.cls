@@ -145,8 +145,7 @@ public with sharing class SecurityCheckController {
     public List<Database.DeleteResult> doDelete(List<SObject> records) {
         if (records.isEmpty()) {
             return new List<Database.DeleteResult>();
-        }
-        if (CanTheUser.destroy(records)) {
+        }else if (CanTheUser.destroy(records) && records.get(0).getSObjectType().getDescribe().isDeletable()) {
             return Database.delete(records, this.allOrNothing);
         }
         return new List<Database.DeleteResult>();

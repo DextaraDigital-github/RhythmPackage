@@ -30,7 +30,6 @@ export default class RtmvpcAssessments extends NavigationMixin(LightningElement)
     ];
     /* connectedCallback is used to get accountAssessment data based on the account Id */
     connectedCallback() {
-        console.log('connectedassessments');
         this.fieldsList = [];
         if (this.tablefieldList && this.tablefieldList.length > 0) {
             this.tablefieldList.forEach(tabList => {
@@ -63,7 +62,6 @@ export default class RtmvpcAssessments extends NavigationMixin(LightningElement)
         getAssessmentJunctionRecords({ accountId: this.accId }).then(result => {
 
             this.recList = result;
-            console.log('this.recList', this.recList);
             this.show.grid = true;
             if (this.urlId != null && typeof this.urlId != 'undefined') {
                 this.accountassessmentId = this.urlId;
@@ -175,13 +173,10 @@ export default class RtmvpcAssessments extends NavigationMixin(LightningElement)
                 quTemp.files = savedResp.get(quTemp.questionId).get('files');
             }
         });
-        console.log('questionMap123', questionMap);
         for (let key of questionMap) {
-            console.log('key', key);
+            
             for (let key1 in key) {
-                console.log('key12', key1);
                 var questiondata = questionMap.get(key1);
-                console.log('key1', questiondata);
 
             }
 
@@ -192,22 +187,18 @@ export default class RtmvpcAssessments extends NavigationMixin(LightningElement)
 
                         }
                         else {
-                            console.log('questiondata123', questiondata);
                             questiondata.splice(j, 1);
-                            console.log('questiondata', questiondata);
 
                         }
                     }
                 }
             }
         }
-        console.log('questionmap', questionMap);
         return questionMap;
 
     }
     handlCsv(accountassessmentId) {
         let name = 'Sample';
-        console.log('this.accountassessmentId', accountassessmentId);
 
         getPdfContent({ accountassessmentId: accountassessmentId }).then(result => {
             let attachment = (result[0].Rhythm__PdfConvertor__c);
@@ -218,7 +209,6 @@ export default class RtmvpcAssessments extends NavigationMixin(LightningElement)
             for (const section in parseLst) {
                 str = str + section + '"\n"';
                 let data = parseLst[section];
-                console.log('data', data);
                 data.forEach(ques => {
                     str = str + ques.snumber + '","' + ques.question + '","';
                     if (typeof ques.value !== 'undefined') {
@@ -243,7 +233,6 @@ export default class RtmvpcAssessments extends NavigationMixin(LightningElement)
                 });
                 str = str + '"\n"';
             }
-            console.log('Str>>', str);
             //str = str.replaceAll('undefined', '').replaceAll('null', '');
             let blob = new Blob([str], { type: 'text/plain' });
             let url = window.URL.createObjectURL(blob);

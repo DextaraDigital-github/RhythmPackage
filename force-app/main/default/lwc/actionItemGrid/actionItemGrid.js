@@ -123,7 +123,6 @@ export default class ActionItemGrid extends NavigationMixin(LightningElement) {
         }
     }
     @api handleActionItem() {
-        console.log('handle');
         this.show.grid = true;
         this.show.survey = false;
     }

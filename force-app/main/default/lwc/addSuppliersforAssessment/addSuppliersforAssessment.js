@@ -38,9 +38,7 @@ export default class AddSuppliersforAssessment extends NavigationMixin(Lightning
     }
 
     connectedCallback() {
-        console.log('recordId===>',JSON.stringify(this.recordId));
         this.getTodayDate();
-        console.log('source--->',this.source);
         if(typeof this.source === 'undefined'){
             this.showLWC = true;
         }
@@ -60,20 +58,17 @@ export default class AddSuppliersforAssessment extends NavigationMixin(Lightning
             }
         })
         .catch(error => {
-            //console.log(error);
         });
     }
 
     @wire(getAssessmentRecord, { assessmentId: '$recordId'})
     getAssessmentRecord_wiredData(result) {
         if (result.data) {
-            console.log('result===>',JSON.stringify(result));
             this.assessmentRecord = result.data[0];
             this.startDate = result.data[0].Rhythm__Start_Date__c;
             this.endDate = result.data[0].Rhythm__End_Date__c;
         } else if (result.error) {
-            console.log('elseresult===>',JSON.stringify(result));
-            //console.log(result.error);
+            
         }
     }
 
@@ -105,7 +100,7 @@ export default class AddSuppliersforAssessment extends NavigationMixin(Lightning
                     }
                 })
                 .catch(error => {
-                    //console.log('erroDetails----->',error);
+                    
                     this.showNotification('Error',error.body.message,'error');
                 });
             }else{
