@@ -49,20 +49,21 @@ export default class RtmvpcAssessments extends NavigationMixin(LightningElement)
             this.urlId = currentPageReference.state?.Rhythm__AccountAssessmentRelation__c;
         }
     }
-    @api handleInbox()
-    {
+    @api handleInbox() {
         this.show.survey = false;
         this.show.grid = true;
     }
-    handleurl(event){
-         this.show.survey = false;
+    handleurl(event) {
+        this.show.survey = false;
         this.show.grid = true;
     }
 
     /* fetchingRecords is used to get accountAssessment data based on the account Id and URL navigation */
     fetchingRecords(refreshData) {
         getAssessmentJunctionRecords({ accountId: this.accId }).then(result => {
+
             this.recList = result;
+            console.log('this.recList', this.recList);
             this.show.grid = true;
             if (this.urlId != null && typeof this.urlId != 'undefined') {
                 this.accountassessmentId = this.urlId;
@@ -79,7 +80,7 @@ export default class RtmvpcAssessments extends NavigationMixin(LightningElement)
             //        this.show.grid=false;
             //    }
             // }
-            if(typeof refreshData !== 'undefined' && refreshData === true){
+            if (typeof refreshData !== 'undefined' && refreshData === true) {
                 this.show.survey = false;
                 this.assessmentId = undefined;
                 this.show.grid = true;
@@ -120,8 +121,8 @@ export default class RtmvpcAssessments extends NavigationMixin(LightningElement)
     backClickHandler() {
         this.fetchingRecords(true);
         //this.recList =[];
-        
-        
+
+
 
     }
 
@@ -223,19 +224,19 @@ export default class RtmvpcAssessments extends NavigationMixin(LightningElement)
                     if (typeof ques.value !== 'undefined') {
                         str = str + ques.value + '","';
                     }
-                     if (typeof ques.value === 'undefined') {
-                        str = str +''+ '","';
+                    if (typeof ques.value === 'undefined') {
+                        str = str + '' + '","';
                     }
                     if (typeof ques.files !== 'undefined') {
                         str = str + ques.files + '","';
                     }
-                     if (typeof ques.files === 'undefined') {
+                    if (typeof ques.files === 'undefined') {
                         str = str + '' + '","';
                     }
                     if (typeof ques.conversationHistory !== 'undefined') {
                         str = str + ques.conversationHistory;
                     }
-                     if (typeof ques.conversationHistory === 'undefined') {
+                    if (typeof ques.conversationHistory === 'undefined') {
                         str = str + '' + '","';
                     }
                     str = str + '"\n"';
@@ -256,64 +257,67 @@ export default class RtmvpcAssessments extends NavigationMixin(LightningElement)
         });
     }
     handlepdf(accountassessmentId) {
-        getPdfContent({ accountassessmentId: accountassessmentId }).then(result => {
-            let attachment = (result[0].Rhythm__PdfConvertor__c);
-            name = result[0].Rhythm__Assessment__r.Name;
-           
-            let attachmentstr = attachment.replaceAll('&quot;', '\"');
-            let parseLst = JSON.parse(attachmentstr);
-            let count = 0;
-             console.log('parseLst',parseLst);
-            let tableHtml = '<table><thead><tr>';
-            tableHtml += '<th>Section</th><th colspan="2">Question</th><th>Response</th><th>NumberOfAttachments</th><th>ConversationHistory</th>';
-            tableHtml += '</tr></thead><tbody>';
-            for (const section in parseLst) {
-                count++;
-                let data = parseLst[section];
-                tableHtml += '<tr><td class="oddLeftTd" rowspan=' + (data.length+1) + '>' + section + '</td>';
-                if (count % 2 === 0) {
-                   // tableHtml += '<tr><td class="evenLeftTd" rowspan=' + section.length + '>' + section + '</td>';
-                }
-                else {
-                    
-                }
-                console.log('data',data);
-                data.forEach(ques => {
-                    tableHtml += '<tr><td class="align-to-top">';
-                    tableHtml = tableHtml + ques.snumber + '</td><td>' + ques.question + '</td>';
-                    if (typeof ques.value !== 'undefined') {
-                        tableHtml = tableHtml + '<td>' + ques.value + '</td>';
-                    }
-                    if(typeof ques.value === 'undefined'){
-                         tableHtml = tableHtml + '<td>' + '' + '</td>';
-                    }
-                    if (typeof ques.files !== 'undefined') {
-                        tableHtml = tableHtml + '<td>' + ques.files + '</td>';
-                    }
-                    if (typeof ques.files === 'undefined') {
-                        tableHtml = tableHtml + '<td>' + '' + '</td>';
-                    }
-                    if (typeof ques.conversationHistory !== 'undefined') {
-                        tableHtml = tableHtml + '<td>' + ques.conversationHistory + '</td>';
-                    }
-                    if (typeof ques.conversationHistory === 'undefined') {
-                        tableHtml = tableHtml + '<td>' + ''+ '</td>';
-                    }
-                    tableHtml = tableHtml +'</tr>';
-                });
-            }
-            tableHtml += '</tbody></table>';
-            console.log('Str>>', tableHtml);
-            let win = window.open('', '', 'width=' + (window.innerWidth * 0.9) + ',height=' + (window.innerHeight * 0.9) + ',location=no, top=' + (window.innerHeight * 0.1) + ', left=' + (window.innerWidth * 0.1));
-            let style = '<style>@media print { * {-webkit-print-color-adjust:exact;}}} @page{ margin: 0px;} *{margin: 0px; padding: 0px; height: 0px; font-family: Source Sans Pro, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif !important;} .headerDiv{width: 100%; height: 56px; padding: 20px; background-color: #03314d;} .headerText{font-size: 40px; color: white; font-weight: bold} .tableDiv{padding: 20px;} table {border-collapse:collapse; font-size: 14px;} table td, th{ padding: 4px;} table tr:nth-child(odd) td {background-color: #F9F9F9;} .oddLeftTd{background-color: #E9E9E9 !important;} .evenLeftTd{background-color: #F1F1F1 !important;} table th{ border: 1px solid #E9E9E9; background-color:#B5BEC58F} table { page-break-inside:auto; } tr { page-break-inside:avoid; page-break-after:auto; } .align-to-top{ vertical-align: top; }</style>';
-            win.document.getElementsByTagName('head')[0].innerHTML += style;
-            win.document.getElementsByTagName('body')[0].innerHTML += '<div class="headerDiv slds-p-around_small"><span class="headerText">Rhythm</span></div><br/>';
-            tableHtml = tableHtml.replaceAll('undefined', '').replaceAll('null', '');
-            win.document.getElementsByTagName('body')[0].innerHTML += '<div class="tableDiv slds-p-around_medium">' + tableHtml + '</div>';
-            win.print();
-            win.close();
-        }).catch(error => {
+        let pageurl = window.location.href;
+        let baseurl = pageurl.split('/s/')[0] + '/apex/Rhythm__RenderAsPdf?id=' + accountassessmentId;
+        window.open(baseurl);
+        // getPdfContent({ accountassessmentId: accountassessmentId }).then(result => {
+        //     let attachment = (result[0].Rhythm__PdfConvertor__c);
+        //     name = result[0].Rhythm__Assessment__r.Name;
 
-        });
+        //     let attachmentstr = attachment.replaceAll('&quot;', '\"');
+        //     let parseLst = JSON.parse(attachmentstr);
+        //     let count = 0;
+        //      console.log('parseLst',parseLst);
+        //     let tableHtml = '<table><thead><tr>';
+        //     tableHtml += '<th>Section</th><th colspan="2">Question</th><th>Response</th><th>NumberOfAttachments</th><th>ConversationHistory</th>';
+        //     tableHtml += '</tr></thead><tbody>';
+        //     for (const section in parseLst) {
+        //         count++;
+        //         let data = parseLst[section];
+        //         tableHtml += '<tr><td class="oddLeftTd" rowspan=' + (data.length+1) + '>' + section + '</td>';
+        //         if (count % 2 === 0) {
+        //            // tableHtml += '<tr><td class="evenLeftTd" rowspan=' + section.length + '>' + section + '</td>';
+        //         }
+        //         else {
+
+        //         }
+        //         console.log('data',data);
+        //         data.forEach(ques => {
+        //             tableHtml += '<tr><td class="align-to-top">';
+        //             tableHtml = tableHtml + ques.snumber + '</td><td>' + ques.question + '</td>';
+        //             if (typeof ques.value !== 'undefined') {
+        //                 tableHtml = tableHtml + '<td>' + ques.value + '</td>';
+        //             }
+        //             if(typeof ques.value === 'undefined'){
+        //                  tableHtml = tableHtml + '<td>' + '' + '</td>';
+        //             }
+        //             if (typeof ques.files !== 'undefined') {
+        //                 tableHtml = tableHtml + '<td>' + ques.files + '</td>';
+        //             }
+        //             if (typeof ques.files === 'undefined') {
+        //                 tableHtml = tableHtml + '<td>' + '' + '</td>';
+        //             }
+        //             if (typeof ques.conversationHistory !== 'undefined') {
+        //                 tableHtml = tableHtml + '<td>' + ques.conversationHistory + '</td>';
+        //             }
+        //             if (typeof ques.conversationHistory === 'undefined') {
+        //                 tableHtml = tableHtml + '<td>' + ''+ '</td>';
+        //             }
+        //             tableHtml = tableHtml +'</tr>';
+        //         });
+        //     }
+        //     tableHtml += '</tbody></table>';
+        //     console.log('Str>>', tableHtml);
+        //     let win = window.open('', '', 'width=' + (window.innerWidth * 0.9) + ',height=' + (window.innerHeight * 0.9) + ',location=no, top=' + (window.innerHeight * 0.1) + ', left=' + (window.innerWidth * 0.1));
+        //     let style = '<style>@media print { * {-webkit-print-color-adjust:exact;}}} @page{ margin: 0px;} *{margin: 0px; padding: 0px; height: 0px; font-family: Source Sans Pro, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif !important;} .headerDiv{width: 100%; height: 56px; padding: 20px; background-color: #03314d;} .headerText{font-size: 40px; color: white; font-weight: bold} .tableDiv{padding: 20px;} table {border-collapse:collapse; font-size: 14px;} table td, th{ padding: 4px;} table tr:nth-child(odd) td {background-color: #F9F9F9;} .oddLeftTd{background-color: #E9E9E9 !important;} .evenLeftTd{background-color: #F1F1F1 !important;} table th{ border: 1px solid #E9E9E9; background-color:#B5BEC58F} table { page-break-inside:auto; } tr { page-break-inside:avoid; page-break-after:auto; } .align-to-top{ vertical-align: top; }</style>';
+        //     win.document.getElementsByTagName('head')[0].innerHTML += style;
+        //     win.document.getElementsByTagName('body')[0].innerHTML += '<div class="headerDiv slds-p-around_small"><span class="headerText">Rhythm</span></div><br/>';
+        //     tableHtml = tableHtml.replaceAll('undefined', '').replaceAll('null', '');
+        //     win.document.getElementsByTagName('body')[0].innerHTML += '<div class="tableDiv slds-p-around_medium">' + tableHtml + '</div>';
+        //     win.print();
+        //     win.close();
+        // }).catch(error => {
+
+        // });
     }
 }
