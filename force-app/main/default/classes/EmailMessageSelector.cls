@@ -36,9 +36,6 @@ public with sharing class EmailMessageSelector {
             String query = 'SELECT ' + String.join(fields,',') + childQry + ' FROM EmailMessage ' + filter;
             try {
                 List<EmailMessage> emList = safe.doQuery(query);
-                for(EmailMessage em:emList) {
-                	SYstem.debug(em.EmailMessageRelations);
-                }
                 return new Map<Id,EmailMessage>(emList);
             }
             catch(Exception e) {

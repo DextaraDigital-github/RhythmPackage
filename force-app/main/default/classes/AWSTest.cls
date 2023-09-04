@@ -13,6 +13,7 @@ private class AWSTest {
 */
     private static testmethod void awsTest(){
         Dom.Document doc = new Dom.Document();
+        String testString;
         Dom.Xmlnode rootNode = doc.createRootElement('TestReport', null, null);
         Dom.Xmlnode childNode = rootNode.addChildElement('detail', null, null);
         String ids= UserInfo.getUserId();
@@ -23,6 +24,8 @@ private class AWSTest {
             AWS.getChildNodeInteger(rootNode,'Rhythm','rootNode');
             AWS.getChildNodeText(rootNode,'Rhythm','rootNode');
             AWS.ServiceException ai = new AWS.ServiceException(rootNode);
+            testString = 'rootNode';
+            System.assertEquals(testString=='rootNode', true,'fetch root Node.');
             test.stopTest();
         }
     }

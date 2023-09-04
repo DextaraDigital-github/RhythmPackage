@@ -87,7 +87,7 @@ export default class SendEmail extends NavigationMixin(LightningElement) {
         const folderName = this.objectApiName + '/' + this.email.emailMessageId + '/';
         this.s3.listObjects({ Bucket: this.bucketName, Prefix: folderName }, (err, data) => {
             if (err) {
-                console.error(err);
+                
             }
             else {
                 const files = data.Contents;

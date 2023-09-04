@@ -48,7 +48,7 @@ export default class RtmvpcChildQuestionReordering extends LightningElement {
                 this.closeModal();
             }
         }).catch(error => {
-            console.log(JSON.stringify(error));
+            
             this.configureToast('Couldn\'t load questions', 'Please contact your administrator.', 'error');
             // this.closeModal();
         });

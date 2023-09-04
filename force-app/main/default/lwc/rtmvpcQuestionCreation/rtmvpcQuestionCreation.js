@@ -90,7 +90,6 @@ export default class RtmvpcQuestionCreation extends LightningElement {
     }
     handleOnLoad() {
         this.questionWrapper.Rhythm__Question__c = '';
-        console.log('this.assessmentTemplate', this.assessmentTemplate);
         if (typeof this.assessmentTemplate !== 'undefined') {
             this.createQues = true;
         }
@@ -196,7 +195,7 @@ export default class RtmvpcQuestionCreation extends LightningElement {
         This method method is used to Select the sections value (custom lookup).
     */
     handleSelectedValue(event) {
-        console.log('In update', event.detail);
+        
         this.questionWrapper['Rhythm__Section__c'] = event.detail;
         if (typeof this.assessmentTemplate !== 'undefined') {
             this.questionWrapper['Rhythm__Assessment_Template__c'] = this.assessmentTemplate;
@@ -220,7 +219,7 @@ export default class RtmvpcQuestionCreation extends LightningElement {
 
     }
     @api handlesaveChild(){
-        console.log('this.handlesave');
+        
         this.handlesave();
     }
     /* 
@@ -327,7 +326,7 @@ export default class RtmvpcQuestionCreation extends LightningElement {
                                 let respQueslst = [];
                                 respQueslst.push(responsemap);
                                 createResponseQuestionMap({ responseQuestionmap: respQueslst }).then(result => {
-                                    console.log('createResponseQuestionMap', result);
+                                    
                                     this.totastmessage = 'Conditional Question has been created Successfully.';
                                     this.createQues = false;
                                     this.childQuesCreation = false;
@@ -372,7 +371,7 @@ export default class RtmvpcQuestionCreation extends LightningElement {
                             }
                         }
                         else {
-                            toastmessage = 'Preferred/Not Preferred and Upload Required fields are mandatory';
+                            toastmessage = 'ResponseValue, Preferred/Not Preferred and Upload Required fields are mandatory';
                         }
                         this.configureToast('Some Error has occured', toastmessage, 'error');
                         this.loading = false;

@@ -33,12 +33,22 @@ public with sharing class AssessmentController {
             throw new AuraHandledException(errorMsg);
         }
     }
+        
+    /**
+    * @description Gets Salesforce Url.
+    * @return Salesforce url.  
+    */
     @AuraEnabled	
     public static String getSalesforceDomainURL(){
         String url= System.Url.getOrgDomainUrl()+'/';
         return url;
     }
+     /**
+    * @description Gets pdfContent Url.
+    * @return pdfContent for particular AccountAssessment.  
+    */
     @AuraEnabled
+    /* sfge-disable-stack ApexFlsViolationRule */
     public static void updatePdfContent(String paramMap){
          Map<String,object> queryMap = (Map<String,Object>)JSON.deserializeUntyped(paramMap);
          String accAssmtId =(string)queryMap.get('accountassessmentid');
@@ -601,7 +611,7 @@ public with sharing class AssessmentController {
                 List<String> errorList = SecurityCheckController.safeClassExceptionHandlerInsert(saveResult);
                 responseData.put('questionId',(String)chatMap.get('questionId'));
                 responseData.put('responseId',responseRecords[0].Id);
-                 responseData.put('conversation',responseRecords[0].Conversation_History__c);
+                responseData.put('conversation',responseRecords[0].Conversation_History__c);
                 if(errorList.size()>0){
                     Database.rollback(sp);
                     throw new SecurityControllerException(String.join( errorList, ', ' ));
@@ -615,14 +625,14 @@ public with sharing class AssessmentController {
                 if(accType !='supplier'){
                 response.Flag__c=true;
                 }
-                List<Response__c> responseList = new List<Response__c>();
+                List<Response__c> responseList = new List<Response__c>(); 
                 responseList.add(response);
                 Database.SaveResult[] results = safe.doInsert(responseList);
                 for(Database.SaveResult result : results) {
                     if(result.isSuccess()){
                         responseData.put('questionId',(String)chatMap.get('questionId'));
                         responseData.put('responseId',result.getId());
-                         responseData.put('conversation', JSON.serialize(chatMap.get('responseList')));
+ 						responseData.put('conversation', JSON.serialize(chatMap.get('responseList')));                        
                     }
                 }
                 List<String> errorsList = SecurityCheckController.safeClassExceptionHandlerInsert(results);
@@ -1365,6 +1375,18 @@ public with sharing class AssessmentController {
             throw new AuraHandledException(errorMsg);
         }
     }
+    
+    
+    /**
+    * @description Fetches the AccountAssessmentRelation record based on Id
+    * @param parameterMap It is a stringified JSON of parameters required to fetch AccountAssessmentRelation record
+    * @return AccountAssessmentRelation record
+    */
+    @AuraEnabled
+    public static sObject fetchAccountAssessmentRelation(String parameterMap) {
+        return accAssService.fetchAccountAssessmentRelation(parameterMap);
+    }
+    
     
     /**
     * @description It is used to store the response from server

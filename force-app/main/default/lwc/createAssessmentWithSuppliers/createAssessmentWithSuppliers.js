@@ -61,7 +61,7 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
     }
 
     handleChange(event){
-        console.log(event.detail.value);
+        
         this.templateId = event.detail.value;
         this.fetchTemplateData();
     }
@@ -70,7 +70,6 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
         getTodayDate()
         .then(result => {
             if(result){
-                console.log(result);
                 this.todayDate = result;
                 this.startDate = result;
             }
@@ -141,8 +140,7 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
         let endDate = this.template.querySelector(`[data-id="enddate"]`).value;
         let todayDate =  new Date(this.todayDate).toISOString().substring(0, 10);
 
-        console.log('startDate------>',startDate);
-        console.log('todayDate------>',todayDate);
+        
         if(this.templateStatus !== undefined && (this.templateStatus ==='New' || this.templateStatus ==='Inactive')){
             validatedDetails.isSave = false;
             validatedDetails.message = 'Assessment Program can be created only using an Active Template';
@@ -254,7 +252,7 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
         getTodayDate()
         .then(result => {
                 this.todayDate = result;
-                console.log('this.todayDate==>',JSON.stringify(this.todayDate));
+                
             //}
         })
         .catch(error => {

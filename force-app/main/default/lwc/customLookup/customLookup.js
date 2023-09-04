@@ -15,9 +15,7 @@ export default class SearchComponentLwc extends  LightningElement{
     @api questionId;
     @api sectionId;
    connectedCallback() {
-     console.log('questionId',this.questionId);
-     console.log('sectionId',this.sectionId);
-     console.log('disabled',this.istempstatus);
+    
      if(typeof this.questionId!='undefined')
      {
        this.lookupName = this.sectionId;
@@ -29,10 +27,10 @@ export default class SearchComponentLwc extends  LightningElement{
      setTimeout(()=>{_this.showSearchedValues = false;}, 300);
     }
    handleClick(){
-        console.log('sectionName',this.lookupName,'templateId',this.templateId);
+        
         getRecordsList({templateId:this.templateId,sectionName:this.lookupName})
         .then(data => {
-          console.log('data',data);
+          
         this.messageResult=false;
          if (data) {
            // TODO: Error handling 
@@ -55,7 +53,7 @@ export default class SearchComponentLwc extends  LightningElement{
             this.lookupValuesList=[];           
             this.showSearchedValues = false;
             this.messageResult=true;
-            console.log(error);
+           
       });
         
    
@@ -65,7 +63,7 @@ export default class SearchComponentLwc extends  LightningElement{
   handleKeyChange(event){       
     this.messageResult=false; 
     this.lookupName = event.target.value;
-    console.log('this.lookupName',this.lookupName);
+    
     if( this.lookupName === '') {
                    this.lookupId = '';
                    const selectedEvent = new CustomEvent('selectedvalue', { detail:  this.lookupName });

@@ -48,8 +48,7 @@ export default class AWSS3FileOperations extends LightningElement {
         this.isdisabled = true;
     }
     connectedCallback() {
-        console.log(this.responseRecId);
-        console.log('isdisabled', this.isdisabled);
+        
         if ((this.recId === null || this.recId === undefined) && this.assessmentRecId != null) {
             this.fileRecordID = this.assessmentRecId;
         }
@@ -114,7 +113,7 @@ export default class AWSS3FileOperations extends LightningElement {
         const folderName = this.objectName + '/' + this.responseRecId + '/';
         this.s3.listObjects({ Bucket: this.bucketName, Prefix: folderName }, (err, data) => {
             if (err) {
-                console.error(err);
+                
             } else {
                 const files = data.Contents;
                 let fileList = [];
@@ -223,8 +222,7 @@ export default class AWSS3FileOperations extends LightningElement {
                     const selectedEvent = new CustomEvent('deletefile', {
                         detail: {value : rmp}
                     });
-                    console.log('rmp',rmp);
-                    console.log('selectedEvent',selectedEvent);
+                   
                     // Dispatches the event.
                     this.dispatchEvent(selectedEvent);
                     
@@ -271,11 +269,11 @@ export default class AWSS3FileOperations extends LightningElement {
                         }
                     })
                         .catch(error => {
-                            window.console.log(error);
+                            
                         });
                 }
             }).catch(error => {
-                console.error(error);
+                
             });
         }
         else {
@@ -303,7 +301,7 @@ export default class AWSS3FileOperations extends LightningElement {
                 }
             })
                 .catch(error => {
-                    window.console.log(error);
+                    
                 });
         }
     }
