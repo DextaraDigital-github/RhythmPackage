@@ -35,8 +35,6 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
     @track showPopup = false;
     @track showSupplierPopup = false;
     connectedCallback() {
-
-        console.log('qtype', this.qtype);
         if (typeof this.conditionaval !== 'undefined' && typeof this.qtype !== 'undefined') {
             this.conditionaldisplay = true;
             if (this.qtype === 'Checkbox') {
@@ -48,8 +46,6 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
                 }
             }
         }
-        console.log('isSupplier', this.issupplier);
-        console.log('accountassessmentid', this.accountassessmentid);
         console.log('Responses', this.responses);
         this.chatterMap.openChat = false;
         this.chatterMap.disableSendButton = true;
@@ -125,7 +121,6 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
     }
 
     handleRejectButton(event) {
-        console.log('koushik123');
         const selectedEvent = new CustomEvent('rejectchange', {
             bubbles: true,
             detail: event.detail
@@ -337,7 +332,7 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
 
             });
         }
-        console.log('parentQuestionId', parentQuestionId);
+        console.log('parentQuestionId',this.responses );
         this.responsemap.parent = parentQuestionId;
         this.responsemap.SectionId = this.sectionid;
         this.responsemap.option = changedvalue;
@@ -475,6 +470,11 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
         const removequeshighlight = new CustomEvent('removequeshighlight', { detail: 'id' });
         this.dispatchEvent(removequeshighlight);
         this.highlightQuestionHandler(event);
+        // Added by Mani
+        const openrightpanel = new CustomEvent('removequeshighlight', { detail: 'id',bubbles: true });
+        this.dispatchEvent(openrightpanel);
+        this.highlightQuestionHandler(event);
+
     }
     /* highlightQuestionHandler method is used to highlight the selected question and remove highligh for other questions in same section. It also sends an event to parent component to remove highlight for questions in other sections, if any.*/
     highlightQuestionHandler(event) {
@@ -530,8 +530,9 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
         this.uploadMap.isEditable = event.currentTarget.dataset.disable;
         this.uploadMap.response = event.currentTarget.dataset.response;
         this.uploadMap.showUpload = event.currentTarget.dataset.showupload;
+        let typeIdentifier = (typeof event.currentTarget.dataset.typeidentifier !== 'undefined' && event.currentTarget.dataset.typeidentifier === 'button')?'button':'question';
         const selectedEvent = new CustomEvent('selectchange', {
-            detail: { chat: this.chatterMap, file: this.uploadMap }
+            detail: { chat: this.chatterMap, file: this.uploadMap, identifier: typeIdentifier }
         });
         // Dispatches the event.
         this.dispatchEvent(selectedEvent);
