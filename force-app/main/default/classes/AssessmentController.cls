@@ -601,6 +601,7 @@ public with sharing class AssessmentController {
                 List<String> errorList = SecurityCheckController.safeClassExceptionHandlerInsert(saveResult);
                 responseData.put('questionId',(String)chatMap.get('questionId'));
                 responseData.put('responseId',responseRecords[0].Id);
+                 responseData.put('conversation',responseRecords[0].Conversation_History__c);
                 if(errorList.size()>0){
                     Database.rollback(sp);
                     throw new SecurityControllerException(String.join( errorList, ', ' ));
@@ -621,7 +622,7 @@ public with sharing class AssessmentController {
                     if(result.isSuccess()){
                         responseData.put('questionId',(String)chatMap.get('questionId'));
                         responseData.put('responseId',result.getId());
-                        
+                         responseData.put('conversation', JSON.serialize(chatMap.get('responseList')));
                     }
                 }
                 List<String> errorsList = SecurityCheckController.safeClassExceptionHandlerInsert(results);
