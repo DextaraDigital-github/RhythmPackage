@@ -38,6 +38,20 @@ public with sharing class AssessmentController {
         String url= System.Url.getOrgDomainUrl()+'/';
         return url;
     }
+    @AuraEnabled
+    public static void updatePdfContent(String paramMap){
+         Map<String,object> queryMap = (Map<String,Object>)JSON.deserializeUntyped(paramMap);
+         String accAssmtId =(string)queryMap.get('accountassessmentid');
+		List<AccountAssessmentRelation__c> assessment = [SELECT Id,Name,Follow_Up_Requests__c,Status__c,
+                                                        Assessment__c,Account__c,PdfConvertor__c
+                                                        FROM AccountAssessmentRelation__c
+                                                        WHERE Id=:accAssmtId
+                                                        WITH SECURITY_ENFORCED];
+        if(!assessment.isEmpty()){
+            assessment[0].PdfConvertor__c =(String)queryMap.get('pdfContnet');
+            safe.doUpdate(assessment);
+        }
+    }
     /**
     * @description Gets the Question__c,Section__c information of a particular Assessment_Template__c.
     * @param templateId This is a record id of an Assessment_Template__c.
