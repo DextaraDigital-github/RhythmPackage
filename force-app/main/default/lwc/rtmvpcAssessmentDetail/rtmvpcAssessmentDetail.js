@@ -159,8 +159,7 @@ export default class RtmvpcAssessmentDetail extends NavigationMixin(LightningEle
     }
 
     handleTimeLine() {
-        console.log('this.assessmentTimeline', this.assessmentTimeline);
-
+        
         let accountAssessmentRecord = ''
         getUserName({}).then(result => {
             this.isRecordPage = false;
@@ -175,7 +174,7 @@ export default class RtmvpcAssessmentDetail extends NavigationMixin(LightningEle
             }
             /* */
             getAccountAssessmentRecordData({ assrecordId: accountAssessmentRecord }).then(asmtResult => {
-                console.log('asmtResult', asmtResult);
+                
                 /* To get the assessment tracking history to update on timeline*/
                 getAssessmentStatus({ assessmentId: accountAssessmentRecord, objectName: 'AccountAssessmentRelation__c' }).then(statusResult => {
 
@@ -303,13 +302,13 @@ export default class RtmvpcAssessmentDetail extends NavigationMixin(LightningEle
     }
     handleResponse(event) {
         let response = event.detail;
-        console.log('sampledata');
+        
         this.template.querySelector('c-Questionnaire').handleChatResponse(response);
     }
     handleDeleteFile(event) {
-        console.log('handleDeleteFile');
+        
         let mp = event.detail;
-        console.log('handleDeleteFile');
+       
         this.template.querySelector('c-Questionnaire').handleDeleteFile(mp);
     }
     handleFilter() {
@@ -328,7 +327,7 @@ export default class RtmvpcAssessmentDetail extends NavigationMixin(LightningEle
             })
         }
         setTimeout(() => {
-            console.log(' this.template', this.template.querySelectorAll('c-Questionnaire')[0]);
+            
             this.template.querySelectorAll('c-Questionnaire')[0].gethandleTimeline(this.assessmentTimeline);
         }, 400);
 
@@ -439,10 +438,10 @@ export default class RtmvpcAssessmentDetail extends NavigationMixin(LightningEle
                 this.actionData[0].assignedToName = res.name;
             }
         })
-        console.log('sample', this.fileData);
+        
         if (typeof this.showChat !== 'undefined') {
             setTimeout(() => {
-                //console.log('chatter===>', this.template.querySelectorAll('c-rtmvpc-assessment-chatter'));
+                
                 let dispConvList = this.template.querySelectorAll('c-rtmvpc-assessment-chatter');
                 if (typeof dispConvList !== 'undefined' && dispConvList.length > 0 && dispConvList[0] !== 'undefined') {
                     this.template.querySelectorAll('c-rtmvpc-assessment-chatter')[0].displayConversation(this.showChat);
@@ -475,7 +474,7 @@ export default class RtmvpcAssessmentDetail extends NavigationMixin(LightningEle
         this.showCapaForm = false;
         this.objectRecname = event.detail.objectApiName;
         this.isdisabled = (event.detail.isEditable === "true") ? true : false;
-        console.log('isdisable', event.detail);
+       
         this.responseId = event.detail.response;
         this.showUpload = (event.detail.showUpload === "true") ? true : false;
         this.recid = event.detail.recid;
@@ -483,7 +482,6 @@ export default class RtmvpcAssessmentDetail extends NavigationMixin(LightningEle
         this.accountassessmentFileId = event.detail.accountassessmentid;
     }
     handleOnLoad(event) {
-        console.log('filemap', event.detail);
         this.template.querySelectorAll('c-questionnaire')[0].handleGetRespRecord(event.detail);
     }
     handleSelectedChat() {
@@ -495,7 +493,6 @@ export default class RtmvpcAssessmentDetail extends NavigationMixin(LightningEle
         }, 200);
     }
     handleSelectedFile() {
-        console.log('this.filedata', this.fileData);
         this.openRightFile = true;
         this.openReviewComments = false;
         this.showCapaForm = false;
@@ -601,7 +598,6 @@ export default class RtmvpcAssessmentDetail extends NavigationMixin(LightningEle
             let attachmentstr = attachment.replaceAll('&quot;', '\"');
             let parseLst = JSON.parse(attachmentstr);
             let count = 0;
-            console.log('parseLst', parseLst);
             let tableHtml = '<table><thead><tr>';
             tableHtml += '<th>Section</th><th colspan="2">Question</th><th>Response</th><th>NumberOfAttachments</th><th>ConversationHistory</th>';
             tableHtml += '</tr></thead><tbody>';
@@ -641,7 +637,6 @@ export default class RtmvpcAssessmentDetail extends NavigationMixin(LightningEle
                 });
             }
             tableHtml += '</tbody></table>';
-            console.log('Str>>', tableHtml);
             let win = window.open('', '', 'width=' + (window.innerWidth * 0.9) + ',height=' + (window.innerHeight * 0.9) + ',location=no, top=' + (window.innerHeight * 0.1) + ', left=' + (window.innerWidth * 0.1));
             let style = '<style>@media print { * {-webkit-print-color-adjust:exact;}}} @page{ margin: 0px;} *{margin: 0px; padding: 0px; height: 0px; font-family: Source Sans Pro, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif !important;} .headerDiv{width: 100%; height: 56px; padding: 20px; background-color: #03314d;} .headerText{font-size: 40px; color: white; font-weight: bold} .tableDiv{padding: 20px;} table {border-collapse:collapse; font-size: 14px;} table td, th{ padding: 4px;} table tr:nth-child(odd) td {background-color: #F9F9F9;} .oddLeftTd{background-color: #E9E9E9 !important;} .evenLeftTd{background-color: #F1F1F1 !important;} table th{ border: 1px solid #E9E9E9; background-color:#B5BEC58F} table { page-break-inside:auto; } tr { page-break-inside:avoid; page-break-after:auto; } .align-to-top{ vertical-align: top; }</style>';
             win.document.getElementsByTagName('head')[0].innerHTML += style;
@@ -659,8 +654,6 @@ export default class RtmvpcAssessmentDetail extends NavigationMixin(LightningEle
     }
     handlCsv(accountassessmentId) {
         let name = 'Sample';
-        console.log('this.accountassessmentId', accountassessmentId);
-
         getPdfContent({ accountassessmentId: accountassessmentId }).then(result => {
             let attachment = (result[0].Rhythm__PdfConvertor__c);
             name = result[0].Rhythm__Assessment__r.Name;
@@ -670,7 +663,6 @@ export default class RtmvpcAssessmentDetail extends NavigationMixin(LightningEle
             for (const section in parseLst) {
                 str = str + section + '"\n"';
                 let data = parseLst[section];
-                console.log('data', data);
                 data.forEach(ques => {
                     str = str + ques.snumber + '","' + ques.question + '","';
                     if (typeof ques.value !== 'undefined') {
@@ -695,7 +687,6 @@ export default class RtmvpcAssessmentDetail extends NavigationMixin(LightningEle
                 });
                 str = str + '"\n"';
             }
-            console.log('Str>>', str);
             //str = str.replaceAll('undefined', '').replaceAll('null', '');
             let blob = new Blob([str], { type: 'text/plain' });
             let url = window.URL.createObjectURL(blob);
@@ -719,7 +710,6 @@ export default class RtmvpcAssessmentDetail extends NavigationMixin(LightningEle
             for (const section in parseLst) {
                 str = str + section + '"\n"';
                 let data = parseLst[section];
-                console.log('data', data);
                 data.forEach(ques => {
                     str = str + ques.snumber + '","' + ques.question + '","';
                     if (typeof ques.value !== 'undefined') {
@@ -744,7 +734,6 @@ export default class RtmvpcAssessmentDetail extends NavigationMixin(LightningEle
                 });
                 str = str + '"\n"';
             }
-            console.log('Str>>', str);
             // let win = window.open('', '', 'width=' + (window.innerWidth * 0.9) + ',height=' + (window.innerHeight * 0.9) + ',location=no, top=' + (window.innerHeight * 0.1) + ', left=' + (window.innerWidth * 0.1));
             // let style = '<style>@media print { * {-webkit-print-color-adjust:exact;}}} @page{ margin: 0px;} *{margin: 0px; padding: 0px; height: 0px; font-family: Source Sans Pro, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif !important;} .headerDiv{width: 100%; height: 56px; padding: 20px; background-color: #03314d;} .headerText{font-size: 40px; color: white; font-weight: bold} .tableDiv{padding: 20px;} table {border-collapse:collapse; font-size: 14px;} table td, th{ padding: 4px;} table tr:nth-child(odd) td {background-color: #F9F9F9;} .oddLeftTd{background-color: #E9E9E9 !important;} .evenLeftTd{background-color: #F1F1F1 !important;} table th{ border: 1px solid #E9E9E9; background-color:#B5BEC58F} table { page-break-inside:auto; } tr { page-break-inside:avoid; page-break-after:auto; } .align-to-top{ vertical-align: top; }</style>';
             // win.document.getElementsByTagName('head')[0].innerHTML += style;
@@ -774,7 +763,6 @@ export default class RtmvpcAssessmentDetail extends NavigationMixin(LightningEle
             let attachmentstr = attachment.replaceAll('&quot;', '\"');
             let parseLst = JSON.parse(attachmentstr);
             let count = 0;
-            console.log('parseLst', parseLst);
             let tableHtml = '<table><thead><tr>';
             tableHtml += '<th>Section</th><th colspan="2">Question</th><th>Response</th><th>NumberOfAttachments</th><th>ConversationHistory</th>';
             tableHtml += '</tr></thead><tbody>';

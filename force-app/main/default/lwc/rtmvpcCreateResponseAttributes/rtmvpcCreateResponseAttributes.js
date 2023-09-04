@@ -96,7 +96,7 @@ export default class RtmvpcCreateResponseAttributes extends LightningElement {
         tabdata.rowdata.forEach(data => {
             if (data.label === 'Id') {
                 deleteResponseAttribute({ responseId: data.value }).then(result => {
-                    console.log('deleted Successfully', result);
+                    
                 }).catch(error => {
                     let errormap = {};
                     errormap.componentName = 'RtmvpcCreateResponseAttributes';
@@ -230,6 +230,6 @@ export default class RtmvpcCreateResponseAttributes extends LightningElement {
     handlefocus(event) {
         // let dataId = event.currentTarget.getAttribute('data-val');
         // let respValue = event.target.value;
-        // console.log('dataId',dataId);
+        
     }
 }

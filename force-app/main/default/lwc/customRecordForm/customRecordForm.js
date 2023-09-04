@@ -101,7 +101,7 @@ export default class CustomRecordForm extends LightningElement {
                 }),
               );
             }).catch(error => {
-              //console.log(error);
+              
             });
           }
         }

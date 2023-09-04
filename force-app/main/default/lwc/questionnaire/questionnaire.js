@@ -1196,7 +1196,7 @@ export default class Questionnaire extends LightningElement {
     handleFilterRejected() {
         this.isfiltername = 'reject';
         this.questionsAndAnswerss = JSON.parse(JSON.stringify(this.filterQuestionsAndAnswers));
-        console.log(this.questionsAndAnswerss);
+        
         this.questionsAndAnswerss.forEach(questionAnswer => {
             questionAnswer.sectionAccordian = "slds-accordion__section slds-is-open";
             questionAnswer.questions.forEach(question => {

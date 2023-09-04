@@ -25,10 +25,10 @@ export default class CloneTemplatewithRelatedRecords extends NavigationMixin(Lig
             let fields = event.detail.fields;
             fields = Object.assign( { 'sobjectType': 'Rhythm__Assessment_Template__c'}, fields );
             this.templateRecord = fields;
-            console.log('templateRecord---->',JSON.stringify(this.templateRecord));
+            
             cloneTemplate({templateId:this.templateId,templateRecord:this.templateRecord})
             .then(result => {
-                console.log('cloneTemplateResult------>',JSON.stringify(result));
+                
                 if(result.isSuccess){
                     this.showNotification('Success','Template Cloned Successfully.','success');
                     this.clonedTemplateId = result.recordId;
@@ -38,10 +38,10 @@ export default class CloneTemplatewithRelatedRecords extends NavigationMixin(Lig
                 }
             })
             .catch(error => {
-                console.log(error);
+                
             });
         }catch(e){
-            console.log('handleSubmit----->',e);
+            
         }
     }
 

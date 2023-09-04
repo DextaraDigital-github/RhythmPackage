@@ -129,7 +129,7 @@ export default class AWSS3FileOperations extends LightningElement {
         const folderName = this.objectApiName + '/' + this.recordId + '/';
         this.s3.listObjects({ Bucket: this.bucketName, Prefix: folderName }, (err, data) => {
             if (err) {
-                console.error(err);
+                
             } else {
                 const files = data.Contents;
                 let fileList = [];
@@ -235,7 +235,7 @@ export default class AWSS3FileOperations extends LightningElement {
             }
         })
             .catch(error => {
-                window.console.log(error);
+                //window.console.log(error);
             });
     }
 

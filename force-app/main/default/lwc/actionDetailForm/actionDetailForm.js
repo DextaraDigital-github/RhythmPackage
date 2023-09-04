@@ -43,13 +43,11 @@ export default class ActionDetailForm extends LightningElement {
       // if(typeof this.actionFormData[0].Rhythm__Supplier__r === 'undefined'){
       //   this.actionFormData[0].Rhythm__Supplier__r.Name='sampple';
       // }
-      console.log('sampletest', this.actionFormData);
       if (this.actionFormData[0].Rhythm__Status__c === 'Closed' || this.actionFormData[0].Rhythm__Status__c === 'Expired') {
         this.isSave = false;
         this.isButton=false;
         if (this.actionFormData[0].Rhythm__Status__c === 'Expired') {
           this.expired = true;
-          console.log('sampletest12', this.expired);
           let optionMap = {};
           optionMap.label = 'Expired';
           optionMap.value = 'Expired';
@@ -90,7 +88,7 @@ export default class ActionDetailForm extends LightningElement {
   }
   handleCloseButton() {
     saveActionResponse({ actionResponse: this.showresponse, isUpdate: true }).then(() => {
-      console.log('kkkkk', this.showresponse);
+      
       this.showPopup = false;
       this.showToast = true;
       this.success = true;
@@ -101,7 +99,6 @@ export default class ActionDetailForm extends LightningElement {
         notifyUsers({ actionData: (this.showresponse[0]), body: 'Action Item has been marked as closed', userList: userlist }).then(() => {
 
         }).catch(error => {
-          console.log('ggfgf', error);
         })
         this.isSave = false;
         this.isButton=false;

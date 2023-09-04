@@ -373,7 +373,7 @@ export default class CustomTable extends LightningElement {
                                 recDetails.progressBarValue = relatedListRecords[i].Rhythm__Response_Percentage__c +'%';
                             }
                         }
-                        console.log('Rdata',relatedListRecords[i]);
+                        
                         recDetails.templateId = relatedListRecords[i].Rhythm__Assessment__r.Rhythm__Template__c;
                         recDetails.id = relatedListRecords[i].Id;
                     }
@@ -382,7 +382,7 @@ export default class CustomTable extends LightningElement {
             recDetails.record = recArray;
             recDataList.push(recDetails);
         }
-        console.log('cData---->',(recDataList));
+        
         return recDataList;
     }
 
