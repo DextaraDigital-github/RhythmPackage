@@ -353,16 +353,16 @@ export default class RtmvpcAssessmentDetail extends NavigationMixin(LightningEle
 
     }
     handleAction(event) {
-        // if (!this.isOpened) {
-        //     this.handleRightButtonClick();
-        // }
-
-        console.log('hhh', event.detail);
+        let uiDetails = navigator.userAgent;
+        let uiRegexp = /android|iphone|kindle|ipad/i;
+        let isMobileDevice = uiRegexp.test(uiDetails);
+        if (!this.isOpened && isMobileDevice) {
+            this.handleRightButtonClick();
+        }
         this.showResponseForm = event.detail.action;
         this.showCapaForm = this.showResponseForm[0].showCapaForm;
         this.openReviewComments = false;
         this.selectedchatData = event.detail.chat;
-        console.log('sample', this.showResponseForm, this.openReviewComments);
         this.assessmentTimeline.forEach(res => {
             if (res.status === 'In Review') {
                 this.showResponseForm[0].ownershipId = res.id;
@@ -410,9 +410,12 @@ export default class RtmvpcAssessmentDetail extends NavigationMixin(LightningEle
     }
     /* chatHistory is used to get the question id, assessment id and flag boolean from the child component (Questionnaire) and pass it to the child component(AssessmentChatter)*/
     chatHistory(event) {
-        // if (!this.isOpened) {
-        //     this.handleRightButtonClick();
-        // }
+        let uiDetails = navigator.userAgent;
+        let uiRegexp = /android|iphone|kindle|ipad/i;
+        let isMobileDevice = uiRegexp.test(uiDetails);
+        if (!this.isOpened && isMobileDevice && typeof event.detail !== 'undefined' && typeof event.detail.identifier !== 'undefined' && event.detail.identifier === 'button') {
+            this.handleRightButtonClick();
+        }
 
         this.showChat = event.detail.chat;
         //this.showCapaForm=event.detail.showCapaForm;
@@ -420,7 +423,6 @@ export default class RtmvpcAssessmentDetail extends NavigationMixin(LightningEle
         this.showCapaForm = false;
         this.openRightFile = false;
 
-        console.log('chatter', this.showChat);
         this.showChat.accountassessmentId = this.accountassessmentid;
         this.showData = this.showChat.openChat;
         this.showconverstion = this.showChat.disableSendButton;
@@ -441,7 +443,10 @@ export default class RtmvpcAssessmentDetail extends NavigationMixin(LightningEle
         if (typeof this.showChat !== 'undefined') {
             setTimeout(() => {
                 //console.log('chatter===>', this.template.querySelectorAll('c-rtmvpc-assessment-chatter'));
-                this.template.querySelectorAll('c-rtmvpc-assessment-chatter')[0].displayConversation(this.showChat);
+                let dispConvList = this.template.querySelectorAll('c-rtmvpc-assessment-chatter');
+                if (typeof dispConvList !== 'undefined' && dispConvList.length > 0 && dispConvList[0] !== 'undefined') {
+                    this.template.querySelectorAll('c-rtmvpc-assessment-chatter')[0].displayConversation(this.showChat);
+                }
             }, 300);
         }
 
@@ -458,9 +463,12 @@ export default class RtmvpcAssessmentDetail extends NavigationMixin(LightningEle
 
     }
     handleFileData(event) {
-        // if (!this.isOpened) {
-        //     this.handleRightButtonClick();
-        // }
+        let uiDetails = navigator.userAgent;
+        let uiRegexp = /android|iphone|kindle|ipad/i;
+        let isMobileDevice = uiRegexp.test(uiDetails);
+        if (!this.isOpened && isMobileDevice) {
+            this.handleRightButtonClick();
+        }
 
         this.openRightFile = true;
         this.openReviewComments = false;
