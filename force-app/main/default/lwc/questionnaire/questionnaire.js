@@ -227,9 +227,14 @@ export default class Questionnaire extends LightningElement {
                         question.Rhythm__Flag__c = true;
                         this.showFollowButton = false;
                     }
+                   
                     if (typeof question.ResponseId === 'undefined') {
                         question.ResponseId = responseData.responseId;
                     }
+                     question.Rhythm__Conversation_History__c=responseData.conversation;
+                     if (JSON.parse(responseData.conversation).length > 0) {
+                         question.chatColour=true;
+                     }
                 }
                 if (question.Rhythm__Flag__c) { flagcount++; }
                 if (question.Children.length > 0) {
@@ -237,6 +242,7 @@ export default class Questionnaire extends LightningElement {
                         if (childresp.isdisplay) {
                             childresp.questions.forEach(childques => {
                                 if (responseData.questionId === childques.Id) {
+
                                     if (this.isSupplier !== true) {
                                         childques.Rhythm__Flag__c = true;
                                         this.showFollowButton = false;
@@ -244,6 +250,10 @@ export default class Questionnaire extends LightningElement {
                                     if (typeof childques.ResponseId === 'undefined') {
                                         childques.ResponseId = responseData.responseId;
                                     }
+                                childques.Rhythm__Conversation_History__c=responseData.conversation;
+                                if (JSON.parse(responseData.conversation).length > 0) {
+                         childques.chatColour=true;
+                     }
                                 }
                                 if (childques.Rhythm__Flag__c) { flagcount++; }
                             })
@@ -1186,6 +1196,7 @@ export default class Questionnaire extends LightningElement {
     handleFilterRejected() {
         this.isfiltername = 'reject';
         this.questionsAndAnswerss = JSON.parse(JSON.stringify(this.filterQuestionsAndAnswers));
+        console.log(this.questionsAndAnswerss);
         this.questionsAndAnswerss.forEach(questionAnswer => {
             questionAnswer.sectionAccordian = "slds-accordion__section slds-is-open";
             questionAnswer.questions.forEach(question => {
@@ -1472,13 +1483,7 @@ export default class Questionnaire extends LightningElement {
                                             this.success = false;
                                             this.totastmessage = 'Please enter the valid email:';
                                         }
-                                        if (subQuestion.isPhone === true && !(subQuestion.value.match('[0-9]{3}-[0-9]{3}-[0-9]{4}'))) {
-                                            isAssessmentValidated = true;
-                                            this.showspinner = false;
-                                            this.showToast = true;
-                                            this.success = false;
-                                            this.totastmessage = 'Please enter the valid phone number in the format xxx-xxx-xxxx:';
-                                        }}}});}});}});});
+                                       }}});}});}});});
         for (const seckey of this.responseMap.keys()) {
             let reponse = { 'sobjectType': 'Rhythm__Response__c' };
             reponse.Rhythm__AccountAssessmentRelation__c = this.accountassessmentid;
