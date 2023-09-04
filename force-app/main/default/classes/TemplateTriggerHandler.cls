@@ -48,10 +48,13 @@ public with sharing class TemplateTriggerHandler implements ITriggerHandler{
         List<Assessment_Template__c> tmplList=new List<Assessment_Template__c>();
         for(sObject templt:newMap.values()){
             Decimal assessmentCount = (Decimal)templt.get('Number_of_Assessments__c');
-            boolean isCriteriaMet = serviceController.checkEntryCriteria(templt,oldMap.get(templt.Id),'Assessment_Template_c');
-            if(isCriteriaMet){
-                templt.addError('Details of the Active/Inactive Template cannot be modified');
+            if(!String.valueOf(templt.get('Status__c')).equalsIgnoreCase('New')){
+                 boolean isCriteriaMet = serviceController.checkEntryCriteria(templt,oldMap.get(templt.Id),'Assessment_Template_c');
+                if(isCriteriaMet){
+                    templt.addError('Details of the Active/Inactive Template cannot be modified');
+                }
             }
+           
             Assessment_Template__c oldtemplate=((Assessment_Template__c)oldMap.get(templt.Id));
             Assessment_Template__c newtemplate=((Assessment_Template__c)templt);
             if(newtemplate.Status__c != oldtemplate.Status__c && newtemplate.Status__c !='New') {
