@@ -58,6 +58,7 @@ export default class AddSuppliersforAssessment extends NavigationMixin(Lightning
             }
         })
         .catch(error => {
+            //console.log(error);
         });
     }
 
@@ -84,29 +85,31 @@ export default class AddSuppliersforAssessment extends NavigationMixin(Lightning
             }
             let todayDate =  new Date(this.todayDate).toISOString().substring(0, 10);
             let save = false;
-           
-            if(this.suppliersList.length > 0 || (typeof this.delList !== 'undefined' && this.delList.length>0)){
-                addSuppliers({assessmentRecord:this.assessmentRecord,operationType:'update',suppliers:JSON.stringify(this.suppliersList),existingSups:exSupListStr,deleteList:deleteListStr})
-                .then(result => {
-                    if(result.isSuccess === true){
-                        this.showManageSuppliers = false;
-                        this.source = false;
-                        this.showLWC = false;
-                        this.showNotification('Success','Suppliers Added to Assessments Successfully.','success');
-                        this.closeModal();
-                        this.navigateToRecordPage();
-                    }else{
-                        //this.showNotification('Error',result.message,'error');
-                    }
-                })
-                .catch(error => {
-                    
-                    this.showNotification('Error',error.body.message,'error');
-                });
+           if(new Date(this.endDate) >= new Date(todayDate)){
+                if(this.suppliersList.length > 0 || (typeof this.delList !== 'undefined' && this.delList.length>0)){
+                    addSuppliers({assessmentRecord:this.assessmentRecord,operationType:'update',suppliers:JSON.stringify(this.suppliersList),existingSups:exSupListStr,deleteList:deleteListStr})
+                    .then(result => {
+                        if(result.isSuccess === true){
+                            this.showManageSuppliers = false;
+                            this.source = false;
+                            this.showLWC = false;
+                            this.showNotification('Success','Suppliers Added to Assessments Successfully.','success');
+                            this.closeModal();
+                            this.navigateToRecordPage();
+                        }else{
+                            //this.showNotification('Error',result.message,'error');
+                        }
+                    })
+                    .catch(error => {
+                        //console.log('erroDetails----->',error);
+                        this.showNotification('Error',error.body.message,'error');
+                    });
+                }else{
+                    this.closeModal();
+                }         
             }else{
-                this.closeModal();
+                this.showNotification('Error','Suppliers cannot be added for the past Assessment.','error');
             }
-            
         }catch(e){
             let errString = e.name+' '+e.message;
             this.showNotification('Error',errString,'error');
