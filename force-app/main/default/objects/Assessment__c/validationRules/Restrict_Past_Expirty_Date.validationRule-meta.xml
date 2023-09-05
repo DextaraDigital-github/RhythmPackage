@@ -2,6 +2,6 @@
 <ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Restrict_Past_Expirty_Date</fullName>
     <active>true</active>
-    <errorConditionFormula>IF(AND(NOT(ISBLANK(End_Date__c)),ISCHANGED(Expiry_Reminder_Before_in_Days__c),End_Date__c- Expiry_Reminder_Before_in_Days__c&lt;= Start_Date__c ),true,false)</errorConditionFormula>
-    <errorMessage>The Due Date reminder you choose must come after the Start Date and fall on or before the End Date.</errorMessage>
+    <errorConditionFormula>IF(AND(NOT(ISBLANK(End_Date__c)),ISCHANGED(Expiry_Reminder_Before_in_Days__c),OR(End_Date__c- Expiry_Reminder_Before_in_Days__c&lt;= Start_Date__c,End_Date__c- Expiry_Reminder_Before_in_Days__c&lt;= TODAY()  ) ),true,false)</errorConditionFormula>
+    <errorMessage>The Due Date reminder must fall between Today and on or before the End Date.</errorMessage>
 </ValidationRule>
