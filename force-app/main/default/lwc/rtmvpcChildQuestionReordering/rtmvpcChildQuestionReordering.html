@@ -23,10 +23,10 @@
 							<template for:each={responseList} for:item="response">
 								<li class="fileSource_item" key={response} data-name="response" data-response={response}
 									role="presentation" onclick={navItemClickHandler}>
-									<a class="slds-navigation-list--vertical__action slds-text-link--reset slds-line-clamp"
+									<div class="slds-navigation-list--vertical__action slds-text-link--reset slds-line-clamp"
 										href="#" role="tab">
 										<span class="slds-line-clamp" title={response}>{response}</span>
-									</a>
+									</div>
 								</li>
 							</template>
 						</ul>
