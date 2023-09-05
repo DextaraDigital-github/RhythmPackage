@@ -134,15 +134,15 @@
 												</lightning-input>
 											</template>
 											<template if:true={questionary.isCheckbox}>
-												<template if:true={checkedLabel}>
+												<template if:true={questionary.checkboxcheck}>
 													<lightning-input type="Checkbox" value={questionary.value}
 														variant="label-hidden" data-checkbox={questionary.Id}
 														data-con={questionary.conditional} data-key={questionary.Id}
-														onchange={handleChange} checked={questionary.value}
+														onchange={handleChange} checked={questionary.value} 
 														onclick={openChatHandler} disabled={questionary.isEditable}>
 													</lightning-input>
 												</template>
-												<template if:false={checkedLabel}>
+												<template if:false={questionary.checkboxcheck}>
 													<lightning-input type="Checkbox" value={questionary.value}
 														variant="label-hidden" data-checkbox={questionary.Id}
 														data-con={questionary.conditional} data-key={questionary.Id}
