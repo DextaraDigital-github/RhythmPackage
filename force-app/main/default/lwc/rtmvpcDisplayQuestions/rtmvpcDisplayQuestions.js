@@ -320,8 +320,7 @@ export default class RtmvpcDisplayQuestions extends LightningElement {
 
     }
     handlesave(event) {
-
-        if (typeof event.detail !== 'undefined') {
+        if (typeof event.detail !== 'undefined' && event.detail!==null) {
             this.createChildQues = false;
             this.viewQuestions = false;
             this.createNewQues = false;

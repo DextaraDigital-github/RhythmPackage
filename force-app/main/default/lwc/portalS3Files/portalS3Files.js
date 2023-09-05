@@ -233,8 +233,9 @@ export default class AWSS3FileOperations extends LightningElement {
 
 
     //Upload files to AWS after uploaded successfully to salesforce
-    handleUploadFinished() {
+    handleUploadFinished(event) {
         let respMap = {};
+         const uploadedFiles = event.detail.files;
         if (this.responseRecId == null) {
             let filemap = {};
             filemap.quesId = this.questionId;
@@ -251,11 +252,12 @@ export default class AWSS3FileOperations extends LightningElement {
                             this.renderFlag = true;
                             updateRespFilesCount({
                                 responseId: this.responseRecId,
-                                filesCount: this.keyList.length + 1
+                                filesCount: this.keyList.length + uploadedFiles.length
                             }).then(reco => {
                                 this.showToastMessage('Uploaded', 'Uploaded Successfully', 'success');
                                 respMap.response = rec;
                                 respMap.questionId = '';
+                                respMap.filescount =  this.keyList.length + uploadedFiles.length;
                                 const selectedEvent = new CustomEvent('getdata', {
                                     detail: respMap
                                 });
@@ -273,7 +275,7 @@ export default class AWSS3FileOperations extends LightningElement {
                         });
                 }
             }).catch(error => {
-                
+                console.error(error);
             });
         }
         else {
@@ -283,12 +285,13 @@ export default class AWSS3FileOperations extends LightningElement {
                 if (result) {
                     updateRespFilesCount({
                         responseId: this.responseRecId,
-                        filesCount: this.keyList.length + 1
+                        filesCount: this.keyList.length + uploadedFiles.length
                     }).then(reco => {
                         this.renderFlag = true;
                         this.showToastMessage('Uploaded', 'Uploaded Successfully', 'success');
                         respMap.response = '';
                         respMap.questionId = this.questionId;
+                        respMap.filescount =  this.keyList.length + uploadedFiles.length;
                         const selectedEvent = new CustomEvent('getdata', {
                             detail: respMap
                         });
