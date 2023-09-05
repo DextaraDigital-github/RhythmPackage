@@ -46,24 +46,8 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
                 }
             }
         }
-        
         this.chatterMap.openChat = false;
         this.chatterMap.disableSendButton = true;
-        if (this.responses && this.responses.length > 0) {
-            this.responses.forEach(res => {
-                if (res.isCheckbox) {
-
-                    if (res.value === true) {
-                        this.checkedLabel = true;
-
-                    }
-                    else {
-                        this.checkedLabel = false;
-                    }
-                }
-            });
-        }
-        
     }
     /* deleteForm is used to delete the CAPA form for a question by dispatching the questionId to its parent Component
        Questionnaire */
@@ -94,6 +78,7 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
                     if (res.Id === quesId) {
                         if (label === 'Reject' || label === 'Rejected') {
                             rejectMap.rejectResponse = !(res.rejectButton);
+                           
                             this.timeline.forEach(res => {
                                 if (res.status === 'Need More Information') {
                                     rejectMap.needData = !(res.needData);
@@ -213,11 +198,11 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
         //         var x ={};
         // var y={};
         // y['key']=question.Id;
-        //  console.log('y',y);
+        //
         //  x['dataset']=y;
-        // console.log('x',x);
+        // 
         // this.responsemap.event.currentTarget = x;
-        //         // console.log('x',this.responsemap.event.currentTarget.dataset.key);
+        //        
         //     }
         // })
     }
@@ -290,7 +275,6 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
             this.responses.forEach(res => {
                 res.Children.forEach(conditional => {
                     if (conditional.questions.length > 0 && res.Id===questionId) {  
-                              
                         this.timeline.forEach(result => {
                             if (result.status === 'In Review') {
                                 this.showSupplierPopup = true;
@@ -302,7 +286,6 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
                 })
                 if ((typeof changedvalue === 'undefined' || changedvalue === '' || changedvalue === '[]') && res.Id === questionId) {
                     if (typeof res.defaultValue !== 'undefined') {
-                        
                         changedvalue = res.defaultValue;
                     }
                 }
@@ -322,7 +305,6 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
 
             });
         }
-        
         this.responsemap.parent = parentQuestionId;
         this.responsemap.SectionId = this.sectionid;
         this.responsemap.option = changedvalue;
@@ -336,7 +318,6 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
                 detail: this.responsemap
             });
             //dispatches event
-           
             this.dispatchEvent(selectedEvent);
         }
     }
@@ -405,7 +386,7 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
             case "csv": this.fileresponsemap.isCsv = true; break;
             case "docx": this.fileresponsemap.isDocx = true; break;
             case "doc": this.fileresponsemap.isDocx = true; break;
-            default: console.log('default');
+            default: 
         }
         x.addEventListener("loadend", () => {
             this.fileresponsemap.filedata = x.result;
