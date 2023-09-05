@@ -1,8 +1,10 @@
 import { LightningElement, api, track, wire } from 'lwc';
+import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import getAccountId from '@salesforce/apex/AssessmentController.getAccountId';
 import getAssessmentJunctionRecords from '@salesforce/apex/AssessmentController.getAssessmentJunctionRecords';
 import errorLogRecord from '@salesforce/apex/AssessmentController.errorLogRecord';
 import getPdfContent from '@salesforce/apex/AssessmentController.getPdfContent';
+import fetchAccountAssessmentRelation from '@salesforce/apex/AssessmentController.fetchAccountAssessmentRelation';
 import getQuestionsList from '@salesforce/apex/AssessmentController.getQuestionsList'; //To fetch all the Questions from the Assessment_Template__c Id from the Supplier_Assessment__c record
 import getSupplierResponseList from '@salesforce/apex/AssessmentController.getSupplierResponseList'; //To fetch all the Supplier_Response__c records related to the Supplier_Assessment__c record
 import getSupplierAssessmentList from '@salesforce/apex/AssessmentController.getSupplierAssessmentList'; //To fetch the Assessment_Template__c Id from the Supplier_Assessment__c record
@@ -55,6 +57,16 @@ export default class RtmvpcAssessments extends NavigationMixin(LightningElement)
     handleurl(event) {
         this.show.survey = false;
         this.show.grid = true;
+    }
+
+    /* Displays toast message */
+    configureToast(_title, _message, _variant) {
+        const toast = new ShowToastEvent({
+            title: _title,
+            message: _message,
+            variant: _variant
+        });
+        this.dispatchEvent(toast);
     }
 
     /* fetchingRecords is used to get accountAssessment data based on the account Id and URL navigation */
@@ -174,10 +186,8 @@ export default class RtmvpcAssessments extends NavigationMixin(LightningElement)
             }
         });
         for (let key of questionMap) {
-            
             for (let key1 in key) {
                 var questiondata = questionMap.get(key1);
-
             }
 
             for (let i = 0; i < questiondata.length; i++) {
@@ -188,7 +198,6 @@ export default class RtmvpcAssessments extends NavigationMixin(LightningElement)
                         }
                         else {
                             questiondata.splice(j, 1);
-
                         }
                     }
                 }
@@ -199,56 +208,74 @@ export default class RtmvpcAssessments extends NavigationMixin(LightningElement)
     }
     handlCsv(accountassessmentId) {
         let name = 'Sample';
-
-        getPdfContent({ accountassessmentId: accountassessmentId }).then(result => {
-            let attachment = (result[0].Rhythm__PdfConvertor__c);
-            name = result[0].Rhythm__Assessment__r.Name;
-            let attachmentstr = attachment.replaceAll('&quot;', '\"');
-            let parseLst = JSON.parse(attachmentstr);
-            let str = 'Section,Question,Answer,NumberOfAttachments,ConversationHistory\n';
-            for (const section in parseLst) {
-                str = str + section + '"\n"';
-                let data = parseLst[section];
-                data.forEach(ques => {
-                    str = str + ques.snumber + '","' + ques.question + '","';
-                    if (typeof ques.value !== 'undefined') {
-                        str = str + ques.value + '","';
+        let _parameterMap = JSON.stringify({ id: accountassessmentId });
+        fetchAccountAssessmentRelation({ parameterMap: _parameterMap }).then(result => {
+            if (typeof result !== 'undefined' && result != null && result.Rhythm__Status__c !== 'New' && result.Rhythm__Status__c !== 'In Progress') {
+                getPdfContent({ accountassessmentId: accountassessmentId }).then(result => {
+                    let attachment = (result[0].Rhythm__PdfConvertor__c);
+                    name = result[0].Rhythm__Assessment__r.Name;
+                    let attachmentstr = attachment.replaceAll('&quot;', '\"');
+                    let parseLst = JSON.parse(attachmentstr);
+                    let str = 'Section,Question,Answer,NumberOfAttachments,ConversationHistory\n';
+                    for (const section in parseLst) {
+                        str = str + section + '"\n"';
+                        let data = parseLst[section];
+                        data.forEach(ques => {
+                            str = str + ques.snumber + '","' + ques.question + '","';
+                            if (typeof ques.value !== 'undefined') {
+                                str = str + ques.value + '","';
+                            }
+                            if (typeof ques.value === 'undefined') {
+                                str = str + '' + '","';
+                            }
+                            if (typeof ques.files !== 'undefined') {
+                                str = str + ques.files + '","';
+                            }
+                            if (typeof ques.files === 'undefined') {
+                                str = str + '' + '","';
+                            }
+                            if (typeof ques.conversationHistory !== 'undefined') {
+                                str = str + ques.conversationHistory;
+                            }
+                            if (typeof ques.conversationHistory === 'undefined') {
+                                str = str + '' + '","';
+                            }
+                            str = str + '"\n"';
+                        });
+                        str = str + '"\n"';
                     }
-                    if (typeof ques.value === 'undefined') {
-                        str = str + '' + '","';
-                    }
-                    if (typeof ques.files !== 'undefined') {
-                        str = str + ques.files + '","';
-                    }
-                    if (typeof ques.files === 'undefined') {
-                        str = str + '' + '","';
-                    }
-                    if (typeof ques.conversationHistory !== 'undefined') {
-                        str = str + ques.conversationHistory;
-                    }
-                    if (typeof ques.conversationHistory === 'undefined') {
-                        str = str + '' + '","';
-                    }
-                    str = str + '"\n"';
+                    //str = str.replaceAll('undefined', '').replaceAll('null', '');
+                    let blob = new Blob([str], { type: 'text/plain' });
+                    let url = window.URL.createObjectURL(blob);
+                    let atag = document.createElement('a');
+                    //finalQuestionlst.push(questionmap);
+                    atag.setAttribute('href', url);
+                    atag.setAttribute('download', name + '.csv');
+                    atag.click();
+                }).catch(error => {
                 });
-                str = str + '"\n"';
             }
-            //str = str.replaceAll('undefined', '').replaceAll('null', '');
-            let blob = new Blob([str], { type: 'text/plain' });
-            let url = window.URL.createObjectURL(blob);
-            let atag = document.createElement('a');
-            //finalQuestionlst.push(questionmap);
-            atag.setAttribute('href', url);
-            atag.setAttribute('download', name + '.csv');
-            atag.click();
+            else {
+                this.configureToast('Assessment can\'t be exported','Assessments with \'New\' and \'In Progress\' can\'t be exported.','info');
+            }
         }).catch(error => {
-
+            this.configureToast('Some error has occured','Please contact your Administrator.');
         });
     }
     handlepdf(accountassessmentId) {
-        let pageurl = window.location.href;
-        let baseurl = pageurl.split('/s/')[0] + '/apex/Rhythm__RenderAsPdf?id=' + accountassessmentId;
-        window.open(baseurl);
+        let _parameterMap = JSON.stringify({ id: accountassessmentId });
+        fetchAccountAssessmentRelation({ parameterMap: _parameterMap }).then(result => {
+            if (typeof result !== 'undefined' && result != null && result.Rhythm__Status__c !== 'New' && result.Rhythm__Status__c !== 'In Progress') {
+                let pageurl = window.location.href;
+                let baseurl = pageurl.split('/s/')[0] + '/apex/Rhythm__RenderAsPdf?id=' + accountassessmentId;
+                window.open(baseurl);
+            }
+            else {
+                this.configureToast('Assessment can\'t be exported','Assessments with \'New\' and \'In Progress\' can\'t be exported.','info');
+            }
+        }).catch(error => {
+            this.configureToast('Some error has occured','Please contact your Administrator.');
+        });
         // getPdfContent({ accountassessmentId: accountassessmentId }).then(result => {
         //     let attachment = (result[0].Rhythm__PdfConvertor__c);
         //     name = result[0].Rhythm__Assessment__r.Name;
@@ -256,7 +283,6 @@ export default class RtmvpcAssessments extends NavigationMixin(LightningElement)
         //     let attachmentstr = attachment.replaceAll('&quot;', '\"');
         //     let parseLst = JSON.parse(attachmentstr);
         //     let count = 0;
-        //      console.log('parseLst',parseLst);
         //     let tableHtml = '<table><thead><tr>';
         //     tableHtml += '<th>Section</th><th colspan="2">Question</th><th>Response</th><th>NumberOfAttachments</th><th>ConversationHistory</th>';
         //     tableHtml += '</tr></thead><tbody>';
@@ -270,7 +296,6 @@ export default class RtmvpcAssessments extends NavigationMixin(LightningElement)
         //         else {
 
         //         }
-        //         console.log('data',data);
         //         data.forEach(ques => {
         //             tableHtml += '<tr><td class="align-to-top">';
         //             tableHtml = tableHtml + ques.snumber + '</td><td>' + ques.question + '</td>';
@@ -296,7 +321,6 @@ export default class RtmvpcAssessments extends NavigationMixin(LightningElement)
         //         });
         //     }
         //     tableHtml += '</tbody></table>';
-        //     console.log('Str>>', tableHtml);
         //     let win = window.open('', '', 'width=' + (window.innerWidth * 0.9) + ',height=' + (window.innerHeight * 0.9) + ',location=no, top=' + (window.innerHeight * 0.1) + ', left=' + (window.innerWidth * 0.1));
         //     let style = '<style>@media print { * {-webkit-print-color-adjust:exact;}}} @page{ margin: 0px;} *{margin: 0px; padding: 0px; height: 0px; font-family: Source Sans Pro, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif !important;} .headerDiv{width: 100%; height: 56px; padding: 20px; background-color: #03314d;} .headerText{font-size: 40px; color: white; font-weight: bold} .tableDiv{padding: 20px;} table {border-collapse:collapse; font-size: 14px;} table td, th{ padding: 4px;} table tr:nth-child(odd) td {background-color: #F9F9F9;} .oddLeftTd{background-color: #E9E9E9 !important;} .evenLeftTd{background-color: #F1F1F1 !important;} table th{ border: 1px solid #E9E9E9; background-color:#B5BEC58F} table { page-break-inside:auto; } tr { page-break-inside:avoid; page-break-after:auto; } .align-to-top{ vertical-align: top; }</style>';
         //     win.document.getElementsByTagName('head')[0].innerHTML += style;
