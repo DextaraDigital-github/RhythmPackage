@@ -5,10 +5,10 @@ import cloneTemplate from '@salesforce/apex/TemplateController.doClone';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 
 export default class CloneTemplatewithRelatedRecords extends NavigationMixin(LightningElement) {
-    templateId;
+    @api templateId;
     templateName;
     templateDescription;
-    objectApiName = 'Rhythm__Assessment_Template__c';
+   @api objectApiName = 'Rhythm__Assessment_Template__c';
     @track templateRecord;
     clonedTemplateId;
 
@@ -18,7 +18,9 @@ export default class CloneTemplatewithRelatedRecords extends NavigationMixin(Lig
           this.templateId = currentPageReference.state.recordId;
         }
     }
-
+connectedCallback() {
+    console.log('template id==='+this.templateId);
+}
     handleSubmit(event){
         try{
             event.preventDefault();
@@ -30,11 +32,18 @@ export default class CloneTemplatewithRelatedRecords extends NavigationMixin(Lig
             .then(result => {
                 
                 if(result.isSuccess){
+                     this.dispatchEvent(new CustomEvent(
+            'callvf',
+            {
+                detail:{list:result.recordId,type:'record'},
+                bubbles: true,
+                composed: true,
+            }));
                     this.showNotification('Success','Template Cloned Successfully.','success');
                     this.clonedTemplateId = result.recordId;
                     this.closeModal();
                 }else{
-                    this.showNotification('Error',result.message,'error');
+                    this.showVfpageNotification('Error',result.message,'error');
                 }
             })
             .catch(error => {
@@ -82,4 +91,14 @@ export default class CloneTemplatewithRelatedRecords extends NavigationMixin(Lig
         });
         this.dispatchEvent(evt);
     }
+         showVfpageNotification(title,message,variant) {
+          this.dispatchEvent(new CustomEvent(
+            'callvferror',
+            {
+                detail:{title:title,message:message,variant:variant},
+                bubbles: true,
+                composed: true,
+            }));       
+    }
+
 }
