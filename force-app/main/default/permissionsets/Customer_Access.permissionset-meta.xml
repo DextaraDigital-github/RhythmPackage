@@ -120,7 +120,6 @@
         <enabled>true</enabled>
         <name>Trigger_Field_Change_Handler__mdt</name>
     </customMetadataTypeAccesses>
-   
     <fieldPermissions>
         <editable>true</editable>
         <field>Account.AccountNumber</field>
@@ -1095,6 +1094,10 @@
     </objectPermissions>
     <pageAccesses>
         <apexPage>RenderAsPdf</apexPage>
+        <enabled>true</enabled>
+    </pageAccesses>
+    <pageAccesses>
+        <apexPage>createAssessmentVfPage</apexPage>
         <enabled>true</enabled>
     </pageAccesses>
     <recordTypeVisibilities>
