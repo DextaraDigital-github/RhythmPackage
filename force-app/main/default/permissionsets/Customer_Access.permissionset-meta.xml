@@ -1097,6 +1097,10 @@
         <enabled>true</enabled>
     </pageAccesses>
     <pageAccesses>
+        <apexPage>cloneTemplate</apexPage>
+        <enabled>true</enabled>
+    </pageAccesses>
+    <pageAccesses>
         <apexPage>createAssessmentVfPage</apexPage>
         <enabled>true</enabled>
     </pageAccesses>
