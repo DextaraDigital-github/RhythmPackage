@@ -48,7 +48,6 @@ public with sharing class AssessmentController {
     * @return pdfContent for particular AccountAssessment.  
     */
     @AuraEnabled
-    /* sfge-disable-stack ApexFlsViolationRule */
     public static void updatePdfContent(String paramMap){
          Map<String,object> queryMap = (Map<String,Object>)JSON.deserializeUntyped(paramMap);
          String accAssmtId =(string)queryMap.get('accountassessmentid');
@@ -1375,7 +1374,13 @@ public with sharing class AssessmentController {
             throw new AuraHandledException(errorMsg);
         }
     }
-    
+     /**
+    * @description To fetch the listviewid
+    */
+     @AuraEnabled
+    public static List<ListView> fetchlistviewId(){
+        return [SELECT Id FROM ListView WHERE Name = 'All' AND SObjectType = 'rhythm__assessment__c' WITH SECURITY_ENFORCED];
+    }
     
     /**
     * @description Fetches the AccountAssessmentRelation record based on Id
