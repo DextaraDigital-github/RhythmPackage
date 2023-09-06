@@ -36,7 +36,7 @@
                             </visibilityRule>
                         </valueListItems>
                         <valueListItems>
-                            <value>Rhythm__Assessment_Template__c.Clone</value>
+                            <value>CustomButton.Assessment_Template__c.Clone</value>
                             <visibilityRule>
                                 <criteria>
                                     <leftValue>{!Record.Status__c}</leftValue>

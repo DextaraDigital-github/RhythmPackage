@@ -1,0 +1,55 @@
+<apex:page sidebar="false" standardController="Assessment_Template__c">
+  <apex:slds />
+  <div id="spinnerdiv">
+    <div class="slds-spinner_container">
+      <div class="slds-align_absolute-center">
+        <p style="font-size:25px;">Loading...</p>
+      </div>
+    </div>
+  </div>
+  <apex:includeLightning />  
+  <div id="auraComponentDiv" />    
+  <script>
+     document.addEventListener("callvf", function(event){
+           if(event.detail.type === 'listview'){
+               var listviewId = event.detail.list;
+             sforce.one.navigateToList(listviewId,'All', 'Assessment_Template__c');
+               }
+            if(event.detail.type === 'record'){
+               var recordId= event.detail.list;
+                console.log('sample',tempId);
+                 sforce.one.showToast({
+                "title": "Success!",
+                "message": "Template created successfully.",
+                "type": "success"
+            });
+                sforce.one.navigateToSObject(recordId,'view');
+               
+               }
+           
+            if(event.detail.type === 'relatedlist'){
+               var tempId = event.detail.list;
+                console.log('sample',tempId);
+                sforce.one.navigateToRelatedList('Rhythm__Assessment_Template__r',tempId);
+               }
+        });
+       document.addEventListener("callvferror", function(event){
+           sforce.one.showToast({
+                "title": event.detail.title,
+                "message": event.detail.message,
+                "type": event.detail.variant
+            });
+           });
+  	var templateId = "{!$CurrentPage.parameters.templateId}";
+    console.log('templateId=='+templateId);
+    $Lightning.use("c:createAssessment", function() {
+        $Lightning.createComponent("c:cloneTemplatewithRelatedRecords",
+                                   {"templateId" : templateId,'objectApiName':'Rhythm__Assessment_Template__c'},
+                                   "auraComponentDiv",
+                                   function(cmp) {
+                                       var loadingDivElt = document.getElementById("spinnerdiv");
+                                       loadingDivElt.style.display = 'none';
+                                   });
+    });
+  </script>
+</apex:page>
