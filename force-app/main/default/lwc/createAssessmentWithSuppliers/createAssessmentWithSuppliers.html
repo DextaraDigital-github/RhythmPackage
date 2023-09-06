@@ -24,7 +24,7 @@
 							<lightning-layout multiple-rows>
 								<lightning-layout-item size="12" large-device-size="6" medium-device-size="6"
 									class="slds-p-horizontal_small slds-m-bottom_x-small">
-									<lightning-input-field field-name="Name" data-id="name"
+									<lightning-input-field variant="label-stacked" field-name="Name" data-id="name"
 										onchange={updateValuesHandler} name="name" value={values.name} required>
 									</lightning-input-field>
 								</lightning-layout-item>
@@ -41,38 +41,38 @@
 								</lightning-layout-item>
 								<lightning-layout-item size="12" large-device-size="6" medium-device-size="6"
 									class="slds-p-horizontal_small slds-m-bottom_x-small">
-									<lightning-input-field field-name="Rhythm__Start_Date__c" data-id="startdate"
+									<lightning-input-field variant="label-stacked" field-name="Rhythm__Start_Date__c" data-id="startdate"
 										onchange={updateValuesHandler} name="startdate" value={startDate} required>
 									</lightning-input-field>
 								</lightning-layout-item>
 								<lightning-layout-item size="12" large-device-size="6" medium-device-size="6"
 									class="slds-p-horizontal_small slds-m-bottom_x-small">
-									<lightning-input-field field-name="Rhythm__End_Date__c" data-id="enddate"
+									<lightning-input-field variant="label-stacked" field-name="Rhythm__End_Date__c" data-id="enddate"
 										onchange={updateValuesHandler} name="enddate" value={values.enddate}>
 									</lightning-input-field>
 								</lightning-layout-item>
 								<lightning-layout-item size="12" large-device-size="6" medium-device-size="6"
 									class="slds-p-horizontal_small slds-m-bottom_x-small">
-									<lightning-input-field field-name="Rhythm__Category__c" data-id="category"
+									<lightning-input-field variant="label-stacked" field-name="Rhythm__Category__c" data-id="category"
 										onchange={updateValuesHandler} name="category" value={values.category} required>
 									</lightning-input-field>
 								</lightning-layout-item>
 								<lightning-layout-item size="12" large-device-size="6" medium-device-size="6"
 									class="slds-p-horizontal_small slds-m-bottom_x-small">
-									<lightning-input-field field-name="Rhythm__Frequency__c" data-id="frequencyvalue"
+									<lightning-input-field variant="label-stacked" field-name="Rhythm__Frequency__c" data-id="frequencyvalue"
 										onchange={updateValuesHandler} name="frequencyValue"
 										value={values.frequencyValue}>
 									</lightning-input-field>
 								</lightning-layout-item>
 								<lightning-layout-item size="12" large-device-size="6" medium-device-size="6"
 									class="slds-p-horizontal_small slds-m-bottom_x-small">
-									<lightning-input-field field-name="Rhythm__Disclosure__c" data-id="disclosure"
+									<lightning-input-field variant="label-stacked" field-name="Rhythm__Disclosure__c" data-id="disclosure"
 										onchange={updateValuesHandler} name="disclosure" value={values.disclosure}>
 									</lightning-input-field>
 								</lightning-layout-item>
 								<lightning-layout-item size="12" large-device-size="6" medium-device-size="6"
 									class="slds-p-horizontal_small slds-m-bottom_x-small">
-									<lightning-input-field field-name="Rhythm__Description__c" data-id="description"
+									<lightning-input-field variant="label-stacked" field-name="Rhythm__Description__c" data-id="description"
 										onchange={updateValuesHandler} name="description" value={values.description}>
 									</lightning-input-field>
 								</lightning-layout-item>
@@ -80,7 +80,7 @@
 						</div>
 
 						<div class="slds-modal__footer">
-							<lightning-button class="slds-button" label="Cancel" title="Cancel" onclick={closeModal}>
+							<lightning-button class="slds-button" label="Cancel" title="Cancel" onclick={closeModal} >
 							</lightning-button>
 							<lightning-button class="slds-button" variant="brand" label="Next" title="Next" type="submit"></lightning-button>
 						</div>
