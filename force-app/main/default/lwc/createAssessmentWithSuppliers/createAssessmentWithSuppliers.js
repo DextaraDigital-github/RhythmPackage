@@ -5,10 +5,8 @@ import addSuppliers from '@salesforce/apex/AssessmentController.sendAssessment';
 import getTemplateData from '@salesforce/apex/AssessmentController.getTemplateData';
 import fetchAssessmentTemplates from '@salesforce/apex/AssessmentController.fetchAssessmentTemplates';
 import getTodayDate from '@salesforce/apex/AssessmentController.getTodayDate';
+import fetchlistviewId from '@salesforce/apex/AssessmentController.fetchlistviewId';
 import errorLogRecord from '@salesforce/apex/AssessmentController.errorLogRecord';
-
-
-
 export default class CreateAssessmentWithSuppliers extends NavigationMixin(LightningElement) {
     showModal = true;
     showNewAssessment=false;
@@ -24,12 +22,15 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
     todayDate;
     templateStatus ='';
     @track templateOptions = [];
-    startDate
+    startDate;
+    @track logoutURL;
 
     connectedCallback() {
+        this.templateId=(this.templateId.length === 0)?null:this.templateId;
         this.getTodayDate();
         this.fetchTemplateData();
         this.fetchAssessmentTempData();
+        
     }
     /* Fetches list of Assessment Templates from Apex */
     fetchAssessmentTempData() {
@@ -44,9 +45,11 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
         this.templateOptions = [];
         if(typeof result != 'undefined'){
             result.forEach(template => {
+
                 this.templateId = (typeof this.templateId != 'undefined' && template.Id.includes(this.templateId))?template.Id:this.templateId;
                 this.templateOptions.push({ label: template.Name, value: template.Id, icon: 'custom:custom13' });
             });
+        
         }
     }
 
@@ -61,7 +64,6 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
     }
 
     handleChange(event){
-        
         this.templateId = event.detail.value;
         this.fetchTemplateData();
     }
@@ -125,6 +127,8 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
                 this.showSuppliers = true;
                 this.modalHeading = 'Add Suppliers';
             }else{
+
+                this.showVfpageNotification('Error',validatedData.message,'error');                
                 this.showNotification('Error',validatedData.message,'error');
             }
         }catch(e){
@@ -139,8 +143,6 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
         let startDate = this.template.querySelector(`[data-id="startdate"]`).value;
         let endDate = this.template.querySelector(`[data-id="enddate"]`).value;
         let todayDate =  new Date(this.todayDate).toISOString().substring(0, 10);
-
-        
         if(this.templateStatus !== undefined && (this.templateStatus ==='New' || this.templateStatus ==='Inactive')){
             validatedDetails.isSave = false;
             validatedDetails.message = 'Assessment Program can be created only using an Active Template';
@@ -181,6 +183,7 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
                     this.showNotification('Error',error,'error');
                 });
             }else{
+                 this.showVfpageNotification('Error','Please select atleast one supplier to proceed.','error');
                 this.showNotification('Error','Please select atleast one supplier to proceed.','error');
             }
         }catch(e){
@@ -200,7 +203,7 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
         }else{
             this.navigateToObjectHome();
         }
-        //eval("$A.get('e.force:refreshView').fire();");//Todo Prudvi please check this
+        
     }
     showNotification(title,message,variant) {
         const evt = new ShowToastEvent({
@@ -210,37 +213,79 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
         });
         this.dispatchEvent(evt);
     }
+     showVfpageNotification(title,message,variant) {
+          this.dispatchEvent(new CustomEvent(
+            'callvferror',
+            {
+                detail:{title:title,message:message,variant:variant},
+                bubbles: true,
+                composed: true,
+            }));       
+    }
+
 
     navigateToObjectHome(){
-        this[NavigationMixin.Navigate]({
-            type: 'standard__objectPage',
-            attributes: {
-                objectApiName: 'Rhythm__Assessment__c',
-                actionName: 'home'
-            },
+        let listviewId;
+        fetchlistviewId({}).then(result=>{
+            listviewId=(result[0].Id).toString();
+            this.dispatchEvent(new CustomEvent(
+            'callvf',
+            {
+                detail:{list:listviewId,type:'listview'},
+                bubbles: true,
+                composed: true,
+            }
+        ));
+        })
+        .catch(error=>{
+
         });
+        // this.dispatchEvent(navigateEvent);
+        // this[NavigationMixin.Navigate]({
+        //     type: 'standard__objectPage',
+        //     attributes: {
+        //         objectApiName: 'Rhythm__Assessment__c',
+        //         actionName: 'home'
+        //     },
+        // });
+       
     }
     navigateToRecordPage(){
-        this[NavigationMixin.Navigate]({
-            type: "standard__recordPage",
-            attributes: {
-              objectApiName: "Rhythm__Assessment__c",
-              actionName: "view",
-              recordId: this.assessmentId
-            }
-        });
+         this.dispatchEvent(new CustomEvent(
+            'callvf',
+            {
+                detail:{list:this.assessmentId,type:'record'},
+                bubbles: true,
+                composed: true,
+            }));
+
+        // this[NavigationMixin.Navigate]({
+        //     type: "standard__recordPage",
+        //     attributes: {
+        //       objectApiName: "Rhythm__Assessment__c",
+        //       actionName: "view",
+        //       recordId: this.assessmentId
+        //     }
+        // });
     }
     // Navigation to Related list 
     navigateRelatedListView() {
-        this[NavigationMixin.Navigate]({
-            type: 'standard__recordRelationshipPage',
-            attributes: {
-                recordId: this.templateId,
-                objectApiName: 'Rhythm__Assessment_Template__c',
-                relationshipApiName: 'Rhythm__Assessments__r',
-                actionName: 'view'
-            },
-        });
+          this.dispatchEvent(new CustomEvent(
+            'callvf',
+            {
+                detail:{list:this.templateId,type:'relatedlist'},
+                bubbles: true,
+                composed: true,
+            }));
+        // this[NavigationMixin.Navigate]({
+        //     type: 'standard__recordRelationshipPage',
+        //     attributes: {
+        //         recordId: this.templateId,
+        //         objectApiName: 'Rhythm__Assessment_Template__c',
+        //         relationshipApiName: 'Rhythm__Assessments__r',
+        //         actionName: 'view'
+        //     },
+        // });
     }
 
     backHandler()
@@ -256,7 +301,7 @@ export default class CreateAssessmentWithSuppliers extends NavigationMixin(Light
             //}
         })
         .catch(error => {
-            //console.log(error);
+    
         });
     }
 }
