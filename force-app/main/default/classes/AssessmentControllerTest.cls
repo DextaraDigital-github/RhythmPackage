@@ -945,6 +945,17 @@ private class AssessmentControllerTest
             Test.stopTest();
         }
     }
+    
+     @isTest
+    static void fetchlistviewIdTest(){
+        user u = [SELECT Id,UserName FROM User WHERE Email='standarduser@testorg.com' LIMIT 1];
+        System.runAs(u){    
+            Test.startTest();
+            AssessmentController.fetchlistviewId();
+            Test.stopTest();
+        }
+    }
+
 
     @isTest
     static void sendAssessmentUpdateTestforData(){
@@ -979,7 +990,7 @@ private class AssessmentControllerTest
             Test.stopTest();
         }
     }
-    /*
+    
     @isTest
     static void deleteResponseTest(){
         user u = [SELECT Id,UserName FROM User WHERE Email='standarduser@testorg.com' LIMIT 1];
@@ -988,7 +999,7 @@ private class AssessmentControllerTest
             List<Question__c> queList = [SELECT Id FROM Question__c LIMIT 1];
             List<AccountAssessmentRelation__c> assaccRel = [SELECT Id FROM AccountAssessmentRelation__c LIMIT 1];
             //Map<string,object> mapData = {'responsequestionId'=>queList[0].Id,'accountassessmentId'=>assaccRel[0].Id};
-            Map<String,Object> contactAttributes  = new Map<String,Object>{'responsequestionId'=>queList[0].Id,'accountassessmentId'=>assaccRel[0].Id};
+            Map<String,Object> contactAttributes  = new Map<String,Object>{'responsequestionId'=>queList,'accountassessmentId'=>assaccRel[0].Id};
            	string jsonstring = JSON.serialize(contactAttributes);
             Test.startTest();
             AssessmentController.deleteResponse(contactAttributes);
@@ -996,5 +1007,5 @@ private class AssessmentControllerTest
             System.assertEquals(testString =='Success', true,'assessment updated');
             Test.stopTest();
         }
-    }*/
+    }
 }
