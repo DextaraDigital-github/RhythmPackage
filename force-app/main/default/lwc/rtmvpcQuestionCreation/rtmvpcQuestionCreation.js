@@ -217,7 +217,7 @@ export default class RtmvpcQuestionCreation extends LightningElement {
         this.dispatchEvent(selectedEvent);
 
     }
-    @api handlesaveChild(){
+    @api handlesaveChild() {
         this.handlesave();
     }
     /* 
@@ -254,6 +254,10 @@ export default class RtmvpcQuestionCreation extends LightningElement {
             // this.showToast = true;
             this.loading = false;
             this.configureToast('Some Error has occured', 'Please Fill the required Fields : Question, Question Type and Section ', 'error');
+            const selectedEvent = new CustomEvent('handleerror', {
+                detail: false
+            });
+            this.dispatchEvent(selectedEvent);
         }
         else {
             this.questionlst = [];
@@ -295,6 +299,7 @@ export default class RtmvpcQuestionCreation extends LightningElement {
                                 this.loading = false;
                             }).catch(error => {
                                 this.configureToast('Some Error has occured', 'Please contact admin', 'error');
+                              
                                 let errormap = {};
                                 this.loading = false;
                                 errormap.componentName = 'RtmvpcQuestionCreation';
@@ -302,6 +307,10 @@ export default class RtmvpcQuestionCreation extends LightningElement {
                                 errormap.className = 'QuestionAttributeResponseService';
                                 errormap.errorData = error.message;
                                 errorLogRecord({ errorLogWrapper: JSON.stringify(errormap) }).then(() => { });
+                                  const selectedEvent = new CustomEvent('handleerror', {
+                                    detail: false
+                                });
+                                this.dispatchEvent(selectedEvent);
                             });
                             if (updatelst.length > 0) {
                                 updateResponseAttributes({ responseAttributes: updatelst }).then(result => {
@@ -310,11 +319,16 @@ export default class RtmvpcQuestionCreation extends LightningElement {
                                     let errormap = {};
                                     this.loading = false;
                                     this.configureToast('Some Error has occured', 'Please contact admin', 'error');
+                                   
+                                    this.dispatchEvent(selectedEvent);
                                     errormap.componentName = 'RtmvpcQuestionCreation';
                                     errormap.methodName = 'updateResponseAttributes';
                                     errormap.className = 'QuestionAttributeResponseService';
                                     errormap.errorData = error.message;
                                     errorLogRecord({ errorLogWrapper: JSON.stringify(errormap) }).then(() => { });
+                                     const selectedEvent = new CustomEvent('handleerror', {
+                                        detail: false
+                                    });
                                 })
                             }
                             if (isChildCreated) {
@@ -371,6 +385,10 @@ export default class RtmvpcQuestionCreation extends LightningElement {
                             toastmessage = 'ResponseValue, Preferred/Not Preferred and Upload Required fields are mandatory';
                         }
                         this.configureToast('Some Error has occured', toastmessage, 'error');
+                        const selectedEvent = new CustomEvent('handleerror', {
+                            detail: false
+                        });
+                        this.dispatchEvent(selectedEvent);
                         this.loading = false;
                     }
                 }
@@ -389,16 +407,28 @@ export default class RtmvpcQuestionCreation extends LightningElement {
                                 this.dispatchEvent(selectedEvent);
                             }).catch(error => {
                                 this.configureToast('Some Error has occured', 'Response value,Preferred/Not Preferred and Upload Required fields are mandatory', 'error');
+                                const selectedEvent = new CustomEvent('handleerror', {
+                                    detail: false
+                                });
+                                this.dispatchEvent(selectedEvent);
                                 this.loading = false;
                             });
                         }
                         else {
                             this.configureToast('Some Error has occured', 'Response value,Preferred/Not Preferred and Upload Required fields are mandatory', 'error');
+                            const selectedEvent = new CustomEvent('handleerror', {
+                                detail: true
+                            });
+                            this.dispatchEvent(selectedEvent);
                             this.loading = false;
                         }
                     }
                     else {
                         this.configureToast('Some Error has occured', 'Response value,Preferred/Not Preferred and Upload Required fields are mandatory', 'error');
+                        const selectedEvent = new CustomEvent('handleerror', {
+                            detail: false
+                        });
+                        this.dispatchEvent(selectedEvent);
                         this.loading = false;
                     }
                 }
@@ -410,6 +440,10 @@ export default class RtmvpcQuestionCreation extends LightningElement {
                         getChildQuestions({ questionId: this.questionWrapper.Id, templateId: this.templateId }).then(result => {
                             if (result.length > 0) {
                                 this.configureToast('Some Error has occured', 'Before changing the Response type, please delete Condtional questions', 'error');
+                                const errorEvent = new CustomEvent('handleerror', {
+                                    detail: true
+                                });
+                                this.dispatchEvent(errorEvent);
                                 this.createQues = false;
                                 this.loading = false;
                                 const selectedEvent = new CustomEvent('handleaftersave', {
@@ -438,23 +472,33 @@ export default class RtmvpcQuestionCreation extends LightningElement {
                                         this.dispatchEvent(selectedEvent);
                                     }).catch(error => {
                                         this.loading = false;
-                                        this.configureToast('Some Error has occured', 'Please contact admin', 'error');
+                                       
                                         let errormap = {};
                                         errormap.componentName = 'RtmvpcQuestionCreation';
                                         errormap.methodName = 'deleteQuesRespAttribute';
                                         errormap.className = 'QuestionAttributeResponseService';
                                         errormap.errorData = error.message;
                                         errorLogRecord({ errorLogWrapper: JSON.stringify(errormap) }).then(() => { });
+                                         this.configureToast('Some Error has occured', 'Please contact admin', 'error');
+                                        const errorEvent = new CustomEvent('handleerror', {
+                                            detail: false
+                                        });
+                                        this.dispatchEvent(errorEvent);
                                     });
                                 }).catch(error => {
                                     this.loading = false;
                                     this.configureToast('Some Error has occured', 'Please contact admin', 'error');
+                                  
                                     let errormap = {};
                                     errormap.componentName = 'RtmvpcQuestionCreation';
                                     errormap.methodName = 'createQuestions';
                                     errormap.className = 'QuestionAttributeResponseService';
                                     errormap.errorData = error.message;
                                     errorLogRecord({ errorLogWrapper: JSON.stringify(errormap) }).then(() => { });
+                                      const selectedEvent = new CustomEvent('handleerror', {
+                                        detail: true
+                                    });
+                                    this.dispatchEvent(selectedEvent);
                                 });
                             }
                         });
@@ -478,11 +522,16 @@ export default class RtmvpcQuestionCreation extends LightningElement {
                             let errormap = {};
                             this.loading = false;
                             this.configureToast('Some Error has occured', 'Please contact admin', 'error');
+                            
                             errormap.componentName = 'RtmvpcQuestionCreation';
                             errormap.methodName = 'createQuestions';
                             errormap.className = 'QuestionAttributeResponseService';
                             errormap.errorData = error.message;
                             errorLogRecord({ errorLogWrapper: JSON.stringify(errormap) }).then(() => { });
+                            const selectedEvent = new CustomEvent('handleerror', {
+                                detail: false
+                            });
+                            this.dispatchEvent(selectedEvent);
                         });
                     }
                 }
@@ -508,11 +557,16 @@ export default class RtmvpcQuestionCreation extends LightningElement {
                         this.loading = false;
                         let errormap = {};
                         this.configureToast('Some Error has occured', 'Please contact admin', 'error');
+                        
                         errormap.componentName = 'RtmvpcQuestionCreation';
                         errormap.methodName = 'createResponseQuestionMap';
                         errormap.className = 'QuestionAttributeResponseService';
                         errormap.errorData = error.message;
                         errorLogRecord({ errorLogWrapper: JSON.stringify(errormap) }).then(() => { });
+                        const selectedEvent = new CustomEvent('handleerror', {
+                            detail: false
+                        });
+                        this.dispatchEvent(selectedEvent);
                     });
                 });
             }

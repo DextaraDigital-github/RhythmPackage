@@ -138,7 +138,7 @@
 													<lightning-input type="Checkbox" value={questionary.value}
 														variant="label-hidden" data-checkbox={questionary.Id}
 														data-con={questionary.conditional} data-key={questionary.Id}
-														onchange={handleChange} checked={questionary.value} 
+														onchange={handleChange} checked={questionary.value}
 														onclick={openChatHandler} disabled={questionary.isEditable}>
 													</lightning-input>
 												</template>
@@ -157,8 +157,8 @@
 													style="max-width:150px;" name={questionary.question}
 													data-key={questionary.Id} data-questiontype="phone"
 													disabled={questionary.isEditable} onblur={handleChange}
-													onkeyup={handleChange} onkeydown={handleChange} max-length="12"
-													pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" onclick={openChatHandler}>
+													onkeyup={handleKeyup} onkeydown={handleKeyup} max-length="12"
+													onclick={openChatHandler}>
 												</lightning-input>
 											</template>
 											<template if:true={questionary.isCurrency}>
@@ -206,7 +206,8 @@
 														<lightning-button-icon variant="neutral"
 															label="Review & Comments" title="Review & Comments"
 															data-id={questionary.Id} icon-name="utility:comments"
-															onclick={handleQuestionHighlight} data-typeidentifier="button"
+															onclick={handleQuestionHighlight}
+															data-typeidentifier="button"
 															data-disable={questionary.isEditable}
 															data-response={questionary.ResponseId}
 															data-showupload={questionary.showUpload}>
@@ -225,7 +226,8 @@
 														<lightning-button-icon variant="brand" label="Review & Comments"
 															title="Review & Comments" data-id={questionary.Id}
 															icon-name="utility:comments"
-															onclick={handleQuestionHighlight} data-typeidentifier="button"
+															onclick={handleQuestionHighlight}
+															data-typeidentifier="button"
 															data-disable={questionary.isEditable}
 															data-response={questionary.ResponseId}
 															data-showupload={questionary.showUpload}>

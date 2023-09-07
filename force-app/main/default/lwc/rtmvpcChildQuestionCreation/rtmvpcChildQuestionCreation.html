@@ -44,7 +44,7 @@
 							</div>
 							<template if:true={createQues}>
 								<c-rtmvpc-question-creation onhandleaftersave={handleaftersave}
-									onhandlecancel={handleclose} child-ques-creation={childQuesCreation}
+									onhandlecancel={handleclose} child-ques-creation={childQuesCreation} onhandleerror={handledisable}
 									childwrapper={childwrapper}>
 								</c-rtmvpc-question-creation>
 								
@@ -56,7 +56,7 @@
 							style="position: absolute; width: 100%; bottom:0px; z-index:99;">
 							<button class="slds-button slds-button_neutral" aria-label="Cancel and close" onclick={handleClose}>Cancel</button>
 							<lightning-button class="slds-button" variant="brand" label="Save" title="Save"
-								onclick={handlesave}>
+								onclick={handlesave} disabled={savedisable}>
 							</lightning-button>
 						</div>
 					</template>

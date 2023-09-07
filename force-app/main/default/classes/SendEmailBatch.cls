@@ -225,6 +225,38 @@ public with sharing class SendEmailBatch implements Database.batchable<sObject>,
             }
             safe.doInsert(email.userEmrMap.values());
             
+            List<User> userList = [SELECT Id, Email, ContactId, Contact.AccountId, Contact.Account.Name FROM User WHERE Email!=null AND Contact.Primary_Contact__c = true AND Contact.Email != null AND Contact.AccountId IN :email.selectedRecipients];
+            if((userList == null || userList.size() == 0) && email.attachmentsData != null && email.attachmentsData.contentDocuments != null && email.attachmentsData.contentDocuments.size() > 0) {
+                /* Fetching Content Versions to attach to the email */  
+                List<Messaging.EmailFileAttachment> emailAttachments = new List<Messaging.EmailFileAttachment>();
+                List<String> cvFields = new List<String>{'Id', 'VersionData', 'FileExtension', 'PathOnClient'};
+                String cvFilter = 'where ContentDocumentId in (\'' + String.join(email.attachmentsData.contentDocuments,'\',\'') + '\')';
+                Map<String,Object> cvParameterMap = new Map<String,Object>{ 'fields'=>cvFields, 'filter'=>cvFilter };
+                email.contentVersionMap = cvSelector.fetchContentVersions(cvParameterMap);   // Stores map of all the ContentVersions of all the attachments which will be attached to the email
+                List<ContentVersion> cvList = new List<ContentVersion>();
+                if(email.contentVersionMap != null) {
+                    cvList = email.contentVersionMap.values();
+                }
+                
+                /* Creating File Attachments for the Email */
+                for(ContentVersion cv:cvList) {
+                    Messaging.EmailFileAttachment mef = new Messaging.EmailFileAttachment();
+                    mef.setFileName(cv.PathOnClient);
+                    mef.setBody(cv.VersionData);
+                    switch on cv.FileExtension {
+                        when 'png', 'jpeg' {
+                            mef.setContentType('image/'+cv.FileExtension);
+                        }
+                        when 'csv' {
+                            mef.setContentType('text/csv');
+                        }
+                        when 'pdf' {
+                            mef.setContentType('application/pdf');
+                        }
+                    }
+                    emailAttachments.add(mef);
+                }
+            }
             /* Storing the Email Attachments in AWS S3 */
             if(email.contentVersionMap != null && email.contentVersionMap.size() > 0) {
                 AWSS3ServiceQueueable awsQu=new AWSS3ServiceQueueable();
