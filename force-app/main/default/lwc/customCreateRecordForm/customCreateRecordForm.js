@@ -96,7 +96,6 @@ export default class CustomRecordForm extends LightningElement {
                 }),
               );
             }).catch(error => {
-              
             });
           }
         }
@@ -113,7 +112,9 @@ export default class CustomRecordForm extends LightningElement {
       else if (this.objName === 'Rhythm__Section__c') {
         if (this.sectionName != '' && this.sectionName != ' ') {
           if (typeof this.templateId !== 'undefined') {
-            fields.Rhythm__Assessment_Template__c = this.templateId;
+            if (typeof fields !== 'undefined') {
+              fields.Rhythm__Assessment_Template__c = this.templateId;
+            }
           }
           if (this.sectionId != null && this.sectionId != undefined) {
             fields.Id === this.sectionId;
@@ -144,7 +145,6 @@ export default class CustomRecordForm extends LightningElement {
             this.handleCancel(event);
 
           }).catch(error => {
-            
           });
         }
         else {

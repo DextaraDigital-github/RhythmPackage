@@ -87,7 +87,7 @@ export default class SendEmail extends NavigationMixin(LightningElement) {
         const folderName = this.objectApiName + '/' + this.email.emailMessageId + '/';
         this.s3.listObjects({ Bucket: this.bucketName, Prefix: folderName }, (err, data) => {
             if (err) {
-                
+                console.error(err);
             }
             else {
                 const files = data.Contents;
@@ -425,7 +425,7 @@ export default class SendEmail extends NavigationMixin(LightningElement) {
                     a.label = attachment.name.slice(0, attachment.name.lastIndexOf('.'));
                     a.name = attachment.documentId;
                     a.fileType = attachment.name.slice(attachment.name.lastIndexOf('.') + 1);
-                    a.href = '/sfc/servlet.shepherd/document/download/' + attachment.documentId + '?operationContext=S1'; //Creating a downloadable link
+                    a.href = window.location.origin+'/sfc/servlet.shepherd/document/download/' + attachment.documentId + '?operationContext=S1'; //Creating a downloadable link
                 }
                 this.email.attachmentsData.contentDocuments.push(a.name);
                 this.email.attachmentsData.deleteContentDocuments.push(a.name);

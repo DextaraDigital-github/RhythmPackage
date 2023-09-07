@@ -257,19 +257,6 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
         var changedvalue = event.target.value;
         let questionId = event.currentTarget.dataset.key;
         let parentQuestionId;
-        let questiontype = event.currentTarget.dataset.questiontype;
-        if (typeof questiontype !== 'undefined' && questiontype === 'phone') {
-            let phoneNo = changedvalue.split('-');
-            if (!(phoneNo.length === 3 && phoneNo[0].length === 3 && phoneNo[1].length === 3 && phoneNo[2].length === 4)) {
-                changedvalue = phoneNo.join('');
-                if (changedvalue.length >= 3 && changedvalue.length <= 6) {
-                    changedvalue = changedvalue.substring(0, 3) + '-' + changedvalue.substring(3,6);
-                }
-                else if (changedvalue.length > 6) {
-                    changedvalue = changedvalue.substring(0, 3) + '-' + changedvalue.substring(3, 6) + '-' + changedvalue.substring(6, 10);
-                }
-            }
-        }
         if (this.responses && this.responses.length > 0) {
             
             this.responses.forEach(res => {
@@ -566,5 +553,24 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
     @api
     fileUploadHandler() {
         this.uploadingFile = true;
+    }
+
+    handleKeyup(event) {
+        let questiontype = event.currentTarget.dataset.questiontype;
+        if (typeof questiontype !== 'undefined' && questiontype === 'phone') {
+            let changedvalue = event.target.value;
+            let phoneNo = changedvalue.split('-');
+            if (!(phoneNo.length === 3 && phoneNo[0].length === 3 && phoneNo[1].length === 3 && phoneNo[2].length === 4)) {
+                changedvalue = phoneNo.join('');
+                if (changedvalue.length >= 3 && changedvalue.length <= 6) {
+                    changedvalue = changedvalue.substring(0, 3) + '-' + changedvalue.substring(3,6);
+                    this.template.querySelectorAll('[data-questiontype="phone"]')[0].value = changedvalue;
+                }
+                else if (changedvalue.length > 6) {
+                    changedvalue = changedvalue.substring(0, 3) + '-' + changedvalue.substring(3, 6) + '-' + changedvalue.substring(6, 10);
+                    this.template.querySelectorAll('[data-questiontype="phone"]')[0].value = changedvalue;
+                }
+            }
+        }
     }
 }
