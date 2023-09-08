@@ -562,7 +562,7 @@ export default class RtmvpcRenderQuestionTemplate extends LightningElement {
             let phoneNo = changedvalue.split('-');
             if (!(phoneNo.length === 3 && phoneNo[0].length === 3 && phoneNo[1].length === 3 && phoneNo[2].length === 4)) {
                 changedvalue = phoneNo.join('');
-                if (changedvalue.length >= 3 && changedvalue.length <= 6) {
+                if (changedvalue.length > 3 && changedvalue.length <= 6) {
                     changedvalue = changedvalue.substring(0, 3) + '-' + changedvalue.substring(3,6);
                     this.template.querySelectorAll('[data-questiontype="phone"]')[0].value = changedvalue;
                 }
