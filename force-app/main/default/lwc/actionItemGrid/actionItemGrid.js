@@ -52,11 +52,16 @@ export default class ActionItemGrid extends NavigationMixin(LightningElement) {
                             if (key === 'Rhythm__Due_Date__c' || key === 'Rhythm__Priority__c'
                                 || key === 'Rhythm__Status__c' || key === 'Rhythm__OwnershipName__c') {
                                 actionRecordMap.fieldName = key;
+                                if(key === 'Rhythm__Due_Date__c'){actionRecordMap.label='Due Date';}
+                                if(key === 'Rhythm__Priority__c'){actionRecordMap.label='Priority';}
+                                if(key === 'Rhythm__Status__c'){actionRecordMap.label='Status';}
+                                 if(key === 'Rhythm__OwnershipName__c'){actionRecordMap.label='Ownership';}
                                 actionRecordMap.value = res[key];
                                 actionRecordList.push(actionRecordMap);
                             }
                             if (key === 'Name') {
                                 actionRecordMap.fieldName = key;
+                                actionRecordMap.label='Action Item Name';
                                 actionRecordMap.value = res[key];
                                 actionRecordMap.isHyperlink = true;
                                 actionRecordList.push(actionRecordMap);
@@ -64,6 +69,7 @@ export default class ActionItemGrid extends NavigationMixin(LightningElement) {
                             if (key === 'Rhythm__Flag_Status__c') {
                                 actionRecordMap.fieldName = key;
                                 actionRecordMap.value = res[key];
+                                 actionRecordMap.label='Flag Status';
                                 if (res['Rhythm__Status__c'] == 'Closed') {
                                     actionRecordMap.isFlag = true;
                                 }
@@ -77,6 +83,8 @@ export default class ActionItemGrid extends NavigationMixin(LightningElement) {
                             }
                             if (key === 'Rhythm__Assigned_To__r' || key === 'Rhythm__Related_Record__r') {
                                 actionRecordMap.fieldName = key;
+                                 if(key === 'Rhythm__Assigned_To__r'){actionRecordMap.label='Assigned To';}
+                                  if(key === 'Rhythm__Related_Record__r'){actionRecordMap.label='Related Record';}
                                 actionRecordMap.value = res[key]['Name'];
                                 actionRecordList.push(actionRecordMap);
                             }
@@ -86,14 +94,19 @@ export default class ActionItemGrid extends NavigationMixin(LightningElement) {
                         var actionRecordMapData = {};
                         actionRecordMapData.fieldName = this.viewColList[i].fieldName;
                         actionRecordMapData.value = '';
+                        if(this.viewColList[i].fieldName === 'Rhythm__Due_Date__c'){
+                        actionRecordMapData.label='Due Date';
+                        }
                         actionRecordList.push(actionRecordMapData);
                     }
                 }
 
                 actionMap.record = actionRecordList;
                 this.actionItemData.push(actionMap);
+                
             })
             this.allRecordsList = this.actionItemData;
+           
         });
 
         if (this.urlId !== null && typeof this.urlId !== 'undefined') {
