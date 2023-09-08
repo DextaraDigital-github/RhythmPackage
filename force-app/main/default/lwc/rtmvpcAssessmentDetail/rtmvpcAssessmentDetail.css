@@ -140,7 +140,7 @@
     .cad-type{ display:block; position:absolute; left:-300px; height:100%; }
     .cad-type.cadshowleft{ display:block; position:absolute; left:0px; z-index:7; height:100%; }
     .cad-list{ display:block; position:relative; width:100%; height:100%; }
-    .cad-disc{ display:block; position:absolute; right:0px; top:0; width:100%; height:100%; z-index:8;}
+    .cad-disc{ display:block; position:absolute; right:0px; top:0; width:calc(100% - 40px); height:100%; z-index:8;}
     .cad-disc.cadshowright {display:block; position:absolute; right:-115%; top:0; width:100%; height:100%; z-index:8; }
     .cad-top_menu_container{display:block; height:30px;}
     .cad-sec_bodyfull2 {height:calc(100% - 95px);}
