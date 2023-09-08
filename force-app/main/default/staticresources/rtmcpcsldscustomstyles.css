@@ -222,8 +222,10 @@
 	.slds-input-has-icon_left-right .slds-input--bare, .slds-input-has-icon--left-right .slds-input,
 	.slds-input-has-icon--left-right .slds-input_faux, .slds-input-has-icon--left-right .slds-input_bare, 
 	.slds-input-has-icon--left-right .slds-input--bare { border-radius:4px!important; }
-	
-
+	/*
+	.slds-dueling-list__column_responsive { flex:1 1 5rem; flex-wrap: wrap; max-width: 11%; }
+	.slds-dueling-list__column_responsive .slds-media__body .slds-truncate {word-break: break-all;}
+	*/
 
 
 	@media screen and (max-width:992px) {
@@ -330,5 +332,14 @@
 	.cdg.questions .slds-scrollable_y { width:100%!important; }
 	.cdg lightning-tree-grid table.slds-table tbody tr { display:inline-block; width:calc(100% - 0px); position:relative!important; padding:15px; margin:18px -3px -3px; background:rgb(227 212 235); border-radius:5px; /*box-shadow:0 0 5px rgba(0,0,0,0.2);*/ }
 	.cdg lightning-tree-grid table.slds-table tbody tr[aria-level="2"] { display:block; width:calc(100% - 0px); position:relative!important; padding:15px; margin:-7px -3px -7px -3px; background:rgb(227 212 235); border-radius:5px; /*box-shadow:0 0 5px rgba(0,0,0,0.2);*/ }
+	
+	.slds-dueling-list__column { display:inline-block;}
+	.slds-dueling-list__column.slds-dueling-list__column_responsive {display: inline-flex; flex:1 1 15rem; flex-wrap: wrap; max-width:100%; }
+	.slds-dueling-list__column.slds-dueling-list__column_responsive .slds-media__body .slds-truncate {word-break: break-all;}
+	.slds-dueling-list__column lightning-button-icon {display:inline-block; }
+	.slds-dueling-list__column lightning-button-icon button { transform: rotate(90deg); }
+	.slds-dueling-list__column:last-child .slds-button:first-of-type { transform: rotate(0deg); }
+                                                                                                                                                                                                                                                                            
+	.slds-dueling-list { display: grid; clear: both; }
 
 }
