@@ -1,18 +1,66 @@
-<apex:page applyHtmlTag="true" applyBodyTag="true" controller="DisplayPDFController" showHeader="false" cache="true" readOnly="true" standardStylesheets="false">
-    <div>
-        <div class="headerDiv slds-p-around_small">
-            <span class="headerText">Rhythm</span>
+<apex:page renderAs="pdf" controller="DisplayPDFController" showHeader="false" cache="true" applyHtmlTag="false" applyBodyTag="false">
+    <apex:stylesheet value="{!URLFOR($Resource.pdfStyles, 'styles.css')}"/>
+    <html>
+    <head>
+        <style>
+            *{ margin: 0px; padding: 0px; font-size: 12px; font-family: sans-serif !important; }
+            .outer{ width: 100vw; height: 100vh !important; }
+            .headerDiv{ width: 100%; background-color: white; }
+            .rap-hdr-table{ border-collapse: collapse; page-break-inside: auto; width: 100%; }
+            .rap-hdr-tr{ width: 100%; height: 5px; }
+            .rap-hdr-pl{ width: 100%; height: 5px; background-color: rgb(107, 56, 136); }
+            .rap-hdr-ol{ width: 100%; height: 5px; background-color: rgb(239, 104, 55); }
+        	.rap-table{ border-collapse: collapse; page-break-inside: auto; width: 100%;  }
+            .rap-thead{ width:100%; background-color: #d6dbde !important; color: rgb(60 60 60); }
+            .rap-tr{ page-break-inside:avoid; page-break-after:auto; }
+            .rap-table tbody tr td:nth-child(1){ color: rgb(107, 56, 136); }
+            .rap-th{ padding: 10px; }
+            .rap-td{ background-color: white; padding: 10px; }
+        	.rap-td-odd{ background-color: rgb(246 246 246); }
+        </style>
+    </head>
+    <body>
+    <div class="outer" id="content">
+        <div class="headerDiv" id="pageHeader">
+            <table class="rap-hdr-table">
+                <tr class="rap-hdr-tr">
+                    <td style="width: 50%;">
+                        <div class="rap-hdr-pl"></div>
+                    </td>
+                    <td style="width: 50%;">
+                        <div class="rap-hdr-ol"></div>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <div style="padding: 15px;">
+                            <img src="{!$Resource.rtmlogofull}" height="26px"/>
+                        </div>
+                    </td>
+                </tr>
+            </table>
         </div>
         <div class="tableDiv">
-            <apex:outputText value="{!displayText}" />
+            <table class="rap-table">
+                <thead class="rap-thead">
+                    <tr class="rap-tr">
+                        <apex:repeat value="{!columns}" var="column">
+                            <th class="rap-th">{!column.label}</th>
+                        </apex:repeat>
+                    </tr>
+                </thead>
+                <tbody class="rap-tbody">
+                    <apex:repeat value="{!data}" var="row">
+                        <tr class="rap-tr">
+                            <apex:repeat value="{!columns}" var="column">
+                                <td class="rap-td {!row.className}">{!row[column.name]}</td>
+                            </apex:repeat>
+                        </tr>
+                    </apex:repeat>
+                </tbody>
+            </table>
         </div>
-    </div> 
-    <script>
-    setTimeout(function(){
-        console.log('HI');
-        var style = '<style>@media print { * {-webkit-print-color-adjust:exact;}}} @page{ margin: 0px;} *{margin: 0px; padding: 0px; height: 0px; font-family: Source Sans Pro, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif !important;} .headerDiv{width: 100%; height: 56px; padding: 20px; background-color: #03314d;} .headerText{font-size: 40px; color: white; font-weight: bold} .tableDiv{padding: 20px;} table {border-collapse:collapse; font-size: 14px;} table td, th{ padding: 4px;} table tr:nth-child(odd) td {background-color: #F9F9F9;} .oddLeftTd{background-color: #E9E9E9 !important;} .evenLeftTd{background-color: #F1F1F1 !important;} table th{ border: 1px solid #E9E9E9; background-color:#B5BEC58F} table { page-break-inside:auto; } tr { page-break-inside:avoid; page-break-after:auto; } .align-to-top{ vertical-align: top; }</style>';
-        document.getElementsByTagName('head')[0].innerHTML += style;
-        window.print();
-    });
-    </script>
+    </div>
+    </body>
+    </html>
 </apex:page>

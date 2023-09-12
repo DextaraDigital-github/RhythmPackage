@@ -1,0 +1,12 @@
+<template>
+	<div>
+		<div class="slds-clearfix">
+			<div class="slds-float_right">
+				<lightning-button label="Send Email" onclick={sendEmailHandler}></lightning-button>
+			</div>
+		</div>
+		<template if:true={show.sendEmail}>
+			<c-send-email-to-contacts assessment-id={recordId} assessment-name={recordName} onclose={closeHandler}></c-send-email-to-contacts>
+		</template>
+	</div>
+</template>

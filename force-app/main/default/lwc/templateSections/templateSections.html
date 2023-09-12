@@ -20,31 +20,37 @@
 						<div class="slds-col slds-small-size_12-of-12 slds-medium-size_6-of-12 slds-large-size_6-of-12">
 							<div class="slds-grid slds-wrap slds-gutters_small">
 								<div class="slds-col slds-text-align_right slds-size_1-of-1 ">
-									<div class="slds-grid slds-wrap slds-grid_align-end slds-gutters_x-small">
+									<div class="slds-grid slds-wrap slds-grid_align-end slds-gutters_x-small slds-p-right_xx-small">
 										<div class="slds-col"></div>
+										<div class="slds-p-left_xxx-small">
+											<lightning-button-icon icon-name="utility:refresh"
+												style="font-size: small;color: white;" onclick={handleRefresh}
+												alternative-text="Refresh" title="Refresh">
+											</lightning-button-icon>
+										</div>
 										<template if:true={disableButtons}>
-											<div class="slds-p-left_small">
+											<div class="slds-p-left_xxx-small">
 												<lightning-button slds-button_neutral
-													style="font-size: small;color: white;" title="Reorder"
-													onclick={handleReorderSections} variant="neutral" type="submit"
-													name="Section Reorder" label="Section Reorder">
+													style="font-size: small;color: white;" data-name="Reorder Section"
+													title="Reorder" onclick={handleGetTemplate} variant="neutral"
+													type="submit" name="Section Reorder" label="Section Reorder">
 												</lightning-button>
 											</div>
-											<div class="slds-p-left_small">
+											<div class="slds-p-left_xxx-small">
 												<lightning-button slds-button_neutral
-													style="font-size: small;color: white;" title="Reorder"
-													onclick={handleReorderQuestions} variant="neutral" type="submit"
-													name="Question Reorder" label="Question Reorder">
+													style="font-size: small;color: white;" data-name="Reorder Question"
+													title="Reorder" onclick={handleGetTemplate} variant="neutral"
+													type="submit" name="Question Reorder" label="Question Reorder">
 												</lightning-button>
 											</div>
-											<div class="slds-p-left_small slds-p-right_small">
+											<div class="slds-p-left_xxx-small slds-p-right_small">
 												<lightning-button slds-button_neutral
-													style="font-size: small;color: white;" title="New Record"
-													onclick={handlenew} variant="neutral" type="submit" name="New"
-													label="New">
+													style="font-size: small;color: white;" data-name="New"
+													title="New Record" onclick={handleGetTemplate} variant="neutral"
+													type="submit" name="New" label="New">
 												</lightning-button>
 											</div>
-                                            <!-- <div class="slds-p-left_small slds-p-right_small">
+											<!-- <div class="slds-p-left_xxx-small slds-p-right_small">
 												<lightning-button slds-button_neutral
 													style="font-size: small;color: white;" title="Delete Record"
 													onclick={handleDelete} variant="neutral" type="submit" name="Delete"
@@ -59,7 +65,7 @@
 					</div>
 					<div class="cdg">
 						<lightning-tree-grid data={sectionListData} columns={columns} key-field="Id"
-							onrowaction={handleRowActions}>
+							onrowaction={handleGetTemplateDetails} wrap-text-max-lines="5">
 						</lightning-tree-grid>
 					</div>
 
@@ -69,10 +75,10 @@
 	</div>
 
 	<template lwc:if={showModal.createModal}>
-		<div class="demo-only" style="height: 1540px; width: 832px;">
+		<div class="demo-only">
 			<section role="dialog" tabindex="-1" aria-labelledby="modal-heading-02" aria-modal="true"
 				aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
-				<div class="slds-modal__container" style="max-width: 55rem; width: 60%;">
+				<div class="slds-modal__container">
 					<header class="slds-modal__header">
 						<button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" onclick={closeCreateModal} title="Close">
                                 <lightning-icon alternative-text="close" icon-name="utility:close" size="small" variant="inverse"></lightning-icon>
@@ -96,9 +102,37 @@
 		</div>
 		<div class="slds-backdrop slds-backdrop_open"></div>
 	</template>
+	<template lwc:if={showModal.editModal}>
+		<div class="demo-only">
+			<section role="dialog" tabindex="-1" aria-labelledby="modal-heading-02" aria-modal="true"
+				aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+				<div class="slds-modal__container">
+					<header class="slds-modal__header">
+						<button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" onclick={closeEditModal} title="Close">
+                                <lightning-icon alternative-text="close" icon-name="utility:close" size="small" variant="inverse"></lightning-icon>
+                                <span class="slds-assistive-text">Close</span>
+                            </button>
+						<h2 id="modal-heading" class="slds-text-heading_medium slds-hyphenate">Edit Section</h2>
+					</header>
+					<div class="slds-modal__content slds-p-around_medium" id="modal-content-id">
+						<div class="slds-grid slds-grid_vertical-align-end">
+							<div class="slds-col">
+								<c-custom-create-record-form obj-name={objectName}
+									fields-list={fieldListforCreation.Rhythm__Section__c} template-id={recordId}
+									onclose={closeEditModal} onrefreshdata={handleSuccess} section-name={selectedSectionName}
+									section-id={selectedRecordId} onsavenew={reOpenCreateModal}>
+								</c-custom-create-record-form>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+		</div>
+		<div class="slds-backdrop slds-backdrop_open"></div>
+	</template>
 
 	<template lwc:elseif={showModal.deleteModal}>
-		<div class="demo-only" style="height: 1540px;">
+		<div class="demo-only">
 			<section role="dialog" tabindex="-1" aria-labelledby="modal-heading-07" aria-modal="true"
 				aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
 				<div class="slds-modal__container">
@@ -161,4 +195,9 @@
 		</section>
 		<div class="slds-backdrop slds-backdrop_open"></div>
 	</template>
+	<template if:true={viewQuestions}>
+				<c-rtmvpc-question-creation onhandleaftersave={handlesave} onhandlecancel={handleCancel}
+					template-id={tempid} question-id={questionId} section-name={sectionName} tempstatus={tempStatus}>
+				</c-rtmvpc-question-creation>
+			</template>
 </template>

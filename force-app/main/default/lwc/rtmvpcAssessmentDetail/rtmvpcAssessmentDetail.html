@@ -1,14 +1,22 @@
 <!-- This HTML is used to load both section(tabluar report questionnaire) and Questions(Quesstionnaire) in same component based on the selection of sectionId and AssessmentId
 	-->
 <template>
+	<template if:true={showBack}>
+		<button class="slds-float_right cad-btn_bck1" onclick={handleBackButton}>
+			<span >	
+				<i class="las la-chevron-circle-left"></i> Back
+			</span>
+		</button>
+	</template>
 	<div class="cad-cardbase slds-p-around_small">
 		<div class="cad-tbl">
 			<div class="cad-row">
-				<div class="cad-cel cad-w230 cad-type cadshowleft cad-pr8" data-id="cadtype" >
+				<div class="cad-cel cad-w230 cad-type cadshowleft cad-pr8" data-id="cadtype">
 					<div class="cad-sec_container">
 						<div class="cad-sec_header">
 							<button class="cad_actions" onclick={handleLeftButtonClick} title="Close Timeline Panel" style="z-index:1; position:inherit;">
-								<i class="las la-chevron-circle-left"></i>
+								<!-- <i class="las la-chevron-circle-left"></i> -->
+								<i class="las la-indent" style="transform:rotate(0deg);"></i>
 							</button><span>Time Line</span>
 						</div>
 						<div class="cad-sec_bodyfull1">
@@ -36,36 +44,34 @@
 				<div class="cad-cel cad-auto cad-list">
 					<div class="cad-sec_container">
 						<div class="cad-sec_header cad-titlebutton_more">
-							<div class="slds-float_left slds-is-absolute" style="width:100%; padding:4px 80px 0px 31px;"
+							<div class="slds-float_left slds-is-absolute" style="width:100%; padding:4px 170px 0px 31px;"
 								title="Details : ESG Assessment (Due date 05/14/2023)">
 								<div class="slds-truncate">Details : {assessmentName} {endDate}</div>
 							</div>
 
 							<div class="slds-float_left slds-is-relative">
-								<button class="cad_actions" onclick={handleLeftButtonClick} title="Show / Hide Timeline Panel"><i class="las la-indent" style="transform:rotate(0deg);"></i></button>
+								<button class="cad_actions" onclick={handleLeftButtonClick} title="Show / Hide Timeline Panel"><i class="las la-indent" style="transform:rotate(180deg);"></i></button>
 							</div>
 
 							<div class="slds-float_right slds-is-relative">
 								<template if:true={showstatus}>
-									<template if:true={showflagquestions}>
-
-										<div class="cib-flag slds-is-absolute" style="left:-15px; top:4px;">
-											<lightning-icon data-id="showlowerflag"
-												icon-name="utility:lower_flag" size="x-small" onclick={handleChange}>
-											</lightning-icon>
-										</div>
-									</template>
-									<template if:false={showflagquestions}>
-										<div class="cib-archive:hover slds-is-absolute" style="left:-15px; top:4px;">
-											<lightning-icon data-id="showpriorityflag" icon-name="utility:priority"
-												 size="x-small"
-											     onclick={handleChange}></lightning-icon>
-										</div>
-										
-									</template>
+									<lightning-button-menu icon-name="utility:filter" menu-alignment="right"
+										menu-size="medium" alternative-text="Filtering" variant="label-hidden"
+										title="Filtering" style="top:-3px;left:2px;">
+										<lightning-menu-item data-id="showlowerflag" label="Flagged" title="Flagged"
+											onclick={handleChange}>
+										</lightning-menu-item>
+										<lightning-menu-item data-id="showrejected" label="Rejected" title="Rejected"
+											onclick={handleRejectChange}>
+										</lightning-menu-item>
+										<lightning-menu-item data-id="All" label="All" title="All"
+											onclick={handleChange}>
+										</lightning-menu-item>
+										<!-- <lightning-menu-item label="Excel" title="Excel" value="Excel"></lightning-menu-item> -->
+									</lightning-button-menu>
 								</template>
 								&nbsp; &nbsp;
-								
+
 								<template if:true={showExpand}>
 
 									<button class="cad_actions" onclick={handleAccordian} title="Expand" data-id="[ + ]"><i class="las la-window-maximize"></i></button>
@@ -75,31 +81,36 @@
 
 									<button class="cad_actions" onclick={handleAccordian} title="Collapse" data-id="[ - ]"><i class="las la-window-minimize"></i></button>
 								</template>
-							<template if:true={showdownloadIcon}>
-								<lightning-button-menu icon-name="utility:download" data-id={accountassessmentid}
-									menu-alignment="right" menu-size="medium" alternative-text="Export"
-									variant="label-hidden" title="Export" style="top:-3px;">
-									<lightning-menu-item data-id={accountassessmentid} label="PDF" title="PDF" value="PDF" onclick={handleExportPDF}>
-									</lightning-menu-item>
-									<lightning-menu-item data-id={accountassessmentid} label="CSV" title="CSV" value="CSV"
-										onclick={handleExportCSV}>
-									</lightning-menu-item>
-									<!-- <lightning-menu-item label="Excel" title="Excel" value="Excel"></lightning-menu-item> -->
-								</lightning-button-menu></template>
-								<button class="cad_actions" onclick={handleRightButtonClick} title="Show / Hide Info Panel"><i class="las la-indent" style="transform:rotate(180deg);"></i></button>
+								<template if:true={showdownloadIcon}>
+									<lightning-button-menu icon-name="utility:download" data-id={accountassessmentid}
+										menu-alignment="right" menu-size="medium" alternative-text="Export"
+										variant="label-hidden" title="Export" style="top:-3px;">
+										<lightning-menu-item data-id={accountassessmentid} label="PDF" title="PDF"
+											value="PDF" onclick={handleExportPDF}>
+										</lightning-menu-item>
+										<lightning-menu-item data-id={accountassessmentid} label="CSV" title="CSV"
+											value="CSV" onclick={handleExportCSV}>
+										</lightning-menu-item>
+										<!-- <lightning-menu-item label="Excel" title="Excel" value="Excel"></lightning-menu-item> -->
+									</lightning-button-menu>
+								</template>
+								<button class="cad_actions" onclick={handleRightButtonClick} title="Show / Hide Info Panel"><i class="las la-indent" style="transform:rotate(0deg);"></i></button>
 							</div>
 						</div>
 						<div class="cad-sec_bodyfull1 cad-titlebutton_more">
 							<div class="cad-sec_vcontainer2_2" style="height:calc(100% - 0px)">
-								<div class="slds-scrollable_y" style="max-height:calc(100% - 40px);">
+								<div class="slds-scrollable_y" style="max-height:calc(100% - 0px);">
 									<div class="slds-text-align_center slds-text-heading_large">
 										<template if:true={showSections}>
 											<c-Questionnaire vendor={accountid} assessment={assessmentid}
 												object-api-name={objectApiName} record-id={recordId} accid={assaccId}
+												object-name ={objectRecname} 
 												onselectconversation={chatHistory} onshowsummary={showsummaryHandler}
-												account-assessment-status={accountAssessmentStatus} onupdatetimeline={handleupdatetimeline}
-												onexpandcollapse={handleExpandCollapse} accountassessmentid={accountassessmentid}
-												ontimelinehandle={handleTimeLine}>
+												account-assessment-status={accountAssessmentStatus} 
+												onupdatetimeline={handleupdatetimeline} onuploadfile={handleFileData}
+												onexpandcollapse={handleExpandCollapse}
+												accountassessmentid={accountassessmentid} template-id={tempId}
+												onselectaction={handleAction} ontimelinehandle={handleTimeLine}>
 											</c-Questionnaire>
 										</template>
 									</div>
@@ -109,8 +120,81 @@
 					</div>
 				</div>
 
+
 				<div class="cad-cel cad-w300 cad-disc cad-pl8 cadshowright" data-id="caddisc">
+					<div class="cad-sec_container">
+						<div class="cad-sec_header cad-titlebutton_more">
+							<div class="slds-float_right slds-is-relative">
+								<button class="cad_actions" onclick={handleRightButtonClick} title="Show / Hide Timeline Panel">
+								<i class="las la-indent" style="transform:rotate(180deg);"></i>
+								<!-- <i class=" las la-chevron-circle-right" style="transform:rotate(0deg);"></i> -->
+								</button>
+							</div>
+							
+								
+							<div class="slds-float_right slds-is-relative">
+								<button class="cad_actions" onclick={handleSelectedChat} title="Comments">
+									<i class="las la-comments"></i>
+								</button>
+								<button class="cad_actions" onclick={handleSelectedFile} title="Attachments">
+									<i class="las la-paperclip"></i>
+								</button>
+								<button class="cad_actions" onclick={handleSelectedAction} title="CAPA">
+									<i class="las la-file-invoice"></i>
+								</button>
+								
+								<!-- <lightning-button-icon class="cad_actions slds-float_right slds-is-absolute"
+									style="right:30px;top:3px;" size="small" icon-name="utility:edit_form"
+									onclick={handleSelectedAction}>
+								</lightning-button-icon>
+								<lightning-button-icon class="cad_actions slds-float_right slds-is-absolute"
+									style="right:60px;top:3px;" size="small" icon-name="utility:attach"
+									onclick={handleSelectedFile}>
+								</lightning-button-icon>
+								<lightning-button-icon class="cad_actions slds-float_right slds-is-absolute "
+									style="right:90px;top:3px;border-radius:0px" size="small"
+									icon-name="utility:comments" onclick={handleSelectedChat}>
+								</lightning-button-icon> -->
+							</div>
+						</div>
+						<div class="cad-sec_bodyfull1 cad-titlebutton_more">
+							<div class="cad-sec_vcontainer2_2" style="height:calc(100% - 0px);">
+								
+
+
+									<template if:true={openReviewComments}>
+										<c-rtmvpc-assessment-chatter chattermap={showChat} onsendresponse={handleResponse}
+											onchatconversation={handleChat} recordid={customerId}
+											timeline={assessmentTimeline}>
+										</c-rtmvpc-assessment-chatter>
+									</template>
+									<template if:true={showCapaForm}>
+										<c-action showresponse={showResponseForm} oncloseform={closeForm}
+											onremovedeleteicon={handleDeleteIcon}>
+										</c-action>
+									</template>
+									<template if:true={openRightFile}>
+										<template if:true={showUpload}>
+											<c-portal-s3-files object-name={objectRecname} isdisabled={isdisabled}
+												response-rec-id={responseId} ongetdata={handleOnLoad} ondeletefile={handleDeleteFile}
+												assessment-rec-id={accountassessmentFileId} rec-id={recid}
+												question-id={questionId}>
+											</c-portal-s3-files>
+										</template>
+									</template>
+								
+							</div>
+
+						</div>
+					</div>
+				</div>
+
+
+
+
+				<!-- <div class="cad-cel cad-w300 cad-disc cad-pl8 cadshowright" data-id="caddisc">
 					<div class="cad-sec_container_nobdr cad-sec_vcontainer">
+						<template if:true={showCapaForm}>
 						<div class="cad-tophead-details cad-sec_vcontainer1a">
 							<div class="slds-text-align_center slds-p-vertical_x-small">
 								<button class="cad_actions slds-float_right slds-is-absolute" style="right:0px;top:3px;" data-id="buttoncaddisc" onclick={handleRightButtonClick} >
@@ -120,19 +204,26 @@
 								<h4> Review & Comments History</h4>
 							</div>
 						</div>
+						</template>
 						<template if:true={showconverstion}>
 							<div class="cad-sec_vcontainer2bdr">
 								<div class="slds-scrollable_y">
-									<!-- to show apply or remove class "cadshowright" -->
+									
 
 								</div>
 							</div>
 						</template>
+						<template if:true={showCapaForm}>
 						<c-rtmvpc-assessment-chatter chattermap={showChat} onchatconversation={handleChat}
 							recordid={customerId}>
 						</c-rtmvpc-assessment-chatter>
+						</template>
+						<template if:false={showCapaForm}>							
+						<c-action showresponse={showResponseForm} oncloseform={closeForm} onremovedeleteicon={handleDeleteIcon}>
+						</c-action>
+				        </template>
 					</div>
-				</div>
+				</div> -->
 			</div>
 		</div>
 	</div>

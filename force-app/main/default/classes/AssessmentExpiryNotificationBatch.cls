@@ -28,28 +28,13 @@ global with sharing class AssessmentExpiryNotificationBatch implements Database.
     /* sfge-disable-stack ApexFlsViolationRule */
     global void execute(Database.BatchableContext bc, List<AccountAssessmentRelation__c> scope){
         List<ErrorTransactionLog__c> errorList = new List<ErrorTransactionLog__c>();
-        List<Messaging.SingleEmailMessage> emailMessagesList = new List<Messaging.SingleEmailMessage>();
-        Configuration__mdt siteData = Configuration__mdt.getInstance('Site_URL');
-        try{ 
+        try{
+            set<Id> assmtRelIds = new Set<Id>();
             for(AccountAssessmentRelation__c assRelRec:scope){
-                if(String.isNotBlank(assRelRec.Account__r.Email__c) && siteData != null){
-                    List<String> sendTo = new List<String>();
-                    sendTo.add(assRelRec.Account__r.Email__c);
-                    Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
-                    mail.setToAddresses(sendTo);
-                    mail.setSubject('Sample Survey - Reminder');
-                    String body = '<html><body>'+
-                    '<br><br>'+'Dear '+assRelRec.Account__r.Name+
-                    '<br><br>'+'Assessmet is going to end soon, we’d like to complete a short survey.'+
-                    '<br><br><a href='+siteData.Site_URL__c+assRelRec.Id+'>Take the survey now.</a>'+
-                                    '<br><br>'+'Kind regards,'+
-                                    '<br>'+'Rhythm';
-                    mail.setHtmlBody(body);
-                    emailMessagesList.add(mail);
-                }
+                assmtRelIds.add(assRelRec.Id);
             }
-            if(emailMessagesList.isEmpty() == false){
-                Messaging.sendEmail(emailMessagesList);
+            if(assmtRelIds.isEmpty() == false){
+                AssessmentController.sendEmails(assmtRelIds,'ExpiryNotification');
             }
         }catch(exception e){
             ErrorTransactionLog__c errorRec = new ErrorTransactionLog__c();
@@ -77,6 +62,10 @@ global with sharing class AssessmentExpiryNotificationBatch implements Database.
     global void finish(Database.BatchableContext bc){
         return;
     }
+    
+    /**
+    * @description It is used to throw the exception
+    */
     public class SecurityControllerException extends Exception{
     }
 }

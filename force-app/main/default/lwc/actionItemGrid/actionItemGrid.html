@@ -1,0 +1,94 @@
+<template>
+	<header class="rtmvpc-pgheader">
+		<div class="rtmvpc-pghtitle">
+			<div class="rtmvpc-pgstitle">Welcome to the Supplier Portal </div>
+			<h1 class="rtmvpc-pgmtitle capitalize">Action Items</h1>
+		</div>
+	</header>
+	<div class="">
+		<div class="slds-p-around_small">
+			<div class="cdgWrapper">
+				<template if:true={show.grid}>
+					<div class="cdgtitletoolbar slds-grid slds-wrap ">
+						<div class="slds-col slds-small-size_12-of-12 slds-medium-size_6-of-12 slds-large-size_6-of-12">
+							<div class="slds-grid slds-wrap slds-p-bottom_xx-small slds-grid_vertical-align-center">
+								<div class="slds-text-left">
+									<lightning-icon icon-name="standard:budget" size="medium" title=""></lightning-icon>
+								</div>
+								<div class="slds-text-left slds-col_bump-right">
+									<h1 class="slds-p-left_x-small"
+										style="min-width:fit-content; font-size: 20px; font-weight: 600;">All</h1>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="cdgWrapperinner">
+						<div class="cdg">
+							<!-- Grid Row Header to display column names -->
+							<div class="tr">
+								<div class="th">
+									<br/>
+					</div>
+									<!-- Dynamically displaying the column names in the grid -->
+									<template for:each={viewColList} for:item="col">
+										<!-- Column label -->
+										<div key={col.fieldName} class="th" data-columnheader={col.fieldName}>
+											<div>{col.label}</div>
+											<i data-id={col.fieldName} onclick={sortClickHandler} data-sorticon class="las la-angle-down sort-inactive"></i>
+											<div>
+												<input type="text" data-filtertextbox data-id={col.fieldName} onkeyup={inputChangeHandler} class="slds-input"/>
+							           </div>
+											</div>
+									</template>
+									<div class="th"></div>
+								</div>
+
+								<!-- Grid Rows with data. Iterating through rows.-->
+
+								<template for:each={actionItemData} for:item="obj">
+									<div key={obj} class="tr" data-id={obj.Id}>
+										<div class="td" key={obj} data-id={obj.Id}>
+										</div>
+										<!-- Dynamically passing data to each column in a row by iterating through columns -->
+										<template for:each={obj.record} for:item="col">
+											<div key={col.fieldName} class="td" data-id={obj.Id}
+												onclick={takeSurveyHandler}>
+												<label class="slds-form-element__label">{col.label}</label>
+												<div class="" data-id={col.fieldName} title={col.value}>
+													<template lwc:if={col.isHyperlink}>
+														<a>{col.value}</a>
+													</template>
+													<template lwc:elseif={col.isFlag}>
+														<img src={greenFlagUrl} style="height:20px; width:20px;" />
+									            	</template>
+													<template lwc:elseif={col.isOrangeFlag}>
+															<img src={orangeFlagUrl} style="height:20px; width:20px;" />
+										                </template>
+														<template lwc:elseif={col.isRedFlag}>
+															<img src={redFlagUrl} style="height:20px; width:20px; " />
+										                </template>
+															<template lwc:else>
+																{col.value}
+															</template>
+												</div>
+											</div>
+										</template>
+										<div class="td" key={obj} data-id={obj.Id}>
+										</div>
+									</div>
+								</template>
+							</div>
+						</div>
+				</template>
+				<template if:true={show.survey}>
+					<button class="slds-m-bottom_small cdg_actions" onclick={backClickHandler}>
+						<span class="textstyle01">
+							<i class="las la-chevron-circle-left"></i> Back
+						</span>
+					</button>
+					<c-action-detail-form actionid={actionId}></c-action-detail-form>
+				</template>
+			</div>
+		</div>
+	</div>
+</template>

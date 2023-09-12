@@ -1,5 +1,5 @@
-import { LightningElement, track} from 'lwc';
-import { NavigationMixin } from 'lightning/navigation';
+import { LightningElement, track,wire} from 'lwc';
+import { CurrentPageReference,NavigationMixin } from 'lightning/navigation';
 import { loadStyle } from 'lightning/platformResourceLoader';
 import RtmFonts from '@salesforce/resourceUrl/rtmfonts';
 import RtmvpcStylesCSS from '@salesforce/resourceUrl/rtmvpcstyles';
@@ -17,7 +17,8 @@ export default class RtmvpcMaster extends NavigationMixin(LightningElement) {
     rtmvpclogofullpic1Url = RtmvpcLogofullPic1;
 
     isHome = false; 
-    isInbox = false; 
+    isInbox = false;
+     isAction = false; 
     isCalendar = false; 
     isAssessments = false; 
     isProjects = false; 
@@ -85,6 +86,7 @@ export default class RtmvpcMaster extends NavigationMixin(LightningElement) {
     }
 
     handleRenderUI(event){
+        let data;
         this.isHome = false; 
         this.isInbox = false; 
         this.isCalendar = false; 
@@ -93,6 +95,7 @@ export default class RtmvpcMaster extends NavigationMixin(LightningElement) {
         this.isRFPs = false; 
         this.isEmployees = false; 
         this.isDocuments = false; 
+         this.isAction = false;
         this.isResources = false; 
         this.isProfile = false; 
         this.isCompilance = false; 
@@ -100,10 +103,19 @@ export default class RtmvpcMaster extends NavigationMixin(LightningElement) {
         this.isReports = false; 
         this.isDashboard = false; 
         this.isSettings = false;
-        if(event.detail === 'Inbox'){ this.isInbox = true; }
+          
+        if (event.detail === 'Inbox') {
+            this.isInbox = true;
+            data = 'Rhythm__Inbox__c';
+           
+        }
         else if(event.detail === 'Home') {this.isHome = true; }
         else if(event.detail === 'Calendar'){this.isCalendar = true; }
-        else if(event.detail === 'Assessments'){this.isAssessments = true; }
+       
+       else if (event.detail === 'Assessments') {
+            this.isAssessments = true;
+            data = 'Rhythm__Assessments__c';
+        }
         else if(event.detail === 'Projects'){this.isProjects = true; }
         else if(event.detail === 'RFPs'){this.isRFPs = true; }
         else if(event.detail === 'Employees'){this.isEmployees = true; }
@@ -111,6 +123,33 @@ export default class RtmvpcMaster extends NavigationMixin(LightningElement) {
         else if(event.detail === 'Resources'){this.isResources = true; }
         else if(event.detail === 'Profile'){this.isProfile = true; }
         else if(event.detail === 'Admin'){this.isAdmin = true; }
+        else if (event.detail === 'Action') {
+            this.isAction = true;
+            data = 'Rhythm__Action__c';
+        }
+        
+
+        const pageRef = {
+            type: 'comm__namedPage',
+            attributes: {
+                name: 'Home' // Replace with your community page name
+            },
+            state: {
+                // Define your parameters here
+                navigate: data
+            }
+        };
+        // Navigate to the community page
+        this[NavigationMixin.Navigate](pageRef);
+        if(this.isAssessments === true)
+        {
+             this.template.querySelector('c-rtmvpc-assessments').handleInbox();
+        }
+        if(this.isAction === true)
+        {
+            
+             this.template.querySelector('c-action-item-grid').handleActionItem();
+        }
 
     }
 
@@ -128,13 +167,40 @@ export default class RtmvpcMaster extends NavigationMixin(LightningElement) {
         else if(menuName === 'Profile'){this.isProfile = true; }
         else if(menuName === 'Admin'){this.isAdmin = true; }
     }
+    @wire(CurrentPageReference)
+    getStateParameters(currentPageReference) {
+        
+
+        if (typeof currentPageReference.state?.Rhythm__Action__c !== 'undefined') {
+            this.urlId = currentPageReference.state?.Rhythm__Action__c;
+            
+        }
+        if (typeof currentPageReference.state?.navigate !== 'undefined') {
+            this.openClicked = currentPageReference.state?.navigate;
+            
+        }
+    }
 
     toggleMenu() {
         const leftMenu = this.template.querySelector('[data-id="leftmenu"]');
         leftMenu.classList.toggle('show');
       }
     connectedCallback(){
-        this.isAssessments = true;
+        if (typeof this.urlId === 'undefined') {
+            this.isAssessments = true;
+        }
+        if (typeof this.openClicked !== 'undefined') {
+            this.isAssessments = false;
+            if (this.openClicked === 'Rhythm__Inbox__c') { this.isInbox = true; }
+            if (this.openClicked === 'Rhythm__Action__c') { this.isAction = true; }
+            if (this.openClicked === 'Rhythm__Assessments__c') { this.isAssessments = true; }
+
+        }
+        if (typeof this.urlId !== 'undefined') {
+
+            
+            this.isAction = true;
+        }
         this.template.addEventListener('leftmenu', this.handleLeftMenu.bind(this));
     }
     handleLeftMenu(event) {

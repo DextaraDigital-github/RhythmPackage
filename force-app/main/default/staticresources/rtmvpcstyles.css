@@ -1,16 +1,10 @@
-/*
-@import url('rtmfonts/SourceSansPro/SourceSansPro.css');
-@import url('rtmfonts/line-awesome/line-awesome.css');
-*/
-
-:root {
-	
+:root {	
 	/* var(--green-200) */
 		--aprimary:rgb(107, 56, 136);
 		--aprimaryh:rgb(86, 45, 109);
 		--bsecondary:rgb(239, 104, 55);
 		--bsecondaryh:rgb(206, 81, 36);
-		
+
 	/* ScrollBar */
 		--sb-sc:rgba(0,0,0,0.4) rgba(0,0,0,0.05);
 		--sb-track:rgba(0,0,0,0.08);
@@ -18,8 +12,7 @@
 		--sb-thumbbdr:rgba(0,0,0,0.1);	
 	
 	/* Font-Family */
-		--ff-1:Source Sans Pro, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
-		
+		--ff-1:Source Sans Pro, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif ;		
 	/* Font-Sizes */
 		--fs-0:0px;
 		--fs-10:10px;
@@ -50,10 +43,12 @@
 		
 	/* Buttons */
 		/* Links */
-		--link-primary-n:rgb(45, 103, 197);
-		--link-primary-h:rgb(33, 82, 161);
+		--link-primary-n:rgb(107, 56, 136);
+		--link-primary-h:rgb(86, 45, 109);
 		--iconlink-primary-n:rgb(107, 56, 136);
 		--iconlink-primary-h:rgb(86, 45, 109);
+    	--lwc-colorTextInverse: rgb(107, 56, 136)!important;
+		--lwc-colorTextDefault: rgb(86, 45, 109)!important;
 		/* White */
 		--dbtn-bg:rgb(255, 255, 255);
 		--dbtn-bgh:rgb(243, 243, 243);
@@ -63,7 +58,16 @@
 		--dbtn-icoh:rgb(86, 45, 109);
 		--dbtn-txt:rgb(116, 116, 116);
 		--dbtn-txth:rgb(98, 98, 98);
-		
+		--link-primary-n:rgb(107, 56, 136)!important;
+		--link-primary-h:rgb(86, 45, 109)!important;
+		--lwc-brandTextLink:rgb(107, 56, 136)!important;
+		--lwc-brandTextLinkActive:rgb(86, 45, 109)!important;
+		--slds-c-button-text-color:rgb(107, 56, 136)!important;
+		--slds-c-button-text-color-hover:rgb(86, 45, 109)!important;
+		--slds-c-tabs-item-color-border-hover:rgb(107, 56, 136)!important;
+		--slds-c-tabs-item-color-border-active:rgb(86, 45, 109)!important;
+		--lwc-brandAccessible:#562d6d!important;
+		--lwc-brandAccessibleActive:#3b194f!important;
 		/* Purple */
 		--pbtn-bg:rgb(107, 56, 136); /* rgba(107,56,136,1); */
 		--pbtn-bgh:rgb(86, 45, 109); /* rgba(86,45,109,1); */
@@ -92,7 +96,7 @@
 		--txt-primary-color1:rgba(255,255,255,0.9);
 		--bdr-headerandfooter:rgba(0,0,0,0.15);
 		--bg-headerandfooter:rgba(107, 56, 136,0.1);
-		--bg-secheader:rgba(107, 56, 136,0.2);
+		--bg-secheader: rgba(107, 56, 136,0.2);
 		
 	/* CustomDataGrid */	
 		--cdg-txt-colorbg:rgba(0,0,0,.9);	
@@ -115,8 +119,7 @@
 		--cdg-bgrowevn-color:rgba(255,255,255,0.8);
 	
 		--cdg-bdrcell-color:rgba(235,235,235,0.8);
-		--cdg-bdrouter-color:rgba(0,0,0,0.12);
-	
+		--cdg-bdrouter-color:rgba(0,0,0,0.12);	
 		
 		--cibcadcdg-bdr-color:rgba(0,0,0,0.2);
 		--cibcadcdg-bdr-color1:rgba(0,0,0,0.05);
@@ -124,32 +127,32 @@
 		--cibcadcdg-bdrh-color:rgba(239,104,55,1);
 		
 		
-		
 	/* CustomInBox & Custom Assessment Design */
-		--cibcad-bg:;
-		--cibcad-bdr:;
-		--cibcad-bghlt:;
-		--cibcad-bdrhlt:;
-		--cibcad-txt:;
-		--cibcad-txthlt:;
-		--cibcad-hlt:;
-		
-		
-		
-	
-		
-		
-		
+		--cibcad-bg: ;
+		--cibcad-bdr: ;
+		--cibcad-bghlt: ;
+		--cibcad-bdrhlt: ;
+		--cibcad-txt: ;
+		--cibcad-txthlt: ;
+		--cibcad-hlt: ;	
+		.cad-cardbase {position:relative; width:100%; border-radius:0px; overflow:hidden;}
+		.cad-titlebutton_more .slds-button--icon-more, .cad-titlebutton_more .slds-button_icon-more { background-color:transparent!important; border-color:transparent!important; margin-top: -4px; }
+
+            
 		--box-shadow:0 5px 15px 0 rgba(0,0,0,.07), 0 15px 35px 0 rgba(49,105,193,.1);
+        .slds-tabs_card {padding-top:5px!important; min-height: calc(100vh - 200px); }
+		.slds-tabs_card .slds-tabs_default__nav { height:33px; }
+        .slds-tabs_card .slds-tabs_default__link, .slds-tabs_card .slds-tabs--default__link { height: 2rem!important; line-height: 1.8rem; }
+        
 	   /*  var(--bg-section-rtmvpc)  */ 
 	}
 	
 	html { scroll-behavior:smooth; }
 	
 	* { scrollbar-width:thin; scrollbar-color:var(--sb-sc); }
-	*::-webkit-scrollbar { width:8px; height:8px; z-index:7; line-height:0; }
-	*::-webkit-scrollbar-track { background:var(--sb-track); z-index:8; font-size:var(--fs-0); line-height:0; border-radius:5px; }
-	*::-webkit-scrollbar-thumb { background:var(--sb-thumb); border-radius:5px; border:1px solid var(--sb-thumbbdr); z-index:9; font-size:var(--fs-0); line-height:0; height:8px; }
+	*::-webkit-scrollbar { width:8px; height:8px; z-index:97; line-height:0; }
+	*::-webkit-scrollbar-track { background:var(--sb-track); z-index:98; font-size:var(--fs-0); line-height:0; border-radius:5px; }
+	*::-webkit-scrollbar-thumb { background:var(--sb-thumb); border-radius:5px; border:1px solid var(--sb-thumbbdr); z-index:99; font-size:var(--fs-0); line-height:0; height:8px; }
 	
 	body, button, input, select, textarea { color:#454545; font-family:var(--ff-1);	font-size:var(--fs-14); font-weight:var(--fw-400); line-height:1.5; }
 	body { background:var(--bg-page-body) }
@@ -167,6 +170,17 @@
 	.slds-button--brand:active, .slds-button_brand:active, .slds-button--brand:focus, .slds-button_brand:focus, .slds-button--brand:hover, .slds-button_brand:hover, .slds-button--brand:visited, .slds-button_brand:visited,
 	.comm-login-form__login-button:active, .comm-login-form__login-button:active, .comm-login-form__login-button:focus, .comm-login-form__login-button:focus, .comm-login-form__login-button:hover, .comm-login-form__login-button:hover, .comm-login-form__login-button:visited, .comm-login-form__login-button:visited 
 	{ background:var(--pbtn-bgh)!important; border-color:var(--pbtn-bdrh)!important; }
+	.salesforceIdentityLoginBody2 a {
+	color:rgb(107, 56, 136)!important;
+    }
+    .salesforceIdentityLoginBody2 a:hover {
+        color:rgb(86, 45, 109)!important;
+    }
+    .comm-page-login-home .salesforceIdentityLoginForm2 .inverseTextColor {
+        color: var(--lwc-colorTextInverse,rgb(107, 56, 136))!important;
+    }
+    
+    .loginbg { min-width:100vw; min-height:100vh; width:100%; max-width:auto; position:absolute; top:0px; left:0px; z-index:0;}
 	
 	.slds-button--neutral, .slds-button_neutral { color:var(--dbtn-ico); background:var(--dbtn-bg); border:1px solid var(--dbtn-bdr); }
 	.slds-button--neutral:active, .slds-button_neutral:active, .slds-button--neutral:focus, .slds-button_neutral:focus, .slds-button--neutral:hover, .slds-button_neutral:hover, .slds-button--neutral:visited, .slds-button_neutral:visited { color:var(--dbtn-icoh); background:var(--dbtn-bgh); border:1px solid var(--dbtn-bdrh); }
@@ -294,12 +308,15 @@
 	.rtmvpc .slds-form-element__label {font-size:var(--fs-12); text-transform:uppercase; color:unset !important; min-width: 22px; max-width:96%; }
 	.rtmvpc .slds-form-element__labelttnor {font-size:var(--fs-14); text-transform:unset !important; color:unset !important; min-width: 22px; max-width:96%; }
 	.rtmvpc .slds-form-element__label.no-wordbreak{ word-break:keep-all; }
-	.rtmvpc .slds-form-element__icon { padding-top:0.1rem!important; }
+	.rtmvpc .slds-form-element__icon { padding-top:0rem!important; padding-left:5px; }
 	.rtmvpc .slds-form-element__static {font-size:var(--fs-14); font-weight:var(--fw-600); }
+	.slds-popover--tooltip, .slds-popover_tooltip { color:var(--lwc-colorTextButtonBrand); background:var(--pbtn-bg); }
+	.slds-popover--tooltip .slds-popover__body, .slds-popover_tooltip .slds-popover__body {color:var(--lwc-colorTextButtonBrand); background:var(--pbtn-bg);}
 	.slds-section-title--divider, .slds-section-title_divider { text-transform:unset; }
 	
 	.status-notstarted, .status-inprogress, .status-completed, .status-deferred, .status-waitingonsomeoneelse, .status-draft,
-	.colorcode-project1, .colorcode-project2, .colorcode-project3, .colorcode-project4, .colorcode-project5 { border-radius:4px; padding:0px 6px; }
+	.colorcode-project1, .colorcode-project2, .colorcode-project3, .colorcode-project4, .colorcode-project5, .cad-timeline_pending,
+	.cad-timeline_rejected { border-radius:4px; padding:0px 6px; }
 	.status-notstarted { background:var(--cdg-bgnotstarted-colorbg); color:var(--cdg-txt-colorbg); }
 	.status-inprogress { background:var(--cdg-bginprogress-colorbg); color:var(--cdg-txt-colorbg); }
 	.status-completed { background:var(--cdg-bgcompleted-colorbg); color:var(--cdg-txt-colorbg); }
@@ -315,6 +332,8 @@
 	
 	.cdgWrapper {position:relative; }
 	button.cdg_actions { border-radius:4px; box-shadow:1px 1px 3px rgba(0,0,0,0.6); border:1px solid var(--cibcadcdg-bdr-color); word-break:keep-all;position:absolute; right:16px; top:-33px; }
+		.rtmvpc-contentbg .cdgWrapper button.cdg_actions { top:-35px; }
+	.rtmvpc-contentbg .slds-p-around_small .cdgWrapper button.cdg_actions { top:-45px; right:8px; }
 	.cdgWrapperinner button.slds-button_icon-border { border:0px solid transparent; z-index:99; }
 	div.cdg .slds-dropdown__item>a { padding:0px 0.75rem; }
 	.cdgWrapper .td .slds-dropdown-trigger_click .slds-dropdown, .cdgWrapper .td .slds-dropdown-trigger_click:hover .slds-dropdown { right:33px; top:-3px; }
@@ -379,11 +398,6 @@
 	.slds-path__nav .slds-is-current:first-child:hover:before, .slds-path__nav .slds-is-current:first-child:hover:after {background:var(--pbtn-bgh);}
 	.slds-path__nav .slds-is-current:first-child:before, .slds-path__nav .slds-is-current:first-child:after { background:var(--pbtn-bg);}
 
-	.comm-login-form__container, .comm-forgot-password__container {padding:45px 30px 16px !important; background:#f3f3f3!important; box-shadow:0px 0px 6px rgba(0,0,0,0.2); border:none; border-radius:10px; font-size:16px !important; position:absolute; width:100%; max-width:350px; left:50%; top:50%; transform:translate(-50%, 50%); }
-	.comm-login-form__container:before, .comm-forgot-password__container:before {content:''; position:absolute; width:220px; height:60px; top:-30px; left:50%; transform:translatex(-50%); z-index:9; background:#ffffff url(/resource/Rhythm__rtmlogofull) no-repeat; background-position:center 10px; border-width: var(--slds-c-card-sizing-border,var(--sds-c-card-sizing-border,1px));
-    border-radius:8px; box-shadow:0px 0px 6px rgba(0,0,0,0.2); }
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
-	.comm-login-form__container .slds-form-element__label { font-size:unset;}
 	
 	@keyframes edit-in { from { opacity:0; transform:rotateZ(-70deg); }
 	 to { opacity:1; transform:rotateZ(0deg); }
@@ -435,10 +449,34 @@
 	div.cib-details .slds-button__icon--left, div.cib-details .slds-button__icon_left { margin-right:0rem; }
 	.slds-utility-bar li.slds-utility-bar__item:first-child {display:none;}
 	@media screen and (max-width:992px) { 
-		.cdgWrapper { padding-bottom:20px; }
+		.cdgWrapper { padding-bottom:10px; }
 		.cdgWrapperinner { max-width:calc(100vw - 28px); overflow-x:auto; }
 		.rtmvpc-leftmenu { left:-150px; width:150px; }
 		.rtmvpc-leftmenu.show { left:0px; width:150px; }
 		.menuicontoggle { margin-left:0px; }
 		.rtmvpc-contents { padding-left:0px; }
+		.rtmvpc-footer { width:calc(100% - 0px);}
 	}
+
+.comm-login-form__container, .comm-forgot-password__container, .salesforceIdentityLoginBody2 .cCenterPanel .siteforceContentArea {padding:45px 30px 16px !important; background:#f3f3f3!important; box-shadow:0px 0px 6px rgba(0,0,0,0.2); border:none; border-radius:10px; font-size:16px !important;width:350px; position:absolute; left:50%; top:50%; transform:translate(-50%, -50%); }
+	.comm-login-form__container:before, .comm-forgot-password__container:before, .salesforceIdentityLoginBody2 .cCenterPanel .siteforceContentArea:before {content:''; position:absolute; width:220px; height:60px; top:-30px; left:50%; transform:translatex(-50%); z-index:9; background:#ffffff url(Rhythm__rtmlogofull) no-repeat; background-position:center 10px; border-width: var(--slds-c-card-sizing-border,var(--sds-c-card-sizing-border,1px));
+    border-radius:8px; box-shadow:0px 0px 6px rgba(0,0,0,0.2); }
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
+	.comm-login-form__container .slds-form-element__label { font-size:unset;}
+	.siteforceContentArea .comm-layout-column:not(:empty) {padding-top:0px; padding-bottom:0px; }
+	.cCenterPanel, .contentRegion.comm-layout-column, .comm-content-header.comm-layout-column, .comm-content-footer.comm-layout-column { 
+		width:auto; max-width: 800px; /* Set a maximum width if desired */ padding: 0; display: flex; justify-content: center; /*margin: 0 auto; align-items: center;*/ flex-direction: column;
+    }
+    .comm-content-header.comm-layout-column, .comm-content-footer.comm-layout-column {
+        display: none;
+    }
+
+    .cCenterPanel, .contentRegion.comm-layout-column .ui-widget .salesforceIdentityLoginForm2 {
+        min-width:300px;
+    }
+    .rtmvpc { width:calc(100vw - 0px); height:calc(100vh - 0px);  overflow-x: hidden; overflow-y: auto; position: absolute!important; top: 0px!important; left: 0px!important; }
+    .cCenterPanel.slds-m-top--x-large.slds-p-horizontal--medium{margin-top:0px!important; }
+
+
+
+

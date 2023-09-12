@@ -1,0 +1,32 @@
+/* rtmvpcRelatedEmails --> START */
+.rem-rbtn button { text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rem-rbtn { --slds-c-button-shadow-focus: 0 0 0 #ffffff00 !important; outline: 0; --slds-c-button-shadow: 0 0 0 #ffffff00 !important; outline: 0; text-align: left; }
+.rem-rbtn .slds-button:active { background-color: #ffffff00; border-color: #ffffff00; }
+/* rtmvpcRelatedEmails --> START */
+    
+    
+    
+/* rtmvpcChildQuestionReordering --> START */
+.cqr-dualList lightning-dual-listbox .slds-dueling-list .slds-dueling-list__column:nth-child(3),
+.cqr-dualList lightning-dual-listbox .slds-dueling-list .slds-dueling-list__column:nth-child(4) { display: none; }
+.cqr-dualList lightning-dual-listbox .slds-dueling-list .slds-dueling-list__column:nth-child(6) .slds-button:first-of-type { margin-top: 4px; }
+.cqr-dualList lightning-dual-listbox .slds-dueling-list .slds-dueling-list__column:nth-child(5) .slds-dueling-list__options .slds-listbox__item .slds-listbox__option span { white-space: pre-wrap; }
+.cqr-dualList lightning-dual-listbox .slds-dueling-list__options, .slds-picklist__options { border: 1px solid rgb(213 213 213); border-radius: 0px; padding: 0px; }
+.cqr-dualList lightning-dual-listbox .slds-dueling-list__options { height: auto; }
+.cqr-dualList lightning-dual-listbox .slds-listbox__item { border-bottom: 1px solid rgb(213 213 213); }
+.cqr-dualList lightning-dual-listbox .slds-dueling-list__options .slds-listbox .slds-listbox__item:last-child { border-bottom: 0px solid rgb(213 213 213); }
+/* rtmvpcChildQuestionReordering --> START */
+    
+    
+    
+/* RtmvpcDisplayQuestions --> START */
+lightning-tree-grid.rdq-tree-grid lightning-datatable .dt-outer-container table tr td:nth-child(4) lightning-button { --slds-c-button-line-height: 0; }  
+/* lightning-tree-grid.rdq-tree-grid lightning-datatable .dt-outer-container table tr td:nth-child(5) span { max-height: 60px; text-overflow: ellipsis; overflow: hidden; position: relative; --max-lines: 3; } */
+.rdq-tree-grid table tbody tr th {display:table-cell;}
+.rdq-tree-grid table tbody tr[aria-expanded="true"]{background:#f0ebf3;}
+.rdq-tree-grid table tbody tr[aria-level="2"]{background:#f0ebf3a3;}
+/* lightning-tree-grid.rdq-tree-grid lightning-datatable .dt-outer-container table tr td:nth-child(5) span::before { content: '...'; position: absolute; bottom:0; right: 0; }
+lightning-tree-grid.rdq-tree-grid lightning-datatable .dt-outer-container table tr td:nth-child(5) span:hover::after { content: ""; position: absolute; right: 0; width: 8.5px; height: 39px; background: #f3f3f3; }
+lightning-tree-grid.rdq-tree-grid lightning-datatable .dt-outer-container table tr td:nth-child(5) span::after { content: ""; position: absolute; right: 0; width: 8.5px; height: 39px; background: white; }
+lightning-tree-grid.rdq-tree-grid lightning-datatable .dt-outer-container table tr td:nth-child(5) span div { width: calc(100% - 8.5px); } */
+/* RtmvpcDisplayQuestions --> END */

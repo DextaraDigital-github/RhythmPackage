@@ -4,10 +4,18 @@
     <isExposed>true</isExposed>
     <targets>
         <target>lightning__RecordAction</target>
+        <target>lightning__AppPage</target>
+        <target>lightning__RecordPage</target>
     </targets>
     <targetConfigs>
         <targetConfig targets="lightning__RecordAction">
             <actionType>ScreenAction</actionType>
+        </targetConfig>
+        <targetConfig targets="lightning__RecordPage">
+            <supportedFormFactors>
+                <supportedFormFactor type="Large" />
+                <supportedFormFactor type="Small" />
+            </supportedFormFactors>
         </targetConfig>
     </targetConfigs>
 </LightningComponentBundle>

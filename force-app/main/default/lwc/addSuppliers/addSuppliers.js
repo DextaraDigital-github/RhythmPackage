@@ -20,11 +20,17 @@ export default class AddSuppliers extends LightningElement {
     @api recordId;
     newAccounts = [];
     delAccounts = [];
-    
+    @api startDate;
+    @api endDate;
+    @api todayDate;
+
     connectedCallback() {
+        
         if (this.recordId !== undefined) {
             this.fetchExistingSuppliers();
         }
+       
+        
     }
     fetchExistingSuppliers() {
         getExistingSuppliers({ assessmentId: this.recordId, searchKey: '' })
@@ -37,6 +43,9 @@ export default class AddSuppliers extends LightningElement {
                     if (tempList.length > 0) {
                         this.existingSuppList = JSON.parse(JSON.stringify(tempList));
                         this.existingSuppListtemp = JSON.parse(JSON.stringify(tempList));
+                    }
+                     if(this.existingSuppList.length >0){
+                    this.countRecords();
                     }
                 }
             })
@@ -68,10 +77,7 @@ export default class AddSuppliers extends LightningElement {
             this.values = JSON.parse(JSON.stringify(this.existingSuppList));
             if (typeof tempList != 'undefined') {
                 this.supplierData = JSON.parse(JSON.stringify(tempList));
-                if (!this.renderedAllSuppliers) {
-                    this.countRecords();
-                    this.renderedAllSuppliers = true;
-                }
+                this.countRecords();
             }
         }
 
@@ -93,10 +99,17 @@ export default class AddSuppliers extends LightningElement {
                         }
                     }
                     else if (selectedValues.indexOf(suppData.value) === -1 && this.existingSuppList.indexOf(suppData.value) !== -1) {
-                        if (this.existingSuppListtemp.includes(suppData.value)) {
-                            this.values = JSON.parse(JSON.stringify(this.existingSuppList));
-                            this.showNotification('Error', 'Suppliers who received the Assessment cannot be removed from the Assessment Program.', 'error');
-                            return;
+                        let todayDate =  new Date(this.todayDate).toISOString().substring(0, 10);
+                        let showError = true;
+                        if(new Date(this.startDate) > new Date(todayDate)){
+                            showError = false;
+                        }
+                        if(showError){
+                            if (this.existingSuppListtemp.includes(suppData.value)) {
+                                this.values = JSON.parse(JSON.stringify(this.existingSuppList));
+                                this.showNotification('Error', 'Suppliers who received the Assessment cannot be removed from the Assessment Program.', 'error');
+                                return;
+                            }
                         }
                         this.delAccounts.push(suppData.value);
                         this.existingSuppList.splice(this.existingSuppList.indexOf(suppData.value), 1);
@@ -104,16 +117,19 @@ export default class AddSuppliers extends LightningElement {
                             this.newAccounts.splice(this.newAccounts.indexOf(suppData.value), 1);
                         }      
                     }
+                       
                     if (JSON.stringify(selectedValues[0]) === JSON.stringify(this.delAccounts[0])) {
                     }
                 })
             }
+         
             const custEvent = new CustomEvent('updatedsupliers', {
                 detail: { newSuppliers: this.newAccounts, existingSupps: this.existingSuppList, delList: this.delAccounts }
             })
             this.dispatchEvent(custEvent);
             this.countRecords();
         } catch (error) {
+            
         }
     }
     // Updates the search value to search for account among the available accounts
@@ -130,15 +146,8 @@ export default class AddSuppliers extends LightningElement {
         } catch (error) {
         }
     }
-    // Displays status/error as a toast message
-    showNotification(title, message, variant) {
-        const evt = new ShowToastEvent({
-            title: title,
-            message: message,
-            variant: variant,
-        });
-        this.dispatchEvent(evt);
-    }
+    
+    
     countRecords() {
         var selectedAccounts = 0;
         if (typeof this.supplierData !== 'undefined' && typeof this.existingSuppList !== 'undefined') {
@@ -151,4 +160,14 @@ export default class AddSuppliers extends LightningElement {
             this.availableSuppliersCount = this.availableSuppliersCount.split('(')[0] + '(' + (this.supplierData.length - selectedAccounts) + ')';
         }
     }
+    // Displays status/error as a toast message
+    showNotification(title, message, variant) {
+        const evt = new ShowToastEvent({
+            title: title,
+            message: message,
+            variant: variant,
+        });
+        this.dispatchEvent(evt);
+    }
+    
 }

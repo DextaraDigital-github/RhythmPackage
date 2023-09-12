@@ -1,6 +1,6 @@
 /** 
 * Class Name        : AssessmentController
-* Developer         : Sai Koushik Nimmaturi and Reethika Velpula           
+* Developer         : Sai Koushik Nimmaturi, Reethika Velpula, Sri Kushal Reddy N          
 * Created Date      : 
 * @description       : AssessmentController class is used for SOQl on Question__c,Section__c,Assessment_Template__c and DML operations on the objects Assessment__c,Response__c.
 * Last Modified Date: 
@@ -9,6 +9,8 @@ public with sharing class AssessmentController {
     
     public static SecurityCheckController safe = new SecurityCheckController();//use singleton pattern
     private static Savepoint sp;//prudhvi to work
+
+    static AssessmentService accAssService = AssessmentService.getInstance();
     
     /**
     * @description Gets the assessment information.
@@ -20,7 +22,7 @@ public with sharing class AssessmentController {
         try{
             assessmentId = String.escapeSingleQuotes(assessmentId);
             List<AccountAssessmentRelation__c> acctAssessmntList =  [SELECT Id,Assessment__r.Name,Assessment__r.Template__c,
-                                                                    Assessment__r.Disclosure__c,Status__c
+                                                                    Assessment__r.Disclosure__c,Status__c,Account__r.Name
                                                                     FROM AccountAssessmentRelation__c
                                                                     WHERE Id=:assessmentId
                                                                     WITH SECURITY_ENFORCED
@@ -31,7 +33,34 @@ public with sharing class AssessmentController {
             throw new AuraHandledException(errorMsg);
         }
     }
-    
+        
+    /**
+    * @description Gets Salesforce Url.
+    * @return Salesforce url.  
+    */
+    @AuraEnabled	
+    public static String getSalesforceDomainURL(){
+        String url= System.Url.getOrgDomainUrl()+'/';
+        return url;
+    }
+     /**
+    * @description Gets pdfContent Url.
+    * @return pdfContent for particular AccountAssessment.  
+    */
+    @AuraEnabled
+    public static void updatePdfContent(String paramMap){
+         Map<String,object> queryMap = (Map<String,Object>)JSON.deserializeUntyped(paramMap);
+         String accAssmtId =(string)queryMap.get('accountassessmentid');
+		List<AccountAssessmentRelation__c> assessment = [SELECT Id,Name,Follow_Up_Requests__c,Status__c,
+                                                        Assessment__c,Account__c,PdfConvertor__c
+                                                        FROM AccountAssessmentRelation__c
+                                                        WHERE Id=:accAssmtId
+                                                        WITH SECURITY_ENFORCED];
+        if(!assessment.isEmpty()){
+            assessment[0].PdfConvertor__c =(String)queryMap.get('pdfContnet');
+            safe.doUpdate(assessment);
+        }
+    }
     /**
     * @description Gets the Question__c,Section__c information of a particular Assessment_Template__c.
     * @param templateId This is a record id of an Assessment_Template__c.
@@ -43,13 +72,13 @@ public with sharing class AssessmentController {
             templateId = String.escapeSingleQuotes(templateId);
             List<Question__c> questionList = [SELECT Id,Name,Section__c,Question_Type__c,
                                             Required__c,Default_Value__c,Conditional_Response__c,
-                                            OptionValueSet__c,Question__c,Requires_File_Upload__c,
-                                            Parent_Question__c,HelpText__c,Section__r.Name,Section__r.Id,Assessment_Template__c
+                                            OptionValueSet__c,Question_Sequence_Number__c,Question__c,Requires_File_Upload__c,
+                                            Parent_Question__c,HelpText__c,Section__r.Section_Sequence_Number__c,
+                                            Section__r.Name,Section__r.Id,Assessment_Template__c
                                             FROM Question__c
                                             WHERE Assessment_Template__c =:templateId
                                             WITH SECURITY_ENFORCED
                                             ORDER BY  Section__r.Section_Sequence_Number__c,Question_Sequence_Number__c];
-            
             return questionList;
         }catch(exception e){
             String errorMsg = e.getMessage();
@@ -68,9 +97,9 @@ public with sharing class AssessmentController {
     public static List<SObject> getSupplierResponseList(String assessmentId){
         try{
             assessmentId = String.escapeSingleQuotes(assessmentId);
-            List<Response__c> responseList = [SELECT Id, Question__c,Assessment__c,Question__r.Question_Type__c,
-                                                Assessment__r.Name,Files__c, Response__c,
-                                                CreatedDate, Flag__c, Conversation_History__c,LastModifiedDate,LastModifiedById
+            List<Response__c> responseList = [SELECT Id,Question__c,Assessment__c,Question__r.Question_Type__c,
+                                                Assessment__r.Name,Files__c,Response__c,Reject__c,
+                                                CreatedDate,Flag__c,Conversation_History__c,LastModifiedDate,LastModifiedById
                                                 FROM Response__c
                                                 WHERE AccountAssessmentRelation__c= :assessmentId
                                                 AND Is_Latest_Response__c= true
@@ -91,79 +120,30 @@ public with sharing class AssessmentController {
     @AuraEnabled
     /* sfge-disable-stack ApexFlsViolationRule */
     public static List<SObject> createSupplierResponse(List<SObject> suppResponseList,String paramMap){
-        try{
-            Map<String,object> queryMap = (Map<String,Object>)JSON.deserializeUntyped(paramMap);
-            String accAssmtId =(string)queryMap.get('accountassessmentid');
-            accAssmtId = String.escapeSingleQuotes(accAssmtId);
-            List<Id> questionIds = new List<Id>();
-            Map<Id,SObject> suppResponseMap = new Map<Id,SObject>();
-            for(SObject response:suppResponseList){
-                questionIds.add((Id)response.get('Rhythm__Question__c'));
-                suppResponseMap.put((Id)response.get('Rhythm__Question__c'),response);
+        Map<String,object> queryMap = (Map<String,Object>)JSON.deserializeUntyped(paramMap);
+        String accAssmtId =(string)queryMap.get('accountassessmentid');
+        accAssmtId = String.escapeSingleQuotes(accAssmtId);
+        SObjectType responseType = Schema.getGlobalDescribe().get('Rhythm__Response__c');
+		Map<String,Schema.SObjectField> fieldMap = responseType.getDescribe().fields.getMap();
+        Schema.SObjectField idVal = fieldMap.get('Id');
+        safe.doUpsert(suppResponseList,idVal);
+        List<AccountAssessmentRelation__c> assessment = [SELECT Id,Name,Follow_Up_Requests__c,Status__c,
+                                                        Assessment__c,Account__c,PdfConvertor__c
+                                                        FROM AccountAssessmentRelation__c
+                                                        WHERE Id=:accAssmtId
+                                                        WITH SECURITY_ENFORCED];
+        if(!assessment.isEmpty()){
+            assessment[0].Status__c =(String)queryMap.get('status');
+            
+            assessment[0].PdfConvertor__c =(String)queryMap.get('pdfContnet');
+                assessment[0].Response_Percentage__c = (Decimal)queryMap.get('percentage');
+            if((String)queryMap.get('status')=='Submitted'){
+                assessment[0].Submission_Date__c = DateTime.now();
+                
             }
-            List<Response__c> existingResponses = new List<Response__c>();
-            if(!questionIds.isEmpty()){
-                existingResponses = [SELECT Id,Name,Question__c,Response__c,Files__c,Assessment__c,
-                                        Flag__c,Is_Latest_Response__c,AccountAssessmentRelation__c
-                                        FROM Response__c
-                                        WHERE Question__c IN:questionIds
-                                        AND AccountAssessmentRelation__c=:accAssmtId
-                                        AND Is_Latest_Response__c = true
-                                        WITH SECURITY_ENFORCED];
-            }
-            if (sp == null){
-                sp = Database.setSavepoint();
-            }
-            if (Schema.sObjectType.Response__c.isUpdateable()) {
-                for(Response__c resp :existingResponses){
-                    ((Response__c)suppResponseMap.get(resp.Question__c)).put('Files__c', resp.Files__c);
-                    if (Schema.sObjectType.Response__c.fields.Is_Latest_Response__c.isUpdateable()) {
-                        resp.Is_Latest_Response__c = false;
-                    }
-                }
-                if(suppResponseMap.values().isEmpty() == false && Schema.sObjectType.Response__c.isCreateable()){
-                    Database.SaveResult[] results = safe.doInsert(suppResponseMap.values());
-                    List<String> errorsList = SecurityCheckController.safeClassExceptionHandlerInsert(results);
-                    if(errorsList.size()>0){
-                        Database.rollback(sp);
-                        throw new SecurityControllerException(String.join(errorsList, ', ' ));
-                    }
-                }
-                Database.SaveResult[] saveResult = safe.doUpdate(existingResponses);
-                List<String> errorList = SecurityCheckController.safeClassExceptionHandlerInsert(saveResult);
-                if(errorList.size()>0){
-                    Database.rollback(sp);
-                    throw new SecurityControllerException(String.join( errorList, ', ' ));
-                }
-                List<AccountAssessmentRelation__c> assessment = [SELECT Id,Name,Follow_Up_Requests__c,Status__c,
-                                                                Assessment__c,Account__c,PdfConvertor__c
-                                                                FROM AccountAssessmentRelation__c
-                                                                WHERE Id=:accAssmtId
-                                                                WITH SECURITY_ENFORCED];
-                if(!assessment.isEmpty() && Schema.sObjectType.AccountAssessmentRelation__c.isUpdateable()){
-                    if (Schema.sObjectType.AccountAssessmentRelation__c.fields.Status__c.isUpdateable()) {
-                        assessment[0].Status__c =(String)queryMap.get('status');
-                    }
-                    if (Schema.sObjectType.AccountAssessmentRelation__c.fields.PdfConvertor__c.isUpdateable()) {
-                        assessment[0].PdfConvertor__c =(String)queryMap.get('pdfContnet');
-                    }
-                    if((String)queryMap.get('status')=='Submitted' && 
-                        Schema.sObjectType.AccountAssessmentRelation__c.fields.Submission_Date__c.isUpdateable()){
-                        assessment[0].Submission_Date__c = DateTime.now();
-                    }
-                    Database.SaveResult[] updResult = safe.doUpdate(assessment);
-                    List<String> upderrorList = SecurityCheckController.safeClassExceptionHandlerInsert(updResult);
-                    if(upderrorList.size()>0){
-                        Database.rollback(sp);
-                        throw new SecurityControllerException(String.join( upderrorList, ', ' ));
-                    }
-                }
-            }
-            return suppResponseList;
-        }catch(exception e){
-            string errorMsg = e.getMessage();
-            throw new AuraHandledException(errorMsg);
-        }
+            safe.doUpdate(assessment);
+        }   
+        return suppResponseList;
     }
     
     /**
@@ -218,13 +198,13 @@ public with sharing class AssessmentController {
             assessmentId = String.escapeSingleQuotes(assessmentId);
             objectName = String.escapeSingleQuotes(objectName);
             List<SObject> assessmentstatus = [SELECT Object_Field_Name__c,Object_Field_Value__c,
-                                                Object_Name__c,object_Record_Id__c,Activity_User__c,CreatedDate
-                                                FROM FieldHistoryTracking__c
-                                                WHERE object_Record_Id__c=:assessmentId
-                                                AND Object_Name__c=:objectName
-                                                AND Object_Field_Name__c=:fName
-                                                WITH SECURITY_ENFORCED
-                                                ORDER BY CreatedDate DESC];
+                                            Object_Name__c,object_Record_Id__c,ActivityUserId__c,Activity_User__c,CreatedDate
+                                            FROM FieldHistoryTracking__c
+                                            WHERE object_Record_Id__c=:assessmentId
+                                            AND Object_Name__c=:objectName
+                                            AND Object_Field_Name__c=:fName
+                                            WITH SECURITY_ENFORCED
+                                            ORDER BY CreatedDate DESC];
             return assessmentstatus;
         }catch(exception e){
             string errorMsg = e.getMessage();
@@ -237,8 +217,7 @@ public with sharing class AssessmentController {
     * @return
     */
     @AuraEnabled
-    public static List<Object> getAssesmentRecords()
-    {
+    public static List<Object> getAssesmentRecords(){
         try{
             List<Assessment__c> assessmentRecords = [SELECT Name,Target_Completion_Date__c,Status__c,Additional_Requests__c,
                                                     Customer_Review__c,Number_of_Questions__c,Start_Date__c,
@@ -261,8 +240,7 @@ public with sharing class AssessmentController {
     * @return
     */
     @AuraEnabled
-    public static List<Object> getAccountAssesmentRecords(String accountId, String assessmentId)
-    {
+    public static List<Object> getAccountAssesmentRecords(String accountId, String assessmentId){
         try{
             accountId = String.escapeSingleQuotes(accountId);
             assessmentId =  String.escapeSingleQuotes(assessmentId);
@@ -270,7 +248,7 @@ public with sharing class AssessmentController {
                                                 Assessment__r.Status__c,Assessment__r.Customer_Review__c,CreatedDate,
                                                 Assessment__r.Number_of_Questions__c,Status__c,Start_Date__c,End_Date__c,
                                                 Assessment__r.Additional_Requests__c,Number_of_Questions__c,Assessment__r.CreatedDate,
-                                                Assessment__r.Template__c, Number_of_Responses__c,Assessment__r.CreatedBy.Name,Assessment__r.CreatedUser__c
+                                                Assessment__r.Template__c,Number_of_Responses__c,Assessment__r.CreatedBy.Name,Assessment__r.CreatedUser__c
                                                 FROM AccountAssessmentRelation__c
                                                 WHERE Account__c=:accountId
                                                 AND Assessment__c=:assessmentId
@@ -289,15 +267,13 @@ public with sharing class AssessmentController {
     * @return
     */
     @AuraEnabled
-    public static List<Response__c> getResponseList(String responseWrapper)
-    {
+    public static List<Response__c> getResponseList(String responseWrapper){
         try{
             Map<String,Object> responseMap = (Map<String,Object>)JSON.deserializeUntyped(responseWrapper);
             String quesId = (String)responseMap.get('questionId');
             quesId = String.escapeSingleQuotes(quesId);
             String accAssmtId = (String)responseMap.get('accountassessmentId');
             accAssmtId = String.escapeSingleQuotes(accAssmtId);
-            
             List<Response__c> responseRecords = [SELECT Conversation_History__c,createdDate
                                                 FROM Response__c
                                                 WHERE AccountAssessmentRelation__c=:accAssmtId
@@ -316,10 +292,21 @@ public with sharing class AssessmentController {
 	* @return
 	*/
     @AuraEnabled
-    public static String getUserName()
-    {
+    public static String getUserName(){
         String userName=UserInfo.getName();
         return userName;
+    }
+    /** 
+    * @description get pdf content method is used to get the data from AccountAssessment
+	* @return AccountAssessmentrecord
+	*/
+    @AuraEnabled
+    public static List<SObject> getPdfContent(String accountassessmentId){
+        List<SObject> accasslst =[SELECT Id,PdfConvertor__c,Assessment__r.Name 
+                                  FROM AccountAssessmentRelation__c 
+                                  WHERE Id=:accountassessmentId
+                                  WITH SECURITY_ENFORCED];
+        return accasslst;
     }
 
     /**
@@ -346,6 +333,58 @@ public with sharing class AssessmentController {
             String errorMsg = e.getMessage();
             throw new AuraHandledException(errorMsg);
         }
+        //return null;
+    }
+    /**
+    * @description To update the rejected flag.
+    * @param updateRejectFlagList This is the list of records.  
+    * @return 
+    */
+    @AuraEnabled
+    /* sfge-disable-stack ApexFlsViolationRule */
+    public static void updateRejectFlag(List<SObject> updateRejectFlagList){
+        try{
+            if (sp == null){
+                sp = Database.setSavepoint();
+            }
+            if(updateRejectFlagList.isEmpty() == false){
+                Database.SaveResult[] saveResult = safe.doUpdate(updateRejectFlagList);
+                List<String> errorsList = SecurityCheckController.safeClassExceptionHandlerInsert(saveResult);
+                if(errorsList.size()>0){
+                    Database.rollback(sp);
+                    throw new SecurityControllerException(String.join(errorsList, ', ' ));
+                }
+            }
+        }catch(exception e){
+            String errorMsg = e.getMessage();
+            throw new AuraHandledException(errorMsg);
+        }    
+    }
+
+    /**
+    * @description To create the rejected flag.
+    * @param insertRejectFlagList This is the list of records. 
+    * @return 
+    */
+    @AuraEnabled
+    /* sfge-disable-stack ApexFlsViolationRule */
+    public static void insertRejectFlag(List<SObject> insertRejectFlagList){
+        try{
+            if (sp == null){
+                sp = Database.setSavepoint();
+            }
+            if(insertRejectFlagList.isEmpty() == false){
+                Database.SaveResult[] saveResult = safe.doInsert(insertRejectFlagList);
+                List<String> errorsList = SecurityCheckController.safeClassExceptionHandlerInsert(saveResult);
+                if(errorsList.size()>0){
+                    Database.rollback(sp);
+                    throw new SecurityControllerException(String.join(errorsList, ', ' ));
+                }
+            }
+        }catch(exception e){
+            String errorMsg = e.getMessage();
+            throw new AuraHandledException(errorMsg);
+        }
     }
     
     /**
@@ -353,33 +392,44 @@ public with sharing class AssessmentController {
     * @return
     */
     @AuraEnabled
-    public static string getCommunityURL()
-    {
+    public static string getCommunityURL(){
         try{
-            String relativeUrlBase = URL.getSalesforceBaseUrl().toExternalForm()+'/login';
+            String relativeUrlBase = '';
+            if(!Test.isRunningTest()){
+                Id currentNetworkId = Network.getNetworkId();
+                Network currNetwork = [SELECT Id, Name, UrlPathPrefix FROM Network WHERE Id = :currentNetworkId];
+                relativeUrlBase = URL.getSalesforceBaseUrl().toExternalForm()+'/';
+               if(currNetwork.UrlPathPrefix != null)
+                {
+                    relativeUrlBase = relativeUrlBase+currNetwork.UrlPathPrefix+'/s/login';
+                }
+                else{
+                    relativeUrlBase = relativeUrlBase+'/s/login';
+                }
+            }
             return relativeUrlBase;
+            //String relativeUrlBase = URL.getSalesforceBaseUrl().toExternalForm()+'/s'+'/login';
         }catch(exception e){
             String errorMsg = e.getMessage();
             throw new AuraHandledException(errorMsg);
         }
     }
-    
-    
     /**
     * @description To get the response information of all fields in AccountAssessmentRelation__c for a particular Account__c.
     * @param accountId This is a record id of an Account__c.
     * @return
     */
     @AuraEnabled
-    public static List<SObject> getAssessmentJunctionRecords(String accountId)
-    {
+    public static List<SObject> getAssessmentJunctionRecords(String accountId){
         try{
             accountId = String.escapeSingleQuotes(accountId);
             List<AccountAssessmentRelation__c> assessmentData = [SELECT Id,IsDeleted,Name,Account__c,Assessment__c,Assessment__r.name,
                                                                 Assessment__r.Status__c,Assessment__r.Customer_Review__c,Assessment__r.Number_of_Questions__c,
-                                                                Assessment__r.CreatedBy.Name,Status__c,End_Date__c,Completed__c,Follow_Up_Requests__c
+                                                                Assessment__r.CreatedBy.Name,Status__c,Response_Percentage__c,End_Date__c,Completed__c,
+                                                                Follow_Up_Requests__c,Assessment__r.Template__c
                                                                 FROM AccountAssessmentRelation__c
-                                                                WHERE Account__c=:accountId
+                                                                WHERE Status__c != 'Cancel'
+                                                                AND Account__c=:accountId
                                                                 WITH SECURITY_ENFORCED
                                                                 ORDER BY CreatedDate DESC];
             return assessmentData;
@@ -391,23 +441,20 @@ public with sharing class AssessmentController {
         }
     }
 
-
-    
     /**
     * @description To get the response data
     * @param assrecordId record id of a AccountAssessmentRelation__c.
     * @return
     */
     @AuraEnabled
-    public static List<Sobject> getAccountAssessmentRecordData(String assrecordId)
-    {
+    public static List<Sobject> getAccountAssessmentRecordData(String assrecordId){
         try{
             assrecordId = String.escapeSingleQuotes(assrecordId);
-            List<AccountAssessmentRelation__c> accountassessment =  [SELECT Id, IsDeleted, Name,Account__c,Assessment__c, Assessment__r.Name,
-                                                                    Assessment__r.Status__c,Assessment__r.Customer_Review__c,CreatedDate,
+            List<AccountAssessmentRelation__c> accountassessment =  [SELECT Id,IsDeleted,Name,Account__c,Assessment__c,Assessment__r.Name,
+                                                                    Assessment__r.Status__c,Assessment__r.Customer_Review__c,CreatedDate,Account__r.Name,
                                                                     Assessment__r.Number_of_Questions__c,Start_Date__c,End_Date__c,Status__c,
                                                                     Assessment__r.Additional_Requests__c,Number_of_Questions__c,Assessment__r.CreatedDate,
-                                                                    Assessment__r.Template__c, Number_of_Responses__c,Assessment__r.CreatedBy.Name,
+                                                                    Assessment__r.Template__c,Number_of_Responses__c,Assessment__r.CreatedBy.Name,
                                                                     Assessment__r.CreatedUser__c,CreatedBy.Name
                                                                     FROM AccountAssessmentRelation__c
                                                                     WHERE Id=:assrecordId
@@ -427,13 +474,12 @@ public with sharing class AssessmentController {
     */
     @AuraEnabled
     /* sfge-disable-stack ApexFlsViolationRule */
-    public static List<SObject> getResponseFlag(String questionId, String accountAssessmentId)
-    {
+    public static List<SObject> getResponseFlag(String questionId, String accountAssessmentId){
         try{
             questionId = String.escapeSingleQuotes(questionId);
             accountAssessmentId = String.escapeSingleQuotes(accountAssessmentId);
-            List<Response__c> supplierResponseList =   [SELECT Id, Question__c,Assessment__c,Question__r.Question_Type__c,
-                                                        Assessment__r.Name,Files__c, Response__c,CreatedBy.Name,CreatedDate, Flag__c,
+            List<Response__c> supplierResponseList =   [SELECT Id,Question__c,Assessment__c,Question__r.Question_Type__c,
+                                                        Assessment__r.Name,Files__c,Response__c,CreatedBy.Name,CreatedDate,Flag__c,
                                                         Conversation_History__c,LastModifiedDate,LastModifiedById
                                                         FROM Response__c
                                                         WHERE Question__c=:questionId
@@ -443,13 +489,11 @@ public with sharing class AssessmentController {
             if (sp == null){
                 sp = Database.setSavepoint();
             }
-            if(!supplierResponseList.isEmpty() && Schema.sObjectType.Response__c.isUpdateable())
+            if(!supplierResponseList.isEmpty())
             {
                 for(Response__c response :supplierResponseList)
                 {
-                    if (Schema.sObjectType.Response__c.fields.Flag__c.isUpdateable()) {
-                        response.Flag__c = !(response.Flag__c);
-                    }
+                    response.Flag__c = !(response.Flag__c);
                 }	
                 Database.SaveResult[] saveResult = safe.doUpdate(supplierResponseList);
                 List<String> errorList = SecurityCheckController.safeClassExceptionHandlerInsert(saveResult);
@@ -458,20 +502,12 @@ public with sharing class AssessmentController {
                     throw new SecurityControllerException(String.join( errorList, ', ' ));
                 }
                 return supplierResponseList;
-            }else if(Schema.sObjectType.Response__c.isUpdateable()){
+            }else{
                 Response__c response = new Response__c();
-                if (Schema.sObjectType.Response__c.fields.Question__c.isUpdateable()) {
-                    response.Question__c = questionId;
-                }
-                if (Schema.sObjectType.Response__c.fields.AccountAssessmentRelation__c.isUpdateable()) {
+                response.Question__c = questionId;
                 response.AccountAssessmentRelation__c = accountAssessmentId;
-                }
-                if (Schema.sObjectType.Response__c.fields.Flag__c.isUpdateable()) {
                 response.Flag__c = true;
-                }
-                if (Schema.sObjectType.Response__c.fields.Is_Latest_Response__c.isUpdateable()) {
                 response.Is_Latest_Response__c = true;
-                }
                 List<Response__c> responseList = new List<Response__c>();
                 responseList.add(response);
                 if(responseList.isEmpty() == false){
@@ -488,7 +524,6 @@ public with sharing class AssessmentController {
             String errorMsg = e.getMessage();
             throw new AuraHandledException(errorMsg);
         }
-        return (new List<Response__c>());
     }
     
     /**
@@ -497,9 +532,8 @@ public with sharing class AssessmentController {
     * @return
     */
     @AuraEnabled
-    /* sfge-disable-stack ApexFlsViolationRule */
-    public static Object deleteFileAttachment(String deleteMap)
-    {
+     /* sfge-disable-stack ApexFlsViolationRule */
+    public static Object deleteFileAttachment(String deleteMap){
         try{
             Map<String,Object> filemap = (Map<String,Object>) JSON.deserializeUntyped(deleteMap);
             String quesId = (String)filemap.get('questionId');
@@ -550,13 +584,13 @@ public with sharing class AssessmentController {
     */
     @AuraEnabled
     /* sfge-disable-stack ApexFlsViolationRule */
-    public static Boolean saveChatterResponse(String chatWrapperstring)// responseList,string assessmentId,string questionId)
-    {
+    public static Map<String,String> saveChatterResponse(String chatWrapperstring){// responseList,string assessmentId,string questionId)
         try{
             Map<String,Object> chatMap = (Map<String,Object>)JSON.deserializeUntyped(chatWrapperstring);
+            Map<string,string> responseData=new Map<string,string>();
             String quesId = (String)chatMap.get('questionId');
-            quesId = String.escapeSingleQuotes(quesId);
             String accAssmtId = (String)chatMap.get('accountassessmentId');
+            string accType=(String)chatMap.get('accountData');
             accAssmtId = String.escapeSingleQuotes(accAssmtId);
             List<Response__c> responseRecords = [SELECT Conversation_History__c,createdDate
                                                 FROM Response__c
@@ -569,8 +603,14 @@ public with sharing class AssessmentController {
             }
             if(!responseRecords.isEmpty()){
                 responseRecords[0].put('Conversation_History__c',JSON.serialize(chatMap.get('responseList')));
+                if(accType !='supplier'){
+                responseRecords[0].put('Flag__c',true);
+                }
                 Database.SaveResult[] saveResult = safe.doUpdate(responseRecords);
                 List<String> errorList = SecurityCheckController.safeClassExceptionHandlerInsert(saveResult);
+                responseData.put('questionId',(String)chatMap.get('questionId'));
+                responseData.put('responseId',responseRecords[0].Id);
+                responseData.put('conversation',responseRecords[0].Conversation_History__c);
                 if(errorList.size()>0){
                     Database.rollback(sp);
                     throw new SecurityControllerException(String.join( errorList, ', ' ));
@@ -581,20 +621,31 @@ public with sharing class AssessmentController {
                 response.Conversation_History__c = JSON.serialize(chatMap.get('responseList'));
                 response.AccountAssessmentRelation__c=(String)chatMap.get('accountassessmentId');
                 response.Is_Latest_Response__c = true;
-                List<Response__c> responseList = new List<Response__c>();
+                if(accType !='supplier'){
+                response.Flag__c=true;
+                }
+                List<Response__c> responseList = new List<Response__c>(); 
                 responseList.add(response);
                 Database.SaveResult[] results = safe.doInsert(responseList);
+                for(Database.SaveResult result : results) {
+                    if(result.isSuccess()){
+                        responseData.put('questionId',(String)chatMap.get('questionId'));
+                        responseData.put('responseId',result.getId());
+ 						responseData.put('conversation', JSON.serialize(chatMap.get('responseList')));                        
+                    }
+                }
                 List<String> errorsList = SecurityCheckController.safeClassExceptionHandlerInsert(results);
                 if(errorsList.size()>0){
                     Database.rollback(sp);
                     throw new SecurityControllerException(String.join(errorsList, ', ' ));
                 }
             }
+            return responseData;
         }catch(exception e){
             String errorMsg = e.getMessage();
             throw new AuraHandledException(errorMsg);
         }
-        return true;
+        
     }
     
      /**
@@ -604,23 +655,14 @@ public with sharing class AssessmentController {
     */
     @AuraEnabled
     /* sfge-disable-stack ApexFlsViolationRule */
-    public static ErrorTransactionLog__c errorLogRecord(String errorLogWrapper)
-    {
+    public static ErrorTransactionLog__c errorLogRecord(String errorLogWrapper){
         try{
             Map<String,Object> errorLogMap = (Map<String,Object>)JSON.deserializeUntyped(errorLogWrapper);
             ErrorTransactionLog__c errorRecord=new ErrorTransactionLog__c();
-            if (Schema.sObjectType.ErrorTransactionLog__c.fields.Class_Name__c.isCreateable()) {
-                errorRecord.Class_Name__c=(String)errorLogMap.get('className');
-            }
-            if (Schema.sObjectType.ErrorTransactionLog__c.fields.LWC_Component_Name__c.isCreateable()) {
-                errorRecord.LWC_Component_Name__c=(String)errorLogMap.get('componentName');
-            }
-            if (Schema.sObjectType.ErrorTransactionLog__c.fields.Method_Name__c.isCreateable()) {
-                errorRecord.Method_Name__c=(String)errorLogMap.get('methodName');
-            }
-            if (Schema.sObjectType.ErrorTransactionLog__c.fields.Error_Stack_Trace__c.isCreateable()) {
-                errorRecord.Error_Stack_Trace__c=(String)errorLogMap.get('errorData');
-            }
+            errorRecord.Class_Name__c=(String)errorLogMap.get('className');
+            errorRecord.LWC_Component_Name__c=(String)errorLogMap.get('componentName');
+            errorRecord.Method_Name__c=(String)errorLogMap.get('methodName');
+            errorRecord.Error_Stack_Trace__c=(String)errorLogMap.get('errorData');
             List<ErrorTransactionLog__c> errLogList = new List<ErrorTransactionLog__c>();
             errLogList.add(errorRecord);
             if (sp == null){ 
@@ -639,26 +681,20 @@ public with sharing class AssessmentController {
             String errorMsg = e.getMessage();
             throw new AuraHandledException(errorMsg);
         }
-        
     }
-    
 
- 
     /**
     * @description Its used to save the file and save the reference link in Response__c in JSON format.
     * @param fileResp wrapper with questionid, assessmentid and file data to upload.
     * @return
     */
-    @AuraEnabled 
-    /* sfge-disable-stack ApexFlsViolationRule */   
-    public static List<SObject> uploadFile(String fileResp)
-    {
+    @AuraEnabled
+    /* sfge-disable-stack ApexFlsViolationRule */
+    public static List<SObject> uploadFile(String fileResp){
         try{
             Map<String,Object> filemap = (Map<String,Object>) JSON.deserializeUntyped(fileResp);
             String quesId = (String)filemap.get('quesId');
-            quesId = String.escapeSingleQuotes(quesId);
             String accAssmtId = (String)filemap.get('assessmentId');
-            accAssmtId = String.escapeSingleQuotes(accAssmtId);
             String baseUrl = URL.getSalesforceBaseUrl().toExternalForm();
             String fileblob = (String)filemap.get('fileBlob');
             Blob file=EncodingUtil.base64Decode(fileblob.split(',')[1]);
@@ -681,12 +717,18 @@ public with sharing class AssessmentController {
                 cvId = cvList[0].Id;
             }
             List<Response__c> srList = new List<Response__c>();
-            cvId = String.escapeSingleQuotes(cvId);
+            String query = 'SELECT Id, ContentDocumentId'
+                            +' FROM ContentVersion'
+                            +' WHERE Id=\'' + String.escapeSingleQuotes(cvId) + '\''
+                            +' WITH SECURITY_ENFORCED';
+            safe.doQuery(query);
             String ftype = ((String)filemap.get('name')).substringAfter('.');
             if(String.isNotBlank(quesId) && String.isNotBlank(accAssmtId)){
                 List<String> errorList = new List<String>();
-                
-                List<ContentVersion> newcvList = [SELECT Id,ContentDocumentId FROM ContentVersion WHERE Id=:cvId WITH SECURITY_ENFORCED];
+                List<ContentVersion> newcvList = [SELECT Id,ContentDocumentId 
+                                                FROM ContentVersion 
+                                                WHERE Id=:cvId 
+                                                WITH SECURITY_ENFORCED];
                 ContentDocumentLink cDocLink = new ContentDocumentLink();
                 cDocLink.ContentDocumentId = newcvList[0].ContentDocumentId;//Add ContentDocumentId
                 cDocLink.LinkedEntityId = accAssmtId;//Add attachment parentId
@@ -695,21 +737,21 @@ public with sharing class AssessmentController {
                 List<ContentDocumentLink> cdlList = new List<ContentDocumentLink>{cDocLink};
                 Database.SaveResult[] cdlSResult = safe.doInsert(cdlList);
                 errorList = SecurityCheckController.safeClassExceptionHandlerInsert(cdlSResult);
-                
+
                 srList = [SELECT Id,Files__c,Question__c
                             FROM Response__c
                             WHERE Question__c =:quesId
                             AND AccountAssessmentRelation__c =:accAssmtId
                             AND Is_Latest_Response__c = true
                             WITH SECURITY_ENFORCED];
+
                 if(srList.isEmpty() == false){
                     String fileUrl = baseUrl+'/sfc/servlet.shepherd/document/download/'+newcvList[0].ContentDocumentId+'?operationContext=S1';
                     String fileJson = '{"name":"'+(String)filemap.get('name')+'","url":"'+fileUrl+'","type":"'+ftype+'"}';
                     srList[0].Files__c = (srList[0].Files__c == null || srList[0].Files__c.trim().length() == 0 || srList[0].Files__c=='[]') ? '['+fileJson+']' : '['+fileJson+','+srList[0].Files__c.substring(1,srList[0].Files__c.length());
                     Database.SaveResult[] saveResult = safe.doUpdate(srList);
                     errorList = SecurityCheckController.safeClassExceptionHandlerInsert(saveResult);
-                }
-                else{
+                }else{
                     Response__c res=new Response__c();
                     res.Question__c= quesId;
                     res.AccountAssessmentRelation__c= accAssmtId;
@@ -760,24 +802,18 @@ public with sharing class AssessmentController {
                 String sKey ='\'%'+searchKey+'%\'';
                 filter += ' AND (((Name LIKE '+sKey+') ';
             }
-            if(string.isNotBlank(existingData))
-            {
-                if(string.isNotBlank(searchKey))
-                {
+            if(string.isNotBlank(existingData)){
+                if(string.isNotBlank(searchKey)){
                     filter += ' AND (Id NOT IN :existingSups)) OR ((Id IN :existingSups) ';
-                }
-                else
-                {
+                }else{
                     filter += ' AND ((Id NOT IN :existingSups) OR ((Id IN :existingSups) ';
                 }
-                if(string.isNotBlank(exSearchKey))
-                {
+                if(string.isNotBlank(exSearchKey)){
                     string sKey = '\'%'+exSearchKey+'%\'';
                 	filter += ' AND (Name LIKE '+sKey+') ';
                 }
             }
-            if(String.isNotBlank(filter))
-            {
+            if(String.isNotBlank(filter)){
                 filter+=' ))';
             }
             query = query+filter+' ORDER BY CreatedDate DESC';
@@ -811,20 +847,18 @@ public with sharing class AssessmentController {
             }
             if(operationType.equalsIgnoreCase('new') && assessmentRecord != null){
                 assmtList.add(assessmentRecord);
-                Database.SaveResult[] saveResult = safe.doInsert(assmtList);
-                errorList = SecurityCheckController.safeClassExceptionHandlerInsert(saveResult);
+                    Database.SaveResult[] saveResult = safe.doInsert(assmtList);
+                    errorList = SecurityCheckController.safeClassExceptionHandlerInsert(saveResult);
             }else{
-                assessmentId = assessmentRecord.Id;          
+                assessmentId = assessmentRecord.Id;             
             }
             if(errorList.size()>0){
                 Database.rollback(sp);
                 throw new SecurityControllerException(String.join( errorList, ', ' ));
             }
             else if (assmtList.isEmpty() == false && assmtList[0].Id != null){
-                assessmentId = assmtList[0].Id;
-                     
+                assessmentId = assmtList[0].Id; 
             }
-         
             Date asmtStartDate = (Date)assessmentRecord.get('Start_Date__c');
             Date asmtEndDate = (Date)assessmentRecord.get('End_Date__c') != null?(Date)assessmentRecord.get('End_Date__c'):null;
             Set<String> suppliersList = new Set<String>();
@@ -845,6 +879,7 @@ public with sharing class AssessmentController {
                 List<Assessment_Supplier__c> assSuppList=  [SELECT Id
                                                             FROM Assessment_Supplier__c
                                                             WHERE Account__c IN:deleteSupList
+                                                            AND Assessment__c=:assessmentId
                                                             WITH SECURITY_ENFORCED];
                 if(assSuppList.isEmpty() == false){
                     List<Database.DeleteResult> deleteResult = safe.doDelete(assSuppList);
@@ -902,7 +937,6 @@ public with sharing class AssessmentController {
                 Database.rollback(sp);
                 throw new SecurityControllerException(String.join(errorsList, ', ' ));
             }
-
             Set<Id> successRecordsIdSet = new Set<Id>();
             if(accountAssessRelnsList.isEmpty() == false){
                 Database.SaveResult[] results = safe.doInsert(accountAssessRelnsList);
@@ -929,7 +963,6 @@ public with sharing class AssessmentController {
             resWrap.message = e.getMessage();
             resWrap.errorCode = '';
             String errorMsg = e.getMessage();
-           
             throw new AuraHandledException(ErrorMsg);
         }
         return resWrap;
@@ -942,58 +975,137 @@ public with sharing class AssessmentController {
     */
     public static void sendEmails(Set<Id> recordIdsSet, String source){
         try{
+            List<ErrorTransactionLog__c> errorList = new List<ErrorTransactionLog__c>();
             Configuration__mdt siteData = Configuration__mdt.getInstance('Site_URL');
             List<Messaging.SingleEmailMessage> emailMessagesList = new List<Messaging.SingleEmailMessage>();
+            Map<Integer,String> monthMap = new Map<Integer,String>{
+                1=>'Jan',2=>'Feb',3=>'Mar',4=>'Apr',5=>'May',6=>'Jun',
+                7=>'Jul',8=>'Aug',9=>'Sep',10=>'Oct',11=>'Nov',12=>'Dec'
+            };
             List<AccountAssessmentRelation__c> assRlnsList= [SELECT Id,Account__c,Account__r.Name,
-                                                            Account__r.Email__c,Assessment__c
+                                                            Account__r.Email__c,Assessment__r.End_Date__c,Assessment__c,Assessment__r.Name
                                                             FROM AccountAssessmentRelation__c
                                                             WHERE ID IN:recordIdsSet
                                                             WITH SECURITY_ENFORCED];
-            if(assRlnsList.isEmpty() == false && string.isBlank(source)){
-                for(AccountAssessmentRelation__c assRelRec:assRlnsList){
-                    if(string.isNotBlank(assRelRec.Account__r.Email__c) && siteData != null){
-                        Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
-                        List<String> sendTo = new List<String>();
-                        sendTo.add(assRelRec.Account__r.Email__c);
-                        mail.setToAddresses(sendTo);
-                        mail.setSubject('Sample Survey');
-                        String body = '<html><body>'+
-                            '<br><br>'+'Dear '+assRelRec.Account__r.Name+
-                            '<br><br>'+'we’d like to complete a short survey.'+
-                            '<br><br><a href='+siteData.Site_URL__c+assRelRec.Id+'>Take the survey now.</a>'+
-                            '<br><br>'+'Kind regards,'+
-                            '<br>'+'Rhythm';
-                        mail.setHtmlBody(body);
-                        emailMessagesList.add(mail);
+            Set<Id> acctIds = new Set<Id>();
+            Map<Id,List<User>> accUserMap = new Map<Id,List<User>>();
+            set<Id> conIds = new set<Id>();
+            for(AccountAssessmentRelation__c ar:assRlnsList ){
+                if(string.isNotBlank(ar.Account__c)){
+                    acctIds.add(ar.Account__c);
+                }
+            }
+            
+            if(acctIds.isEmpty() == false){
+                for(Contact con:[SELECT Id,AccountId,Email FROM Contact WHERE AccountId IN:acctIds AND Primary_Contact__c=true WITH SECURITY_ENFORCED]){
+                    conIds.add(con.Id);
+                }
+            }
+           if(conIds.isEmpty() == false){
+                for(User us:[SELECT Id,Name,Contact.AccountId,Email FROM User WHERE ContactId IN:conIds WITH SECURITY_ENFORCED]){
+                    if(accUserMap.containsKey(us.Contact.AccountId)){
+                        List<User> tempList = accUserMap.get(us.Contact.AccountId);
+                        tempList.add(us);
+                        accUserMap.put(us.Contact.AccountId,tempList);
+                    }else{
+                        List<User> tempList = new List<User>{us};
+                        accUserMap.put(us.Contact.AccountId,tempList);
                     }
                 }
-            }else if(assRlnsList.isEmpty() == false){
-                for(AccountAssessmentRelation__c assRelRec:assRlnsList){
-                    if(string.isNotBlank(assRelRec.Account__r.Email__c) && siteData != null){
-                        Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
-                        List<String> sendTo = new List<String>();
-                        sendTo.add(assRelRec.Account__r.Email__c);
-                        mail.setToAddresses(sendTo);
-                        mail.setSubject('Updates on the Assessment');
-                        String body = '<html><body>'+
-                            '<br><br>'+'Dear '+assRelRec.Account__r.Name+
-                            '<br><br>'+'There are few comments on the responses submitted.'+
-                            '<br><br><a href='+siteData.Site_URL__c+assRelRec.Id+'>Click Here</a>'+
-                            '<br><br>'+'Kind regards,'+
-                            '<br>'+'Rhythm';
-                        mail.setHtmlBody(body);
-                        emailMessagesList.add(mail);
+            }
+            if(assRlnsList.isEmpty() == false && accUserMap.isEmpty() == false && siteData != null){
+                if(string.isBlank(source)){
+                    for(AccountAssessmentRelation__c assRelRec:assRlnsList){
+                        if(accUserMap.containsKey(assRelRec.Account__c)){
+                            for(User uRec:accUserMap.get(assRelRec.Account__c)){
+                                Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
+                                String subject = 'New Assessment assigned - '+assRelRec.Assessment__r.Name;
+                                String body = '<html><body>'+
+                                    '<br><br>'+'Dear '+uRec.Name+','+
+                                    '<br><br>'+'A new Assessment has been assigned to you, please take out some time and complete it before the due date.'+
+                                    '<br><br>To access the Assessment click on this <a href='+siteData.Site_URL__c+assRelRec.Id+'>Link</a> and log in with your username and password.'+
+                                    '<br><br>'+'Thanks,'+
+                                    '<br>'+UserInfo.getName();
+                                mail.setSubject(subject);
+                                mail.setTreatTargetObjectAsRecipient(true);
+                                mail.setTargetObjectId(uRec.Id);
+                                mail.setHtmlBody(body);
+                                mail.setSaveAsActivity(false);
+                                emailMessagesList.add(mail);
+                            }
+                        }
+                    }
+                }else if(source.equalsIgnoreCase('FUR')){
+                    for(AccountAssessmentRelation__c assRelRec:assRlnsList){
+                        if(accUserMap.containsKey(assRelRec.Account__c)){
+                            for(User uRec:accUserMap.get(assRelRec.Account__c)){
+                                Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
+                                String subject = 'Need Attention - '+assRelRec.Assessment__r.Name;
+                                String body = '<html><body>'+
+                                    '<br><br>'+'Dear '+uRec.Name+','+
+                                    '<br><br>'+'Thank you for submitting the assessment, it has been reviewed and some of the questions need your attention.'+
+                                    '<br><br>To access the Assessment click on this <a href='+siteData.Site_URL__c+assRelRec.Id+'>Link</a> and log in with your username and password.'+
+                                    '<br><br>'+'Thanks,'+
+                                    '<br>'+UserInfo.getName();
+                                mail.setSubject(subject);
+                                mail.setTreatTargetObjectAsRecipient(true);
+                                mail.setTargetObjectId(uRec.Id);
+                                mail.setHtmlBody(body);
+                                mail.setSaveAsActivity(false);
+                                emailMessagesList.add(mail);
+                            }
+                        }
+                    }
+                }else if(source.equalsIgnoreCase('ExpiryNotification')){
+                    for(AccountAssessmentRelation__c assRelRec:assRlnsList){
+                        Date endDate = assRelRec.Assessment__r.End_Date__c;
+                        Integer month = endDate.month();
+                        String monthStr = monthMap.get(month);
+                        Integer day = endDate.day();
+                        Integer year =  endDate.year();
+                        String endDateStr = monthStr+'-'+String.valueOf(day)+'-'+String.valueOf(year);
+                        if(accUserMap.containsKey(assRelRec.Account__c)){
+                            for(User uRec:accUserMap.get(assRelRec.Account__c)){
+                                Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
+                                String subject = 'Due Date remainder for '+assRelRec.Assessment__r.Name;
+                                String body = '<html><body>'+
+                                    '<br><br>'+'Dear '+uRec.Name+','+
+                                    '<br><br>'+'The deadline for completing your Assessment is '+endDateStr+'. This is a reminder to make sure you’ve finished the Assessment by then.'+
+                                    '<br><br>To access the Assessment click on this <a href='+siteData.Site_URL__c+assRelRec.Id+'>Link</a> and log in with your username and password.'+
+                                    '<br><br>'+'Thanks,'+
+                                    '<br>'+UserInfo.getName();
+                                mail.setSubject(subject);
+                                mail.setTreatTargetObjectAsRecipient(true);
+                                mail.setTargetObjectId(uRec.Id);
+                                mail.setHtmlBody(body);
+                                mail.setSaveAsActivity(false);
+                                emailMessagesList.add(mail);
+                            }
+                        }
                     }
                 }
             }
             if(emailMessagesList.isEmpty() == false){
-                Messaging.sendEmail(emailMessagesList);
+                List<Messaging.SendEmailResult> emailResults = Messaging.sendEmail(emailMessagesList);
+                for(Messaging.SendEmailResult result :emailResults) {   
+                    List<Messaging.SendEmailError> errors = result.getErrors();                                 
+                    if(!result.IsSuccess() && errors.size() > 0){
+                        Messaging.SendEmailError err = errors[0];
+                        ErrorTransactionLog__c errorRec = new ErrorTransactionLog__c();
+                        errorRec.Class_Name__c = 'AssessmentController';
+                        errorRec.Error_Stack_Trace__c = err.getMessage();
+                        errorRec.Name = 'Error Record';
+                        errorRec.LWC_Component_Name__c = '';
+                        errorRec.Method_Name__c = 'SendEmails';
+                        errorList.add(errorRec);
+                    }
+                }
             }
         }catch(exception e){
             String errorMsg = e.getMessage();
             AuraHandledException auraEx = new AuraHandledException(errorMsg);
             auraEx.setMessage(errorMsg);
-            //throw auraEx;
+            throw auraEx;
         }
     }
     
@@ -1057,7 +1169,7 @@ public with sharing class AssessmentController {
                                                     FROM Assessment__c
                                                     WHERE Id=:assessmentId
                                                     WITH SECURITY_ENFORCED
-                                                    LIMIT 1];     
+                                                    LIMIT 1];
             return assessmentList;
         }catch(exception e){
             String errorMsg = e.getMessage();
@@ -1074,18 +1186,17 @@ public with sharing class AssessmentController {
     @AuraEnabled
     public static List<AccountAssessmentRelation__c> getExistingSuppliersWithSearch(string assessmentId, string searchKey){
         try{
-            assessmentId = String.escapeSingleQuotes(assessmentId);
             String query = 'SELECT Id,Account__c,Account__r.Name'
                      +' FROM Assessment_Supplier__c'
-                     +' WHERE Assessment__c =:assessmentId';
+                     +' WHERE Assessment__c = \'' + String.escapeSingleQuotes(assessmentId) + '\'';
             if(String.isNotBlank(searchKey)){
                 string sKey = '\'%'+String.escapeSingleQuotes(searchKey)+'%\'';
                 query = query+' AND Account__r.Name LIKE '+sKey;
+                query = query+' WITH SECURITY_ENFORCED';
             }else{
-                query = query+' LIMIT 500';
+                query = query+' WITH SECURITY_ENFORCED LIMIT 500';
             }
-            Map<String, Object> bindVariables = new Map<String, Object>{'assessmentId' => assessmentId};
-            return safe.doQueryWithBinds(query,bindVariables);
+            return safe.doQuery(query);
         }catch(exception e){
             String errorMsg = e.getMessage();
             throw new AuraHandledException(ErrorMsg);
@@ -1143,10 +1254,9 @@ public with sharing class AssessmentController {
     @AuraEnabled
     public static List<Assessment_Template__c> getTemplateData(string templateId){
         try{
-            templateId = String.escapeSingleQuotes(templateId);
             List<Assessment_Template__c> templateList = new List<Assessment_Template__c>();
             if(string.isNotBlank(templateId)){
-                 templateList = [SELECT Id,Status__c,Name
+                templateList = [SELECT Id,Status__c,Name
                                 FROM Assessment_Template__c
                                 WHERE Id=:templateId
                                 WITH SECURITY_ENFORCED];
@@ -1157,6 +1267,43 @@ public with sharing class AssessmentController {
             throw new AuraHandledException(ErrorMsg);
         }
     }
+    
+    /**
+    * @description It is used to delete the response.
+    * @param deletedata reponse object data.
+    * @return
+    */
+    @AuraEnabled
+    /* sfge-disable-stack ApexFlsViolationRule */
+    public static List<Response__c> deleteResponse(Map<string,object> deletedata){
+        List<Object> lst = (List<Object>)deletedata.get('responsequestionId');
+        List<string> questionId= new List<String>();
+        for(Integer i=0;i<lst.size();i++){
+            questionId.add(String.valueOf(lst[i]));   
+        }
+        string accountAssessmentid=(string)deletedata.get('accountassessmentId');
+        List<Response__c> deleteResponseList=[SELECT Id 
+                                            FROM Response__c 
+                                            WHERE Question__c IN : questionId
+                                            AND AccountAssessmentRelation__c=:accountAssessmentid
+                                            AND Is_Latest_Response__c= true
+                                            WITH SECURITY_ENFORCED];
+          try{
+            if(deleteResponseList.isEmpty() == false){
+                List<Database.DeleteResult> deleteResult = safe.doDelete(deleteResponseList);
+                List<String> errorList = SecurityCheckController.safeClassExceptionHandlerDelete(deleteResult);
+                if(errorList.size()>0){
+                    Database.rollback(sp);
+                    throw new SecurityControllerException(String.join( errorList, ', ' ));
+                }
+            }
+            return deleteResponseList;
+        }catch(exception e){
+            String errorMsg = e.getMessage();
+            throw new AuraHandledException(errorMsg);
+        }
+    }
+    
     /**
     * @description It is used to get the current date.
     * @return
@@ -1170,6 +1317,81 @@ public with sharing class AssessmentController {
             throw new AuraHandledException(ErrorMsg);
         }
     }
+        
+    /**
+    * @description Fetches the Assessment_Template__c records based on search string and other parameters
+    * @return List of Assessment_Template__c records
+    */
+    @AuraEnabled
+    public static List<sObject> fetchAssessmentTemplates() {
+        return accAssService.fetchAssessmentTemplates();
+    }
+    
+    /**
+    * @description To download the assessments as the PDF
+    * @recordData List of assessments as string to print.
+    * @columnsData List of columns as string to print.
+    */
+    @AuraEnabled
+    public static String getPDFData(String recordData, String columnsData){
+        try{
+            List<ColumnData> pdfColumns = (List<ColumnData>) JSON.deserialize(columnsData, List<ColumnData>.class);
+            List<PDFWrapper> pdfData = (List<PDFWrapper>) JSON.deserialize(recordData, List<PDFWrapper>.class);
+            string tableHtml = '';
+            tableHtml += '<html><body><div><table style="page-break-inside: auto">';
+            tableHtml += '<tr><td height="5px" bgcolor="rgb(107, 56, 136)"></td><td height="5px" bgcolor="rgb(239, 104, 55)"></td></tr>';
+            tableHtml += '<tr><td bgcolor="white" colspan="2"><span><font color="#535353" size=3><b>&nbsp;&nbsp;RHYTHM</b></font></span><br/><span><font color="#535353" size=1><b>&nbsp;&nbsp;&nbsp;INNOVATIONS</b></font></span></td></tr>';
+            tableHtml += '<tr><td colspan="2" height="5px"></td></tr>';
+            tableHtml += '<tr><td colspan="2"><table cellpadding="5"><tr>';
+            for (integer i = 0; i < pdfColumns.size(); i++) {
+                tableHtml += '<th bgcolor="#d6dbde"><font color="rgb(60 60 60)" size=1 face="sans-serif"><b>' + pdfColumns[i].label + '</b></font></th>';
+            }
+            tableHtml += '</tr></table></td></tr>';
+            for (integer i = 0; i < pdfData.size(); i++) {
+                tableHtml += '<tr><td colspan="2"><table cellpadding="5"><tr>';
+                for (integer j = 0; j < pdfData[i].record.size(); j++) {
+                    string dataValue = '';
+                    if(pdfData[i].record[j].value != null){
+                        dataValue = pdfData[i].record[j].value;
+                        if(pdfData[i].record[j].fieldName == 'Rhythm__Response_Percentage__c' && dataValue != null) {
+                            dataValue += '%';
+                        }
+                    }
+                    if(Math.mod(i,2) == 0) {
+                    	tableHtml += '<td bgcolor="white">' + dataValue + '</td>';
+                    }
+                    else {
+                    	tableHtml += '<td bgcolor="rgb(246 246 246)">' + dataValue + '</td>';
+                    }
+                }
+                tableHtml += '</tr></table></td></tr>';
+            }
+            tableHtml += '</table></div></body></html>';
+            Blob pdfContent = Blob.toPdf(tableHtml);
+            return EncodingUtil.base64Encode(pdfContent);
+        }catch(Exception e){
+            String errorMsg = e.getMessage();
+            throw new AuraHandledException(errorMsg);
+        }
+    }
+     /**
+    * @description To fetch the listviewid
+    */
+     @AuraEnabled
+    public static List<ListView> fetchlistviewId(){
+        return [SELECT Id FROM ListView WHERE Name = 'All' AND SObjectType = 'rhythm__assessment__c' WITH SECURITY_ENFORCED];
+    }
+    
+    /**
+    * @description Fetches the AccountAssessmentRelation record based on Id
+    * @param parameterMap It is a stringified JSON of parameters required to fetch AccountAssessmentRelation record
+    * @return AccountAssessmentRelation record
+    */
+    @AuraEnabled
+    public static sObject fetchAccountAssessmentRelation(String parameterMap) {
+        return accAssService.fetchAccountAssessmentRelation(parameterMap);
+    }
+    
     
     /**
     * @description It is used to store the response from server
@@ -1194,12 +1416,39 @@ public with sharing class AssessmentController {
         @AuraEnabled public string recordId;
     }
     
+    /**
+    * @description It is used to store the PDFData from server
+    */
+    public class PDFWrapper{
+        @AuraEnabled public string templateId;
+        @AuraEnabled public string id;
+        @AuraEnabled public string progressBarValue;
+        @AuraEnabled public List<RecordData> record;
+    }
+
+    /**
+    * @description It is used to store the RecordData from server
+    */
+    public class RecordData{
+        @AuraEnabled public string fieldName;
+        @AuraEnabled public string label;
+        @AuraEnabled public string value;
+        @AuraEnabled public string classList;
+        @AuraEnabled public string surveySymbol;
+    }
     
-   
+    /**
+    * @description It is used to store the ColumnData from server
+    */
+    public class ColumnData{
+        @AuraEnabled public string label;
+        @AuraEnabled public string fieldName;
+        @AuraEnabled public string type;
+    }
+    
     /**
     * @description It is used to throw the exception
     */
     public class SecurityControllerException extends Exception{
     }
-    
 }

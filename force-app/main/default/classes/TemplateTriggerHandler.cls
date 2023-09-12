@@ -13,7 +13,17 @@ public with sharing class TemplateTriggerHandler implements ITriggerHandler{
     * @param newList This is the new list of records.  
     */
     public void beforeInsert(List<sObject> newList) {
-        return;
+        Id userId = UserInfo.getUserId();
+        List<AccountTeamMember> teamRecordList =[SELECT Id,UserId,AccountId
+                                            FROM AccountTeamMember 
+                                            WHERE UserId=:userId
+                                            WITH SECURITY_ENFORCED
+                                            LIMIT 1];
+        if(teamRecordList.isEmpty() == false){
+            for(Assessment_Template__c template:(List<Assessment_Template__c>)newList){
+                template.Owner__c = teamRecordList[0].AccountId;
+            }
+        }
     }
     
     /**
@@ -39,7 +49,7 @@ public with sharing class TemplateTriggerHandler implements ITriggerHandler{
         for(sObject templt:newMap.values()){
             Decimal assessmentCount = (Decimal)templt.get('Number_of_Assessments__c');
             boolean isCriteriaMet = serviceController.checkEntryCriteria(templt,oldMap.get(templt.Id),'Assessment_Template_c');
-            if(isCriteriaMet && assessmentCount > 0){
+            if(isCriteriaMet){
                 templt.addError('Details of the Active/Inactive Template cannot be modified');
             }
             Assessment_Template__c oldtemplate=((Assessment_Template__c)oldMap.get(templt.Id));

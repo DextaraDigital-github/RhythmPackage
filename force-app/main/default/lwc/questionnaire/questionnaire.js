@@ -1,31 +1,27 @@
-/*
-* Component Name    : rtmvpcRenderQuestionTemplate
-* Developer         : Sai Koushik Nimmaturi and Reethika Velpula           
-* Created Date      : 
-* Description       : This component is used for loading the question template based on the sections and save the responses
-* Last Modified Date: 
-* Secondary Contributors: 08/06/2023(Sri Kushal Reddy Nomula)
-*/
 import { LightningElement, api, track } from 'lwc';
 import getSupplierAssessmentList from '@salesforce/apex/AssessmentController.getSupplierAssessmentList';
 import getQuestionsList from '@salesforce/apex/AssessmentController.getQuestionsList';
 import getSupplierResponseList from '@salesforce/apex/AssessmentController.getSupplierResponseList';
 import createSupplierResponse from '@salesforce/apex/AssessmentController.createSupplierResponse';
-import errorLogRecord from '@salesforce/apex/AssessmentController.errorLogRecord';
-import uploadFile from '@salesforce/apex/AssessmentController.uploadFile';
 import updateAccountAssessmentStatus from '@salesforce/apex/AssessmentController.updateAccountAssessmentStatus';
-import deleteFileAttachment from '@salesforce/apex/AssessmentController.deleteFileAttachment';
-import getResponseFlag from '@salesforce/apex/AssessmentController.getResponseFlag';
-import getCommunityURL from '@salesforce/apex/AssessmentController.getCommunityURL'
+import updatePdfContent from '@salesforce/apex/AssessmentController.updatePdfContent';
 import getAccountAssessmentRecordData from '@salesforce/apex/AssessmentController.getAccountAssessmentRecordData';
+import getQuestionRespAttributes from '@salesforce/apex/QuestionAttributeResponseController.getQuestionRespAttributes';
+import insertRejectFlag from '@salesforce/apex/AssessmentController.insertRejectFlag';
+import updateRejectFlag from '@salesforce/apex/AssessmentController.updateRejectFlag';
+import getActionRecords from '@salesforce/apex/CAPAController.getActionRecords';
 import RTM_FONTS from '@salesforce/resourceUrl/rtmfonts';
 import CUS_STYLES from '@salesforce/resourceUrl/rtmcpcsldscustomstyles';
 import QUE_PLAT from '@salesforce/resourceUrl/rtmvpcquestionnaireplatform';
+import { constructMultilevelhierarchy, createChildHierarchy } from './questionnaireutil';
 import { loadStyle } from 'lightning/platformResourceLoader';
-
-
+import awsjssdk from '@salesforce/resourceUrl/AWSJSSDK';
+import { loadScript } from 'lightning/platformResourceLoader';
+import getAuthentication from '@salesforce/apex/AWSS3Controller.getAuthenticationData';
+import getSignedURL from '@salesforce/apex/AWSS3Controller.getFileSignedUrl';
+import deleteCapa from '@salesforce/apex/CAPAController.deleteCapa';
+import deleteResponse from '@salesforce/apex/AssessmentController.deleteResponse';
 export default class Questionnaire extends LightningElement {
-
     @track showButtons = {
         Summary: false,
         Section_Navigation: {
@@ -38,10 +34,12 @@ export default class Questionnaire extends LightningElement {
     sectionLimits = 5;
     questionsList = [];
     @api vendor;
+    @track isPreviewComponent = false;
     @track success;
     @track requiredQuestionList = [];
     @track questionsandAnswersflag;
     @api assessment;
+    @track saveWrapper = {};
     @track totastmessage = '';
     @track isTemplate;
     @track showToast = false;
@@ -69,10 +67,14 @@ export default class Questionnaire extends LightningElement {
     @track accordionQuestionFlag = false;
     @track showRefreshbutton = false;
     @track showspinner;
+    @track responselstMap = {};
+    @track saveCustomermap = {};
     sectionidslist = [];
-    @track buttonlabel = '[ + ]';
+    @track buttonlabel = '[+]';
     assessmentStatus;
     @api objectApiName;
+    @api objectName;
+    previewObjectName;
     @api accid;
     @track accountsId;
     @track isAccountAssessment;
@@ -84,8 +86,170 @@ export default class Questionnaire extends LightningElement {
     @api accountassessmentid;
     @track loading = false;
     @track uploadingFile = false;
+    @track isSupplierModalPopup = false;
+    @track isCustomerModalPopup = false;
+    @track actionData;
+    @track accountName;
+    @track accountId;
+    @track showFollowButton = true;
+    @api timeline;
+    @track responseList = [];
+    @track assessmentRecordName;
+    @track filterQuestionsAndAnswers;
+    @track renderFlag = true;
+    @track accessKey;
+    @track secretKey;
+    @track region;
+    @track endpoint;
+    bucketName;
+    @track s3;
+    @track keyList = [];
+    @track getFilesFlag = false;
+    showFiles = false;
+    documentParentId;
+    isStylesLoaded = false;
+    isAutoSave = false;
+    countAutoSave = 0;
+    ishideToast = false;
+    requiredFilesLst = [];
+    @track selectedActionList = [];
+    layoutItemSize = 4;
+    @track fileData;
+    @track saveBool = false;
+    filesdata = [];
+    displayDisclosure = false;
+    isfiltername;
+    pdfwrapper = {};
+    questionCount = 0;
+    responseCount = 0;
+    previewUrl;
+    @api handleGetRespRecord(quesid) {
+        this.questionsAndAnswerss = JSON.parse(JSON.stringify(this.filterQuestionsAndAnswers));
+        if (typeof quesid.response !== 'undefined' && quesid.response !== '') {
+            let responsemap = quesid.response;
+            this.questionsAndAnswerss.forEach(questionAnswer => {
+                questionAnswer.questions.forEach(question => {
+                    if (question.Id === responsemap.Rhythm__Question__c) {
+                        question.ResponseId = responsemap.Id;
+                        question.Files__c = quesid.filescount +'';
+                        this.savedResponseMap.set(question.Id, responsemap.Id);
+                    }
+                    if (question.Children.length > 0) {
+                        question.Children.forEach(childAttr => {
+                            if (childAttr.isdisplay) {
+                                childAttr.questions.forEach(ques => {
+                                    if (ques.Id === responsemap.Rhythm__Question__c) {
+                                        ques.ResponseId = responsemap.Id;
+                                        ques.Files__c = quesid.filescount+'';
+                                        this.savedResponseMap.set(ques.Id, responsemap.Id);
+                                    }})}})}})})
+        }
+        else if (typeof quesid.questionId !== 'undefined' && quesid.questionId !== '') {
+            this.questionsAndAnswerss.forEach(questionAnswer => {
+                questionAnswer.questions.forEach(question => {
+                    if (question.Id === quesid.questionId) {
+                        if (typeof question.Files__c !== 'undefined') {
+                            
+                            question.Files__c = quesid.filescount+'';
+                        }
+                        else {
+                            question.Files__c = quesid.filescount+'';
+                        }
+                    }
+                    if (question.Children.length > 0) {
+                        question.Children.forEach(childAttr => {
+                            if (childAttr.isdisplay) {
+                                childAttr.questions.forEach(ques => {
+                                    if (ques.Id === quesid.questionId) {
+                                        if (typeof ques.Files__c !== 'undefined') {
+                                            ques.Files__c =quesid.filescount+'';
+                                        }
+                                        else {
+                                            ques.Files__c = quesid.filescount+'';
+                                        }
+                                    }})}})}})})
+        }
+        this.constructPdfWrapper(true);
+        this.handleRequiredCheck();
+    }
+    @api
+    handleDeleteFile(filedeletemap) {
+        let deletemap = filedeletemap.value;
+        this.questionsAndAnswerss = JSON.parse(JSON.stringify(this.filterQuestionsAndAnswers));
+        if (typeof deletemap.questionId !== 'undefined' && deletemap.questionId !== null) {
+            this.questionsAndAnswerss.forEach(questionAnswer => {
+                questionAnswer.questions.forEach(question => {
+                    if (question.Id === deletemap.questionId) {
+                        if (typeof question.Files__c !== 'undefined') {
+                            question.Files__c = deletemap.numberoffiles + '';
+                        }
+                    }
+                    if (question.Children.length > 0) {
+                        question.Children.forEach(childAttr => {
+                            if (childAttr.isdisplay) {
+                                childAttr.questions.forEach(ques => {
+                                    if (ques.Id === deletemap.questionId) {
+                                        if (typeof ques.Files__c !== 'undefined') {
+                                            ques.Files__c = deletemap.numberoffiles + '';
+                                        }
+                                    }
+                                })}})}})})
+        }
+        this.constructPdfWrapper(true);
+        this.handleRequiredCheck();
 
-    //Used /* handleAccordionSection is used to handle opening and closing of a disclosure */
+    }
+    @api handleChatResponse(responseData) {
+        this.questionsAndAnswerss = JSON.parse(JSON.stringify(this.filterQuestionsAndAnswers));
+        this.questionsAndAnswerss.forEach(questionAnswer => {
+            let flagcount = 0;
+            questionAnswer.questions.forEach(question => {
+                if (responseData.questionId === question.Id) {
+                    if (this.isSupplier !== true) {
+                        question.Rhythm__Flag__c = true;
+                        this.showFollowButton = false;
+                    }
+                    if (typeof question.ResponseId === 'undefined') {
+                        question.ResponseId = responseData.responseId;
+                    }
+                    question.Rhythm__Conversation_History__c = responseData.conversation;
+                    if (JSON.parse(responseData.conversation).length > 0) {
+                        question.chatColour = true;
+                    }
+                }
+                if (question.Rhythm__Flag__c) { flagcount++; }
+                if (question.Children.length > 0) {
+                    question.Children.forEach(childresp => {
+                        if (childresp.isdisplay) {
+                            childresp.questions.forEach(childques => {
+                                if (responseData.questionId === childques.Id) {
+
+                                    if (this.isSupplier !== true) {
+                                        childques.Rhythm__Flag__c = true;
+                                        this.showFollowButton = false;
+                                    }
+                                    if (typeof childques.ResponseId === 'undefined') {
+                                        childques.ResponseId = responseData.responseId;
+                                    }
+                                    childques.Rhythm__Conversation_History__c = responseData.conversation;
+                                    if (JSON.parse(responseData.conversation).length > 0) {
+                                        childques.chatColour = true;
+                                    }
+                                }
+                                if (childques.Rhythm__Flag__c) { flagcount++; }
+                            })
+                        }})}})
+            questionAnswer.displayFlag = flagcount;
+        });
+        this.constructPdfWrapper(true);
+        if (typeof this.isfiltername !== 'undefined') {
+            if (this.isfiltername === 'reject') { this.handleFilterRejected(); }
+            else {
+                if (this.isfiltername === 'flag') { this.handleFilterFlag(true); }
+                else { this.handleFilterFlag(false); }
+            }
+        }
+    }
     handleAccordionSection() {
         if (this.accordionFlag === false) {
             this.accordionFlag = true;
@@ -96,37 +260,34 @@ export default class Questionnaire extends LightningElement {
             this.showAccordion = 'slds-accordion__section slds-is-close';
         }
     }
-    // This method is to handle expand all and collapse all in the supplier portal and customer portal.
+    @api gethandleTimeline(assessmenttimeLine) {
+        this.timeline = assessmenttimeLine;
+    }
     @api
     handleCollapseExpand(accordianId) {
-        let isdispatch = (accordianId === '[ - ]' || accordianId === '[ + ]');
+        let isdispatch = (accordianId === '[-]' || accordianId === '[+]');
         if (isdispatch) {
             this.buttonlabel = accordianId;
         }
-        if (this.buttonlabel === '[ - ]') {
+        if (this.buttonlabel === '[-]') {
             this.sectionidslist.forEach(secId => {
                 this.template.querySelector('[data-accordian="' + secId + '"]').classList = 'slds-accordion__section slds-is-close';
             });
-            this.buttonlabel = '[ + ]';
+            this.buttonlabel = '[+]';
         }
-        else if (this.buttonlabel === '[ + ]') {
+        else if (this.buttonlabel === '[+]') {
             this.sectionidslist.forEach(secId => {
                 this.template.querySelector('[data-accordian="' + secId + '"]').classList = 'slds-accordion__section slds-is-open';
             });
-            this.buttonlabel = '[ - ]';
+            this.buttonlabel = '[-]';
         }
         if (isdispatch) {
             const selectedEvent = new CustomEvent('expandcollapse', {
                 detail: this.buttonlabel
             });
-            // Dispatches the event.
             this.dispatchEvent(selectedEvent);
         }
-
-
     }
-
-    //Used /* handleAccordionSection is used to handle opening and closing of a section */
     handleAccordionQuestion(event) {
         let accordianClassList = this.template.querySelector('[data-accordian="' + event.currentTarget.dataset.id + '"]').classList;
         if (accordianClassList.contains('slds-accordion__section') && accordianClassList.contains('slds-is-open')) {
@@ -137,54 +298,207 @@ export default class Questionnaire extends LightningElement {
             accordianClassList.add('slds-is-open');
         }
     }
-
-
-    /* Connectedcallback is used to get data on onload */
+    @api displayCloseIcon(deleteData) {
+        this.questionsAndAnswerss = JSON.parse(JSON.stringify(this.filterQuestionsAndAnswers));
+        this.questionsAndAnswerss.forEach(questionAnswer => {
+            questionAnswer.questions.forEach(question => {
+                if (question.Id === deleteData.Rhythm__Question__c) {
+                    question.saveActionForm = deleteData.saveActionForm;
+                }
+                question.Children.forEach(conditionalQuestion => {
+                    if (conditionalQuestion.isdisplay) {
+                        conditionalQuestion.questions.forEach(result => {
+                            if (result.Id === deleteData.Rhythm__Question__c) {
+                                result.saveActionForm = deleteData.saveActionForm;
+                            }})}});});})
+        this.filterQuestionsAndAnswers = JSON.parse(JSON.stringify(this.questionsAndAnswerss));
+        if (typeof this.isfiltername !== 'undefined') {
+            if (this.isfiltername === 'reject') { this.handleFilterRejected(); }
+            else {
+                if (this.isfiltername === 'flag') { this.handleFilterFlag(true); }
+                else { this.handleFilterFlag(false); }
+            }
+        }
+    }
+    @api removeDeleteButton(questionid) {
+        this.questionsAndAnswerss.forEach(questionAnswer => {
+            questionAnswer.questions.forEach(question => {
+                if (question.Id === questionid) {
+                    question.saveActionForm = false;
+                }
+                question.Children.forEach(conditionalQuestion => {
+                    if (conditionalQuestion.isdisplay) {
+                        conditionalQuestion.questions.forEach(result => {
+                            if (result.Id === questionid) {
+                                result.saveActionForm = false;
+                            }
+                        })}});});})
+    }
     connectedCallback() {
-        
+            this.accountsId = this.accid;
+            this.showAccordion = 'slds-accordion__section slds-is-open';
+            this.isTemplate = false;
+            this.handleOnload();
+    }
+    renderedCallback() {
+        Promise.all([
+            loadScript(this, awsjssdk),
+        ])
+            .then(() => {
+                setTimeout(() => { this.configAWS(); }, 100);
+            });
+    }
+    configAWS() {
+        if (this.renderFlag == true) {
+            getAuthentication({})
+                .then(result => {
+                    if (result) {
+                        let metadataRecs = JSON.parse(JSON.stringify(result));
+                        metadataRecs && metadataRecs.forEach(rec => {
+                            (rec["DeveloperName"] == 'region') && (this.region = rec["Rhythm__Value__c"]);
+                            (rec["DeveloperName"] == 'accessKey') && (this.accessKey = rec["Rhythm__Value__c"]);
+                            (rec["DeveloperName"] == 'secretKey') && (this.secretKey = rec["Rhythm__Value__c"]);
+                            (rec["DeveloperName"] == 's3bucket') && (this.bucketName = rec["Rhythm__Value__c"]);
+                            (rec["DeveloperName"] == 'endpoint') && (this.endpoint = rec["Rhythm__Value__c"]);
+                        });
+                        const AWS = window.AWS;
+                        AWS.config.update({
+                            accessKeyId: this.accessKey,
+                            secretAccessKey: this.secretKey,
+                            region_config: this.region
+                        });
+                        this.s3 = new AWS.S3({
+                            params: {
+                                Bucket: this.bucketName
+                            }
+                        });
+                        this.renderFlag = false;
+                        this.retrieveFilesFromS3();
+                    }
+                });
+        }
+        else {
+            this.retrieveFilesFromS3();
+        }
+    }
+    async retrieveFilesFromS3() {
+        const folderName = this.previewObjectName + '/' + this.documentParentId + '/';
+        this.s3.listObjects({ Bucket: this.bucketName, Prefix: folderName }, (err, data) => {
+            if (err) {
+            } else {
+                const files = data.Contents;
+                let fileList = [];
+                this.keyList = [];
+                files && files.forEach(file => {
+                    const objectKey = file.Key;
+                    let fileName = objectKey.substring(objectKey.lastIndexOf("/") + 1);
+                    let fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1);
+                    if (fileExtension === 'doc' || fileExtension === 'docx' || fileExtension === 'xls' || fileExtension === 'xlsx') {
+                        fileList.push({ type: fileExtension, preview: false, key: objectKey, url: this.endpoint + '/' + objectKey, value: fileName.substring(fileName.indexOf("_") + 1) });
+                    }
+                    else {
+                        fileList.push({ type: fileExtension, preview: true, key: objectKey, url: this.endpoint + '/' + objectKey, value: fileName.substring(fileName.indexOf("_") + 1) });
+                    }
+                });
+                this.keyList = fileList.reverse();
+                if (this.keyList.length > 0) {
+                    this.showFiles = true;
+                    this.displayDisclosure = true;
+                    this.getFilesFlag = true;
+                }
+                else {
+                    this.getFilesFlag = false;
+                }
+                this.keyList && this.keyList.forEach(rec => {
+                    rec.icon = ((rec).type === 'png') ? 'doctype:image' :
+                        ((rec).type === 'pdf') ? 'doctype:pdf' :
+                            ((rec).type === 'jpg') ? 'doctype:image' :
+                                ((rec).type === 'jpeg') ? 'doctype:image' :
+                                    ((rec).type === 'xlsx') ? 'doctype:excel' :
+                                        ((rec).type === 'xls') ? 'doctype:excel' :
+                                            ((rec).type === 'txt') ? 'doctype:txt' :
+                                                ((rec).type === 'docx' || (rec).type === 'doc') ? 'doctype:word' : 'doctype:flash';
+                });
+            }
+        });
+    }
+    handleDownload(event) {
+        if (this.isTemplate == false) {
+            getSignedURL({
+                location: event.target.title,
+                file: event.currentTarget.dataset.id,
+                expires: 30
+            })
+                .then(result => {
+                    if (result) {
+                        this.previewUrl = result;
+                        window.open(result);
+                    }
+                });
+        }
+    }
+    handleOnload() {
+        this.saveBool = false;
         this.loading = true;
-        this.accountsId = this.accid;
-        this.isTemplate = false;
+        this.saveCustomermap.isSave = false;
+        this.saveCustomermap.submitAndFollwup = false;
+        this.saveCustomermap.reviecomplete = false;
         let isCustomerPortal = (typeof this.recordId !== 'undefined' && typeof this.objectApiName !== 'undefined');
         if (isCustomerPortal) {
             this.assessment = this.recordId;
+            this.documentParentId = this.recordId;
             this.isTemplate = true;
+            this.previewObjectName = 'Rhythm__Assessment_Template__c';
+        } else {
+            this.layoutItemSize = 12;
+            this.assessment = this.accountassessmentid;
+            getAccountAssessmentRecordData({ assrecordId: this.accountassessmentid }).then(result => {
+                if (typeof result[0].Rhythm__Assessment__r !== 'undefined' && typeof result[0].Rhythm__Assessment__r.Rhythm__Template__c !== 'undefined') {
+                    this.documentParentId = result[0].Rhythm__Assessment__r.Rhythm__Template__c;
+                    this.objectApiName = 'Rhythm__Assessment_Template__c';
+                    this.previewObjectName = 'Rhythm__Assessment_Template__c';
+                }
+            })
         }
-        this.handleOnload();
-        if (this.recordId !== undefined) {
+        if (this.documentParentId != undefined) {
             Promise.all([
                 loadStyle(this, RTM_FONTS + '/line-awesome/line-awesome.css'),
                 loadStyle(this, RTM_FONTS + '/SourceSansPro/SourceSansPro.css'),
                 loadStyle(this, CUS_STYLES),
-                loadStyle(this, QUE_PLAT)
+                loadStyle(this, QUE_PLAT),
+                loadScript(this, awsjssdk)
             ]).then(() => {
-                //console.log('Files loaded-------->');
-            }).catch(() => {
-                // console.error('ErrorMessage----------->',error);
-            });
-
+                this.configAWS();
+            })
+                .catch(err => {
+                });
         }
-
-    }
-    /* handleOnload is used to get Sections data and corresponding Questions data and Responses data on onload */
-    handleOnload() {
+        getActionRecords({ accountAssessment: this.assessment }).then((result) => {
+            this.actionData = result;
+        });
         this.questionMap = new Map();
         this.questionsList = [];
+        this.requiredQuestionList = [];
+        this.requiredFilesLst = [];
         this.sectionidslist = [];
-        let sectionName = [];
+        let sectionName = {};
+        this.questions = [];
+        let sectionSequenceMap = {};
+        this.savedResponseMap = new Map();
+        this.questionsAndAnswerss = [];
         if (this.isTemplate) {
             this.isSupplier = false;
             if (this.objectApiName === 'Rhythm__AccountAssessmentRelation__c') {
                 this.isAccountAssessment = true;
-                /* get all assessments data of a particular AccountAssessmentRelaton__c Id */
                 getAccountAssessmentRecordData({ assrecordId: this.recordId }).then(result => {
-                    if (typeof result[0].Rhythm__Assessment__r !== 'undefined' && typeof result[0].Rhythm__Assessment__r.Rhythm__Template__c !== 'undefined');
-                    {
+                    if (typeof result[0].Rhythm__Assessment__r !== 'undefined' && typeof result[0].Rhythm__Assessment__r.Rhythm__Template__c !== 'undefined') {
                         let assessmentJunctionId = result[0].Id;
+                        this.accountName = result[0].Rhythm__Account__r.Name;
+                        this.accountId = result[0].Rhythm__Account__c;
                         this.assessment = result[0].Rhythm__Assessment__r.Id;
+                        this.assessmentRecordName = result[0].Rhythm__Assessment__r.Name;
                         let assessmentTemplateId = result[0].Rhythm__Assessment__r.Rhythm__Template__c;
                         this.assessmentStatus = result[0].Rhythm__Status__c;
-                        /* get all Sections data and Questions data of a particular Template Id */
                         getQuestionsList({ templateId: assessmentTemplateId }).then(questionResult => {
                             let resultMap = questionResult;
                             resultMap.forEach(question => {
@@ -192,12 +506,17 @@ export default class Questionnaire extends LightningElement {
                                     if (typeof question.Rhythm__Section__r.Id !== 'undefined') {
                                         if (!this.sectionidslist.includes(question.Rhythm__Section__r.Id)) {
                                             this.sectionidslist.push(question.Rhythm__Section__r.Id);
-                                            sectionName.push(question.Rhythm__Section__r.Name);
+                                            sectionName[question.Rhythm__Section__r.Id] = question.Rhythm__Section__r.Name;
+                                            sectionSequenceMap[question.Rhythm__Section__r.Id] = question.Rhythm__Section__r.Rhythm__Section_Sequence_Number__c;
                                         }
                                     }
                                 }
                             });
-                            /* This method is used to get all the responses of the questions in particular section*/
+                            let allQuesId = [];
+                            questionResult.forEach(query => {
+                                allQuesId.push(query.Id);
+                            });
+
                             getSupplierResponseList({ assessmentId: assessmentJunctionId }).then(suppResult => {
                                 if (suppResult && suppResult.length > 0 && suppResult[0] && suppResult[0].CreatedBy && suppResult[0].CreatedDate) {
                                     this.supplierAssessmentName = suppResult[0].CreatedBy.Name;
@@ -205,168 +524,165 @@ export default class Questionnaire extends LightningElement {
                                     let x = this.supplierAssCreatedDate.split('T')[0];
                                     let months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
                                     this.supplierAssCreatedDate = months[Number(x.split('-')[1]) - 1] + '-' + x.split('-')[2] + '-' + x.split('-')[0];
-                                    // }
                                 }
                                 if (this.assessmentStatus !== 'New' && this.assessmentStatus !== 'In Progress') {
                                     suppResult.forEach(qres => {
                                         if (typeof qres.Rhythm__Question__r !== 'undefined') {
-                                            this.savedResponseMap.set(qres.Rhythm__Question__c, { "Id": qres.Id, "questionType": qres.Rhythm__Question__r.Rhythm__Question_Type__c, "value": qres.Rhythm__Response__c, "Files__c": qres.Rhythm__Files__c, "Flag__c": qres.Rhythm__Flag__c, "Conversation_History__c": qres.Rhythm__Conversation_History__c });
+                                            this.savedResponseMap.set(qres.Rhythm__Question__c, { "Id": qres.Id, "questionType": qres.Rhythm__Question__r.Rhythm__Question_Type__c, "value": qres.Rhythm__Response__c, "Files__c": qres.Rhythm__Files__c, "Flag__c": qres.Rhythm__Flag__c, "Reject__c": qres.Rhythm__Reject__c, "Conversation_History__c": qres.Rhythm__Conversation_History__c });
                                         }
                                     });
                                 }
-                                //
-                                this.constructMultilevelhierarchy(resultMap, this.savedResponseMap);
-                                let count = 0;
-                                let sectionsList = [];
-                                for (const seckey of this.questionMap.keys()) {
-                                    count++;
-                                    sectionsList.push({ label: seckey, value: sectionName[count - 1] });
-                                    this.questionsList.push({ "sectionId": seckey, "section": sectionName[count - 1], "numberOfQuestions": '', "numberOfResponses": '', "displayFlag": '', "questions": this.questionMap.get(seckey), "showNext": true, "show": false });
-                                }
-                                this.showButtons.Summary = false;
-                                this.showButtons.Section_Navigation.show = false;
-                                this.showButtons.Save_Submit = false;
-
-                                if (this.questionsList.length > this.sectionLimits) {
-                                    this.showButtons.Summary = true;
-                                    this.showButtons.Section_Navigation.show = true;
-                                    this.showButtons.Section_Navigation.options = sectionsList;
-                                    //this.showButtons.Section_Navigation.value = this.section;
-                                }
-                                this.constructQuestionsAndAnswers(this.questionsList);
-                                //This loop is to give the Qustion number for all the Questions
-                                this.questionsList.forEach(questionWrap => {
-                                    let sequence = 0;
-                                    questionWrap.questions.forEach(question => {
-                                        let childsequence = 0;
-                                        question.snumber = ++sequence;
-                                        //This loop is to give all the number for all children Questions
-                                        question.Children.forEach(childQuestion => {
-                                            childQuestion.snumber = sequence + '.' + (++childsequence);
-                                        })
-                                    })
-                                    questionWrap.responsesPercentage = Math.floor((Number(questionWrap.numberOfResponses) / Number(questionWrap.numberOfQuestions)) * 100);
-                                });
-                                getCommunityURL({}).then(res => {
-                                    let baseurl = res.substring(0, res.length - 6);
-                                    this.questionsAndAnswerss.forEach(questionAnswer => {
-                                        questionAnswer.questions.forEach(question => {
-                                            if (typeof question.Files__c !== 'undefined') {
-                                                question.Files__c.forEach(file => {
-                                                    let fileurl = file.url.split('.com');
-                                                    file.url = baseurl + fileurl[1];
-                                                })
-                                            }
-                                        })
-                                    })
-                                })
-
-
-                                if (this.accountAssessmentStatus === 'Need More Information') {
-                                    //this.handleFilterFlag(true);
-                                }
-                                this.loading = false;
-                            }).catch(error => {
-                                let errormap = {};
-                                errormap.componentName = 'Questionnaire';
-                                errormap.methodName = 'getSupplierResponseList';
-                                errormap.className = 'AssessmentController';
-                                errormap.errorData = error.message;
-                                errorLogRecord({ errorLogWrapper: JSON.stringify(errormap) }).then(() => { });
-                            });
-
-                        }).catch(error => {
-                            let errormap = {};
-                            errormap.componentName = 'Questionnaire';
-                            errormap.methodName = 'getQuestionsList';
-                            errormap.className = 'AssessmentController';
-                            errormap.errorData = error.message;
-                            errorLogRecord({ errorLogWrapper: JSON.stringify(errormap) }).then(() => { });
-                        });
+                                getQuestionRespAttributes({ questionlst: allQuesId }).then(respAttr => {
+                                    constructMultilevelhierarchy(resultMap, this.savedResponseMap, respAttr, this);
+                                    let count = 0;
+                                    let sectionsList = [];
+                                    for (const seckey of this.questionMap.keys()) {
+                                        sectionsList.push({ label: seckey, value: sectionName[seckey] });
+                                        this.questionsList.push({ "sectionId": seckey, "section": sectionName[seckey], "sectionAccordian": "slds-accordion__section slds-is-close", "sequenceNumber": sectionSequenceMap[seckey], "questions": this.questionMap.get(seckey), "showNext": true, "show": false });
+                                        count++;
+                                    }
+                                    this.showButtons.Summary = false;
+                                    this.showButtons.Section_Navigation.show = false;
+                                    this.showButtons.Save_Submit = false;
+                                    if (this.questionsList.length > this.sectionLimits) {
+                                        this.showButtons.Summary = true;
+                                        this.showButtons.Section_Navigation.show = true;
+                                        this.showButtons.Section_Navigation.options = sectionsList;
+                                    }
+                                    this.constructQuestionsAndAnswers(this.questionsList);
+                                    this.questionsList.forEach(questionWrap => {
+                                        questionWrap.questions = questionWrap.questions.sort(this.compare_sort);
+                                    });
+                                    this.questionsAndAnswerss = this.questionsAndAnswerss.sort(this.compare_sort);
+                                    this.questionsAndAnswerss.forEach(questionWrap => {
+                                        let sequence = 0;
+                                        questionWrap.questions.forEach(question => {
+                                            question.snumber = ++sequence;
+                                            if (question.Children.length > 0) {
+                                                question.Children.forEach(childQuestion => {
+                                                    let childsequence = 0;
+                                                    if (childQuestion.isdisplay && question.type !== 'Picklist (Multi-Select)') {
+                                                        question.showUpload = (childQuestion.uploadrequired === 'Yes' || childQuestion.uploadrequired === 'Optional') ? true : false;
+                                                    }
+                                                    if (question.type === 'Picklist (Multi-Select)' && typeof question.value !== 'undefined') {
+                                                        let lst = JSON.parse(question.value);
+                                                        if (lst.includes(childQuestion.optionValue)) {
+                                                            if ((childQuestion.uploadrequired === 'Yes' || childQuestion.uploadrequired === 'Optional')) {
+                                                                question.showUpload = true;
+                                                            }
+                                                        }
+                                                    }
+                                                    childQuestion.questions.forEach(ques => {
+                                                        if (ques.Children.length > 0) {
+                                                            ques.Children.forEach(respAttr => {
+                                                                if (respAttr.isdisplay && ques.type !== 'Picklist (Multi-Select)') {
+                                                                    ques.showUpload = (respAttr.uploadrequired === 'Yes' || respAttr.uploadrequired === 'Optional') ? true : false;
+                                                                }
+                                                                if (ques.type === 'Picklist (Multi-Select)' && typeof ques.value !== 'undefined') {
+                                                                    let lst = JSON.parse(ques.value);
+                                                                    if (lst.includes(respAttr.optionValue)) {
+                                                                        if ((respAttr.uploadrequired === 'Yes' || respAttr.uploadrequired === 'Optional')) {
+                                                                            ques.showUpload = true;
+                                                                        }}}})
+                                                        }
+                                                        ques.snumber = sequence + '.' + (++childsequence);});});}})
+                                        questionWrap.responsesPercentage = Math.floor((Number(questionWrap.numberOfResponses) / Number(questionWrap.numberOfQuestions)) * 100);
+                                        this.ishideToast = false;
+                                    });
+                                    this.loading = false;
+                                    this.filterQuestionsAndAnswers = JSON.parse(JSON.stringify(this.questionsAndAnswerss));
+                                }).catch(err => { });
+                            }).catch(err => { });
+                        })
                     }
-
-                }).catch(error => {
-                    let errormap = {};
-                    errormap.componentName = 'Questionnaire';
-                    errormap.methodName = 'getAccountAssessmentsRecordData';
-                    errormap.className = 'AssessmentController';
-                    errormap.errorData = error.message;
-                    errorLogRecord({ errorLogWrapper: JSON.stringify(errormap) }).then(() => { });
-
-                });
-
+                })
             }
             else {
-                this.showRefreshbutton = true;
+                this.loading = true;
+                this.isPreviewComponent = true;
+                this.showRefreshbutton = false;
                 this.savedResponseMap = {};
-                /* get all Sections data and Questions data of a particular Template Id */
                 getQuestionsList({ templateId: this.recordId }).then(questionResult => {
                     let resultMap = questionResult;
                     resultMap.forEach(question => {
                         if (typeof question.Rhythm__Section__r !== 'undefined' && typeof question.Rhythm__Section__r.Id !== 'undefined') {
                             if (!this.sectionidslist.includes(question.Rhythm__Section__r.Id)) {
                                 this.sectionidslist.push(question.Rhythm__Section__r.Id);
-                                sectionName.push(question.Rhythm__Section__r.Name);
+                                sectionName[question.Rhythm__Section__r.Id] = question.Rhythm__Section__r.Name;
+                                sectionSequenceMap[question.Rhythm__Section__r.Id] = question.Rhythm__Section__r.Rhythm__Section_Sequence_Number__c;
                             }
                         }
                     });
-                    //
-                    this.constructMultilevelhierarchy(resultMap, this.savedResponseMap);
-                    let count = 0;
-                    let sectionsList = [];
-                    for (const seckey of this.questionMap.keys()) {
-                        count++;
-                        sectionsList.push({ label: seckey, value: sectionName[count - 1] });
-                        this.questionsList.push({ "sectionId": seckey, "section": sectionName[count - 1], "questions": this.questionMap.get(seckey), "showNext": true, "show": false });
-                    }
-                    this.constructQuestionsAndAnswers(this.questionsList);
-                    //This loop is to give the Qustion number for all the Questions. 
-                    this.questionsList.forEach(questionWrap => {
-                        let sequence = 0;
-                        questionWrap.questions.forEach(question => {
-                            let childsequence = 0;
-                            question.snumber = ++sequence;
-                            //This loop is to give all the number for all children Questions.
-                            question.Children.forEach(childQuestion => {
-                                childQuestion.snumber = sequence + '.' + (++childsequence);
+                    let allQuesId = [];
+                    questionResult.forEach(query => {
+                        allQuesId.push(query.Id);
+                    });
+                    getQuestionRespAttributes({ questionlst: allQuesId }).then(respAttr => {
+                        constructMultilevelhierarchy(resultMap, this.savedResponseMap, respAttr, this);
+                        let count = 0;
+                        let sectionsList = [];
+                        for (const seckey of this.questionMap.keys()) {
+                            sectionsList.push({ label: seckey, value: sectionName[seckey] });
+                            this.questionsList.push({ "sectionId": seckey, "section": sectionName[seckey], "sectionAccordian": "slds-accordion__section slds-is-close", "sequenceNumber": sectionSequenceMap[seckey], "questions": this.questionMap.get(seckey), "showNext": true, "show": false });
+                            count++;
+                        }
+                        this.constructQuestionsAndAnswers(this.questionsList);
+                        this.questionsList.forEach(questionWrap => {
+                            questionWrap.questions = questionWrap.questions.sort(this.compare_sort);
+                        });
+                        this.questionsAndAnswerss = this.questionsAndAnswerss.sort(this.compare_sort);
+                        this.questionsList.forEach(questionWrap => {
+                            let sequence = 0;
+                            questionWrap.questions.forEach(question => {
+                                question.snumber = ++sequence;
+                                question.Children.forEach(childQuestion => {
+                                    let childsequence = 0;
+                                    childQuestion.questions.forEach(ques => {
+                                        ques.snumber = sequence + '.' + (++childsequence);
+                                    });
+                                });
                             })
-                        })
-                        // questionWrap.responsesPercentage = Math.floor((Number(questionWrap.numberOfResponses) / Number(questionWrap.numberOfQuestions)) * 100);
-                    })
-                    //this.handleFilterFlag(true);
+                            questionWrap.responsesPercentage = Math.floor((Number(questionWrap.numberOfResponses) / Number(questionWrap.numberOfQuestions)) * 100);
+                            this.ishideToast = false;
+                            this.showRefreshbutton = true;
+                        });
+                    }).catch(err => {
+                    });
                     this.loading = false;
-                }).catch(error => {
-                    let errormap = {};
-                    errormap.componentName = 'Questionnaire';
-                    errormap.methodName = 'getQuestionsList';
-                    errormap.className = 'AssessmentController';
-                    errormap.errorData = error.message;
-                    errorLogRecord({ errorLogWrapper: JSON.stringify(errormap) }).then(() => { });
-                });
+                }).catch(err => { });
             }
         }
         else {
+            this.ishideToast = false;
             this.isSupplier = true;
-
-            /*This method is used to get all the assessments records*/
             getSupplierAssessmentList({ assessmentId: this.accountassessmentid }).then(result => {
                 let assessmentTemplateId = result[0].Rhythm__Assessment__r.Rhythm__Template__c;
+                this.accountName = result[0].Rhythm__Account__r.Name;
+                this.accountId = result[0].Rhythm__Account__c;
+                this.assessmentRecordName = result[0].Rhythm__Assessment__r.Name;
                 this.showDisclosure = result[0].Rhythm__Assessment__r.Rhythm__Disclosure__c;
+                if (typeof this.showDisclosure !== 'undefined' && this.showDisclosure != '') {
+                    this.displayDisclosure = true;
+                }
                 this.AssessmentName = result[0].Name;
                 this.assessmentStatus = result[0].Rhythm__Status__c;
                 this.sectionidslist = [];
-                /*This method is used to get all the questions with particular section*/
                 getQuestionsList({ templateId: assessmentTemplateId }).then(questionResult => {
                     let resultMap = questionResult;
                     resultMap.forEach(question => {
                         if (typeof question.Rhythm__Section__r !== 'undefined' && typeof question.Rhythm__Section__r.Id !== 'undefined') {
                             if (!this.sectionidslist.includes(question.Rhythm__Section__r.Id)) {
                                 this.sectionidslist.push(question.Rhythm__Section__r.Id);
-                                sectionName.push(question.Rhythm__Section__r.Name);
+                                sectionName[question.Rhythm__Section__r.Id] = question.Rhythm__Section__r.Name;
+                                sectionSequenceMap[question.Rhythm__Section__r.Id] = question.Rhythm__Section__r.Rhythm__Section_Sequence_Number__c;
                             }
                         }
                     });
-                    /* This method is used to get all the responses of the questions in particular section*/
+                    let allQuesId = [];
+                    questionResult.forEach(query => {
+                        allQuesId.push(query.Id);
+                    });
+
                     getSupplierResponseList({ assessmentId: this.accountassessmentid }).then(suppResult => {
                         if (suppResult && suppResult.length > 0 && suppResult[0] && suppResult[0].CreatedBy && suppResult[0].CreatedDate) {
                             this.supplierAssessmentName = suppResult[0].CreatedBy.Name;
@@ -374,91 +690,129 @@ export default class Questionnaire extends LightningElement {
                             let x = this.supplierAssCreatedDate.split('T')[0];
                             let months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
                             this.supplierAssCreatedDate = months[Number(x.split('-')[1]) - 1] + '-' + x.split('-')[2] + '-' + x.split('-')[0];
-                            // }
                         }
                         suppResult.forEach(qres => {
                             if (typeof qres.Rhythm__Question__r !== 'undefined') {
-                                this.savedResponseMap.set(qres.Rhythm__Question__c, { "Id": qres.Id, "questionType": qres.Rhythm__Question__r.Rhythm__Question_Type__c, "value": qres.Rhythm__Response__c, "Files__c": qres.Rhythm__Files__c, "Flag__c": qres.Rhythm__Flag__c, "Conversation_History__c": qres.Rhythm__Conversation_History__c });
+                                this.savedResponseMap.set(qres.Rhythm__Question__c, { "Id": qres.Id, "questionType": qres.Rhythm__Question__r.Rhythm__Question_Type__c, "value": qres.Rhythm__Response__c, "Files__c": qres.Rhythm__Files__c, "Flag__c": qres.Rhythm__Flag__c, "Reject__c": qres.Rhythm__Reject__c, "Conversation_History__c": qres.Rhythm__Conversation_History__c });
                             }
                         });
-                        //
-                        this.constructMultilevelhierarchy(resultMap, this.savedResponseMap);
-                        let count = 0;
-                        let sectionsList = [];
-                        for (const seckey of this.questionMap.keys()) {
-                            count++;
-                            sectionsList.push({ label: seckey, value: sectionName[count - 1] });
-                            this.questionsList.push({ "sectionId": seckey, "section": sectionName[count - 1], "numberOfQuestions": '', "numberOfResponses": '', "displayFlag": '', "questions": this.questionMap.get(seckey), "showNext": true, "show": false });
-                        }
-                        this.showButtons.Summary = false;
-                        this.showButtons.Section_Navigation.show = false;
-                        if (this.accountAssessmentStatus === 'Submitted' || this.accountAssessmentStatus === 'Review Completed' ||
-                            this.accountAssessmentStatus === 'In Review') {
-                            this.showButtons.Save_Submit = false;
-                            this.showcustomerbuttons = false;
-                            this.showButtons.Summary = true;
-                        }
-                        else {
-                            this.showButtons.Save_Submit = true;
-                        }
-                        if (this.questionsList.length > this.sectionLimits) {
-                            this.showButtons.Summary = true;
-                            this.showButtons.Section_Navigation.show = true;
-                            this.showButtons.Section_Navigation.options = sectionsList;
-                            //this.showButtons.Section_Navigation.value = this.section;
-                        }
-                        this.constructQuestionsAndAnswers(this.questionsList);
-                        //
-                        this.questionsList.forEach(questionWrap => {
-                            let sequence = 0;
-                            questionWrap.questions.forEach(question => {
-                                let childsequence = 0;
-                                question.snumber = ++sequence;
-                                //
-                                question.Children.forEach(childQuestion => {
-                                    childQuestion.snumber = sequence + '.' + (++childsequence);
-                                })
-                            })
-                            questionWrap.responsesPercentage = Math.floor((Number(questionWrap.numberOfResponses) / Number(questionWrap.numberOfQuestions)) * 100);
-                        })
-
-                        // if (this.accountAssessmentStatus === 'Need More Information') {
-                        //     console.log('Into the if to call handlefilterflag');
-                        // }
-                        this.loading = false;
-                    }).catch(error => {
-                        let errormap = {};
-                        errormap.componentName = 'Questionnaire';
-                        errormap.methodName = 'getSupplierResponseList';
-                        errormap.className = 'AssessmentController';
-                        errormap.errorData = error.message;
-                        errorLogRecord({ errorLogWrapper: JSON.stringify(errormap) }).then(() => { });
-                    })
-                }).catch(error => {
-                    let errormap = {};
-                    errormap.componentName = 'Questionnaire';
-                    errormap.methodName = 'getQuestionsList';
-                    errormap.className = 'AssessmentController';
-                    errormap.errorData = error.message;
-                    errorLogRecord({ errorLogWrapper: JSON.stringify(errormap) }).then(() => { });
-                })
-            }).catch(error => {
-                let errormap = {};
-                errormap.componentName = 'Questionnaire';
-                errormap.methodName = 'getAccountAssessmentsRecordData';
-                errormap.className = 'AssessmentController';
-                errormap.errorData = error.message;
-                errorLogRecord({ errorLogWrapper: JSON.stringify(errormap) }).then(() => { });
-            });
+                        getQuestionRespAttributes({ questionlst: allQuesId }).then(respAttr => {
+                            constructMultilevelhierarchy(resultMap, this.savedResponseMap, respAttr, this);
+                            let count = 0;
+                            let sectionsList = [];
+                            for (const seckey of this.questionMap.keys()) {
+                                sectionsList.push({ label: seckey, value: sectionName[seckey] });
+                                this.questionsList.push({ "sectionId": seckey, "section": sectionName[seckey], "sectionAccordian": "slds-accordion__section slds-is-close", "sequenceNumber": sectionSequenceMap[seckey], "questions": this.questionMap.get(seckey), "showNext": true, "show": false });
+                                count++;
+                            }
+                            this.showButtons.Summary = false;
+                            this.showButtons.Section_Navigation.show = false;
+                            if (this.accountAssessmentStatus === 'Submitted' || this.accountAssessmentStatus === 'Review Completed' ||
+                                this.accountAssessmentStatus === 'In Review') {
+                                this.showButtons.Save_Submit = false;
+                                this.showcustomerbuttons = false;
+                                this.showButtons.Summary = true;
+                            }
+                            else {
+                                this.showButtons.Save_Submit = true;
+                            }
+                            if (this.questionsList.length > this.sectionLimits) {
+                                this.showButtons.Summary = true;
+                                this.showButtons.Section_Navigation.show = true;
+                                this.showButtons.Section_Navigation.options = sectionsList;
+                            }
+                            this.constructQuestionsAndAnswers(this.questionsList);
+                            this.questionsAndAnswerss = this.questionsAndAnswerss.sort(this.compare_sort);
+                            this.questionsList.forEach(questionWrap => {
+                                questionWrap.questions = questionWrap.questions.sort(this.compare_sort);
+                            });
+                            this.questionsAndAnswerss.forEach(questionWrap => {
+                                let sequence = 0;
+                                questionWrap.questions.forEach(question => {
+                                    if (question.required) {
+                                        this.requiredQuestionList.push(question.Id);
+                                    }
+                                    question.snumber = ++sequence;
+                                    if (question.Children.length > 0) {
+                                        question.Children.forEach(childQuestion => {
+                                            let childsequence = 0;
+                                            if (childQuestion.isdisplay && question.type !== 'Picklist (Multi-Select)') {
+                                                question.showUpload = (childQuestion.uploadrequired === 'Yes' || childQuestion.uploadrequired === 'Optional') ? true : false;
+                                                if (childQuestion.uploadrequired === 'Yes') {
+                                                    if (typeof question.Files__c === 'undefined' || question.Files__c === '0') {
+                                                        this.requiredFilesLst.push(question.Id);
+                                                    }
+                                                    else {
+                                                        this.filesdata.push(question.Id);
+                                                    }
+                                                }
+                                            }
+                                            if (question.type === 'Picklist (Multi-Select)' && typeof question.value !== 'undefined') {
+                                                let lst = JSON.parse(question.value);
+                                                if (lst.includes(childQuestion.optionValue)) {
+                                                    if ((childQuestion.uploadrequired === 'Yes' || childQuestion.uploadrequired === 'Optional')) {
+                                                        question.showUpload = true;
+                                                        if (childQuestion.uploadrequired === 'Yes') {
+                                                            if (typeof question.Files__c === 'undefined' || question.Files__c === '0') {
+                                                                this.requiredFilesLst.push(question.Id);
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                            childQuestion.questions.forEach(ques => {
+                                                if (childQuestion.isdisplay && ques.required) {
+                                                    this.requiredQuestionList.push(ques.Id);
+                                                }
+                                                if (ques.Children.length > 0) {
+                                                    ques.Children.forEach(respAttr => {
+                                                        if (respAttr.isdisplay && ques.type !== 'Picklist (Multi-Select)') {
+                                                            ques.showUpload = (respAttr.uploadrequired === 'Yes' || respAttr.uploadrequired === 'Optional') ? true : false;
+                                                            if (respAttr.uploadrequired === 'Yes') {
+                                                                if (typeof ques.Files__c === 'undefined' || ques.Files__c === '0') {
+                                                                    this.requiredFilesLst.push(ques.Id);
+                                                                } else {
+                                                                    this.filesdata.push(ques.Id);
+                                                                }
+                                                            }
+                                                        }
+                                                        if (ques.type === 'Picklist (Multi-Select)' && typeof ques.value !== 'undefined') {
+                                                            let lst = JSON.parse(ques.value);
+                                                            if (lst.includes(respAttr.optionValue)) {
+                                                                if ((respAttr.uploadrequired === 'Yes' || respAttr.uploadrequired === 'Optional')) {
+                                                                    ques.showUpload = true;
+                                                                    if (respAttr.uploadrequired === 'Yes') {
+                                                                        if (typeof ques.Files__c === 'undefined' || ques.Files__c === '0') {
+                                                                            this.requiredFilesLst.push(ques.Id);
+                                                                        }}}}}})
+                                                }
+                                                ques.snumber = sequence + '.' + (++childsequence);});});}});
+                                questionWrap.responsesPercentage = Math.floor((Number(questionWrap.numberOfResponses) / Number(questionWrap.numberOfQuestions)) * 100);
+                            });
+                            this.loading = false;
+                            this.filterQuestionsAndAnswers = JSON.parse(JSON.stringify(this.questionsAndAnswerss));
+                        }).catch(error => { this.totastmessage = 'Error : ' + JSON.stringify(error); });
+                    }).catch(err => { })
+                }).catch(err => { })
+            }).catch(err => { });
             this.showspinner = false;
-
         }
     }
-    /**
-* constructQuestionsAndAnswers method method is used to build the wrappers based on sections and their according questions.
-* @param List of sections.
-* 
-*/
+    compare_sort(a, b) {
+        if (a.sequenceNumber < b.sequenceNumber) {
+            return -1;
+        } else if (a.sequenceNumber > b.sequenceNumber) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+    handleuploadFile(event) {
+        const selectedEvent = new CustomEvent('uploadfile', {
+            detail: event.detail
+        });
+        this.dispatchEvent(selectedEvent);
+    }
     constructQuestionsAndAnswers(questionsList) {
         let duplicatequestionList = questionsList;
         this.questionsAndAnswerss = [];
@@ -483,97 +837,265 @@ export default class Questionnaire extends LightningElement {
                 for (let i = 0; i < duplicatequestionList.length; i++) {
                     let numberOfResponses = 0;
                     let displayFlag = 0;
-                    //
+                    let numberofQuestions = 0;
                     for (let j = 0; j < questionsList[i].questions.length; j++) {
+                        numberofQuestions++;
                         if (typeof questionsList[i].questions[j].value !== 'undefined') {
                             if (typeof questionsList[i].questions[j].defaultValue === 'undefined') {
                                 if (questionsList[i].questions[j].value !== '' && questionsList[i].questions[j].value !== '[]') {
                                     numberOfResponses++;
                                 }
-
                             }
-                            else if (typeof this.accountAssessmentStatus !== 'undefined' && this.accountAssessmentStatus !== 'New') {
+                            else if (typeof this.accountAssessmentStatus !== 'undefined') {
                                 numberOfResponses++;
                             }
                         }
                         if (typeof questionsList[i].questions[j].Children !== 'undefined') {
-                            // written and commented for nesting of questions which will be handled at sprint 2.
-                            // for (let k = 0; k < questionsList[i].questions[j].Children.length; k++) {
-                            //     if (typeof questionsList[i].questions[j].Children.value !== 'undefined') {
-                            //         numberOfResponses++;
-                            //     }
-                            // }
+                            questionsList[i].questions[j].Children.forEach(subQuestion => {
+                                if (subQuestion.isdisplay === true) {
+                                    subQuestion.questions.forEach(ques => {
+                                        if (typeof ques.value !== 'undefined') {
+                                            if (ques.value !== '' && ques.value !== '[]') {
+                                                numberOfResponses++;
+                                            }
+                                        }
+                                        if (ques.Rhythm__Flag__c === true) {
+                                            displayFlag++;
+                                        }
+                                        numberofQuestions++;
+                                    })}})
                         }
                         if (duplicatequestionList[i].questions[j].Rhythm__Flag__c === true) {
                             displayFlag++;
                         }
                     }
-                    questionsList[i].displayFlag = displayFlag;
+                    let bool = false;
+                    this.timeline.forEach(res => {
+                        if (res.status === 'Need More Information') {
+                            bool = true;
+                        }
+                    });
+                    if (this.isSupplier === true) {
+                        if (bool) {
+                            questionsList[i].displayFlag = displayFlag;
+                        }
+                        else { questionsList[i].displayFlag = 0; }
+                    }
+                    if (this.isSupplier === false) {
+                        questionsList[i].displayFlag = displayFlag;
+                    }
+                    questionsList[i].numberOfQuestions = numberofQuestions;
                     if (typeof this.accountAssessmentStatus !== 'undefined' && this.accountAssessmentStatus !== 'New') {
-
                         questionsList[i].numberOfResponses = numberOfResponses;
                     }
                     else
                         questionsList[i].numberOfResponses = 0;
                 }
             }
-
         }
     }
-
-    //Used /* onResponseChange method is used to change the wrapper and display the changed responsed for questions values on UI */
     onResponseChange(event) {
+        this.requiredQuestionList = [];
         this.questionresponseafterchange = event.detail;
-        if (this.questionresponseafterchange !== undefined) {
-            //This loop is to iterate over the sections in the wrapper.
+        this.questionsAndAnswerss = JSON.parse(JSON.stringify(this.filterQuestionsAndAnswers));
+        if (this.questionresponseafterchange !== 'undefined' && this.questionresponseafterchange !== null) {
             this.questionsAndAnswerss.forEach(questionAnswer => {
-                //This loop is to iterate over the Questions for a particular sections in the wrapper.
                 questionAnswer.questions.forEach(question => {
-                    if (this.questionresponseafterchange.parent === null && this.questionresponseafterchange.questionId === question.Id) {
+                    
+                    if (question.required) {
+                        this.requiredQuestionList.push(question.Id);
+                    }
+                    if (typeof this.questionresponseafterchange.parent === 'undefined' && this.questionresponseafterchange.questionId === question.Id) {
+                         if (question.type === 'Checkbox' && typeof question.ResponseId === 'undefined') {
+                        question.isEditable = true;
+                        }
                         if (Array.isArray(this.questionresponseafterchange.option)) {
                             question.value = JSON.stringify(this.questionresponseafterchange.option);
+                            question.optionsWrapper.selectedListOptions = (this.questionresponseafterchange.option);
                         }
                         else {
                             question.value = this.questionresponseafterchange.option;
                         }
                         if (question.Children.length > 0) {
-                            //This loop is to iterate over the Child Questions for a particular sections and Questions in the wrapper.
+                            let bool = false;
                             question.Children.forEach(subquestion => {
-                                if (subquestion.conditional === question.value) {
-                                    subquestion.isdisplay = true;
+                                subquestion.questions.forEach(childquestion => {
+                                    if (subquestion.isdisplay === true) {
+                                        var capaMap = {};
+                                        var capaQuestionId = [];
+                                        var rejectedQuestionId = [];
+                                        if (childquestion.saveActionForm) {
+                                            capaQuestionId.push(childquestion.Id);
+                                        }
+                                        rejectedQuestionId.push(childquestion.Id);
+                                        capaMap.capaquestionId = capaQuestionId;
+                                        capaMap.responsequestionId = rejectedQuestionId;
+                                        capaMap.accountassessmentId = this.assessment;
+                                        if (capaQuestionId.length > 0) {
+                                            deleteCapa({ deletedata: capaMap }).then(() => {
+                                                childquestion.saveActionForm = false;
+                                            })
+                                        }
+                                        if (rejectedQuestionId.length > 0) {
+                                            deleteResponse({ deletedata: capaMap }).then(() => {
+                                                childquestion.rejectButton = false;
+                                                childquestion.needData = false;
+                                                childquestion.Rhythm__Flag__c = false;
+                                            })
+                                        }
+                                    }
+                                })
+                                if (subquestion.optionValue === question.value) {
+                                    subquestion.isdisplay = true;                    
+                                    question.showUpload = (subquestion.uploadrequired === 'Yes' || subquestion.uploadrequired === 'Optional') ? true : false;
+                                    subquestion.questions.forEach(ques => {
+                                        ques.isEditable = false;
+                                        if (ques.required) {
+                                            this.requiredQuestionList.push(ques.Id);
+                                        } }) }
+                                else {
+                                    if (question.type === 'Picklist (Multi-Select)') {
+                                        let lst = JSON.parse(question.value);
+                                        if (lst.includes(subquestion.optionValue)) {
+                                            if ((subquestion.uploadrequired === 'Yes' || subquestion.uploadrequired === 'Optional')) {
+                                                question.showUpload = true;
+                                                bool = true;}}
+                                        if (!bool) {
+                                            question.showUpload = false;}}
+                                    subquestion.isdisplay = false;}});} }
+                    else {
+                        if (this.questionresponseafterchange.parent === question.Id) {
+                            let childbool = false;
+                            question.Children.forEach(subquestion => {
+                                subquestion.questions.forEach(ques => {
+                                    if (ques.Id === this.questionresponseafterchange.questionId) {
+                                        if (ques.type === 'Checkbox' && typeof ques.ResponseId === 'undefined') {
+                                            ques.isEditable = true;
+                                        }
+                                        if (Array.isArray(this.questionresponseafterchange.option)) {
+                                            ques.value = JSON.stringify(this.questionresponseafterchange.option);
+                                            ques.optionsWrapper.selectedListOptions = (this.questionresponseafterchange.option);
+                                        }
+                                        else {
+                                            ques.value = this.questionresponseafterchange.option;
+                                        }
+                                        if (ques.Children.length > 0) {
+                                            ques.Children.forEach(respAttr => {
+                                                if (respAttr.optionValue === ques.value) {
+                                                    ques.showUpload = (respAttr.uploadrequired === 'Yes' || respAttr.uploadrequired === 'Optional') ? true : false;
+                                                }
+                                                if (ques.type === 'Picklist (Multi-Select)') {
+                                                    let lst = JSON.parse(ques.value);
+                                                    if (lst.includes(subquestion.optionValue)) {
+                                                        if ((respAttr.uploadrequired === 'Yes' || respAttr.uploadrequired === 'Optional')) {
+                                                            ques.showUpload = true;
+                                                            childbool = true;
+                                                        }
+                                                    }
+                                                    if (!childbool) {
+                                                        ques.showUpload = false;
+                                                    } }})} }
+                                    else {
+                                        if (subquestion.isdisplay === true) {
+                                            if (ques.required === true) {
+                                                this.requiredQuestionList.push(ques.Id);
+                                            }}}});});}
+                        else {
+                            question.Children.forEach(subquestion => {
+                                subquestion.questions.forEach(ques => {
+                                    if (subquestion.isdisplay === true) {
+                                        if (ques.required === true) {
+                                            this.requiredQuestionList.push(ques.Id);}
+                                    }});});}}});
+            });
+            this.responseMap.set(this.questionresponseafterchange.questionId, this.questionresponseafterchange.option);
+            this.constructPdfWrapper(false);
+            this.handleRequiredCheck();
+            this.ishideToast = false;
+            this.isAutoSave = true;
+            this.startAutoSave();
+        }
+        else {
+            this.handleOnload();
+        }
+    }
+    handleRequiredCheck() {
+        this.requiredFilesLst = [];
+        this.questionsAndAnswerss.forEach(questionAnswer => {
+            questionAnswer.questions.forEach(question => {
+                if (question.Children.length > 0) {
+                    question.Children.forEach(respAttr => {
+                        if (question.type === 'Picklist (Multi-Select)' && typeof question.value !== 'undefined') {
+                            let lst = JSON.parse(question.value);
+                            if (lst.includes(respAttr.optionValue) && respAttr.uploadrequired === 'Yes') {
+                                if (typeof question.Files__c === 'undefined' || question.Files__c === '0') {
+                                    this.requiredFilesLst.push(question.Id);
                                 }
                                 else {
-                                    subquestion.isdisplay = false;
+                                    question.attachmentStyle = 'slds-button slds-button_icon slds-button_icon-border-filled rqt-attchbtn-black';
+                                }
+                            }
+                            else { question.attachmentStyle = 'slds-button slds-button_icon slds-button_icon-border-filled rqt-attchbtn-black'; }
+                        }
+                        else {
+                            if (respAttr.optionValue === question.value && respAttr.uploadrequired === 'Yes') {
+                                if (typeof question.Files__c === 'undefined' || question.Files__c === '0') {
+                                    this.requiredFilesLst.push(question.Id);
+                                }
+                                else {
+                                    question.attachmentStyle = 'slds-button slds-button_icon slds-button_icon-border-filled rqt-attchbtn-black';
+                                }
+                            }
+                            else { question.attachmentStyle = 'slds-button slds-button_icon slds-button_icon-border-filled rqt-attchbtn-black'; }
+                        }
+                        if (respAttr.isdisplay) {
+                            respAttr.questions.forEach(childques => {
+                                if (childques.Children.length > 0) {
+                                    childques.Children.forEach(ques => {
+                                        if (childques.type === 'Picklist (Multi-Select)' && typeof childques.value !== 'undefined') {
+                                            if (childques.value !== '') {
+                                                let childlst = JSON.parse(childques.value);
+                                                if (childlst.includes(ques.optionValue) && ques.uploadrequired === 'Yes') {
+                                                    if (typeof childques.Files__c === 'undefined' || childques.Files__c === '0') {
+                                                        this.requiredFilesLst.push(childques.Id);
+                                                    }
+                                                    else {
+                                                        childques.attachmentStyle = 'slds-button slds-button_icon slds-button_icon-border-filled rqt-attchbtn-black';
+                                                    }
+                                                }
+                                                else { question.attachmentStyle = 'slds-button slds-button_icon slds-button_icon-border-filled rqt-attchbtn-black'; }
+                                            }
+                                        }
+                                        else {
+                                            if (childques.value === ques.optionValue && ques.uploadrequired === 'Yes') {
+                                                if (typeof childques.Files__c === 'undefined' || childques.Files__c === '0') {
+                                                    this.requiredFilesLst.push(childques.Id);
+                                                }
+                                                else {
+                                                    childques.attachmentStyle = 'slds-button slds-button_icon slds-button_icon-border-filled rqt-attchbtn-black';
+                                                }
+                                            }
+                                            else { question.attachmentStyle = 'slds-button slds-button_icon slds-button_icon-border-filled rqt-attchbtn-black'; }
+                                        }
+                                    })
                                 }
                             })
                         }
-                    }
-                    else {
-                        if (this.questionresponseafterchange.parentObj === question.Id) {
-                            //This loop is to iterate over the Child Questions for a particular sections and Questions in the wrapper.
-                            question.Children.forEach(() => {
-                                if (Array.isArray(this.questionresponseafterchange.option)) {
-                                    question.value = JSON.stringify(this.questionresponseafterchange.option);
-                                }
-                                else {
-                                    question.value = this.questionresponseafterchange.option;
-                                }
-                            });
-                        }
-                    }
-                });
-            });
-            this.responseMap.set(this.questionresponseafterchange.questionId, this.questionresponseafterchange.option);
+                    })
+                }
+            })
+        });
+        this.filterQuestionsAndAnswers = JSON.parse(JSON.stringify(this.questionsAndAnswerss));
+        if (typeof this.isfiltername !== 'undefined') {
+            if (this.isfiltername === 'reject') { this.handleFilterRejected(); }
+            else {
+                if (this.isfiltername === 'flag') { this.handleFilterFlag(true); }
+                else { this.handleFilterFlag(false); }
+            }
         }
-     
     }
-
-    /*handleFileUpload method is used to store the uploaded attachments into response records */
     handleFileUpload(event) {
-        this.uploadingFile = true;
-        
-
-        // this.template.querySelector('c-rtmvpc-render-question-template').fileUploadHandler('true');
+        this.uploadingFile = true
         this.fileResponseData = event.detail;
         let responseId = '';
         if (this.savedResponseMap !== null) {
@@ -581,115 +1103,60 @@ export default class Questionnaire extends LightningElement {
                 responseId = this.savedResponseMap.get(this.fileResponseData.questionId).Id;
             }
         }
-        let filemap = {};
-        let respval='';
-        filemap.responseId = responseId;
-        filemap.fileBlob = this.fileResponseData.filedata;
-        filemap.name = this.fileResponseData.name;
-        filemap.quesId = this.fileResponseData.questionId;
-        filemap.assessmentId = this.accountassessmentid;
-        /*Apex method is used to store the uploaded attachments into response records */
-        uploadFile({ fileResp: JSON.stringify(filemap) }).then(result => {
-            this.template.querySelectorAll('c-rtmvpc-render-question-template')[0].getShowUploadStatus();
-            for (let i = 0; i < this.questionsAndAnswerss.length; i++) {
-                if (this.questionsAndAnswerss[i].sectionId === this.fileResponseData.sectionId) {
-                    for (let j = 0; j < this.questionsAndAnswerss[i].questions.length; j++) {
-                        if (this.questionsAndAnswerss[i].questions[j].Id === this.fileResponseData.questionId) {
-                            // if (typeof this.questionsAndAnswerss[i].questions[j].Files__c === 'undefined') {
-                            //     let fileresponsedatalst = [];
-                            //     fileresponsedatalst.push(this.fileResponseData);
-                            //     this.questionsAndAnswerss[i].questions[j].Files__c = fileresponsedatalst;
-                            // }
-                            // else {
-                            //     let fileresponsedatalst = this.questionsAndAnswerss[i].questions[j].Files__c;
-                            //     fileresponsedatalst.push(this.fileResponseData);
-                            //     this.questionsAndAnswerss[i].questions[j].Files__c = fileresponsedatalst;
-                            // }
-                            this.uploadingFile = false;
-                            respval = this.questionsAndAnswerss[i].questions[j].value;
-                            let filesdatastored = JSON.parse(result[0].Rhythm__Files__c);
-                            let x = JSON.parse(JSON.stringify(filesdatastored[filesdatastored.length - 1]));
-                            if (typeof this.questionsAndAnswerss[i].questions[j].Files__c === 'undefined') {
-                                let fileresponsedatalst = [];
-                                fileresponsedatalst.push(x);
-                                this.questionsAndAnswerss[i].questions[j].Files__c = fileresponsedatalst;
-                            }
-                            else {
-                                let fileresponsedatalst = JSON.parse(JSON.stringify(this.questionsAndAnswerss[i].questions[j].Files__c));
-                                fileresponsedatalst.push(x);
-                                this.questionsAndAnswerss[i].questions[j].Files__c = fileresponsedatalst;
-                            }
-
-                        }
-                    }
-                }
-            }
-            
-            for(const seckey of this.responseMap.keys()){
-               
-                if(seckey===this.fileResponseData.questionId){
-                    respval = this.responseMap.get(seckey);
-                   
-                }
-            }
-            let quesResponse = { "Id": result[0].Id, "questionType": this.fileResponseData.type, "value": respval, "Files__c": result[0].Rhythm__Files__c, "Flag__c": this.fileResponseData.flag, "Conversation_History__c": this.fileResponseData.conversationHistory };
-            this.savedResponseMap.set(this.fileResponseData.questionId, quesResponse);
-            this.responseMap.set(this.fileResponseData.questionId, quesResponse);
-            // this.template.querySelector('c-rtmvpc-render-question-template').fileUploadHandler('false');
-            this.uploadingFile = false;
-            this.handleOnload();
-        });
     }
-
-    /* handledeletefile method is used to store the uploaded attachments into response records  */
     handledeletefile(event) {
         let deletefileData = event.detail;
         let deletefile = {};
         deletefile.accountAssessmentId = this.accountassessmentid;
         deletefile.questionId = deletefileData.questionId;
         deletefile.name = deletefileData.name;
-        deleteFileAttachment({ deleteMap: JSON.stringify(deletefile) }).then(() => {
-            //This loop is to iterate over the sections in the wrapper.
-            for (let i = 0; i < this.questionsAndAnswerss.length; i++) {
-                if (this.questionsAndAnswerss[i].sectionId === deletefileData.sectionId) {
-                    ////This loop is to iterate over the Questions for a particular sections in the wrapper.
-                    for (let j = 0; j < this.questionsAndAnswerss[i].questions.length; j++) {
-                        if (this.questionsAndAnswerss[i].questions[j].Id === deletefileData.questionId &&
-                            typeof this.questionsAndAnswerss[i].questions[j].Files__c !== 'undefined') {
-                            ////This loop is to iterate over the Files Questions for a particular sections and Questions in the wrapper.
-                            for (let k = 0; k < this.questionsAndAnswerss[i].questions[j].Files__c.length; k++) {
-                                if (this.questionsAndAnswerss[i].questions[j].Files__c[k].name === deletefileData.name) {
-                                    this.questionsAndAnswerss[i].questions[j].Files__c.splice(k, 1); //Review for Optimization
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        });
     }
-    /* This method is used to display the only flageed Questions and All the Questions based on selection */
     @api
     handleFilterFlag(flagFilter) {
-        //this.questionsandAnswersflag =this.questionsAndAnswerss);
+        this.questionsAndAnswerss = JSON.parse(JSON.stringify(this.filterQuestionsAndAnswers));
         if (flagFilter) {
+            this.isfiltername = 'flag';
             this.questionsAndAnswerss.forEach(questionAnswer => {
-                questionAnswer.questions = questionAnswer.questions.filter(item => (item.Rhythm__Flag__c));
+                questionAnswer.sectionAccordian = "slds-accordion__section slds-is-open";
                 questionAnswer.questions.forEach(question => {
-                    question.Children = question.Children.filter(item => item.Rhythm__Flag__c);
-                })
+                    question.Children.forEach(conditionalQuestion => {
+                        if (conditionalQuestion.isdisplay) {
+                            conditionalQuestion.questions = conditionalQuestion.questions.filter(item => (item.Rhythm__Flag__c));
+                            if (conditionalQuestion.questions.length > 0) {
+                                question.valueChange = true;
+                            }
+                        }
+                    });
+                });
+                questionAnswer.questions = questionAnswer.questions.filter(item => (item.Rhythm__Flag__c || item.valueChange));
             })
         }
         else {
-            this.questionsList = [];
-            this.questionMap = new Map();
-            this.questionsAndAnswerss = [];
-            this.handleOnload();
+            this.isfiltername = 'all';
+            this.questionsAndAnswerss.forEach(questionAnswer => {
+                questionAnswer.sectionAccordian = "slds-accordion__section slds-is-open";
+            });
         }
     }
-
-    /* getQuestionTemplate is used to create the basic question template for wrapper construction */
+    @api
+    handleFilterRejected() {
+        this.isfiltername = 'reject';
+        this.questionsAndAnswerss = JSON.parse(JSON.stringify(this.filterQuestionsAndAnswers));
+        this.questionsAndAnswerss.forEach(questionAnswer => {
+            questionAnswer.sectionAccordian = "slds-accordion__section slds-is-open";
+            questionAnswer.questions.forEach(question => {
+                question.Children.forEach(conditionalQuestion => {
+                    if (conditionalQuestion.isdisplay) {
+                        conditionalQuestion.questions = conditionalQuestion.questions.filter(item => (item.rejectButton));
+                        if (conditionalQuestion.questions.length > 0) {
+                            question.rejectFilter = true;
+                        }
+                    }
+                });
+            });
+            questionAnswer.questions = questionAnswer.questions.filter(item => (item.rejectButton || item.rejectFilter));
+        })
+    }
     getQuestionTemplate() {
         let question = {
             "question": "", "helptext": "", "isText": false, "isRadio": false, "isPicklist": false,
@@ -708,52 +1175,189 @@ export default class Questionnaire extends LightningElement {
         };
         return question;
     }
-
-    /*handleSave method is used to save the responses for particular question */
     handleSave() {
-        this.constructResponse(false);
+        this.ishideToast = true;
+        this.isAutoSave = false;
+        this.totastmessage = 'Responses Saved Successfully';
+        this.success = true;
+        this.showToast = true;
+        this.questionsAndAnswerss.forEach(questionAnswer => {
+            let numberofQuestions = 0;
+            let numberofResponses = 0;
+            questionAnswer.questions.forEach(question => {
+                if (typeof question.Id !== 'undefined') {
+                    numberofQuestions++;
+                }
+                if (typeof question.value !== 'undefined') {
+                    if (question.value !== '' && question.value !== '[]') {
+                        numberofResponses++;
+                    }
+                }
+                if (question.Children.length > 0) {
+                    question.Children.forEach(childAttr => {
+                        if (childAttr.isdisplay) {
+                            childAttr.questions.forEach(ques => {
+                                if (typeof ques.Id !== 'undefined') {
+                                    numberofQuestions++;
+                                }
+                                if (typeof ques.value !== 'undefined') {
+                                    if (ques.value !== '' && ques.value !== '[]') {
+                                        numberofResponses++;
+                                    }
+                                }
+                            })
+                        }
+                    })
+                }
+            });
+            questionAnswer.numberOfQuestions = numberofQuestions;
+            questionAnswer.numberOfResponses = numberofResponses;
+        });
     }
-
-    /* handleSubmit method is used to save the responses for particular question and update the assessment status to submit */
     handleSubmit() {
-        if(this.accountAssessmentStatus === 'New'||this.accountAssessmentStatus === 'In Progress'
-         || this.accountAssessmentStatus === 'Need More Information'){
-            this.constructResponse(true);
-         }
-        
+        this.isSupplierModalPopup = true;
     }
+    submitAssessment() {
+        this.ishideToast = true;
+        this.isAutoSave = false;
+        this.totastmessage = '';
+        this.constructResponse(true);
+        this.isSupplierModalPopup = false;
+    }
+    startAutoSave() {
+        this.ishideToast = false;
+        if (this.isAutoSave) {
+            this.constructResponse(false);
+            this.countAutoSave++;
+            if (this.countAutoSave === 1) {
+                const selectedEvent = new CustomEvent('updatetimeline', {
+                    detail: true
+                });
+                this.dispatchEvent(selectedEvent);
+            }
+        }
+    }
+    closeModal() {
+        this.isSupplierModalPopup = false;
+    }
+    constructPdfWrapper(isUpdate) {
+        this.pdfwrapper = {};
+         this.questionCount =0;
+         this.responseCount =0;
+        //this.questionsAndAnswerss = JSON.parse(JSON.stringify(this.filterQuestionsAndAnswers));
+        this.questionsAndAnswerss.forEach(questionWrap => {
+            let pdfwrapperlst = [];
+            let numberofQuestions = 0;
+            let numberofResponses = 0;
+            questionWrap.questions.forEach(ques => {
+                let quesWrap = {};
+                quesWrap.questionId = ques.Id;
+                if (typeof ques.question !== 'undefined') {
+                    quesWrap.question = ques.question;
+                    numberofQuestions++;
+                }
+                quesWrap.snumber = ques.snumber;
+                if (ques.value !== '' && ques.value !== '[]' && ques.value != null) {
+                    quesWrap.value = ques.value;
+                    numberofResponses++;
+                }
+                if (typeof ques.Rhythm__Conversation_History__c !== 'undefined') {
+                    if (JSON.parse((ques.Rhythm__Conversation_History__c).length > 0)) {
+                        let str = '';
+                        let convHistory = JSON.parse(ques.Rhythm__Conversation_History__c);
+                        convHistory.forEach(conv => {
+                            str = str + conv.Name + ':' + conv.Text + '\n';
+                        })
+                        quesWrap.conversationHistory = str;
+                    }
+                }
+                if (typeof ques.Files__c !== 'undefined') {
+                    quesWrap.files = ques.Files__c;
+                }
+                pdfwrapperlst.push(quesWrap);
+                if (ques.Children.length > 0) {
+                    ques.Children.forEach(respAttr => {
+                        if (respAttr.isdisplay) {
+                            respAttr.questions.forEach(childQues => {
+                                quesWrap = {};
+                                quesWrap.questionId = childQues.Id;
+                                if (typeof childQues.question !== 'undefined') {
+                                    quesWrap.question = childQues.question;
+                                    numberofQuestions++;
+                                }
+                                quesWrap.question = childQues.question;
+                                quesWrap.snumber = childQues.snumber;
+                                if (childQues.value !== '' && childQues.value !== '[]' && childQues.value != null) {
+                                    quesWrap.value = childQues.value;
+                                    numberofResponses++;
+                                }
+                                if (typeof childQues.Rhythm__Conversation_History__c !== 'undefined') {
+                                    if (JSON.parse((childQues.Rhythm__Conversation_History__c).length > 0)) {
+                                        let str = '';
+                                        let convHistory = JSON.parse(childQues.Rhythm__Conversation_History__c);
+                                        convHistory.forEach(conv => {
+                                            str = str + conv.Name + ':' + conv.Text + '\n';
+                                        })
+                                        quesWrap.conversationHistory = str;
+                                    }
+                                }
+                                if (typeof childQues.Files__c !== 'undefined') {
+                                    quesWrap.files = childQues.Files__c;
+                                }
+                                pdfwrapperlst.push(quesWrap);
+                            });
+                        }
+                    });
+                }
+            });
+            questionWrap.numberOfQuestions = numberofQuestions;
+            questionWrap.numberOfResponses = numberofResponses;
+            this.pdfwrapper[questionWrap.section] = pdfwrapperlst;
+            this.questionCount = this.questionCount+ numberofQuestions;
+            this.responseCount = this.responseCount + numberofResponses;
+        });
+        if (isUpdate) {
+            this.filterQuestionsAndAnswers = JSON.parse(JSON.stringify(this.questionsAndAnswerss));
+            let responseQueryMap = {};
+            responseQueryMap.pdfContnet = JSON.stringify(this.pdfwrapper);
+            responseQueryMap.accountassessmentid = this.accountassessmentid;
+            updatePdfContent({ paramMap: JSON.stringify(responseQueryMap) }).then(result => {
 
-    /* constructResponse is used to call an apex class to store the response */
+            }).catch(error => { })
+        }
+    }
     constructResponse(isSubmit) {
-        
         var isAssessmentValidated = false;
         var responseList = [];
         var questionsId = [];
         var flagmap = {};
         var filesmap = {};
         var responseIdlist = [];
-        var tabledata = '<table><thead>';
-        tabledata += '<tr><th>Section</th><th>Question</th><th>Responses</th><th>No.of File Attachments</th><th>Response History</th></tr>';
-        tabledata += '</thead><tbody>';
         for (const seckey of this.responseMap.keys()) {
             responseIdlist.push(seckey);
         }
-
-        //This loop is to iterate over the sections in the wrapper.
         this.questionsAndAnswerss.forEach(questionAnswer => {
             let rowdata = '';
-            //This loop is to iterate over the Questions for a particular sections in the wrapper.
             questionAnswer.questions.forEach(question => {
                 if (this.requiredQuestionList.includes(question.Id) &&
                     typeof question.value !== 'undefined') {
-                    if (typeof this.accountAssessmentStatus === 'undefined' || this.accountAssessmentStatus === 'New' ||this.accountAssessmentStatus === 'Need More Information') {
-                        if(this.accountAssessmentStatus === 'Need More Information'){
-                            this.responseMap.set(question.Id,question.value);
-                        }
+                    if (typeof this.accountAssessmentStatus === 'undefined' || this.accountAssessmentStatus === 'New') {
                         let index = this.requiredQuestionList.indexOf(question.Id);
                         this.requiredQuestionList.splice(index, 1);
                     }
                 }
+                question.Children.forEach(conditionalquestion => {
+                    if (conditionalquestion.isdisplay) {
+                        conditionalquestion.questions.forEach(subquestion => {
+                            if (this.requiredQuestionList.includes(subquestion.Id) && typeof subquestion.value !== 'undefined') {
+                                if (typeof this.accountAssessmentStatus === 'undefined' || this.accountAssessmentStatus === 'New') {
+                                    let index = this.requiredQuestionList.indexOf(subquestion.Id);
+                                    this.requiredQuestionList.splice(index, 1);
+                                }
+                            }
+                        })
+                    }
+                })
                 if (typeof question.defaultValue !== 'undefined') {
                     if (responseIdlist.includes(question.Id)) {
                         let index = responseIdlist.indexOf(question.Id);
@@ -770,62 +1374,33 @@ export default class Questionnaire extends LightningElement {
                         }
                     }
                 }
-                if (typeof questionAnswer.section !== 'undefined') {
-                    rowdata = rowdata + '<tr><td>' + questionAnswer.section + '</td>';
-                    if (typeof question.snumber !== 'undefined' && typeof question.question !== 'undefined') {
-                        rowdata = rowdata + '<td>' + question.snumber + ' ' + question.question + '</td>';
-                    }
-                    else {
-                        rowdata = rowdata + '<td></td>';
-                    }
-                    if (typeof question.value !== 'undefined') {
-                        rowdata = rowdata + '<td>' + question.value + '</td>';
-                    }
-                    else {
-                        rowdata = rowdata + '<td></td>';
-                    }
-                    if (typeof question.Files__c !== 'undefined') {
-                        rowdata = rowdata + '<td>' + question.Files__c.length + '</td>';
-                    }
-                    else {
-                        rowdata = rowdata + '<td></td>';
-                    }
-                    if (typeof question.Rhythm__Conversation_History__c !== 'undefined') {
-                        if (JSON.parse((question.Rhythm__Conversation_History__c).length > 0)) {
-                            let str = '';
-                            let convHistory = JSON.parse(question.Rhythm__Conversation_History__c);
-                            convHistory.forEach(conv => {
-                                str = str + conv.Name + ':' + conv.Text + '\n';
-                            })
-                            rowdata = rowdata + '<td>' + str + '</td>';
-                        }
-                    }
-                    else {
-                        rowdata = rowdata + '<td></td>'
-                    }
-                }
             });
-            tabledata = tabledata + rowdata;
         });
-        tabledata = tabledata + '</tbody></table>';
+        let pdflst = [];
+        this.constructPdfWrapper(false);
         let conversationhistory = {};
+        let reject = {};
+        let need = {};
         for (const questionkey of this.responseMap.keys()) {
             questionsId.push(questionkey);
         }
-        //This loop is to iterate over the sections in the wrapper.
         this.questionsAndAnswerss.forEach(questionAnswer => {
-            //This loop is to iterate over the Questions for a particular sections in the wrapper.
             questionAnswer.questions.forEach(question => {
-
                 if (questionsId.includes(question.Id)) {
                     if (typeof question.Rhythm__Flag__c !== 'undefined') {
                         flagmap[question.Id] = question.Rhythm__Flag__c;
                         conversationhistory[question.Id] = question.Rhythm__Conversation_History__c;
                     }
+                    if (typeof question.rejectButton !== 'undefined') {
+                        reject[question.Id] = question.rejectButton;
+                    }
+                    if (typeof question.needData !== 'undefined') {
+                        need[question.Id] = question.needData;
+                    }
                     if (typeof question.Files__c !== 'undefined') {
                         filesmap[question.Id] = question.Files__c;
                     }
-                    if (typeof question.value != 'undefined') {
+                    if (typeof question.value != 'undefined' && question.value != '') {
                         if (question.isEmail === true && !(question.value.match(/^\w+([\\.-]?\w+)*@\w+([\\.-]?\w+)*(\.\w{2,3})+$/))) {
                             isAssessmentValidated = true;
                             this.showspinner = false;
@@ -833,64 +1408,62 @@ export default class Questionnaire extends LightningElement {
                             this.success = false;
                             this.totastmessage = 'Please enter the valid email:';
                         }
-
-                        if (question.isPhone === true && !(question.value.match('[0-9]{3}-[0-9]{3}-[0-9]{4}'))) {
-                            isAssessmentValidated = true;
-                            this.showspinner = false;
-                            this.showToast = true;
-                            this.success = false;
-                            this.totastmessage = 'Please enter the valid phone number in the format xxx-xxx-xxxx:';
-                        }
+                       
                     }
-                    //This loop is to iterate over the Child Questions for a particular sections and Questions in the wrapper.
-                    question.Children.forEach(subQuestion => {
-                        if (questionsId.includes(subQuestion.Id)) {
-                            if (typeof subQuestion.Rhythm__Flag__c !== 'undefined') {
-                                flagmap[subQuestion.Id] = subQuestion.Rhythm__Flag__c;
-                                conversationhistory[subQuestion.Id] = subQuestion.Rhythm__Conversation_History__c;
-                            }
-                            if (typeof subQuestion.Files__c !== 'undefined') {
-                                filesmap[subQuestion.Id] = subQuestion.Files__c;
-                            }
+                    question.Children.forEach(conditionalQuestion => {
+                        if (conditionalQuestion.isdisplay) {
+                            conditionalQuestion.questions.forEach(subQuestion => {
+                                if (questionsId.includes(subQuestion.Id)) {
+                                    if (typeof subQuestion.Rhythm__Flag__c !== 'undefined') {
+                                        flagmap[subQuestion.Id] = subQuestion.Rhythm__Flag__c;
+                                        conversationhistory[subQuestion.Id] = subQuestion.Rhythm__Conversation_History__c;
+                                    }
+                                    if (typeof subQuestion.Files__c !== 'undefined') {
+                                        filesmap[subQuestion.Id] = subQuestion.Files__c;
+                                    }
+                                    if (typeof subQuestion.value !== 'undefined' && subQuestion.value !== '') {
+                                        if (subQuestion.isEmail === true && !(subQuestion.value.match(/^\w+([\\.-]?\w+)*@\w+([\\.-]?\w+)*(\.\w{2,3})+$/))) {
+                                            isAssessmentValidated = true;
+                                            this.showspinner = false;
+                                            this.showToast = true;
+                                            this.success = false;
+                                            this.totastmessage = 'Please enter the valid email:';
+                                        }
+                                    }
+                                }
+                            });
                         }
                     });
                 }
             });
         });
-    
         for (const seckey of this.responseMap.keys()) {
             let reponse = { 'sobjectType': 'Rhythm__Response__c' };
             reponse.Rhythm__AccountAssessmentRelation__c = this.accountassessmentid;
             reponse.Rhythm__Question__c = seckey;
             reponse.Rhythm__Account__c = this.vendor;
-            
+            if (typeof this.responselstMap[seckey] !== 'undefined') {
+                reponse.Id = this.responselstMap[seckey];
+            }
             if (Array.isArray(this.responseMap.get(seckey))) {
-
                 reponse.Rhythm__Response__c = JSON.stringify(this.responseMap.get(seckey));
             }
             else if (this.responseMap.get(seckey) === true || this.responseMap.get(seckey) === false) {
                 reponse.Rhythm__Response__c = JSON.stringify(this.responseMap.get(seckey));
             }
             else {
-                
-                if(typeof this.responseMap.get(seckey).Id ==='undefined'){
-                    reponse.Rhythm__Response__c = (this.responseMap.get(seckey));
-                }
-                
+                reponse.Rhythm__Response__c = (this.responseMap.get(seckey));
             }
             if (typeof flagmap[seckey] !== 'undefined') {
                 reponse.Rhythm__Flag__c = flagmap[seckey];
             }
+            if (typeof reject[seckey] !== 'undefined' && need[seckey] !== 'undefined') {
+                if (reject[seckey] === true) { reponse.Rhythm__Reject__c = 'Rejected'; }
+                if (reject[seckey] === false && need[seckey] === true) { reponse.Rhythm__Reject__c = 'Approved'; }
+                if (reject[seckey] === false && need[seckey] === false) { reponse.Rhythm__Reject__c = ''; }
+            }
             if (typeof conversationhistory[seckey] !== 'undefined' && conversationhistory[seckey].length > 0) {
                 reponse.Rhythm__Conversation_History__c = conversationhistory[seckey];
-            }
-            if(typeof filesmap[seckey] !=='undefined' && filesmap[seckey].length>0){
-             
-                reponse.Rhythm__Files__c = filesmap[seckey]; 
-                if(typeof this.responseMap.get(seckey).value!=='undefined'){
-                    reponse.Rhythm__Response__c = this.responseMap.get(seckey).value;  
-                } 
-                
             }
             reponse.Rhythm__Is_Latest_Response__c = true;
             if (this.requiredQuestionList.includes(reponse.Rhythm__Question__c)) {
@@ -901,30 +1474,42 @@ export default class Questionnaire extends LightningElement {
                     break;
                 }
                 else {
-                    // for (let i = 0; i < this.requiredQuestionList.length; i++) {
-                    //     if (this.requiredQuestionList[i] === reponse.Rhythm__Question__c) {
-                    //         this.requiredQuestionList.splice(i, 1);
-                    //     }
-                    // }
-                    let index = this.requiredQuestionList.indexOf(reponse.Rhythm__Question__c);
-                    this.requiredQuestionList.splice(index,1);
-
+                    for (let i = 0; i < this.requiredQuestionList.length; i++) {
+                        if (this.requiredQuestionList[i] === reponse.Rhythm__Question__c) {
+                            this.requiredQuestionList.splice(i, 1);
+                        }
+                    }
                 }
             }
             responseList.push(reponse);
         }
-       
-        if (isSubmit) {
-            if (isAssessmentValidated) {
-                isAssessmentValidated = true;
-                this.showspinner = false;
-                this.showToast = true;
-                this.success = false;
-                this.totastmessage = 'Please fill Mandatory questions ';
+        if (isSubmit && (this.requiredQuestionList.length > 0 || this.requiredFilesLst.length > 0)) {
+            isAssessmentValidated = true;
+            this.showspinner = false;
+            this.showToast = true;
+            this.success = false;
+            this.totastmessage = 'Please fill Mandatory questions ';
+            if (this.requiredFilesLst.length > 0) {
+                this.totastmessage = 'Please upload required file.'
+                this.questionsAndAnswerss.forEach(questionAnswer => {
+                    questionAnswer.questions.forEach(question => {
+                        if (this.requiredFilesLst.includes(question.Id)) {
+                            question.attachmentStyle = 'slds-button slds-button_icon slds-button_icon-border-filled rqt-attchbtn-red';
+                        }
+                        if (question.Children.length > 0) {
+                            question.Children.forEach(childwrap => {
+                                if (childwrap.isdisplay) {
+                                    childwrap.questions.forEach(ques => {
+                                        if (this.requiredFilesLst.includes(ques.Id)) {
+                                            ques.attachmentStyle = 'slds-button slds-button_icon slds-button_icon-border-filled rqt-attchbtn-red';
+                                        }
+                                    })
+                                }
+                            })
+                        }
+                    })
+                })
             }
-        }
-        else{
-            isAssessmentValidated = false;
         }
         if (isAssessmentValidated === false) {
             this.showToast = true;
@@ -933,24 +1518,22 @@ export default class Questionnaire extends LightningElement {
             responseQueryMap.accountId = this.accid;
             responseQueryMap.assesmentId = this.assessment;
             responseQueryMap.accountassessmentid = this.accountassessmentid;
+            responseQueryMap.percentage = Math.floor(Number(this.responseCount / this.questionCount) * 100);
             if (this.assessmentStatus !== 'Need More Information') {
                 if (isSubmit) {
                     responseQueryMap.status = 'Submitted';
-                    this.showButtons.Save_Submit = false;
                 }
                 else {
                     responseQueryMap.status = 'In Progress';
                 }
             }
             else {
-           
                 if (isSubmit) {
                     responseQueryMap.status = 'Submitted';
                     this.showButtons.Save_Submit = false;
                 }
                 else {
                     responseQueryMap.status = 'Need More Information';
-
                 }
             }
             if (isSubmit) {
@@ -959,48 +1542,68 @@ export default class Questionnaire extends LightningElement {
             else {
                 responseQueryMap.submit = false;
             }
-            responseQueryMap.pdfContnet = tabledata;
-            /* This method is used to create the response for the questions*/
-            createSupplierResponse({ suppResponseList: responseList, paramMap: JSON.stringify(responseQueryMap) }).then(() => {
-                this.totastmessage = 'Responses saved successfully';
+            responseQueryMap.pdfContnet = JSON.stringify(this.pdfwrapper);
+
+            createSupplierResponse({ suppResponseList: responseList, paramMap: JSON.stringify(responseQueryMap) }).then((result) => {
+                result.forEach(res => {
+                    this.responselstMap[res.Rhythm__Question__c] = res.Id;
+                });
+                let filemaplst = {};
+                this.questionsAndAnswerss.forEach(questionAnswer => {
+                    questionAnswer.questions.forEach(question => {
+                        if (question.type === 'Checkbox' && typeof question.ResponseId === 'undefined') {
+                            question.isEditable = false;}
+                        if (question.Children.length > 0) {
+                            question.Children.forEach(conditionalQuestion => {
+                                if (conditionalQuestion.isdisplay) {
+                                    conditionalQuestion.questions.forEach(subQuestion => {
+                                        if(subQuestion.type === 'Checkbox' && typeof subQuestion.ResponseId === 'undefined'){
+                        subQuestion.isEditable=false; }})}})}})})
                 if (isSubmit) {
+                    this.totastmessage = 'Responses Submitted Successfully';
+                    this.showButtons.Save_Submit = false;
                     this.questionsAndAnswerss.forEach(questionAnswer => {
                         questionAnswer.questions.forEach(question => {
+                            if(question.type === 'Checkbox'){
+                                question.isEditable=false;
+                            }
                             if (question.Flag__c !== true) {
                                 question.isEditable = true;
                             }
-                            question.Children.forEach(subQuestion => {
-                                if (subQuestion.Flag__c !== true) {
-                                    subQuestion.isEditable = true;
-                                }
-                            })
-                        })
-                    });
+                            if (typeof question.Files__c !== 'undefined' && question.Files__c !== '0') {
+                                filemaplst.files = true;
+                            }
+                            question.Children.forEach(conditionalQuestion => {
+                                if (conditionalQuestion.isdisplay) {
+                                    conditionalQuestion.questions.forEach(subquestion => {
+                                        if (typeof subquestion.Files__c !== 'undefined' && subquestion.Files__c !== '0') {
+                                            filemaplst.files = true;
+                                        }
+                                        if (subquestion.Flag__c !== true) {
+                                            subquestion.isEditable = true;
+                                        }});}})})});
                 }
-                const selectedEvent = new CustomEvent('updatetimeline', {
-                    detail: true
-                });
-                this.dispatchEvent(selectedEvent);
-                
-
-            }).catch(error => {
-                let errormap = {};
-                errormap.componentName = 'Questionnaire';
-                errormap.methodName = 'createSupplierResponse';
-                errormap.className = 'AssessmentController';
-                errormap.errorData = error.message;
-                errorLogRecord({ errorLogWrapper: JSON.stringify(errormap) }).then(() => { });
+                filemaplst.updateTimeline = true;
+                if (!this.isAutoSave) {
+                    this.success = true;
+                    const selectedEvent = new CustomEvent('updatetimeline', {
+                        detail: filemaplst
+                    });
+                    if (this.countAutoSave > 1 && !isSubmit) {
+                        this.dispatchEvent(selectedEvent);
+                    }
+                    else {
+                        if (isSubmit) {
+                            setTimeout(() => {
+                                this.dispatchEvent(selectedEvent);
+                                this.handleOnload();
+                            }, 200);}}}
+            }).catch(err => {
                 this.totastmessage = 'Error : Something went wrong, Please contact admin.';
-            });
-        }
-    }
-
-    /* Used to close the toast message populated on saving */
+            });}}
     closeToastHandler(event) {
         this.showToast = event.detail.showModal;
     }
-
-    /*constructWrapperConditionalQuestion method is used to construct the wrapper for Questions and responses  */
     constructWrapperConditionalQuestion(qu, savedResp) {
         let quTemp = this.getQuestionTemplate();
         quTemp.Id = qu.Id;
@@ -1009,7 +1612,6 @@ export default class Questionnaire extends LightningElement {
         }
         quTemp.question = qu.Rhythm__Question__c;
         let qtype = qu.Rhythm__Question_Type__c;
-        //quTemp.sectionId = this.section;
         quTemp.isText = ('Text' === qtype);
         quTemp.isPercent = ('Percent' === qtype);
         quTemp.isRadio = ('Radio' === qtype);
@@ -1024,11 +1626,29 @@ export default class Questionnaire extends LightningElement {
         quTemp.isEmail = ('Email' === qtype);
         quTemp.isTextArea = ('Text Area (Rich)' === qtype);
         quTemp.type = qtype;
+        quTemp.rejectFilter = false;
+        quTemp.valueChange = false;
         quTemp.required = qu.Rhythm__Required__c;
         quTemp.inputId = qu.Id + '_inputId';
         quTemp.labelId = qu.Id + '_labelId';
         quTemp.spanId = qu.Id + '_spanId';
         quTemp.customerFlag = false;
+        quTemp.capaAction = false;
+        quTemp.saveActionForm = false;
+        quTemp.reviewForm = false;
+        quTemp.rejectButton = false;
+        quTemp.needData = false;
+        quTemp.disableReject = false;
+        quTemp.rejectedData = '';
+        quTemp.attachmentStyle = 'slds-button slds-button_icon slds-button_icon-border-filled rqt-attchbtn-black';
+        quTemp.sequenceNumber = qu.Rhythm__Question_Sequence_Number__c;
+        quTemp.chatColour = false;
+          quTemp.checkboxcheck= false;
+        this.actionData.forEach(res => {
+            if (res.Rhythm__Question__c == quTemp.Id) {
+                quTemp.saveActionForm = true;
+            }
+        })
         if (typeof qu.Rhythm__Default_Value__c !== 'undefined' && typeof this.recordId === 'undefined'
             && typeof this.objectApiName === 'undefined') {
             quTemp.defaultValue = qu.Rhythm__Default_Value__c;
@@ -1038,29 +1658,62 @@ export default class Questionnaire extends LightningElement {
         if (this.objectApiName === 'Rhythm__AccountAssessmentRelation__c' || !this.isTemplate) {
             if (typeof savedResp.get(qu.Id) !== 'undefined') {
                 quTemp.Rhythm__Flag__c = savedResp.get(qu.Id).Flag__c;
+                quTemp.ResponseId = savedResp.get(qu.Id).Id;
+                if (savedResp.get(qu.Id).Reject__c === 'Rejected') {
+                    quTemp.rejectButton = true;
+                    quTemp.rejectedData = 'Rejected';
+                }
+                if (savedResp.get(qu.Id).Reject__c === 'Approved') {
+                    quTemp.needData = true;
+                    quTemp.rejectButton = false;
+                    quTemp.rejectedData = 'Approved';
+                }
+                if (savedResp.get(qu.Id).Reject__c === 'WithHold') {
+                    quTemp.needData = false;
+                    quTemp.rejectButton = false;
+                    quTemp.rejectedData = 'WithHold';
+                }
+                if (savedResp.get(qu.Id).Reject__c === '') {
+                    quTemp.needData = false;
+                    quTemp.rejectButton = false;
+                    quTemp.rejectedData = '';
+                }
+                this.responselstMap[qu.Id] = savedResp.get(qu.Id).Id;
+                if (quTemp.Rhythm__Flag__c == true) {
+                    this.showFollowButton = false;
+                }
             }
             if (this.objectApiName === 'Rhythm__AccountAssessmentRelation__c') {
                 if (this.accountAssessmentStatus === 'Submitted' || this.accountAssessmentStatus === 'In Review' || this.accountAssessmentStatus === 'Need More Information') {
                     this.showcustomerbuttons = true;
+                    this.timeline.forEach(res => {
+                        if (res.status === 'Need More Information') {
+                            quTemp.capaAction = true;
+                            quTemp.customerFlag = true;
+                        }
+                    })
                     if (this.accountAssessmentStatus === 'Submitted') {
                         this.showInReview = true;
+                        quTemp.disableReject = true;
                     }
                     if (this.accountAssessmentStatus === 'Need More Information' || this.accountAssessmentStatus === 'In Review') {
                         this.showInReview = false;
                         this.showSaveAndSubmit = true;
                         quTemp.customerFlag = true;
-                    }
-                }
+                        quTemp.capaAction = true;
+                        if (this.accountAssessmentStatus === 'Need More Information') {
+                            quTemp.disableReject = true;
+                        }}}
                 else {
-                    if (this.accountAssessmentStatus === 'Review completed') {
+                    if (this.accountAssessmentStatus === 'Review Completed') {
                         quTemp.isEditable = true;
+                        quTemp.capaAction = true;
+                        quTemp.reviewForm = true;
+                        quTemp.customerFlag = true;
+                        quTemp.disableReject = true;
                     }
                     else {
-                        quTemp.isEditable = false;
-                    }
-                }
-
-            }
+                        quTemp.isEditable = false;}}}
             else {
                 if (this.accountAssessmentStatus === 'Submitted' || this.accountAssessmentStatus === 'Need More Information' || this.assessmentStatus === 'In Review') {
                     if (this.assessmentStatus === 'Need More Information') {
@@ -1070,27 +1723,24 @@ export default class Questionnaire extends LightningElement {
                         else {
                             quTemp.isEditable = true;
                         }
+                        quTemp.capaAction = true;
+                        quTemp.customerFlag = true;
                     }
                     else {
+                        this.timeline.forEach(res => {
+                            if (res.status === 'Need More Information') {
+                                quTemp.capaAction = true; }})
+                        quTemp.capaAction = true;
                         quTemp.isEditable = true;
-                        this.showButtons.Save_Submit = false;
-                    }
-                }
+                        this.showButtons.Save_Submit = false; }}
                 else {
                     if (this.accountAssessmentStatus === 'Review Completed') {
                         quTemp.isEditable = true;
+                        quTemp.capaAction = true;
+                        quTemp.customerFlag = true;
                     }
                     else {
-                        quTemp.isEditable = false;
-                    }
-                }
-            }
-            if (qu.Rhythm__Required__c === true) {
-                if(!this.requiredQuestionList.includes(qu.Id)){
-                    this.requiredQuestionList.push(qu.Id);
-                }
-                
-            }
+                        quTemp.isEditable = false; }} }
             quTemp.conditional = qu.Rhythm__Conditional_Response__c === null ? '' : qu.Rhythm__Conditional_Response__c;
             quTemp.optionsValueSet = qu.Rhythm__OptionValueSet__c;
             let optionList = [];
@@ -1101,8 +1751,7 @@ export default class Questionnaire extends LightningElement {
                     optionMap.label = opt;
                     optionMap.value = opt;
                     optionList.push(optionMap);
-                });
-            }
+                });}
             quTemp.optionsWrapper.options = optionList;
             quTemp.optionsWrapper.pickListOptions = optionList;
             quTemp.optionsWrapper.radioOptions = optionList;
@@ -1110,16 +1759,19 @@ export default class Questionnaire extends LightningElement {
             if (typeof savedResp.get(qu.Id) !== 'undefined' && typeof savedResp.get(qu.Id).value !== 'undefined') {
                 quTemp.value = savedResp.get(qu.Id).value;
                 if (savedResp.get(qu.Id).questionType === "Checkbox") {
-                    if (savedResp.get(qu.Id).value === "true")
+                    if (savedResp.get(qu.Id).value === "true"){
                         quTemp.value = true;
-                    else
+                          quTemp.checkboxcheck= true;
+                    }
+                    else{
                         quTemp.value = false;
+                         quTemp.checkboxcheck= false;
+                    }
                 }
                 if (savedResp.get(qu.Id).questionType === "Picklist (Multi-Select)") {
                     if (savedResp.get(qu.Id).value.includes('[')) {
                         quTemp.optionsWrapper.selectedListOptions = JSON.parse(savedResp.get(qu.Id).value);
                         quTemp.value = JSON.stringify(quTemp.optionsWrapper.selectedListOptions);
-
                     }
                     else
                         quTemp.optionsWrapper.selectedListOptions = false;
@@ -1145,25 +1797,18 @@ export default class Questionnaire extends LightningElement {
                     }
                 }
             }
-            //console.log('savedResp.get(qu.Id).Rhythm__Conversation_History__c',savedResp.get(qu.Id).Conversation_History__c);   
             if (typeof savedResp.get(qu.Id) !== 'undefined' && typeof savedResp.get(qu.Id).Conversation_History__c !== 'undefined') {
                 quTemp.Rhythm__Conversation_History__c = savedResp.get(qu.Id).Conversation_History__c;
+                if (JSON.parse(savedResp.get(qu.Id).Conversation_History__c).length > 0) {
+                    quTemp.chatColour = true;
+                }
             }
             else {
                 quTemp.Rhythm__Conversation_History__c = [];
             }
             quTemp.showUpload = qu.Rhythm__Requires_File_Upload__c;
             if (typeof savedResp.get(qu.Id) !== 'undefined' && typeof savedResp.get(qu.Id).Files__c !== 'undefined') {
-                let responsedData = JSON.parse(savedResp.get(qu.Id).Files__c);
-                if (responsedData) {
-                    responsedData.forEach(resData => {
-                        resData.isPng = (resData).type === 'png';
-                        resData.isPdf = (resData).type === 'pdf';
-                        resData.isCsv = (resData).type === 'csv';
-                        resData.isDocx = (resData).type === 'docx';
-                        resData.isDocx = (resData).type === 'doc';
-                    });
-                }
+                let responsedData = savedResp.get(qu.Id).Files__c;
                 quTemp.Files__c = responsedData;
             }
             quTemp.showUploadProgress = false;
@@ -1171,10 +1816,12 @@ export default class Questionnaire extends LightningElement {
                 this.responseMap.set(qu.Id, savedResp.get(qu.Id).value);
             quTemp.Children = [];
             if (typeof qu.Rhythm__Section__r !== 'undefined' && typeof qu.Rhythm__Section__r.Name !== 'undefined') {
-                if (this.questionMap.has(qu.Rhythm__Section__r.Id)) {
-                    this.questionMap.get(qu.Rhythm__Section__r.Id).push(quTemp);
-                } else {
-                    this.questionMap.set(qu.Rhythm__Section__r.Id, [quTemp]);
+                if (typeof qu.Rhythm__Parent_Question__c === 'undefined') {
+                    if (this.questionMap.has(qu.Rhythm__Section__r.Id)) {
+                        this.questionMap.get(qu.Rhythm__Section__r.Id).push(quTemp);
+                    } else {
+                        this.questionMap.set(qu.Rhythm__Section__r.Id, [quTemp]);
+                    }
                 }
             }
             if (this.isTemplate || this.objectApiName === 'Rhythm__AccountAssessmentRelation__c') {
@@ -1182,11 +1829,6 @@ export default class Questionnaire extends LightningElement {
             }
         } else {
             quTemp.isEditable = false;
-            if (qu.Rhythm__Required__c === true) {
-                if(!this.requiredQuestionList.includes(qu.Id)){
-                this.requiredQuestionList.push(qu.Id);
-                }
-            }
             quTemp.conditional = qu.Rhythm__Conditional_Response__c === null ? '' : qu.Rhythm__Conditional_Response__c;
             quTemp.optionsValueSet = qu.Rhythm__OptionValueSet__c;
             let optionList = [];
@@ -1229,140 +1871,167 @@ export default class Questionnaire extends LightningElement {
             quTemp.showUpload = qu.Rhythm__Requires_File_Upload__c;
             quTemp.showUploadProgress = false;
             quTemp.Children = [];
-            if (this.questionMap.has(qu.Rhythm__Section__r.Id)) {
-                this.questionMap.get(qu.Rhythm__Section__r.Id).push(quTemp);
-            } else {
-                this.questionMap.set(qu.Rhythm__Section__r.Id, [quTemp]);
-            }
-        }
-        return quTemp;
-
-    }
-
-    // constructMultilevelhierarchy method is used to construct nested questions wrapper, based on condition of having parentQuestionId
-    constructMultilevelhierarchy(queryResults, savedResp) {
-        const children = queryResults.filter(result => typeof result.Rhythm__Parent_Question__c !== 'undefined');
-        const parent = queryResults.filter(result => typeof result.Rhythm__Parent_Question__c === 'undefined');
-        children.forEach(child => {
-            const hierarchyObj = this.constructWrapperConditionalQuestion(child, savedResp);
-            this.createChildHierarchy(queryResults, hierarchyObj, savedResp);
-            this.hierarchy.push(hierarchyObj);
-        });
-        parent.forEach(parentdata => {
-            if (!(this.parentQuestionList.includes(parentdata.Id))) {
-                const hierarchyObj = this.constructWrapperConditionalQuestion(parentdata, savedResp);
-                this.hierarchy.push(hierarchyObj);
-            }
-        });
-    }
-
-    // createChildHierarchy method is used to construct nested questions wrapper for child questions accordingly with its parent Question 
-    createChildHierarchy(queryResults, childObj, savedResp) {
-        const parent = queryResults.filter(result =>
-            result.Id === childObj.parentQuestionId);
-        if (parent.length > 0) {
-            parent.forEach(parentdata => {
-                const parentObj = this.constructWrapperConditionalQuestion(parentdata, savedResp);
-                this.createChildHierarchy(queryResults, parentObj, savedResp);
-                this.childQuestionList.push(childObj.Id);
-                this.parentQuestionList.push(parentdata.Id);
-                if (parentObj.value === childObj.conditional) {
-                    let key = parentObj.question + '-' + parentObj.value;
-                    this.questionsvaluemap[key] = childObj;
-                    childObj.isdisplay = true;
-                    parentObj.Children.push(childObj);
-                }
-                else {
-                    let key = parentObj.question + '-' + parentObj.value;
-                    this.questionsvaluemap[key] = childObj;
-                    childObj.isdisplay = false;
-                    parentObj.Children.push(childObj);
-                }
-            });
-        }
-    }
-
-    /* handlechatHistory is used to dispatch the event to the parent component (rtmvpcAssessmentDetail) */
+            if (typeof qu.Rhythm__Parent_Question__c === 'undefined') {
+                if (this.questionMap.has(qu.Rhythm__Section__r.Id)) {
+                    this.questionMap.get(qu.Rhythm__Section__r.Id).push(quTemp);
+                } else {
+                    this.questionMap.set(qu.Rhythm__Section__r.Id, [quTemp]);
+                }} }
+        return quTemp;}
     handleFlagResponseMethod(event) {
+        this.showFollowButton = true;
+        this.saveBool = false;
         this.showChat = event.detail;
         this.showChat.assesmentId = this.assessment;
         this.questionsAndAnswerss.forEach(questionAnswer => {
+            let flagCount = 0;
             questionAnswer.questions.forEach(question => {
                 if (question.Id === this.showChat.questionId && typeof this.showChat.responseflag !== 'undefined') {
                     question.Rhythm__Flag__c = this.showChat.responseflag;
                 }
-            })
+                if (question.Rhythm__Flag__c === true) {
+                    this.showFollowButton = false;
+                    flagCount++;}
+                question.Children.forEach(conditionalQuestion => {
+                    if (conditionalQuestion.isdisplay) {
+                        conditionalQuestion.questions.forEach(subquestion => {
+                            if (subquestion.Id === this.showChat.questionId && typeof this.showChat.responseflag !== 'undefined') {
+                                subquestion.Rhythm__Flag__c = this.showChat.responseflag;
+                            }
+                            if (subquestion.Rhythm__Flag__c === true) {
+                                this.showFollowButton = false;
+                                flagCount++;
+                            }})}})})
+            questionAnswer.displayFlag = flagCount;
         })
-        getResponseFlag({ questionId: this.showChat.questionId, accountAssessmentId: this.recordId }).then(() => {
-            //console.log('getResponseFlag ', result);
-        }).catch((error) => {
-            let errormap = {};
-            errormap.componentName = 'Questionnaire';
-            errormap.methodName = 'getResponseFlag';
-            errormap.className = 'AssessmentController';
-            errormap.errorData = error.message;
-            errorLogRecord({ errorLogWrapper: JSON.stringify(errormap) }).then(() => { });
-        });
-
+        this.handleselectedaction();
+        this.filterQuestionsAndAnswers = JSON.parse(JSON.stringify(this.questionsAndAnswerss));
+        this.saveBool = true;
+        this.handleSaveCustomer();
         const selectedChat = new CustomEvent('selectconversation', {
-            detail: this.showChat
+            detail: { chat: this.showChat, actionData: this.selectedActionList, file: this.fileData, identifier: event.detail.identifier }
         });
         this.dispatchEvent(selectedChat);
+    }
+    handleReject(event) {
+        let rejectedMap = event.detail;
+        this.saveBool = false;
+        this.questionsAndAnswerss = JSON.parse(JSON.stringify(this.filterQuestionsAndAnswers));
+        this.questionsAndAnswerss.forEach(questionAnswer => {
+            questionAnswer.sectionAccordian = "slds-accordion__section slds-is-open";
+            questionAnswer.questions.forEach(question => {
+                if (question.Id === rejectedMap.questionId && typeof rejectedMap.rejectResponse !== 'undefined') {
+                    question.rejectButton = rejectedMap.rejectResponse;
+                }
+                if (question.Id === rejectedMap.questionId && typeof rejectedMap.needData !== 'undefined') {
+                    question.needData = rejectedMap.needData;
+                }
+                if (question.Children.length > 0) {
+                    question.Children.forEach(conditionalQuestion => {
+                        if (conditionalQuestion.isdisplay) {
+                            conditionalQuestion.questions.forEach(subQuestion => {
+                                if (subQuestion.Id === rejectedMap.questionId && typeof rejectedMap.rejectResponse !== 'undefined') {
+                                    subQuestion.rejectButton = rejectedMap.rejectResponse;
+                                }
+                                if (subQuestion.Id === rejectedMap.questionId && typeof rejectedMap.needData !== 'undefined') {
+                                    subQuestion.needData = rejectedMap.needData;
+                                }});}});}})
+        });
+        this.saveBool = true;
+        this.handleSaveCustomer();
+    }
+    handleActionResponse(event) {
+        let responseMap = {};
+        this.responseList = [];
+        var selectedChat = {};
+        responseMap.Rhythm__Question__c = event.detail.quesId;
+        responseMap.showCapaForm = event.detail.showCapaForm;
+        responseMap.isSupplier = this.isSupplier;
+        responseMap.Rhythm__AccountAssessment__c = this.recordId;
+        selectedChat.accountassessmentId = this.recordId;
+        selectedChat.accountType = 'vendor';
+        if (this.isSupplier === true) {
+            responseMap.Rhythm__AccountAssessment__c = this.accountassessmentid;
+            selectedChat.accountassessmentId = this.accountassessmentid;
+            selectedChat.accountType = 'supplier';
+        }
+        responseMap.accountName = this.accountName;
+        responseMap.Rhythm__Account__c = this.accountId;
+        responseMap.Rhythm__Related_Record__c = this.assessment;
+        responseMap.relatedRecordName = this.assessmentRecordName;
+        this.responseList.push(responseMap);
+        selectedChat.questionId = event.detail.quesId;
+        selectedChat.openChat = false;
+        const selectedAction = new CustomEvent('selectaction', {
+            detail: { action: this.responseList, chat: selectedChat }
+        });
+        this.dispatchEvent(selectedAction);
+    }
+    handleselectedaction() {
+        var selectedActionMap = {};
+        this.selectedActionList = [];
+        selectedActionMap.Rhythm__Question__c = this.showChat.questionId;
+        selectedActionMap.isSupplier = this.isSupplier;
+        selectedActionMap.Rhythm__AccountAssessment__c = this.recordId;
+        if (this.isSupplier === true) {
+            selectedActionMap.Rhythm__AccountAssessment__c = this.accountassessmentid;
+        }
+        selectedActionMap.accountName = this.accountName;
+        selectedActionMap.Rhythm__Account__c = this.accountId;
+        selectedActionMap.Rhythm__Related_Record__c = this.assessment;
+        selectedActionMap.Rhythm__Related_Record__Name = this.assessmentRecordName;
+        this.selectedActionList.push(selectedActionMap);
     }
     handlechatHistory(event) {
-        this.showChat = event.detail;
+        this.showChat = event.detail.chat;
+        this.fileData = event.detail.file;
+        this.handleselectedaction();
         const selectedChat = new CustomEvent('selectconversation', {
-            detail: this.showChat
+            detail: { chat: this.showChat, actionData: this.selectedActionList, file: this.fileData, identifier: event.detail.identifier }
         });
         this.dispatchEvent(selectedChat);
     }
-
-    /* summaryClickHandler is used to navigate to the sections */
     summaryClickHandler() {
         const showsummary = new CustomEvent('showsummary', {});
         this.dispatchEvent(showsummary);
     }
-
-    /* section_navigationChangeHandler is used to navigate to the sections */
     section_navigationChangeHandler() {
         this.constructQuestionsAndAnswers(this.questionsList);
     }
-
-    /* selectquestionHandler is used to highlight the question when flag icon is clicked */
     selectquestionHandler(event) {
         let x = this.template.querySelectorAll('c-rtmvpc-render-question-template');
         for (let i = 0; i < x.length; i++) {
             x[i].removehighlightHandler(event.detail.id);
         }
     }
-    /* handleConversationData is used to Store the conversation in  the wrapper for a particular Question*/
     @api handleConversationData(chatterData) {
-        //This loop is to iterate over the sections in the wrapper.
-        for (let i = 0; i < this.questionsAndAnswerss.length; i++) {
-            //This loop is to iterate over the Questions for a particular sections in the wrapper.
-            for (let j = 0; j < this.questionsAndAnswerss[i].questions.length; j++) {
-                if (this.questionsAndAnswerss[i].questions[j].Id === chatterData.questionId) {
-                    this.questionsAndAnswerss[i].questions[j].Rhythm__Conversation_History__c = chatterData.conversationHistory;
-                    break;
-                }
-                //This loop is to iterate over the Child Questions for a particular sections and Questions in the wrapper.
-                for (let k = 0; k < this.questionsAndAnswerss[i].questions[j].Children.length; k++) {
-                    if (this.questionsAndAnswerss[i].questions[j].Children[k].Id === chatterData.questionId) {
-                        this.questionsAndAnswerss[i].questions[j].Children[k].Rhythm__Conversation_History__c = chatterData.conversationHistory;
-                        break;
+        //this.questionsAndAnswerss = JSON.parse(JSON.stringify(this.filterQuestionsAndAnswers));
+        this.questionsAndAnswerss.forEach(questionAnswer => {
+            questionAnswer.questions.forEach(question => {
+                if (question.Id === chatterData.questionId) {
+                    question.Rhythm__Conversation_History__c = chatterData.conversationHistory;
+                    if (JSON.parse(chatterData.conversationHistory).length > 0) {
+                        question.chatColour = true;
+                        if (typeof chatterData.flagResponse !== 'undefined') {
+                            if (this.isSupplier !== true) { question.Rhythm__Flag__c = chatterData.flagResponse; }
+                        }
                     }
                 }
-            }
-        }
-
+                question.Children.forEach(subQuestion => {
+                    subQuestion.questions.forEach(ques => {
+                        if (ques.Id === chatterData.questionId) {
+                            ques.Rhythm__Conversation_History__c = chatterData.conversationHistory;
+                            if (JSON.parse(chatterData.conversationHistory).length > 0) {
+                                ques.chatColour = true;
+                                if (typeof chatterData.flagResponse !== 'undefined') {
+                                    if (this.isSupplier !== true) { ques.Rhythm__Flag__c = chatterData.flagResponse; }} }}})})})});
     }
-    /*This method is to update the AccountAssessmentStatus to In Review. And to display the flags in customer portal. */
     handleStartReview() {
         let param = {};
+        this.loading = true;
         let status = 'In Review';
         param.assessmentStatus = status;
         param.recId = this.recordId;
-        /* The Apex methd is to update the AccountAssessmentStatus to In Review */
         updateAccountAssessmentStatus({ paramMap: JSON.stringify(param) }).then(() => {
             this.showSaveAndSubmit = true;
             this.showInReview = false;
@@ -1370,63 +2039,220 @@ export default class Questionnaire extends LightningElement {
                 detail: param
             });
             this.dispatchEvent(selectedEvent);
-            setTimeout(() => { this.handleOnload() }, 350);
-
-        }).catch(error => {
-            let errormap = {};
-            errormap.componentName = 'Questionnaire';
-            errormap.methodName = 'updateAccountAssessmentStatus';
-            errormap.className = 'AssessmentController';
-            errormap.errorData = error.message;
-            errorLogRecord({ errorLogWrapper: JSON.stringify(errormap) }).then(() => { });
+            this.accountAssessmentStatus = 'In Review';
+            this.handleOnload();
+        }).catch(err => {
         });
         this.showcustomerbuttons = true;
         this.showInReview = false;
         this.showSaveAndSubmit = true;
     }
-    /* The Apex method is to update the AccountAssessmentStatus to 'Need More Information or Review Completed 
-    based on the flags on customer portal */
+    handleSaveCustomer() {
+        var updateRejectFlagList = [];
+        var insertRejectFlagList = [];
+        let count = 0;
+        this.timeline.forEach(time => {
+            if (time.status === 'In Review') {
+                count++;
+            }
+        })
+        this.questionsAndAnswerss.forEach(questionAnswer => {
+            questionAnswer.questions.forEach(question => {
+                if (typeof question.ResponseId !== 'undefined') {
+                    var rejectFlagMap = {};
+                    rejectFlagMap.sobjectType = 'Rhythm__Response__c';
+                    rejectFlagMap.Id = question.ResponseId;
+                    rejectFlagMap.Rhythm__Flag__c = question.Rhythm__Flag__c;
+                    if (question.rejectButton === true) { rejectFlagMap.Rhythm__Reject__c = 'Rejected'; }
+                    if (question.rejectButton === false && question.needData === true) { rejectFlagMap.Rhythm__Reject__c = 'Approved'; }
+                    if (question.rejectButton === false && question.needData === false) {
+                        rejectFlagMap.Rhythm__Reject__c = (count > 1) ? 'WithHold' : '';
+                    }
+                    updateRejectFlagList.push(rejectFlagMap);
+                }
+                if (typeof question.ResponseId === 'undefined') {
+                    var flagMap = {};
+                    flagMap.sobjectType = 'Rhythm__Response__c';
+                    flagMap.Rhythm__Question__c = question.Id;
+                    flagMap.Rhythm__Flag__c = question.Rhythm__Flag__c;
+                    if (question.rejectButton === true) { flagMap.Rhythm__Reject__c = 'Rejected'; }
+                    if (question.rejectButton === false && question.needData === true) { flagMap.Rhythm__Reject__c = 'Approved'; }
+                    if (question.rejectButton === false && question.needData === false) { flagMap.Rhythm__Reject__c = (count > 1) ? 'WithHold' : ''; }
+                    flagMap.Rhythm__Is_Latest_Response__c = true;
+                    flagMap.Rhythm__AccountAssessmentRelation__c = this.recordId;
+                    insertRejectFlagList.push(flagMap);
+                }
+                if (question.Children.length > 0) {
+                    question.Children.forEach(conditionalQuestion => {
+                        if (conditionalQuestion.isdisplay) {
+                            conditionalQuestion.questions.forEach(subQuestion => {
+                                if (typeof subQuestion.ResponseId !== 'undefined') {
+                                    var rejectFlagMap = {};
+                                    rejectFlagMap.sobjectType = 'Rhythm__Response__c';
+                                    rejectFlagMap.Id = subQuestion.ResponseId;
+                                    if (question.rejectButton) {
+                                        rejectFlagMap.Rhythm__Reject__c = 'Rejected';
+                                        subQuestion.rejectButton = true;
+                                    }
+                                    else {
+                                        if (subQuestion.rejectButton === false && subQuestion.needData === true) { rejectFlagMap.Rhythm__Reject__c = 'Approved'; }
+                                        if (subQuestion.rejectButton === false && subQuestion.needData === false) { rejectFlagMap.Rhythm__Reject__c = (count > 1) ? 'WithHold' : ''; }
+                                        if (subQuestion.rejectButton === true) { rejectFlagMap.Rhythm__Reject__c = 'Rejected'; }
+                                        rejectFlagMap.Rhythm__Flag__c = subQuestion.Rhythm__Flag__c;
+                                    }
+                                    updateRejectFlagList.push(rejectFlagMap);
+                                }
+                                if (typeof subQuestion.ResponseId === 'undefined') {
+                                    var flagMap = {};
+                                    var rejectFlagMap = {};
+                                    flagMap.sobjectType = 'Rhythm__Response__c';
+                                    flagMap.Rhythm__Question__c = subQuestion.Id;
+                                    if (question.rejectButton) {
+                                        flagMap.Rhythm__Reject__c = 'Rejected';
+                                        subQuestion.rejectButton = true;
+                                    }
+                                    else {
+                                        if (subQuestion.rejectButton === false && subQuestion.needData === true) { flagMap.Rhythm__Reject__c = 'Approved'; }
+                                        if (subQuestion.rejectButton === false && subQuestion.needData === false) { flagMap.Rhythm__Reject__c = (count > 1) ? 'WithHold' : ''; }
+                                        if (subQuestion.rejectButton === true) { flagMap.Rhythm__Reject__c = 'Rejected'; }
+                                        flagMap.Rhythm__Flag__c = subQuestion.Rhythm__Flag__c;
+                                    }
+                                    flagMap.Rhythm__Is_Latest_Response__c = true;
+                                    flagMap.Rhythm__AccountAssessmentRelation__c = this.recordId;
+                                    insertRejectFlagList.push(flagMap);
+                                }}) }});}})
+        })
+        if (updateRejectFlagList.length > 0) {
+            updateRejectFlag({ updateRejectFlagList: updateRejectFlagList, accountAssessment: this.recordId }).then(res=>{
+                 this.filterQuestionsAndAnswers = JSON.parse(JSON.stringify(this.questionsAndAnswerss));
+                    if (typeof this.isfiltername !== 'undefined') {
+                        if (this.isfiltername === 'reject') { this.handleFilterRejected(); }
+                        else {
+                            if (this.isfiltername === 'flag') { this.handleFilterFlag(true); }
+                            else { this.handleFilterFlag(false); }
+                        }
+                    }
+            })
+        }
+        if (insertRejectFlagList.length > 0) {
+            insertRejectFlag({ insertRejectFlagList: insertRejectFlagList, accountAssessment: this.recordId }).then(result => {
+                getSupplierResponseList({ assessmentId: this.recordId }).then(suppResult => {
+                    let mp = {};
+                    let quesLst = [];
+                    suppResult.forEach(qres => {
+                        if (typeof qres.Id !== 'undefined' && typeof qres.Rhythm__Question__r !== 'undefined') {
+                            mp[qres.Rhythm__Question__r.Id] = qres.Id;
+                            quesLst.push(qres.Rhythm__Question__r.Id);
+                        }
+                    });
+                    this.questionsAndAnswerss.forEach(questionAnswer => {
+                        questionAnswer.questions.forEach(question => {
+                            if (quesLst.includes(question.Id) && typeof question.ResponseId === 'undefined') {
+                                question.ResponseId = mp[question.Id];
+                            }
+                            if (question.Children.length > 0) {
+                                question.Children.forEach(childresp => {
+                                    if (childresp.isdisplay) {
+                                        childresp.questions.forEach(childques => {
+                                            if (quesLst.includes(childques.Id) && typeof childques.ResponseId === 'undefined') {
+                                                childques.ResponseId = mp[childques.Id];
+                                            }
+                                        })
+                                    }
+                                })
+                            }
+                        })
+                    });
+                    this.filterQuestionsAndAnswers = JSON.parse(JSON.stringify(this.questionsAndAnswerss));
+                    if (typeof this.isfiltername !== 'undefined') {
+                        if (this.isfiltername === 'reject') { this.handleFilterRejected(); }
+                        else {
+                            if (this.isfiltername === 'flag') { this.handleFilterFlag(true); }
+                            else { this.handleFilterFlag(false); }
+                        }
+                    }
+                })})}
+    }
+    submitReviewResponse() {
+        this.handleSubmitReviewCustomer();
+    }
+    submitResponse() {
+        this.isCustomerModalPopup = true;
+    }
+    customerCloseModal() {
+        this.isCustomerModalPopup = false;
+    }
+    handleAprroveReject() {
+        let count = 0;
+        this.timeline.forEach(res => {
+            if (res.status === 'In Review') { count++; }
+        })
+        this.questionsAndAnswerss.forEach(questionAnswer => {
+            questionAnswer.questions.forEach(item => {
+                if (count == 1 && item.rejectButton !== true) {
+                    item.needData = true;
+                }
+                if (item.Children.length > 0) {
+                    item.Children.forEach(conditionalQuestion => {
+                        if (conditionalQuestion.isdisplay) {
+                            conditionalQuestion.questions.forEach(subQuestion => {
+                                if (count == 1 && subQuestion.rejectButton !== true) {
+                                    subQuestion.needData = true;
+                                }
+                                if (count > 1 && (typeof subQuestion.ResponseId === 'undefined')) {
+                                    subQuestion.needData = true;
+                                }
+                                if (count > 1 && (typeof subQuestion.ResponseId !== 'undefined' && subQuestion.rejectedData === '')) {
+                                    subQuestion.needData = true;
+                                }});}});}});});
+    }
     handleSubmitCustomer() {
         let param = {};
+        let boolflag = false;
         let isNeedMoreInfo = false;
+        this.handleAprroveReject();
+        param.assessmentStatus = 'Need More Information';
+        isNeedMoreInfo = true;
+        if (isNeedMoreInfo && boolflag === false) {
+            param.recId = this.recordId;
+            updateAccountAssessmentStatus({ paramMap: JSON.stringify(param) }).then(() => {
+                const selectedEvent = new CustomEvent('updatetimeline', {
+                    detail: param
+                });
+                this.dispatchEvent(selectedEvent);
+                this.handleSaveCustomer();
+                setTimeout(() => {
+                    this.handleOnload();
+                }, 350);
+            }).catch(err => { });
+            this.ishideToast = true;
+            this.showToast = true;
+            this.success = true;
+            this.totastmessage = 'The Assessment Status is updated to  ' + param.assessmentStatus + ' successfuly.';
+        }
+
+    }
+    handleSubmitReviewCustomer() {
+        let param = {};
+        this.isCustomerModalPopup = false;
         this.showcustomerbuttons = false;
         this.showSaveAndSubmit = false;
-        for (let i = 0; i < this.questionsAndAnswerss.length; i++) {
-            for (let j = 0; j < this.questionsAndAnswerss[i].questions.length; j++) {
-                if (this.questionsAndAnswerss[i].questions[j].customerFlag === true &&
-                    this.questionsAndAnswerss[i].questions[j].Rhythm__Flag__c === true) {
-                    param.assessmentStatus = 'Need More Information';
-                    isNeedMoreInfo = true;
-                    break;
-                }
-                else {
-                    param.assessmentStatus = 'Review Completed';
-                }
-            }
-            if (isNeedMoreInfo) {
-                break;
-            }
-        }
+        param.assessmentStatus = 'Review Completed';
         param.recId = this.recordId;
-        /* The Apex methd is to update the AccountAssessmentStatus to Need more Information or Review Completed */
+        this.handleAprroveReject();
         updateAccountAssessmentStatus({ paramMap: JSON.stringify(param) }).then(() => {
             const selectedEvent = new CustomEvent('updatetimeline', {
                 detail: param
             });
-            this.showToast = true;
-            this.success = true;
-            this.totastmessage = 'The Assessment Status is updated to  ' + param.assessmentStatus + ' successfuly.';
             this.dispatchEvent(selectedEvent);
-            this.handleOnload();
-        }).catch(error => {
-            let errormap = {};
-            errormap.componentName = 'Questionnaire';
-            errormap.methodName = 'updateAccountAssessmentStatus';
-            errormap.className = 'AssessmentController';
-            errormap.errorData = error.message;
-            errorLogRecord({ errorLogWrapper: JSON.stringify(errormap) }).then(() => { });
-        });
-
+            this.handleSaveCustomer();
+            setTimeout(() => {
+                this.handleOnload();
+            }, 350);
+        }).catch(err => { });
+        this.ishideToast = true;
+        this.showToast = true;
+        this.success = true;
+        this.totastmessage = 'The Assessment Status is updated to  ' + param.assessmentStatus + ' successfuly.';
     }
-
 }

@@ -1,0 +1,31 @@
+<template>
+	<div class="slds-card" style="border: 1px solid rgb(201, 201, 201)">
+		<div class="rem-grey-bg slds-card__header slds-grid slds-m-bottom_none">
+			<header class="slds-media slds-media_center slds-has-flexi-truncate slds-p-around_medium">
+				<div class="slds-media__figure">
+					<lightning-icon icon-name="standard:email_chatter" size="small"></lightning-icon>
+				</div>
+				<div class="slds-media__body">
+					<h2 class="slds-card__header-title">
+						<a href="#" class="slds-card__header-link slds-truncate" title="Emails">
+							<span>Emails ({show.emailsDataCount})</span>
+						</a>
+					</h2>
+				</div>
+				<div class="slds-no-flex">
+					<lightning-button-icon variant="neutral" icon-name="utility:refresh" title="Refresh"
+						onclick={refreshDataHandler}></lightning-button-icon>
+				</div>
+			</header>
+		</div>
+		<template lwc:if={showRecords}>
+			<div>
+				<div class="slds-border_top">
+					<lightning-datatable data={emailsData} columns={columnsList} key-field="Id" show-row-number-column
+						hide-checkbox-column onrowaction={rowActionsHandler}></lightning-datatable>
+				</div>
+			</div>
+		</template>
+	</div>
+	<c-send-email email-data={selectedEmail} what-id={selectedEmail.whatId} what-name={selectedEmail.whatName} recipients={selectedEmail.recipientsData} is-read-only="true"></c-send-email>
+</template>

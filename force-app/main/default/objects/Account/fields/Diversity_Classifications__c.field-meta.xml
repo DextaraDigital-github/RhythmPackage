@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Diversity_Classifications__c</fullName>
+    <externalId>false</externalId>
+    <label>Diversity Classifications</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Disabled-person-owned(US)</fullName>
+                <default>false</default>
+                <label>Disabled-person-owned(US)</label>
+            </value>
+            <value>
+                <fullName>Disabled-veteran-owned(US)</fullName>
+                <default>false</default>
+                <label>Disabled-veteran-owned(US)</label>
+            </value>
+            <value>
+                <fullName>LGBTQ+-owned(US)</fullName>
+                <default>false</default>
+                <label>LGBTQ+-owned(US)</label>
+            </value>
+            <value>
+                <fullName>Minority-owned(US)</fullName>
+                <default>false</default>
+                <label>Minority-owned(US)</label>
+            </value>
+            <value>
+                <fullName>Native American-owned</fullName>
+                <default>false</default>
+                <label>Native American-owned</label>
+            </value>
+            <value>
+                <fullName>Alaska native-owned(US)</fullName>
+                <default>false</default>
+                <label>Alaska native-owned(US)</label>
+            </value>
+            <value>
+                <fullName>Small Business(SBA)(US)</fullName>
+                <default>false</default>
+                <label>Small Business(SBA)(US)</label>
+            </value>
+            <value>
+                <fullName>Union Personnel (US)</fullName>
+                <default>false</default>
+                <label>Union Personnel (US)</label>
+            </value>
+            <value>
+                <fullName>Veteran-owned(US)</fullName>
+                <default>false</default>
+                <label>Veteran-owned(US)</label>
+            </value>
+            <value>
+                <fullName>Woman-owned(US)</fullName>
+                <default>false</default>
+                <label>Woman-owned(US)</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

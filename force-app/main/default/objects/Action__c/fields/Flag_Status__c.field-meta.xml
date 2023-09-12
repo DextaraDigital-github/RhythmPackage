@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Flag_Status__c</fullName>
+    <externalId>false</externalId>
+    <formula>IF(
+
+  TEXT(Status__c) == &apos;Closed&apos;,
+
+  IMAGE(&apos;/resource/Rhythm__greenFlag&apos;,&apos;green&apos;,20,20),
+ IF(
+  TEXT(Status__c) == &apos;Expired&apos;, IMAGE(&apos;/resource/Rhythm__redFlag&apos;, &apos;red&apos;,20,20),IMAGE(&apos;/resource/Rhythm__orangeFlag&apos;, &apos;orange&apos;,20,20)
+)
+ 
+)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Flag Status</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

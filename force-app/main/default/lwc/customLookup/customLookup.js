@@ -1,25 +1,36 @@
 import { LightningElement, track, api } from 'lwc';
-import getRecordsList from '@salesforce/apex/AssessmentTemplateController.getSections';
+import getRecordsList from '@salesforce/apex/SectionController.getSections';
 export default class SearchComponentLwc extends  LightningElement{
     @track lookupName='';
     @track lookupValuesList = [];
     @track lookupId;
     @api objLabel;
+    @api istempstatus;
     @api templateId;
     @track isshow=false;
     @track messageResult=false;
     @track isShowResult = true;
     @track showSearchedValues = false;   
     @api lookupLabel;
-   
+    @api questionId;
+    @api sectionId;
+   connectedCallback() {
+    
+     if(typeof this.questionId!='undefined')
+     {
+       this.lookupName = this.sectionId;
+     }
+   }
    hideValues()
    {
-     var _this = this;
+     let _this = this;
      setTimeout(()=>{_this.showSearchedValues = false;}, 300);
     }
    handleClick(){
-        getRecordsList({sectionName:this.lookupName,templateId:this.templateId})
+        
+        getRecordsList({templateId:this.templateId,sectionName:this.lookupName})
         .then(data => {
+          
         this.messageResult=false;
          if (data) {
            // TODO: Error handling 
@@ -42,7 +53,7 @@ export default class SearchComponentLwc extends  LightningElement{
             this.lookupValuesList=[];           
             this.showSearchedValues = false;
             this.messageResult=true;
-            //console.log(error);
+           
       });
         
    
@@ -52,13 +63,14 @@ export default class SearchComponentLwc extends  LightningElement{
   handleKeyChange(event){       
     this.messageResult=false; 
     this.lookupName = event.target.value;
+    
     if( this.lookupName === '') {
                    this.lookupId = '';
                    const selectedEvent = new CustomEvent('selectedvalue', { detail:  this.lookupName });
                    this.dispatchEvent(selectedEvent); 
                }
   } 
-  handleParentSelection(event){        
+  handleParentSelection(event){     
     this.showSearchedValues = false;
     this.isShowResult = false;
     this.messageResult=false;
@@ -66,6 +78,7 @@ export default class SearchComponentLwc extends  LightningElement{
     this.lookupId =  event.target.dataset.value;
     //Set the parent calendar label
     this.lookupName =  event.target.dataset.label; 
+    console.log('this.lookupName',this.lookupName ,'Id:',this.lookupId)
     const selectedEvent = new CustomEvent('selectedvalue', { detail: this.lookupId });
         // Dispatches the event.
     this.dispatchEvent(selectedEvent);    

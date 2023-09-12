@@ -1,0 +1,232 @@
+<template>
+
+	<template if:true={createQues}>
+		<section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="modal-heading-01"
+			class="slds-modal slds-fade-in-open slds-modal_small">
+			<div class="slds-modal__container qc-input">
+				<button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={handleClose}>
+					<lightning-icon icon-name="utility:close"
+					alternative-text="close"
+					variant="inverse"
+					size="small" ></lightning-icon>
+					<span class="slds-assistive-text">Close</span> 
+             	</button>
+				<div class="slds-modal__header">
+					<h1 id="modal-heading-01" class="slds-modal__title slds-hyphenate">New Question</h1>
+				</div>
+				<div class="slds-modal__content slds-is-relative" id="modal-content-id-2">
+					<template if:true={loading}>
+						<lightning-spinner alternative-text="Loading" size="large"></lightning-spinner>
+					</template>
+					<div>
+						<div class="slds-p-top_small slds-p-horizontal_medium" style="padding-bottom:60px;">
+							<lightning-layout multiple-rows>
+								<lightning-layout-item size="12"
+									class="slds-p-left_medium slds-p-right_medium slds-p-bottom_x-small"
+									small-device-size="12" medium-device-size="12" large-device-size="6">
+									<div class="slds-col slds-form-element__label slds-no-flex">Question
+									</div>
+									<textarea style="--slds-c-input-color-border: rgb(201, 201, 201);"
+									type="text" variant="standard" name="Question" class="slds-input"
+										label="Question" value={questionWrapper.Rhythm__Question__c}
+										placeholder="Enter your Question here" data-id="Rhythm__Question__c"
+										onchange={handleChange}  required disabled={isdisabled}>{questionWrapper.Rhythm__Question__c}</textarea>
+								</lightning-layout-item>
+								<lightning-layout-item size="12"
+									class="slds-p-left_medium slds-p-right_medium slds-p-bottom_x-small"
+									small-device-size="6" medium-device-size="12" large-device-size="6">
+									<lightning-input type="text" variant="standard" name="Help Text" label="Help Text"
+										data-id="Rhythm__HelpText__c" onchange={handleChange} disabled={isdisabled}
+										value={questionWrapper.Rhythm__HelpText__c} max-length ="255">
+									</lightning-input>
+								</lightning-layout-item>
+								<!-- <lightning-layout-item size="12" class="slds-p-left_medium slds-p-right_medium slds-p-bottom_x-small" small-device-size="6"
+									medium-device-size="12" large-device-size="6">
+									<lightning-input type="text" variant="standard" name="Default Value"
+										label="Default Value" value={questionWrapper.Rhythm__Default_Value__c}
+										data-id="Rhythm__Default_Value__c" onchange={handleChange}>
+									</lightning-input>
+								</lightning-layout-item> -->
+								<lightning-layout-item size="12"
+									class="slds-p-left_medium slds-p-right_medium slds-p-bottom_x-small"
+									small-device-size="6" medium-device-size="12" large-device-size="6">
+									<c-custom-lookup key={key} template-id={assessmentTemplate}
+										lookup-label={lookupLabel} onselectedvalue={handleSelectedValue}
+										question-id={questionId} section-id={sectionName} istempstatus={isdisabled}>
+									</c-custom-lookup>
+								</lightning-layout-item>
+
+								<lightning-layout-item size="12"
+									class="slds-p-left_medium slds-p-right_medium slds-p-bottom_x-small"
+									small-device-size="6" medium-device-size="12" large-device-size="6">
+									<div class="slds-grid slds-grid_vertical-align-center" style="min-height: 56px;">
+										<div class="slds-col slds-grid">
+											<lightning-input style="--slds-c-input-color-border: rgb(201, 201, 201);"
+												variant="label-hidden" type="Checkbox" data-id="Rhythm__Required__c"
+												onchange={handleChange} checked={questionWrapper.Rhythm__Required__c}
+												disabled={isdisabled}>
+											</lightning-input>
+											<div class="slds-col slds-form-element__label slds-no-flex">Required
+											</div>
+										</div>
+									</div>
+								</lightning-layout-item>
+								<lightning-layout-item size="12"
+									class="slds-p-left_medium slds-p-right_medium slds-p-bottom_small"
+									small-device-size="12" medium-device-size="12" large-device-size="6">
+									<lightning-combobox style="--slds-c-input-color-border: rgb(201, 201, 201);"
+										name="Response Type" label="Response Type"
+										value={questionWrapper.Rhythm__Question_Type__c} options={options}
+										data-id="Rhythm__Question_Type__c" onchange={handleChange} required=true
+										disabled={isdisabled}>
+									</lightning-combobox>
+								</lightning-layout-item>
+								<template if:false={showResponseAttributes}>
+									<lightning-layout-item size="12"
+										class="slds-p-left_medium slds-p-right_medium slds-p-bottom_x-small"
+										small-device-size="6" medium-device-size="12" large-device-size="6">
+										<div class="slds-grid slds-grid_vertical-align-center"
+											style="min-height: 56px;">
+											<div class="slds-col slds-grid">
+												<lightning-input variant="label-hidden" type="Checkbox"
+													data-id="Rhythm__Requires_File_Upload__c"
+													checked={questionWrapper.Rhythm__Requires_File_Upload__c}
+													disabled={isdisabled} onchange={handleChange}>
+												</lightning-input>
+												<span class="slds-form-element__label slds-no-flex">Requires File Upload</span>
+											</div>
+										</div>
+									</lightning-layout-item>
+								</template>
+								<template if:true={showResponseAttributes}>
+									<lightning-layout-item size="12"
+										class="slds-p-left_medium slds-p-right_medium slds-p-bottom_x-small"
+										small-device-size="12" medium-device-size="12" large-device-size="12">
+										<div>
+											<c-rtmvpc-create-response-attributes
+												onselectedvalue={handleResponseAttribute} question-id={questionId}
+												ques-type={selQuestionType} isdisable={isdisabled}>
+											</c-rtmvpc-create-response-attributes>
+										</div>
+									</lightning-layout-item>
+								</template>
+							</lightning-layout>
+						</div>
+
+						<div>
+							<!-- <template if:true={showResponseAttributes}>
+								<div>
+									<c-rtmvpc-create-response-attributes onselectedvalue={handleResponseAttribute}
+										question-id={questionId}>
+									</c-rtmvpc-create-response-attributes>
+								</div>
+							</template> -->
+						</div>
+					</div>
+				</div>
+				<div class="slds-modal__footer">
+					<template if:false={loading}>
+						<button class="slds-button slds-button_neutral" aria-label="Cancel and close" onclick={handleClose}>Cancel</button>
+						<lightning-button class="slds-button" variant="brand" label="Save" title="Save"
+							disabled={isdisabled} onclick={handlesave}></lightning-button>
+					</template>
+				</div>
+			</div>
+		</section>
+		<div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
+	</template>
+	<!-- <template if:false={createQues}>
+		<template if:true={displayNew}>
+			<div class="slds-p-right_medium slds-grid slds-grid_align-end">
+				<div class="slds-col" style="position: absolute; z-index: 2; right: 194px; top: 41px;">
+					<lightning-button variant="brand" label="New Question" icon-name="utility:add" title="New"
+						onclick={handleClick}></lightning-button>
+				</div>
+			</div>
+		</template>
+	</template> -->
+	<template if:true={childQuesCreation}>
+		<template if:true={loading}>
+			<lightning-spinner alternative-text="Loading" size="large"></lightning-spinner>
+		</template>
+		<div class="slds-p-top_small slds-p-bottom_small slds-p-horizontal_medium">
+			<lightning-layout multiple-rows>
+				<lightning-layout-item size="12" class="slds-p-left_medium slds-p-right_medium slds-p-bottom_x-small"
+					small-device-size="12" medium-device-size="12" large-device-size="6">
+					<div class="slds-col slds-form-element__label slds-no-flex">Question
+					</div>
+					<textarea style="--slds-c-input-color-border: rgb(201, 201, 201); width:100%"  class="slds-input"
+					variant="standard" name="Question" label="Question"
+					placeholder="Enter your Question here"
+					data-id="Rhythm__Question__c" onchange={handleChange} required ></textarea>
+
+				</lightning-layout-item>
+				<lightning-layout-item size="12" class="slds-p-left_medium slds-p-right_medium slds-p-bottom_x-small"
+					small-device-size="6" medium-device-size="12" large-device-size="6">
+					<lightning-input type="text" variant="standard" name="Help Text" label="Help Text"
+						data-id="Rhythm__HelpText__c" onchange={handleChange}
+						value={questionWrapper.Rhythm__HelpText__c} max-length ="255">
+					</lightning-input>
+				</lightning-layout-item>
+				<!-- <lightning-layout-item size="12" class="slds-p-left_medium slds-p-right_medium slds-p-bottom_x-small" small-device-size="6" medium-device-size="12"
+					large-device-size="6">
+					<lightning-input type="text" variant="standard" name="Default Value" label="Default Value"
+						value={questionWrapper.Rhythm__Default_Value__c} data-id="Rhythm__Default_Value__c"
+						onchange={handleChange}>
+					</lightning-input>
+				</lightning-layout-item> -->
+				<lightning-layout-item size="12" class="slds-p-left_medium slds-p-right_medium slds-p-bottom_x-small"
+					small-device-size="6" medium-device-size="12" large-device-size="6">
+					<!-- <c-custom-lookup key={key} template-id={recordId} lookup-label={lookupLabel}
+						onselectedvalue={handleSelectedValue} question-id={questionId} section-id={sectionName}>
+					</c-custom-lookup> -->
+					<div class="slds-grid slds-grid_vertical-align-center">
+						<lightning-input variant="label-hidden" type="Checkbox" data-id="Rhythm__Required__c"
+							onchange={handleChange} checked={questionWrapper.Rhythm__Required__c}>
+						</lightning-input>
+						<span class="slds-form-element__label slds-no-flex">Required</span>
+					</div>
+				</lightning-layout-item>
+
+				<template if:false={showResponseAttributes}>
+					<lightning-layout-item size="12"
+						class="slds-p-left_medium slds-p-right_medium slds-p-bottom_x-small" small-device-size="6"
+						medium-device-size="12" large-device-size="6">
+						<div class="slds-grid slds-grid_vertical-align-center" style="min-height: 56px;">
+							<div class="slds-col slds-grid">
+								<lightning-input variant="label-hidden" type="Checkbox"
+									data-id="Rhythm__Requires_File_Upload__c"
+									checked={questionWrapper.Rhythm__Requires_File_Upload__c} onchange={handleChange}>
+								</lightning-input>
+								<span class="slds-form-element__label slds-no-flex">Requires File Upload</span>
+							</div>
+						</div>
+					</lightning-layout-item>
+				</template>
+				<lightning-layout-item size="12" class="slds-p-left_medium slds-p-right_medium slds-p-bottom_x-small"
+					small-device-size="12" medium-device-size="12" large-device-size="12">
+					<lightning-combobox style="--slds-c-input-color-border: rgb(201, 201, 201);" name="Response Type"
+						label="Response Type" options={options} data-id="Rhythm__Question_Type__c"
+						onchange={handleChange} required=true>
+					</lightning-combobox>
+				</lightning-layout-item>
+				<template if:true={showResponseAttributes}>
+					<lightning-layout-item size="12"
+						class="slds-p-left_medium slds-p-right_medium slds-p-bottom_x-small" small-device-size="12"
+						medium-device-size="12" large-device-size="12">
+						<div>
+							<c-rtmvpc-create-response-attributes onselectedvalue={handleResponseAttribute}
+								question-id={questionId} ques-type={selQuestionType}>
+							</c-rtmvpc-create-response-attributes>
+						</div>
+					</lightning-layout-item>
+				</template>
+			</lightning-layout>
+		</div>
+		<div style="height: 100px; width: 100%;"></div>
+	</template>
+	<template if:true={showToast}>
+		<c-Show-Toast-Message message-from-component={totastmessage} is-show-modal={showToast} is-sucess={success}
+			onclosetoast={closeToastHandler}></c-Show-Toast-Message>
+	</template>
+</template>

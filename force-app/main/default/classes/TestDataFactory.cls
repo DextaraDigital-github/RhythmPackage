@@ -106,17 +106,30 @@ public with sharing class TestDataFactory{
         }
         return createRecords(usersToInsert, doInsert, attributes);
     }
+
+     /**
+    * @description createUser method is used to create Role records
+    * @return
+    */ 
+    public static UserRole createTestRole(){
+        UserRole ur = new UserRole(Name = 'CEO');
+        List<UserRole> lstuserRole = new List<UserRole>();
+        lstuserRole.add(ur);
+        List<UserRole> retUserRole = createRecords(lstuserRole, true, new Map<String, Object>());
+        return retUserRole[0];
+    }
     /**
     * @description createUser method is used to create Users records
-    * @param numToInsert This is a number of records to insert.  
-    * @param doInsert This is boolean value whether to insert record or not.
-    * @param attributes This is a map which contain record data to insert.
     * @return
     */ 
     public static User createTestUser(){
+        UserRole ur = createTestRole();
         Profile portalProfile = [SELECT Id FROM Profile WHERE Name='Standard Platform User' WITH SECURITY_ENFORCED Limit 1];
+
+        Profile sysAdmin = [SELECT Id FROM Profile WHERE Name='System Administrator' WITH SECURITY_ENFORCED Limit 1];
+
         List<user> lstuser = new List<User>();
-         String orgId = UserInfo.getOrganizationId();
+        String orgId = UserInfo.getOrganizationId();
         String dateString = String.valueof(Datetime.now()).replace(' ','').replace(':','').replace('-','');
         Integer randomInt = Integer.valueOf(math.rint(math.random()*1000000));
         String uniqueName = orgId + dateString + randomInt;
@@ -125,8 +138,24 @@ public with sharing class TestDataFactory{
         EmailEncodingKey='UTF-8', LastName='Testing', LanguageLocaleKey='en_US',
         LocaleSidKey='en_US', ProfileId = portalProfile.Id,
         TimeZoneSidKey='America/Los_Angeles',
-        UserName=uniqueUserName);
+        UserName=uniqueUserName,UserRoleId =ur.Id);
+
+        User userTwo = new User(Alias = 'standt', Email='standarduser2@testorg.com',
+        EmailEncodingKey='UTF-8', LastName='Testing_2', LanguageLocaleKey='en_US',
+        LocaleSidKey='en_US', ProfileId = portalProfile.Id,
+        TimeZoneSidKey='America/Los_Angeles',
+        UserName=uniqueUserName+'_2',UserRoleId =ur.Id);
+
+        User userThree = new User(Alias = 'standt', Email='sysadmin01@testorg.com',
+        EmailEncodingKey='UTF-8', LastName='Testing_23', LanguageLocaleKey='en_US',
+        LocaleSidKey='en_US', ProfileId = sysAdmin.Id,
+        TimeZoneSidKey='America/Los_Angeles',
+        UserName=uniqueUserName+'_3',UserRoleId =ur.Id);
+
         lstuser.add(u);
+        lstuser.add(userTwo);
+        lstuser.add(userThree);
+
         set<Id> userId = new set<Id>();
         List<user> retUser = createRecords(lstuser, true, new Map<String, Object>());
         userId.add(retUser[0].Id);
@@ -208,7 +237,38 @@ public with sharing class TestDataFactory{
         }
         return createRecords(qlist,true,attributes);
     }
- 
+    
+    /**
+    * @description To create Response Attribute records.
+    * @param numToInsert This is a number of records to insert.  
+    * @param doInsert This is boolean value whether to insert record or not.
+    * @param attributes This is a map which contain record data to insert.
+    * @return
+    */
+    public static List<Response_Attribute__c> createResponseAttributes(Integer numToInsert, Boolean doInsert,Map<String, Object> attributes){
+        List<Response_Attribute__c> qlist = new List<Response_Attribute__c>();
+        for(Integer i=0; i< numToInsert; i++){
+        Response_Attribute__c q = new Response_Attribute__c();
+        qlist.add(q);
+        }
+        return createRecords(qlist,true,attributes);
+    }
+
+    /**
+    * @description To create Response Question Map records.
+    * @param numToInsert This is a number of records to insert.  
+    * @param doInsert This is boolean value whether to insert record or not.
+    * @param attributes This is a map which contain record data to insert.
+    * @return
+    */
+ 	public static List<Response_Question_Map__c> createResponseQuestionMap(Integer numToInsert, Boolean doInsert,Map<String, Object> attributes){
+        List<Response_Question_Map__c> qlist = new List<Response_Question_Map__c>();
+        for(Integer i=0; i< numToInsert; i++){
+        Response_Question_Map__c q = new Response_Question_Map__c();
+        qlist.add(q);
+        }
+        return createRecords(qlist,true,attributes);
+    }
     /**
     * @description createAssessment method is used to create Assessment records
     * @param numToInsert This is a number of records to insert.  
@@ -277,6 +337,43 @@ public with sharing class TestDataFactory{
         }
         return createRecords(supplierList,true,attributes);
     }
+
+	    /**
+    * @description createAction method is used to create Action__c records
+    * @param numToInsert This is a number of records to insert.  
+    * @param doInsert This is boolean value whether to insert record or not.
+    * @param attributes This is a map which contain record data to insert.
+    * @return
+    */
+    public static List<Action__c> createAction(Integer numToInsert, Boolean doInsert,Map<String, Object> attributes){
+        List<Action__c> accList = new List<Action__c>();
+        for(Integer i=0; i< numToInsert; i++){
+            Action__c act = new Action__c();
+            accList.add(act);
+        }
+        return createRecords(accList,true,attributes);
+    }
+
+	/**
+    * @description createContentVersion method is used to create contentversion records
+    * @param numToInsert This is a number of records to insert.  
+    * @param doInsert This is boolean value whether to insert record or not.
+    * @param attributes This is a map which contain record data to insert.
+    * @return
+    */
+    public static List<ContentVersion> createContentVersion(Integer numToInsert, Boolean doInsert, Map<String, Object> attributes){
+        List<ContentVersion> insertContentVer = new List<ContentVersion>();
+        for(Integer i=0; i< numToInsert; i++){
+            ContentVersion cv = new ContentVersion();
+            cv.Title = 'Test Document';
+            cv.PathOnClient = 'TestDocument.pdf';
+            cv.VersionData = Blob.valueOf('Test Content');
+            cv.IsMajorVersion = true;
+            insertContentVer.add(cv);
+        }
+        return createRecords(insertContentVer, doInsert, attributes);
+    }
+   
 
     /**
     * @description It is used to throw the exception.

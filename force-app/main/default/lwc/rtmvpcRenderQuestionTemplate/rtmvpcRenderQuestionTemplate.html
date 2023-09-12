@@ -1,13 +1,41 @@
 <!-- This html is used to display different types of questions in sections -->
 <template>
 	<template if:true={responses}>
+		<template if:true={showSupplierPopup}>
+			<section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="modal-heading-02"
+				class="slds-modal slds-fade-in-open">
+				<div class="slds-modal__container">
+					<div class="slds-modal__header">
+						<h1 id="modal-heading-02" class="slds-modal__title slds-hyphenate">
+
+						</h1>
+					</div>
+					<div class="slds-modal__content slds-p-around_medium" id="modal-content-id-2">
+						<p>Attachments and CAPAs added to the Conditional questions will be deleted when the response is
+							changed</p>
+					</div>
+					<div class="slds-modal__footer">
+						<button class="slds-button slds-button_neutral" aria-label="Cancel and close" onclick={handleCancelButton}>Cancel</button>
+						<button class="slds-button slds-button_brand" onclick={handleResponseChange}>Ok</button>
+					</div>
+				</div>
+			</section>
+			<div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
+		</template>
+		<template if:true={isPreviewComponent}>
+			<template if:true={conditionaldisplay}>
+				<p class="slds-p-horizontal_small">↳[{conditionaval}]: </p>
+			</template>
+		</template>
 		<template for:each={responses} for:item="questionary">
 			<div key={questionary.Id} class="temp_question_border-bottom">
 
-				<div class="qactivelabelcont" data-id={questionary.Id} onclick={highlightQuestionHandler}>
+				<div class="qactivelabelcont" data-id={questionary.Id} data-disable={questionary.isEditable}
+					data-response={questionary.ResponseId} onmousedown={handleQuestionHighlight}
+					data-showupload={questionary.showUpload}>
 					<div
-						class="slds-grid slds-text-align_left slds-p-top_x-small slds-p-horizontal_medium slds-p-bottom_small">
-						<div class="slds-col">
+						class="slds-grid slds-text-align_left slds-p-top_x-small slds-p-horizontal_small slds-p-bottom_small">
+						<div class="slds-col" style="min-width:22px">
 							<!-- Question Number Starts here -->
 							<span class="slds-form-element__labelttnor no-wordbreak">
 								{questionary.snumber}
@@ -32,361 +60,502 @@
 									</template>
 									<!-- Help icon Ends here -->
 								</div>
-								<div class="slds-col slds-size_11-of-12 slds-p-top_xx-small">
-									<!-- Form Control Starts here -->
-									<template if:true={questionary.isText}>
-										<lightning-input name={questionary.question} data-key={questionary.Id}
-											data-con={questionary.conditional} type="text" variant="label-hidden"
-											disabled={questionary.isEditable} onchange={handleChange}
-											value={questionary.value} required={questionary.required}
-											onclick={openChatHandler}>
-											<lightning-icon size="xx-small" alternative-text="help"
-												icon-name="utility:info" title="Name" variant="info">
-											</lightning-icon>
-										</lightning-input>
-									</template>
-									<template if:true={questionary.isNumber}>
-										<lightning-input name={questionary.question} data-key={questionary.Id}
-											data-con={questionary.conditional} type="Number" variant="label-hidden"
-											disabled={questionary.isEditable} onchange={handleChange}
-											value={questionary.value} required={questionary.required}
-											onclick={openChatHandler}>
-											<lightning-icon size="xx-small" alternative-text="help"
-												icon-name="utility:info" title="Name" variant="info">
-											</lightning-icon>
-										</lightning-input>
-									</template>
-									<template if:true={questionary.isTextArea}>
-										<lightning-input-rich-text name={questionary.question} data-key={questionary.Id}
-											data-con={questionary.conditional} type="text" variant="label-hidden"
-											disabled={questionary.isEditable} onchange={handleChange}
-											value={questionary.value} required={questionary.required}
-											onclick={openChatHandler}>
-											<lightning-icon size="xx-small" alternative-text="help"
-												icon-name="utility:info" title="Name" variant="info">
-											</lightning-icon>
-										</lightning-input-rich-text>
-									</template>
-									<template if:true={questionary.isPicklist}>
-										<lightning-combobox data-key={questionary.Id} data-con={questionary.conditional}
-											name={questionary.question} variant="label-hidden" value={questionary.value}
-											options={questionary.optionsWrapper.pickListOptions}
-											disabled={questionary.isEditable} onchange={handleChange}
-											required={questionary.required} onclick={openChatHandler}>
-										</lightning-combobox>
-									</template>
-									<template if:true={questionary.isMultiPicklist}>
-										<lightning-dual-listbox data-key={questionary.Id}
-											data-con={questionary.conditional} name={questionary.question}
-											variant="label-hidden"
-											options={questionary.optionsWrapper.multiPickListOptions} size="4"
-											disabled={questionary.isEditable} onchange={handleChange}
-											value={questionary.optionsWrapper.selectedListOptions}
-											disable-reordering="true"
-											onclick={openChatHandler}>
-										</lightning-dual-listbox>
-									</template>
-									<template if:true={questionary.isDate}>
-										<lightning-input type="date" value={questionary.value}
-											data-con={questionary.conditional} name={questionary.question}
-											data-key={questionary.Id} disabled={questionary.isEditable}
-											onchange={handleChange} variant="label-hidden" style="max-width:150px;"
-											onclick={openChatHandler}>
-										</lightning-input>
-									</template>
-									<template if:true={questionary.isDateTime}>
-										<lightning-input type="datetime" value={questionary.value}
-											data-con={questionary.conditional} name={questionary.question}
-											data-key={questionary.Id} disabled={questionary.isEditable}
-											onchange={handleChange} variant="label-hidden" style="max-width:150px;"
-											onclick={openChatHandler}>
-										</lightning-input>
-									</template>
-									<template if:true={questionary.isCheckbox}>
-										<template if:true={checkedLabel}>
-											<lightning-input type="Checkbox" value={questionary.value}
-												variant="label-hidden" data-checkbox={questionary.Id}
-												data-con={questionary.conditional} data-key={questionary.Id}
-												onchange={handleChange} checked={questionary.value}
-												onclick={openChatHandler} disabled={questionary.isEditable}>
+								<div class="slds-col slds-size_11-of-12 slds-p-top_xx-small dx-customfix">
+									<!-- <div class="slds-button-group koushik" style="position:relative; z-index:99;" role="group"> -->
+									<div class="slds-grid slds-wrap">
+										<div class="slds-col" style="width:auto;">
+											<!-- Form Control Starts here -->
+											<template if:true={questionary.isText}>
+												<lightning-input name={questionary.question} data-key={questionary.Id}
+													data-con={questionary.conditional} type="text"
+													variant="label-hidden" disabled={questionary.isEditable}
+													onblur={handleChange} value={questionary.value}
+													required={questionary.required} onclick={openChatHandler}>
+													<lightning-icon size="xx-small" alternative-text="help"
+														icon-name="utility:info" title="Name" variant="info">
+													</lightning-icon>
+												</lightning-input>
+											</template>
+											<template if:true={questionary.isNumber}>
+												<lightning-input name={questionary.question} data-key={questionary.Id}
+													data-con={questionary.conditional} type="Number"
+													variant="label-hidden" disabled={questionary.isEditable}
+													onblur={handleChange} value={questionary.value}
+													required={questionary.required} onclick={openChatHandler}>
+													<lightning-icon size="xx-small" alternative-text="help"
+														icon-name="utility:info" title="Name" variant="info">
+													</lightning-icon>
+												</lightning-input>
+											</template>
+											<template if:true={questionary.isTextArea}>
+												<lightning-input-rich-text name={questionary.question}
+													data-key={questionary.Id} data-con={questionary.conditional}
+													type="text" variant="label-hidden" disabled={questionary.isEditable}
+													onblur={handleChange} value={questionary.value}
+													required={questionary.required} onclick={openChatHandler}>
+													<lightning-icon size="xx-small" alternative-text="help"
+														icon-name="utility:info" title="Name" variant="info">
+													</lightning-icon>
+												</lightning-input-rich-text>
+											</template>
+											<template if:true={questionary.isPicklist}>
+												<lightning-combobox data-key={questionary.Id}
+													data-con={questionary.conditional} name={questionary.question}
+													variant="label-hidden" value={questionary.value}
+													options={questionary.optionsWrapper.pickListOptions}
+													disabled={questionary.isEditable} onchange={handleChange}
+													required={questionary.required} onclick={openChatHandler}>
+												</lightning-combobox>
+											</template>
+											<template if:true={questionary.isMultiPicklist}>
+												<lightning-dual-listbox data-key={questionary.Id}
+													data-con={questionary.conditional} name={questionary.question}
+													variant="label-hidden"
+													options={questionary.optionsWrapper.multiPickListOptions} size="4"
+													disabled={questionary.isEditable} onchange={handleChange}
+													value={questionary.optionsWrapper.selectedListOptions}
+													disable-reordering="true" onclick={openChatHandler}>
+												</lightning-dual-listbox>
+											</template>
+											<template if:true={questionary.isDate}>
+												<lightning-input type="date" value={questionary.value}
+													data-con={questionary.conditional} name={questionary.question}
+													data-key={questionary.Id} disabled={questionary.isEditable}
+													onchange={handleChange} variant="label-hidden"
+													style="max-width:150px;" onclick={openChatHandler}>
+												</lightning-input>
+											</template>
+											<template if:true={questionary.isDateTime}>
+												<lightning-input type="datetime" value={questionary.value}
+													data-con={questionary.conditional} name={questionary.question}
+													data-key={questionary.Id} disabled={questionary.isEditable}
+													onchange={handleChange} variant="label-hidden"
+													style="max-width:250px;" onclick={openChatHandler}>
+												</lightning-input>
+											</template>
+											<template if:true={questionary.isCheckbox}>
+												<template if:true={questionary.checkboxcheck}>
+													<lightning-input type="Checkbox" value={questionary.value}
+														variant="label-hidden" data-checkbox={questionary.Id}
+														data-con={questionary.conditional} data-key={questionary.Id}
+														onchange={handleChange} checked={questionary.value}
+														onclick={openChatHandler} disabled={questionary.isEditable}>
+													</lightning-input>
+												</template>
+												<template if:false={questionary.checkboxcheck}>
+													<lightning-input type="Checkbox" value={questionary.value}
+														variant="label-hidden" data-checkbox={questionary.Id}
+														data-con={questionary.conditional} data-key={questionary.Id}
+														onchange={handleChange} unchecked="true"
+														onclick={openChatHandler} disabled={questionary.isEditable}>
+													</lightning-input>
+												</template>
+											</template>
+											<template if:true={questionary.isPhone}>
+												<lightning-input type="tel" value={questionary.value}
+													data-con={questionary.conditional} variant="label-hidden"
+													style="max-width:150px;" name={questionary.question}
+													data-key={questionary.Id} data-questiontype="phone"
+													disabled={questionary.isEditable} onblur={handleChange}
+													onkeyup={handleKeyup} onkeydown={handleKeyup} max-length="12"
+													onclick={openChatHandler}>
+												</lightning-input>
+											</template>
+											<template if:true={questionary.isCurrency}>
+												<lightning-input type="number" formatter="currency"
+													data-currency={questionary.Id} variant="label-hidden"
+													value={questionary.value} data-con={questionary.conditional}
+													name={questionary.question} data-key={questionary.Id}
+													disabled={questionary.isEditable} onblur={handleChange}
+													onclick={openChatHandler}>
+												</lightning-input>
+											</template>
+											<template if:true={questionary.isPercent}>
+												<lightning-input type="number" formatter="percent-fixed"
+													data-currency={questionary.Id} variant="label-hidden"
+													value={questionary.value} data-con={questionary.conditional}
+													name={questionary.question} data-key={questionary.Id}
+													disabled={questionary.isEditable} onblur={handleChange}
+													onclick={openChatHandler}>
+												</lightning-input>
+											</template>
+											<template if:true={questionary.isEmail}>
+												<lightning-input type="email" value={questionary.value}
+													data-con={questionary.conditional} variant="label-hidden"
+													name={questionary.question} data-key={questionary.Id}
+													disabled={questionary.isEditable} onblur={handleChange}
+													onclick={openChatHandler}>
+												</lightning-input>
+											</template>
+											<template if:true={questionary.isRadio}>
+												<lightning-radio-group data-key={questionary.Id} variant="label-hidden"
+													data-con={questionary.conditional} name={questionary.question}
+													onchange={handleChange}
+													options={questionary.optionsWrapper.radioOptions}
+													value={questionary.value} disabled={questionary.isEditable}
+													type="radio" onclick={openChatHandler}>
+												</lightning-radio-group>
+											</template>
+											<!-- Form Control Ends here -->
+										</div>
+										<div class="slds-col_bump-left">
+											<!-- <div class="slds-button-group koushik" style="position:absolute; z-index:99;" role="group"> -->
+											<lightning-button-group class="slds-m-left_small" style="width:auto;">
+												<template if:true={questionary.capaAction}>
+													<template if:false={questionary.chatColour}>
+														<lightning-button-icon variant="neutral"
+															label="Review & Comments" title="Review & Comments"
+															data-id={questionary.Id} icon-name="utility:comments"
+															onclick={handleQuestionHighlight}
+															data-typeidentifier="button"
+															data-disable={questionary.isEditable}
+															data-response={questionary.ResponseId}
+															data-showupload={questionary.showUpload}>
+														</lightning-button-icon>
+													</template>
+													<template if:true={questionary.chatColour}>
+
+														<!-- <button class="slds-button slds-button_icon slds-button_icon-border-filled slds-m-left_koushik slds-is-relative" style="background-color: rgb(1, 118, 211); --sds-c-icon-color-foreground-default: rgb(255 255 255); "
+															label="Review & Comments" alternative-text="Review & Comments" title="Review & Comments"
+															data-id={questionary.Id} onclick={handleQuestionHighlight} data-disable={questionary.isEditable}
+															data-response={questionary.ResponseId}
+															data-showupload={questionary.showUpload} >
+														<lightning-icon icon-name="utility:comments" size="xx-small" ></lightning-icon>
+														<span class="slds-assistive-text">Close</span>
+														</button> -->
+														<lightning-button-icon variant="brand" label="Review & Comments"
+															title="Review & Comments" data-id={questionary.Id}
+															icon-name="utility:comments"
+															onclick={handleQuestionHighlight}
+															data-typeidentifier="button"
+															data-disable={questionary.isEditable}
+															data-response={questionary.ResponseId}
+															data-showupload={questionary.showUpload}>
+														</lightning-button-icon>
+													</template>
+												</template>
+
+												<!-- <div>
+											<lightning-input type="file"
+												accept=".xlsx, .xls, .csv, .png, .doc, .docx, .pdf"
+												label="Attachment : (Limit Size : 3.5mb)" data-id={questionary.Id}
+												onchange={uploadFilesHandler} disabled={questionary.isEditable}>
 											</lightning-input>
-										</template>
-										<template if:false={checkedLabel}>
-											<lightning-input type="Checkbox" value={questionary.value}
-												variant="label-hidden" data-checkbox={questionary.Id}
-												data-con={questionary.conditional} data-key={questionary.Id}
-												onchange={handleChange} unchecked="true" onclick={openChatHandler}
-												disabled={questionary.isEditable}>
-											</lightning-input>
-										</template>
-									</template>
-									<template if:true={questionary.isPhone}>
-										<lightning-input type="tel" value={questionary.value}
-											data-con={questionary.conditional} variant="label-hidden"
-											style="max-width:150px;" name={questionary.question}
-											data-key={questionary.Id} placeholder="xxx-xxx-xxxx"
-											disabled={questionary.isEditable} onchange={handleChange}
-											pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" onclick={openChatHandler}>
-										</lightning-input>
-									</template>
-									<template if:true={questionary.isCurrency}>
-										<lightning-input type="number" formatter="currency"
-											data-currency={questionary.Id} variant="label-hidden"
-											value={questionary.value} data-con={questionary.conditional}
-											name={questionary.question} data-key={questionary.Id}
-											disabled={questionary.isEditable} onchange={handleChange}
-											onclick={openChatHandler}>
-										</lightning-input>
-									</template>
-									<template if:true={questionary.isPercent}>
-										<lightning-input type="number" formatter="percent-fixed"
-											data-currency={questionary.Id} variant="label-hidden"
-											value={questionary.value} data-con={questionary.conditional}
-											name={questionary.question} data-key={questionary.Id}
-											disabled={questionary.isEditable} onchange={handleChange}
-											onclick={openChatHandler}>
-										</lightning-input>
-									</template>
-									<template if:true={questionary.isEmail}>
-										<lightning-input type="email" value={questionary.value}
-											data-con={questionary.conditional} variant="label-hidden"
-											name={questionary.question} data-key={questionary.Id}
-											disabled={questionary.isEditable} onchange={handleChange}
-											placeholder="abc@gmail.com" onclick={openChatHandler}>
-										</lightning-input>
-									</template>
-									<template if:true={questionary.isRadio}>
-										<lightning-radio-group data-key={questionary.Id} variant="label-hidden"
-											data-con={questionary.conditional} name={questionary.question}
-											onchange={handleChange} options={questionary.optionsWrapper.radioOptions}
-											value={questionary.value} disabled={questionary.isEditable} type="radio"
-											onclick={openChatHandler}>
-										</lightning-radio-group>
-									</template>
-									<!-- Form Control Ends here -->
+										</div> -->
+
+												<template if:true={issupplier}>
+													<template if:true={questionary.capaAction}>
+														<template if:true={questionary.saveActionForm}>
+															<!-- <button class="slds-button slds-button_icon slds-button_icon-border-filled slds-m-left_koushik slds-is-relative" style="background-color: rgb(1, 118, 211); --sds-c-icon-color-foreground-default: rgb(255 255 255); "
+															label="CAPA" alternative-text="CAPA" title="CAPA"
+																data-id={questionary.Id} onclick={openActionForm}>
+																<lightning-icon icon-name="utility:edit_form" size="xx-small" ></lightning-icon>
+																<span class="slds-assistive-text">Close</span>
+														</button> -->
+															<lightning-button-icon data-id={questionary.Id}
+																icon-name="utility:edit_form" label="CAPA"
+																alternative-text="CAPA" title="CAPA"
+																class="slds-m-left_koushik slds-is-relative"
+																onclick={openActionForm} variant="brand">
+															</lightning-button-icon>
+														</template></template>
+												</template>
+												<template if:false={issupplier}>
+													<template if:true={questionary.capaAction}>
+														<template if:false={questionary.saveActionForm}>
+															<template if:false={questionary.reviewForm}>
+																<!-- <lightning-icon data-id={questionary.Id} icon-name="utility:record_alt"
+																size="x-small" onclick={openActionForm}>
+															</lightning-icon> -->
+																<lightning-button-icon data-id={questionary.Id}
+																	icon-name="utility:edit_form" label="CAPA"
+																	alternative-text="CAPA" title="CAPA"
+																	class="slds-m-left_koushik slds-is-relative"
+																	onclick={openActionForm}></lightning-button-icon>
+															</template>
+														</template>
+														<template if:true={questionary.saveActionForm}>
+															<lightning-button-icon data-id={questionary.Id}
+																icon-name="utility:edit_form" label="CAPA"
+																alternative-text="CAPA" title="CAPA"
+																class="slds-m-left_koushik slds-is-relative"
+																onclick={openActionForm} variant="brand">
+															</lightning-button-icon>
+															<!-- <lightning-icon data-id={questionary.Id} icon-name="utility:record_alt"
+															size="x-small" onclick={openActionForm}>
+														</lightning-icon> -->
+															<!-- <lightning-button-icon icon-name="utility:close" variant="bare" size="small" style="margin-top:2px;"
+															data-id={questionary.Id} onclick={deleteForm} alternative-text="Delete file"
+															class="closericon">
+														</lightning-button-icon> -->
+														</template>
+													</template>
+
+												</template>
+
+
+												<template if:true={issupplier}>
+													<template if:true={questionary.customerFlag}>
+														<template if:true={questionary.rejectButton}>
+															<button class="slds-button slds-button_icon slds-button_icon-border-filled" style="cursor:no-drop; background: rgb(251 129 129); --sds-c-icon-color-foreground-default: rgb(213 195 195);"
+															data-label="Rejected" title="Rejected"
+																data-id={questionary.Id}>
+																<lightning-icon icon-name="utility:close" size="xx-small"></lightning-icon>
+																<span class="slds-assistive-text">Close</span>
+															</button>
+															<!-- <lightning-button-icon variant="neutral"
+																data-label="Rejected" title="Rejected"
+																data-id={questionary.Id}																
+																icon-name="utility:close" >
+															</lightning-button-icon> -->
+														</template></template>
+												</template>
+												<template if:false={issupplier}>
+													<template if:true={questionary.customerFlag}>
+														<template if:false={questionary.rejectButton}>
+															<template if:false={questionary.needData}>
+																<lightning-button-icon variant="destructive"
+																	data-label="Reject" title="Reject"
+																	onclick={handleReject} data-id={questionary.Id}
+																	class="slds-p-left_koushik rqt-redbtn_n"
+																	icon-name="utility:close"
+																	disabled={questionary.disableReject}>
+																</lightning-button-icon>
+															</template>
+															<template if:true={questionary.needData}>
+																<lightning-button-icon variant="success"
+																	data-label="Approved" title="Approved"
+																	onclick={handleReject} data-id={questionary.Id}
+																	class="slds-p-left_koushik rqt-greenbtn"
+																	style="background:rgb(129 251 133);"
+																	disabled={questionary.disableReject}
+																	icon-name="utility:check"></lightning-button-icon>
+															</template>
+														</template>
+														<template if:true={questionary.rejectButton}>
+															<lightning-button-icon variant="destructive"
+																data-label="Rejected" title="Rejected"
+																onclick={handleReject} data-id={questionary.Id}
+																class="slds-p-left_koushik rqt-redbtn"
+																icon-name="utility:close"
+																disabled={questionary.disableReject}
+																style="background: rgb(251 129 129);">
+															</lightning-button-icon>
+														</template>
+													</template>
+												</template>
+											</lightning-button-group>
+
+											<template if:true={questionary.showUpload}>
+												<!-- <div variant="base" style='sds-c-icon-color-foreground'  icon-name="utility:attach" data-label="upload" title="titleName"
+														onclick={handleupload} data-id={questionary.Id}
+														data-showupload={questionary.showUpload}
+														data-disable={questionary.isEditable}
+														data-response={questionary.ResponseId}>
+													</div> -->
+												<button class={questionary.attachmentStyle}  data-label="upload" title="titleName"
+														onclick={handleupload} data-id={questionary.Id}
+														data-showupload={questionary.showUpload}
+														data-disable={questionary.isEditable}
+														data-response={questionary.ResponseId}>
+														<div aria-hidden="true">
+															<lightning-icon icon-name="utility:attach" size="x-small"></lightning-icon>
+														</div>
+														<span class="slds-assistive-text">Settings</span>
+													</button>
+											</template>
+
+										</div>
+									</div>
 								</div>
 								<div class="slds-col slds-size_1-of-12 slds-text-align_right slds-m-top_x-small">
 									<!-- Flag Starts here -->
 									<template if:true={issupplier}>
-										<template if:true={questionary.Rhythm__Flag__c}>
-											<lightning-icon data-id={questionary.Id} icon-name="utility:priority"
-												size="x-small" class="cib-flag slds-m-right_medium"
-												onclick={openChatHandler}>
-											</lightning-icon>
-										</template></template>
-									<template if:true={questionary.customerFlag}>
-										<template if:true={questionary.Rhythm__Flag__c}>
-											<lightning-icon data-id={questionary.Id} icon-name="utility:priority"
-												size="x-small" class="cib-flag slds-m-right_medium" onclick={openReview}>
-											</lightning-icon>
-										</template>
-										<template if:false={questionary.Rhythm__Flag__c}>
-											<lightning-icon data-id={questionary.Id} icon-name="utility:priority"
-												size="x-small" class="cib-forward:hover slds-m-right_medium"
-												onclick={openReview}>
-											</lightning-icon>
+										<template if:true={questionary.customerFlag}>
+											<template if:true={questionary.Rhythm__Flag__c}>
+												<lightning-icon data-id={questionary.Id} icon-name="utility:priority"
+													size="x-small" class="cib-flag slds-m-right_medium"
+													onclick={openChatHandler}>
+												</lightning-icon>
+											</template></template>
+									</template>
+									<template if:false={issupplier}>
+										<template if:true={questionary.customerFlag}>
+											<template if:true={questionary.Rhythm__Flag__c}>
+												<template if:false={questionary.disableReject}>
+													<lightning-icon data-id={questionary.Id}
+														icon-name="utility:priority" size="x-small"
+														class="cib-flag slds-m-right_medium" onclick={openReview}>
+													</lightning-icon>
+												</template>
+												<template if:true={questionary.disableReject}>
+													<lightning-icon data-id={questionary.Id}
+														icon-name="utility:priority" size="x-small"
+														class="cib-flag slds-m-right_medium">
+													</lightning-icon>
+												</template>
+											</template>
+											<template if:false={questionary.Rhythm__Flag__c}>
+												<template if:false={questionary.reviewForm}>
+													<template if:false={questionary.disableReject}>
+														<lightning-icon data-id={questionary.Id}
+															icon-name="utility:priority" size="x-small"
+															class="cib-forward:hover slds-m-right_medium"
+															onclick={openReview}>
+														</lightning-icon>
+													</template>
+													<template if:true={questionary.disableReject}>
+														<lightning-icon data-id={questionary.Id}
+															icon-name="utility:priority" size="x-small"
+															class="cib-forward:hover slds-m-right_medium">
+														</lightning-icon>
+													</template>
+												</template>
+											</template>
 										</template>
 									</template>
+
 									<!-- Flag Ends here -->
 								</div>
 							</div>
 						</div>
 					</div>
+				</div>
+				<div class="slds-col slds-grid slds-grid_vertical-align-center slds-size_10-of-12 slds-text-align_right slds-p-top_x-small slds-p-horizontal_small slds-p-bottom_small"
+					style="display:none;">
+					<div class="slds-col">
+						<lightning-button variant="brand" label="Review & Comments" data-id={questionary.Id}
+							class="slds-p-left_medium  rqt-redbtn" icon-name="utility:display_text"
+							onclick={handleQuestionHighlight}>
+						</lightning-button>
+					</div>
+					<div class="slds-col ">
+						<template if:true={issupplier}>
+							<template if:true={questionary.customerFlag}>
+								<template if:true={questionary.rejectButton}>
+									<lightning-button variant="brand" data-label="Rejected" data-id={questionary.Id}
+										class="slds-p-left_medium  rqt-redbtn" icon-name="utility:close">
+									</lightning-button>
+								</template></template>
+						</template>
+						<template if:false={issupplier}>
+							<template if:true={questionary.customerFlag}>
+								<template if:false={questionary.rejectButton}>
+									<template if:false={questionary.needData}>
+										<lightning-button variant="destructive" data-label="Reject"
+											onclick={handleReject} data-id={questionary.Id}
+											class="slds-p-left_medium rqt-redbtn" disabled={questionary.disableReject}>
+										</lightning-button>
+									</template>
+									<template if:true={questionary.needData}>
+										<lightning-button variant="success" label="Approved" onclick={handleReject}
+											data-id={questionary.Id} class="slds-p-left_medium rqt-greenbtn"
+											disabled={questionary.disableReject} icon-name="utility:check">
+										</lightning-button>
+									</template>
+								</template>
+								<template if:true={questionary.rejectButton}>
+									<lightning-button variant="destructive" data-label="Rejected" onclick={handleReject}
+										data-id={questionary.Id} class="slds-p-left_medium rqt-redbtn"
+										icon-name="utility:close" disabled={questionary.disableReject}>
+									</lightning-button>
+								</template>
+							</template>
+						</template>
+					</div>
+					<div class="slds-col slds-size_1-of-12 slds-float_left">
+						<template if:true={issupplier}>
+							<template if:true={questionary.capaAction}>
+								<template if:true={questionary.saveActionForm}>
+									<button class="slds-button slds-button_icon slds-button_icon-border-filled slds-m-left_small"
+									data-id={questionary.Id} label="CAPA" alternative-text="CAPA" title="CAPA" onclick={openActionForm}>
+										<lightning-icon icon-name="utility:edit_form" size="xx-small" style="background-color: rgb(1, 118, 211);"></lightning-icon>
+									<span class="slds-assistive-text">Close</span>
+									</button>
+									<!-- <lightning-button data-id={questionary.Id} icon-name="utility:edit_form"
+										label="CAPA" alternative-text="CAPA" title="CAPA" class="slds-m-left_small"
+										onclick={openActionForm} variant="brand" style="background-color: rgb(1, 118, 211);"></lightning-button> -->
+									<!-- <lightning-icon data-id={questionary.Id} icon-name="utility:record_alt"
+										size="x-small" onclick={openActionForm}>
+									</lightning-icon> -->
+								</template></template>
+						</template>
+						<template if:false={issupplier}>
+							<template if:true={questionary.capaAction}>
+								<template if:false={questionary.saveActionForm}>
+									<template if:false={questionary.reviewForm}>
+										<!-- <lightning-icon data-id={questionary.Id} icon-name="utility:record_alt"
+											size="x-small" onclick={openActionForm}>
+										</lightning-icon> -->
+										<lightning-button data-id={questionary.Id} icon-name="utility:edit_form"
+											label="CAPA" alternative-text="CAPA" title="CAPA" class="slds-m-left_small"
+											onclick={openActionForm}></lightning-button>
+									</template>
+								</template>
+								<template if:true={questionary.saveActionForm}>
+									<lightning-button data-id={questionary.Id} icon-name="utility:edit_form"
+										label="CAPA" alternative-text="CAPA" title="CAPA" class="slds-m-left_small"
+										onclick={openActionForm} variant="brand"></lightning-button>
+									<!-- <lightning-icon data-id={questionary.Id} icon-name="utility:record_alt"
+										size="x-small" onclick={openActionForm}>
+									</lightning-icon> -->
+									<!-- <lightning-button-icon icon-name="utility:close" variant="bare" size="small" style="margin-top:2px;"
+										data-id={questionary.Id} onclick={deleteForm} alternative-text="Delete file"
+										class="closericon">
+									</lightning-button-icon> -->
+								</template>
+							</template>
 
+						</template>
+
+					</div>
 				</div>
 
 				<!-- File upload -->
-				<template if:true={questionary.showUpload}>
-					<!-- <lightning-button key={questionary.Id} variant="brand" label="Upload"></lightning-button> -->
-					<!-- <lightning-file-upload
-							key={questionary.Id} label="Upload Files"
-							name="uploadFiles"
-							accept=".pdf"
-							record-id={questionary.Id} onuploadfinished={uploadFilesHandler} multiple></lightning-file-upload> -->
-					<!-- variant="label-hidden" -->
-					<div class="slds-form-element slds-p-left_x-small slds-text-align_left">
-						<!-- 
-						<span class="slds-form-element__label" id="file-selector-primary-label-105"></span>
-						<div class="slds-form-element__control">
-							<div class="slds-file-selector slds-file-selector_files">
-								<div class="slds-file-selector__dropzone">
-									<input data-id={questionary.Id} onchange={uploadFilesHandler} type="file" class="slds-file-selector__input slds-assistive-text" accept="image/*, .pdf, .csv, .docx" id="file-upload-input-107" aria-labelledby="file-selector-primary-label-105 file-selector-secondary-label106" />
-									<label class="slds-file-selector__body" for="file-upload-input-107" id="file-selector-secondary-label106">
-										<span class="slds-file-selector__button slds-button slds-button_neutral">
-											<span class=" slds-button__icon slds-button__icon_left" style="margin-top:-17px;" aria-hidden="true">
-												<lightning-icon icon-name="utility:attach" size="x-small"></lightning-icon>
-											</span>
-											Attach Files
-										</span>
-									</label>
-								</div>
-							</div>
-						</div>
-						<template if:true={questionary.showUploadProgress} >
-							<div class="slds-m-around_small cad-tnailcard">
-								<div class="cad-tnailcardinner"></div>
-							</div>
-						</template>
-						-->
-						<!-- <span class="slds-form-element__label" id={questionary.spanId} ></span> -->
 
-						<div class="slds-grid slds-text-align_left slds-p-left_x-small slds-p-bottom_small">
-							<div class="slds-col">
-								<!-- Question Number Starts here -->
-								<span class="slds-form-element__labelttnor no-wordbreak">
-														&nbsp;
-														</span>
-								<!-- Question Number Ends here -->
-							</div>
-							<div class="slds-col slds-size_12-of-12">
-								<div class="slds-grid slds-wrap">
-									<div class="slds-col slds-size_12-of-12">
 
-										<div class="slds-file-selector slds-file-selector_files">
-											<!-- <div class="slds-file-selector__dropzone">
-												<input data-id={questionary.Id} onchange={uploadFilesHandler} disabled={questionary.isEditable} type="file" class="slds-file-selector__input slds-assistive-text" accept="image/*, .pdf, .csv, .docx" id={questionary.inputId} aria-labelledby={questionary.inputAriaBy} />
-												<label class="slds-file-selector__body" for={questionary.inputId} id={questionary.labelId} >
-													<span class="slds-file-selector__button slds-button slds-button_neutral">
-														<span class="slds-button__icon slds-button__icon_left" style="margin-top:-17px;" aria-hidden="true">
-															<lightning-icon icon-name="utility:attach" size="x-small"></lightning-icon>
-														</span>
-														Attach Files
-													</span>
-												</label>
-											</div> -->
-											
-											<lightning-input type="file"
-												accept=".xlsx, .xls, .csv, .png, .doc, .docx, .pdf" label="Attachment : (Limit Size : 3.5mb)"
-												data-id={questionary.Id} onchange={uploadFilesHandler} disabled={questionary.isEditable}>
-											</lightning-input>
-										</div>
-
-									</div>
-
-									<div class="slds-col slds-size_12-of-12">
-
-										<div class="slds-grid" style="width:calc(100% - 35px); overflow-x:auto">
-											<!-- <template if:true={showUploadProgress}>
-												<div class="slds-m-around_small cad-tnailcard">
-													<div class="cad-tnailcardinner">
-													</div>
-												</div>
-											</template> -->
-											<template if:true={uploadingFile}>
-												<div class="slds-m-left_xx-small slds-m-right_small slds-m-vertical_small cad-tnailcard2">
-													<div class="slds-grid slds-wrap">
-														<div class="slds-col slds-m-left_x-small slds-m-vertical_xx-small"
-															style="width:95px;" title="Click to Download">
-															<lightning-spinner alternative-text="Loading"
-																size="x-small"></lightning-spinner>
-														</div>
-													</div>
-												</div>
-											</template>
-											<template if:true={questionary.Files__c}>
-												<template for:each={questionary.Files__c} for:item="file">
-													<div class="slds-m-right_small slds-m-vertical_small cad-tnailcard2"
-														key={file}>
-														<div class="slds-grid slds-wrap">
-															<div class="slds-col slds-m-left_x-small slds-m-vertical_xx-small"
-																style="width:0px" title="Click to Download">
-
-																<template if:true={file.isPng}>
-																	<a href={file.url} download={file.filedata}>
-																		<lightning-icon icon-name="doctype:image"
-																			size="small">
-																		</lightning-icon>
-																	</a>
-																	<template if:false={questionary.isEditable}>
-																		<lightning-button-icon icon-name="utility:close"
-																			variant="bare" data-id={questionary.Id}
-																			data-key={file.name} onclick={deleteFile}
-																			alternative-text="Delete file"
-																			class="closericon">
-																		</lightning-button-icon>
-																	</template>
-																</template>
-																<template if:true={file.isPdf}>
-																	<a href={file.url} download={file.filedata}>
-																		<lightning-icon icon-name="doctype:pdf"
-																			size="small">
-																		</lightning-icon>
-																	</a>
-																	<template if:false={questionary.isEditable}>
-																		<lightning-button-icon icon-name="utility:close"
-																			variant="bare" data-id={questionary.Id}
-																			data-key={file.name} onclick={deleteFile}
-																			alternative-text="Delete file"
-																			class="closericon">
-																		</lightning-button-icon>
-																	</template>
-																</template>
-																<template if:true={file.isDocx}>
-																	<a href={file.url} download={file.filedata}>
-																		<lightning-icon icon-name="doctype:word"
-																			size="small">
-																		</lightning-icon>
-																	</a>
-																	<template if:false={questionary.isEditable}>
-																		<lightning-button-icon icon-name="utility:close"
-																			variant="bare" data-id={questionary.Id}
-																			data-key={file.name} onclick={deleteFile}
-																			alternative-text="Delete file"
-																			class="closericon">
-																		</lightning-button-icon>
-																	</template>
-																</template>
-																<template if:true={file.isCsv}>
-																	<a href={file.url} download={file.filedata}>
-																		<lightning-icon icon-name="doctype:csv"
-																			size="small">
-																		</lightning-icon>
-																	</a>
-																	<template if:false={questionary.isEditable}>
-																		<lightning-button-icon icon-name="utility:close"
-																			variant="bare" data-id={questionary.Id}
-																			data-key={file.name} onclick={deleteFile}
-																			alternative-text="Delete file"
-																			class="closericon">
-																		</lightning-button-icon>
-																	</template>
-							on									</template>
-
-															</div>
-															<div class="slds-col" style="overflow:hidden; width:100px;">
-																<a href={file.url} download={file.filedata}>
-																	<div class="slds-m-around_x-small"
-																		style="font-size:12px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;"
-																		title={file.name}>
-																		{file.name}
-																	</div>
-																</a>
-															</div>
-														</div>
-													</div>
-												</template>
-											</template>
-										</div>
-
-									</div>
-
-								</div>
-							</div>
-						</div>
-					</div>
-				</template>
-				<!-- <template if:true={questionary.Children}>
+				<template if:true={questionary.Children}>
 					<template for:each={questionary.Children} for:item="childquestion">
 						<template if:true={childquestion.isdisplay}>
-							<div key={childquestion.isdisplay} class="temp_dashed-border-top slds-m-left_large">
+							<div key={childquestion.isdisplay} class="temp_dashed-border-top">
+								<!--temp_dashed-border-top-->
 								<c-rtmvpc-render-question-template selectquestion={selectquestionHandler}
-									responses={questionary.Children} key={childquestion.isdisplay}>
+									onflagchange={handlecustomerFlag} issupplier={issupplier}
+									onselectchange={handleConversationHistory} responses={childquestion.questions}
+									onactionchange={handleActionChange} key={childquestion.isdisplay}
+									ongetdata={handleFileRecord} onhandleonload={handleFileRecord}
+									conditionaval={childquestion.optionValue} recid={recordId}
+									onuploadfile={handleChildUpload} accountassessmentid={accountassessmentid}
+									qtype={questionary.type} onremovequeshighlight={removehighlightHandler}
+									onvaluechange={handlechildchange} onrejectchange={handleRejectButton}
+									timeline={timeline} is-preview-component={isPreviewComponent}>
 								</c-rtmvpc-render-question-template>
 							</div>
 						</template>
 					</template>
-				</template> -->
+				</template>
 			</div>
 		</template>
+	</template>
+	<template if:true={showPopup}>
+		<section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="modal-heading-01"
+			class="slds-modal slds-fade-in-open">
+			<div class="slds-modal__container">
+				<div class="slds-modal__header">
+					<h1 id="modal-heading-01" class="slds-modal__title slds-hyphenate">
+
+					</h1>
+				</div>
+				<div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+					<p>Flagging the question will make the response editable, Attachments and CAPAs added to the
+						Conditional questions will be deleted when the response is changed</p>
+				</div>
+				<div class="slds-modal__footer">
+					<button class="slds-button slds-button_neutral" aria-label="Cancel and close" onclick={handleCancelButton}>Cancel</button>
+					<button class="slds-button slds-button_brand" onclick={handleFlagButton}>Ok</button>
+				</div>
+			</div>
+		</section>
+		<div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
 	</template>
 </template>

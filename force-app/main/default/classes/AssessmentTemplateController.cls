@@ -40,12 +40,12 @@ public with sharing class AssessmentTemplateController {
         return secList;
     }
 
-/**
-* @description Get the details of the Template.
-* @param templateId This is a record id of an Template__c.
-*@return
-*/    
-    @AuraEnabled(Cacheable=true)
+    /**
+    * @description Get the details of the Template.
+    * @param templateId This is a record id of an Template__c.
+    *@return
+    */    
+    @AuraEnabled
     public static Boolean getTemplateDetails(String templateId) {
         try {
             Boolean hasStatusNew = false;
@@ -146,7 +146,8 @@ public with sharing class AssessmentTemplateController {
         try {
             templateId = String.escapeSingleQuotes(templateId) ;
             if(String.isNotBlank(templateId)) {
-                List<Question__c> questionList = [SELECT Id,Rhythm__Question__c, Section__c
+                List<Question__c> questionList = [SELECT Id,Rhythm__Question__c,Section__c,Parent_Question__c,
+                                                 Assessment_Template__r.Status__c
                                 FROM Question__c
                                 WHERE Assessment_Template__c= :templateId
                                 AND Section__c != NULL
@@ -257,17 +258,23 @@ public with sharing class AssessmentTemplateController {
             if(recIdList.size()>0) {
                 Database.DeleteResult[] drchildList;
                 List<Question__c> questionList = new List<Question__c>();
+                List<Question__c> childquestionList = new List<Question__c>();
                 if(delchildobjrecs==true) {
-                    questionList = [SELECT Id
+                    questionList = [SELECT Id,(SELECT Id,name from Questions__r)
                                     FROM Question__c
                                     WHERE section__c IN :recIdList
                                     WITH SECURITY_ENFORCED];
-                    
+                   
                 }
                 if(questionList.isEmpty() == false) {
                     drchildList=safe.doDelete(questionList);
                 }
-                
+                else {
+                    questionList = [SELECT Id from Question__c where Id IN:recIdList or Parent_Question__c IN:recIdList WITH SECURITY_ENFORCED];
+                }
+                if(questionList.isEmpty() == false) {
+                    drchildList=safe.doDelete(questionList);
+                }  
                 If(recIdList.isEmpty() == false){
                     List<Section__c> deleteList = [SELECT Id FROM Section__c WHERE ID IN:recIdList 
                                                     WITH SECURITY_ENFORCED];
@@ -326,6 +333,34 @@ public with sharing class AssessmentTemplateController {
             List<Section__c> sectionList = [SELECT Id FROM Section__c WHERE Assessment_Template__c=:templateId WITH SECURITY_ENFORCED];
             return sectionList.size();
         }catch(exception e){
+            String errorMsg = e.getMessage();
+            throw new AuraHandledException(ErrorMsg);
+        }
+    }
+
+      /**
+* @description Get the details of the Template.
+* @param templateId This is a record id of an Template__c.
+*@return
+*/    
+    @AuraEnabled(cacheable=true)
+    public static Boolean getTemplateDetail(String templateId) {
+        try {
+            Boolean hasStatusNew = false;
+            templateId = String.escapeSingleQuotes(templateId);
+            if(String.isNotBlank(templateId)) {
+                List<Assessment_Template__c> assessmentList=  [SELECT Status__c
+                                                                FROM Assessment_Template__c
+                                                                WHERE Id= :templateId
+                                                                WITH SECURITY_ENFORCED];
+                Assessment_Template__c assessmentTemp = (AssessmentList.size()==1)?AssessmentList[0]:null;
+                if(assessmentTemp  != null && assessmenttemp.Status__c.equalsIgnoreCase('New')){
+                    hasStatusNew = true;
+                }
+            }
+            return hasStatusNew;
+        }
+        catch(Exception e) {
             String errorMsg = e.getMessage();
             throw new AuraHandledException(ErrorMsg);
         }

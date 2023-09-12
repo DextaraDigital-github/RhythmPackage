@@ -1,0 +1,89 @@
+<template>
+	<div class="slds-card" style="border: 1px solid rgb(201, 201, 201)">
+		<div class="rdm-grey-bg slds-card__header slds-grid slds-m-bottom_none">
+			<header class="slds-has-flexi-truncate ">
+
+				<div class="cdgtitletoolbar slds-grid slds-wrap">
+					<div class="slds-col slds-small-size_12-of-12 slds-medium-size_6-of-12 slds-large-size_6-of-12">
+
+						<div class="slds-grid slds-wrap">
+							<div class="slds-text-left">
+								<lightning-icon icon-name="standard:question_feed" size="small" title="">
+								</lightning-icon>
+							</div>
+							<div class="slds-text-left slds-col_bump-right slds-p-left_small">
+								<h4 style="min-width:fit-content;font-weight: bold;font-size: large;">
+									<p>Questions</p>
+								</h4>
+							</div>
+						</div>
+					</div>
+					<div class="slds-col slds-small-size_12-of-12 slds-medium-size_6-of-12 slds-large-size_6-of-12">
+						<div class="slds-grid slds-wrap slds-gutters_small">
+							<div class="slds-col slds-text-align_right slds-size_1-of-1 ">
+								<div
+									class="slds-grid slds-wrap slds-grid_align-end slds-gutters_x-small slds-p-right_xx-small">
+									<template if:true={tempStatus}>
+										<div class="slds-p-left_xxx-small">
+											<lightning-button-icon icon-name="utility:refresh"
+												style="font-size: small;color: white;" onclick={handleRefresh}
+												alternative-text="Refresh" title="Refresh">
+											</lightning-button-icon>
+										</div>
+										<template lwc:if={show.childReorderBtn}>
+											<div class="slds-p-left_xxx-small">
+												<lightning-button style="font-size: small;color: white;"
+													label="Reorder Conditional Questions" onclick={cQuesReorderHandler}>
+												</lightning-button>
+											</div>
+										</template>
+										<div class="slds-p-left_xxx-small">
+											<lightning-button style="font-size: small;color: white;" label="New"
+												title="New Question" onclick={handleNewClick}>
+											</lightning-button>
+										</div>
+									</template>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</header>
+		</div>
+		<div class="rtm-qcontent">
+			<!-- <div class='rtm-button slds-border_top' style="height: 300px;"> -->
+			<template if:true={show.table}>
+				<div class="rtm-button slds-border_top cdg questions">
+					<lightning-tree-grid class="rdq-tree-grid" key-field="Name" data={data} columns={gridcolumns}
+						onrowaction={handleRowAction} onrowselection={handleRowSelection} show-row-number-column
+						wrap-text-max-lines="5" column-widths-mode="auto">
+					</lightning-tree-grid>
+				</div>
+			</template>
+
+			<template if:true={viewQuestions}>
+				<c-rtmvpc-question-creation onhandleaftersave={handlesave} onhandlecancel={handleCancel}
+					template-id={tempId} question-id={questionId} section-name={sectionName} tempstatus={tempStatus}>
+				</c-rtmvpc-question-creation>
+			</template>
+			<template if:true={createNewQues}>
+				<c-rtmvpc-question-creation onhandleaftersave={handlesave} onhandlecancel={handleCancel}
+					assessment-template={recordId} tempstatus={tempStatus}>
+				</c-rtmvpc-question-creation>
+			</template>
+			<template if:true={createChildQues}>
+				<c-rtmvpc-child-question-creation onhandleaftersave={handlesave} onhandlecancel={handleClose}
+					childwrapper={childQuesWrapper}>
+				</c-rtmvpc-child-question-creation>
+			</template>
+			<template if:true={show.cQuesReorderModal}>
+				<c-rtmvpc-child-question-reordering question={selectedRow} onclosemodal={closeCQuesReorderHandler}>
+				</c-rtmvpc-child-question-reordering>
+			</template>
+			<template if:true={showToast}>
+				<c-Show-Toast-Message message-from-component={totastmessage} is-show-modal={showToast}
+					is-sucess={success} onclosetoast={closeToastHandler}></c-Show-Toast-Message>
+			</template>
+		</div>
+	</div>
+</template>

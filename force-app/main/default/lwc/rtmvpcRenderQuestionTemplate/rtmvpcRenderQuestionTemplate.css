@@ -9,3 +9,46 @@
 .temp_question_border-bottom:last-child {border-bottom: 0px solid #f3f3f3;}
 .no-wordbreak {text-align:right; padding-right:5px;}
 .temp_dashed-border-top {border-top: 1px dashed #f3f3f3;}
+.rqt-greenbtn { 
+    --slds-c-button-success-text-color: white;
+
+    --slds-c-button-color-background:#49c6ab;
+    --slds-c-button-color-background-hover:#30a38a;
+    --slds-c-button-text-color:#ffffffcc;
+    --slds-g-color-neutral-base-50:#ffffffcc;
+    --slds-c-button-text-color-hover: #ffffff;
+
+    --slds-c-button-sizing-border: 0; 
+    }
+.red-background-icon{
+     background: red;
+}
+.rqt-redbtn { 
+    --sds-c-button-destructive-color-background: rgb(235, 103, 117); 
+    --slds-c-button-color-background:#eb6775;
+    --slds-c-button-color-background-hover:#da4c5a;
+    --slds-c-button-text-color:#ffffffcc;
+    --slds-g-color-neutral-base-50:#ffffffcc;
+    --slds-c-button-text-color-hover: #ffffff;
+    --slds-c-button-sizing-border: 0;
+    --sds-c-button-color-background-disabled: #eb6775;
+    }
+.red-non-utility-icon {
+        --sds-c-icon-color-foreground: #CB0015;
+}
+.rqt-redbtn_n { 
+    
+    --slds-c-button-sizing-border: 0;
+    --slds-c-button-text-color:#da4c5a;
+    --slds-g-color-neutral-base-50:#da4c5a;
+    --slds-c-button-text-color-hover: #da4c5a;
+    }
+
+.rqt-attchbtn-red {
+    --sds-c-icon-color-foreground-default: rgb(255 0 0);
+    border: 1px solid rgb(255 0 0);
+}
+.rqt-attchbtn-black {
+    --sds-c-icon-color-foreground-default: rgb(0 0 0);
+    border: 1px solid rgb(0 0 0);
+}

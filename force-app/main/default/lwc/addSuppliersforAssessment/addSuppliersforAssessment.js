@@ -1,11 +1,14 @@
 import { LightningElement,api,track,wire} from 'lwc';
-import { CloseActionScreenEvent } from 'lightning/actions';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import addSuppliers from '@salesforce/apex/AssessmentController.sendAssessment';
 import getAssessmentRecord from '@salesforce/apex/AssessmentController.getAssessmentRecord';
 import { NavigationMixin } from 'lightning/navigation';
 import getTodayDate from '@salesforce/apex/AssessmentController.getTodayDate';
 import { CurrentPageReference } from 'lightning/navigation';
+import { RefreshEvent } from 'lightning/refresh';
+import { loadStyle } from 'lightning/platformResourceLoader';
+import CUS_STYLES from '@salesforce/resourceUrl/rtmcpcsldscustomstyles';
+
 export default class AddSuppliersforAssessment extends NavigationMixin(LightningElement) {
     @api recordId;
     @track suppliersList=[];
@@ -15,6 +18,17 @@ export default class AddSuppliersforAssessment extends NavigationMixin(Lightning
     startDate;
     endDate;
     assessmentId;
+    showManageSuppliers = false;
+    showLWC = false;
+    @api source;
+
+    handleSuppliers(){
+        this.showManageSuppliers = true;
+    }
+
+    handleRefresh() {
+        this.dispatchEvent(new RefreshEvent());
+    }
 
     @wire(CurrentPageReference)
     getPageReferenceParameters(currentPageReference) {
@@ -25,13 +39,22 @@ export default class AddSuppliersforAssessment extends NavigationMixin(Lightning
 
     connectedCallback() {
         this.getTodayDate();
+        if(typeof this.source === 'undefined'){
+            this.showLWC = true;
+        }
+        Promise.all([
+            loadStyle(this, CUS_STYLES),
+        ]).then(() => {
+        })
+            .catch(error => {
+            });
     }
 
     getTodayDate(){
         getTodayDate()
         .then(result => {
             if(result){
-                this.todayDate = result;
+                this.todayDate = JSON.parse(JSON.stringify(result));
             }
         })
         .catch(error => {
@@ -46,7 +69,7 @@ export default class AddSuppliersforAssessment extends NavigationMixin(Lightning
             this.startDate = result.data[0].Rhythm__Start_Date__c;
             this.endDate = result.data[0].Rhythm__End_Date__c;
         } else if (result.error) {
-            //console.log(result.error);
+            
         }
     }
 
@@ -57,24 +80,19 @@ export default class AddSuppliersforAssessment extends NavigationMixin(Lightning
             if(this.existingSuppList.length>0){
                 exSupListStr = JSON.stringify(this.existingSuppList);
             }
-             if(this.delList.length>0){
+             if(typeof this.delList !== 'undefined' && this.delList.length>0){
                 deleteListStr = JSON.stringify(this.delList);
             }
             let todayDate =  new Date(this.todayDate).toISOString().substring(0, 10);
             let save = false;
-            if(this.endDate !== undefined){
-                if(new Date(todayDate)>=new Date(this.startDate) &&  new Date(todayDate) <=new Date(this.endDate)){
-                    save = true;
-                }
-            }else if(new Date(todayDate)>=new Date(this.startDate)){
-                save = true;
-            }
-            if(save){
-                if(this.suppliersList.length > 0 || this.delList.length>0){
+           if(new Date(this.endDate) >= new Date(todayDate)){
+                if(this.suppliersList.length > 0 || (typeof this.delList !== 'undefined' && this.delList.length>0)){
                     addSuppliers({assessmentRecord:this.assessmentRecord,operationType:'update',suppliers:JSON.stringify(this.suppliersList),existingSups:exSupListStr,deleteList:deleteListStr})
                     .then(result => {
                         if(result.isSuccess === true){
-                            this.showModal = false;
+                            this.showManageSuppliers = false;
+                            this.source = false;
+                            this.showLWC = false;
                             this.showNotification('Success','Suppliers Added to Assessments Successfully.','success');
                             this.closeModal();
                             this.navigateToRecordPage();
@@ -87,13 +105,14 @@ export default class AddSuppliersforAssessment extends NavigationMixin(Lightning
                         this.showNotification('Error',error.body.message,'error');
                     });
                 }else{
-                    this.showNotification('Error','Select at least one Supplier to create the Assessment Program','error');
-                }
+                    this.closeModal();
+                }         
             }else{
-                this.showNotification('Error','Suppliers who received the Assessment cannot be removed from the Assessment Program.','error');
+                this.showNotification('Error','Suppliers cannot be added for the past Assessment.','error');
             }
         }catch(e){
-            //console.log(e);
+            let errString = e.name+' '+e.message;
+            this.showNotification('Error',errString,'error');
         }
     }
 
@@ -113,7 +132,12 @@ export default class AddSuppliersforAssessment extends NavigationMixin(Lightning
     }
 
     closeModal() {
-        this.dispatchEvent(new CloseActionScreenEvent());
+        if(this.source){
+            this.source = false;
+        }else{
+            this.showManageSuppliers = false;
+        }
+        this.handleRefresh();
     }
     navigateToRecordPage(){
         this[NavigationMixin.Navigate]({

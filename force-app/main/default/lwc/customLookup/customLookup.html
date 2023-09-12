@@ -8,11 +8,11 @@
 						aria-haspopup="listbox" role="combobox">
 						<div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right"
 							role="none">
-							<lightning-input type="search" id="combobox-id-16" value={lookupName}
+							<lightning-input style="--slds-c-input-color-border: rgb(201, 201, 201);" type="search" id="combobox-id-16" value={lookupName}
 								onchange={handleKeyChange}  onkeydown={handleClick}
 								onclick={handleClick} aria-activedescendant="option1" label={lookupLabel}
 								aria-autocomplete="list" aria-controls="listbox-id-12" role="textbox"
-								placeholder={lookupLabel} onblur={hideValues}>
+								placeholder={lookupLabel} onblur={hideValues} disabled={istempstatus}>
 							</lightning-input>
 							<!-- <button
                             class="slds-button slds-button_icon slds-input__icon slds-input__icon_right searchButtonStyle"
@@ -27,7 +27,7 @@
 							No Result Found!
 						</div> -->
 						<template if:true={showSearchedValues}>
-							<div class="slds-box" style="width: 100%; max-height: 135px; padding: 0px; overflow-y: auto; position: absolute; background-color: white; z-index: 2; top: 56px;" tabindex="-1">
+							<div class="slds-box" style="width: 100%; max-height: 135px; padding: 0px; overflow-y: auto; position: absolute; background-color: white; z-index: 500; top: 56px;" tabindex="-1">
 								<ul class="" role="">
 									<template for:each={lookupValuesList} for:item="rec">
 										<li class="slds-p-top_x-small slds-p-bottom_x-small slds-p-left_medium"

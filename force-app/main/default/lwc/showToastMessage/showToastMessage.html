@@ -14,12 +14,21 @@
              </button>
 
 			<template if:true={isSucess}>
-				<div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1" style="background-color : green; ">
-					<p style="color:White;">{messageFromComponent}</p>
-				</div></template>
+				<div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1" style="background-color : green;">
+					<p style="color:White; text-align:center;">{messageFromComponent}</p>
+				</div>
+				<div class="" style="background-color : green;">
+					<lightning-button label="OK" title="OK" onclick={hideModalBox} class="slds-align_absolute-center slds-m-bottom_small">
+					</lightning-button>
+				</div>
+			</template>
             <template if:false={isSucess}>
                 <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-2" style="background-color : red; ">
-					<p style="color:White;">{messageFromComponent}</p>
+					<p style="color:White;text-align:center;">{messageFromComponent}</p>
+				</div>
+				<div style="background-color : red;">
+					<lightning-button label="OK" title="OK" onclick={hideModalBox} class="slds-align_absolute-center slds-m-bottom_small">
+					</lightning-button>
 				</div>
             </template>
 

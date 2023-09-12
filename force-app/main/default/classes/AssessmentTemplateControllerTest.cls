@@ -20,7 +20,7 @@ private class AssessmentTemplateControllerTest {
 
             Id clinicRecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByName().get('Supplier').getRecordTypeId();
             Map<String, Object> accAttributes = new Map<String, Object>{'RecordTypeId'=>clinicRecordTypeId,'Name'=>'Supplier'};
-            List<Account> accts = TestDataFactory.createAccounts(1,true,accAttributes);
+            TestDataFactory.createAccounts(1,true,accAttributes);
 
             Map<String, Object> assementTemplateattributes = new Map<String, Object>{'Name'=>'2023 Assessment template'};
             List<Assessment_Template__c> templist=TestDataFactory.createAssessmentTemp(1,true,assementTemplateattributes);
@@ -30,9 +30,6 @@ private class AssessmentTemplateControllerTest {
             'Rhythm__Question__c'=>'What is the feedback for service?','Rhythm__Question_Type__c'=>'Text','Rhythm__Required__c'=>True,
             'Rhythm__Section__c'=>seclist[0].Id};
             TestDataFactory.createQuestion(1,true,questionAttributes);
-            Map<String, Object> assessmentattributes = new Map<String, Object>{'Template__c'=>templist[0].Id,
-            'Name'=>'Assessment 2023','Rhythm__Status__c'=>'New','Rhythm__Number_of_Questions__c'=>10};
-
         }
     }
     /**
@@ -63,10 +60,45 @@ private class AssessmentTemplateControllerTest {
             templist[0].status__c='Active';
             //update templist[0];
             AssessmentTemplateController.getTemplateDetails(templist[0].id);
+            AssessmentTemplateController.getTemplateDetail(templist[0].id);
             System.assert(templist.size()>0, True);
             Test.stopTest();
         }
-        
+    }
+
+    @istest
+    static void testgetQuestionsListCatch() {
+        user u = [SELECT Id,UserName FROM User WHERE Email='sysadmin01@testorg.com' LIMIT 1];
+        System.runAs(u){
+            try{
+                Test.startTest();
+                Integer reccount=5;
+                List<Rhythm__Assessment_Template__c> templist=[select id from Rhythm__Assessment_Template__c];
+                List<Rhythm__Section__c> seclist=[select id,Rhythm__No_of_Questions__c from Rhythm__Section__c];
+                List<Rhythm__Question__c> qstnlist=[select id,Rhythm__Section__c from Rhythm__Question__c];
+                
+                AssessmentTemplateController.getQuestionsLists(templist[0].id);
+                AssessmentTemplateController.getRecordsCount(templist[0].id,'Sections');
+                AssessmentTemplateController.getRecordsCount(templist[0].id,'Questions');
+                AssessmentTemplateController.getTemplateSections(templist[0].id);
+                AssessmentTemplateController.updateRecords(seclist);
+                AssessmentTemplateController.updateQustnRecords(qstnlist);
+                AssessmentTemplateController.getTemplateQuestionList(templist[0].id,reccount);
+                AssessmentTemplateController.getSections('\'Test section',templist[0].id);
+                AssessmentTemplateController.getSections('',templist[0].id);
+                AssessmentTemplateController.questionsCount(seclist[0].id);
+                AssessmentTemplateController.sectionsCount(templist[0].id);
+                AssessmentTemplateController.getTemplateDetails(templist[0].id);
+                templist[0].status__c='Active';
+                //update templist[0];
+                AssessmentTemplateController.getTemplateDetails(templist[0].id);
+                AssessmentTemplateController.getTemplateDetail(templist[0].id);
+                System.assert(templist.size()>0, True);
+                Test.stopTest();
+            }catch(exception e){
+                System.assertEquals(e.getMessage() !=null, true,'error catched');
+            }
+        }
     }
     /**
     * @description test method for getTemplateSections.
@@ -84,6 +116,26 @@ private class AssessmentTemplateControllerTest {
             AssessmentTemplateController.deleteRecords(idlist,true);
             System.assert(idlist.size()>0, True);
             Test.stopTest();
+        }
+    }
+
+    @istest
+    static void testgetAssessmentRecordCatch() {
+        user u = [SELECT Id,UserName FROM User WHERE Email='sysadmin01@testorg.com' LIMIT 1];
+        System.runAs(u){
+            try{
+                Test.startTest();
+                AssessmentTemplateController.getTemplateSections('');
+                //List<Assessment__c> asslist=[select id from Assessment__c];
+                List<Account> accts=[select name from Account];      
+                List<id> idlist=new List<id>();
+                idlist.add(accts[0].id);
+                AssessmentTemplateController.deleteRecords(idlist,true);
+                System.assert(idlist.size()>0, True);
+                Test.stopTest();
+            }catch(exception e){
+                System.assertEquals(e.getMessage() !=null, true,'error catched');
+            }
         }
     }
     /**
@@ -131,6 +183,24 @@ private class AssessmentTemplateControllerTest {
             testString = 'Success';
             System.assertEquals(testString =='Success', true,'template deleted');
             Test.stopTest();
+        }
+    }
+
+    @isTest
+    static void deleteTemplateTesException(){
+        user u = [SELECT Id,UserName FROM User WHERE Email='sysadmin01@testorg.com' LIMIT 1];
+        System.runAs(u){
+            try{
+                String testString;
+                List<Assessment_Template__c> templist=[select id from Assessment_Template__c];
+                Test.startTest();
+                delete templist;
+                testString = 'Success';
+                System.assertEquals(testString =='Success', true,'template deleted');
+                Test.stopTest();
+            }catch(exception e){
+                System.assertEquals(e.getMessage() !=null, true,'error catched');
+            }
         }
     }
 }

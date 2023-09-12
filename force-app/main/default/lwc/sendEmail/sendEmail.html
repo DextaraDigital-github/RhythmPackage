@@ -1,0 +1,233 @@
+<template>
+	<template if:true={open}>
+		<section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="modal-heading-01"
+			class="slds-modal slds-fade-in-open slds-modal_medium">
+			<div class="slds-modal__container">
+				<div class="slds-modal__header">
+					<div class="slds-grid slds-wrap">
+						<div class="slds-col slds-large-size_4-of-12 slds-medium-size_0-of-1 slds-size_0-of-1"></div>
+						<div
+							class="slds-col slds-truncate slds-large-size_4-of-12 slds-medium-size_1-of-1 slds-size_1-of-1">
+							<center>
+								<h1 id="modal-heading-01" class="slds-modal__title slds-hyphenate">{currentPage.label}
+								</h1>
+							</center>
+						</div>
+						<div
+							class="slds-col slds-large-size_4-of-12 slds-p-horizontal_x-small slds-medium-size_1-of-1 slds-size_1-of-1">
+							<!-- Modal Footer for navigation between pages -->
+							<template if:true={isReadOnly}>
+								<lightning-button-group class="slds-float_right">
+									<template if:true={currentPage.buttons.previous.show}>
+										<lightning-button label={currentPage.buttons.previous.label}
+											data-name={currentPage.buttons.previous.name}
+											data-pageno={currentPage.pageNo} variant="brand"
+											onclick={previousModalHandler}
+											disabled={currentPage.buttons.previous.disabled}>
+										</lightning-button>
+									</template>
+									<template if:true={currentPage.buttons.next.show}>
+										<lightning-button label={currentPage.buttons.next.label}
+											data-name={currentPage.buttons.next.name} data-pageno={currentPage.pageNo}
+											variant='brand' onclick={nextModalHandler}
+											disabled={currentPage.buttons.next.disabled}>
+										</lightning-button>
+									</template>
+									<template if:true={currentPage.buttons.cancel.show}>
+										<lightning-button label={currentPage.buttons.cancel.label}
+											variant="brand-outline" onclick={cancelModalHandler}
+											disabled={currentPage.buttons.cancel.disabled}>
+										</lightning-button>
+									</template>
+								</lightning-button-group>
+							</template>
+						</div>
+					</div>
+				</div>
+				<div class="sem-modal-body slds-modal__content slds-scrollable_none">
+					<template if:true={show.spinner}>
+						<lightning-spinner size="medium"></lightning-spinner>
+					</template>
+					<template if:false={show.spinner}>
+						<!-- Displays a list of suppliers -->
+						<template lwc:if={pagesData.chooseRecipients.show}>
+							<div class="sem-fh slds-grid slds-grid_vertical">
+								<!-- Functionality to search among suppliers -->
+								<div
+									class="sem-pp-menu slds-col slds-p-horizontal_large slds-p-top_medium slds-p-bottom_small">
+									<lightning-input type="search" variant="label-hidden" placeholder="Search ..."
+										onchange={recSearchHandler} value={show.recSearchKey}
+										is-loading={show.recSearchLoading}>
+									</lightning-input>
+									<div class="slds-text-title slds-m-top_xx-small slds-m-left_xx-small">
+										<template if:true={show.recSearchCount.show}>
+											{show.recSearchCount.value} record(s) found
+										</template>&nbsp;
+									</div>
+								</div>
+								<!-- Displays the list of suppliers -->
+								<div class="sem-fh slds-col slds-scrollable">
+									<lightning-datatable min-column-width="200" key-field="Id" data={recipientsData}
+										columns={columns} onrowselection={rowSelectionHandler}
+										default-sort-direction={defaultSortDirection} sorted-direction={sortDirection}
+										sorted-by={sortedBy} onsort={onHandleSort}
+										selected-rows={email.selectedRecipients} hide-checkbox-column={isReadOnly}
+										show-row-number-column>
+									</lightning-datatable>
+								</div>
+							</div>
+						</template>
+						<!-- Displays fields to compose an email -->
+						<template lwc:elseif={pagesData.composeEmail.show}>
+							<div class="sem-fh slds-grid slds-grid_vertical">
+
+								<!-- Displays number of recipients selected and contains navigation to previous screen -->
+								<div
+									class="sem-pp-menu slds-col slds-p-horizontal_large slds-p-top_medium slds-p-bottom_small">
+									<button class="slds-button slds-button_neutral slds-size_1-of-1" data-pageno={currentPage.pageNo} onclick={previousModalHandler}>Suppliers Selected ({email.selectedRecipientsCount})</button>
+									<!-- <lightning-combobox label="Email Template" value={email.templateId}
+									options={emailTemplatesOpt} onchange={emTempChangeHandler}
+									read-only={email.limitProp}>
+								</lightning-combobox> -->
+								</div>
+
+								<!-- Contains information related to Email -->
+								<div
+									class="sem-fh slds-col slds-p-horizontal_large slds-p-vertical_medium slds-scrollable">
+									<template if:true={isReadOnly}>
+										<lightning-layout multiple-rows>
+											<lightning-layout-item alignment-bump="left" size="12"
+												small-device-size="12" medium-device-size="12" large-device-size="12">
+												<div class="slds-m-bottom_small slds-grid slds-wrap">
+													<span class="slds-col slds-size_1-of-1 slds-large-size_2-of-12 slds-form-element__label">Assessment Program Name</span>
+													<input class="slds-col slds-size_1-of-1 slds-large-size_10-of-12 slds-input sem-rem-bradius" value={email.whatName} readonly />
+											</div>
+											</lightning-layout-item>
+											<lightning-layout-item size="12" small-device-size="12"
+												medium-device-size="12" large-device-size="12">
+												<div class="slds-m-bottom_small slds-grid slds-wrap">
+													<span class="slds-col slds-size_1-of-1 slds-large-size_2-of-12 slds-form-element__label">Sent Date</span>
+													<input class="slds-col slds-size_1-of-1 slds-large-size_10-of-12 slds-input sem-rem-bradius" value={email.sentDate} readonly />
+											</div>
+											</lightning-layout-item>
+											<lightning-layout-item alignment-bump="left" size="12"
+												small-device-size="12" medium-device-size="12" large-device-size="12">
+												<div class="slds-m-bottom_small slds-grid slds-wrap">
+													<span class="slds-col slds-size_1-of-1 slds-large-size_2-of-12 slds-form-element__label">From Name</span>
+													<input class="slds-col slds-size_1-of-1 slds-large-size_10-of-12 slds-input sem-rem-bradius" value={email.fromName} readonly />
+											</div>
+											</lightning-layout-item>
+										</lightning-layout>
+									</template>
+
+									<!-- Subject Information -->
+									<div class="slds-m-bottom_small slds-col slds-grid slds-wrap slds-size_1-of-1">
+										<template if:true={isReadOnly}>
+											<span class="slds-col slds-size_1-of-1 slds-large-size_2-of-12 slds-form-element__label">Subject</span>
+											<input class="xyz slds-col slds-size_1-of-1 slds-large-size_10-of-12 slds-input sem-rem-bradius" value={email.subject} onchange={subjectChangeHandler} readonly={isReadOnly} />
+									</template>
+											<template if:false={isReadOnly}>
+												<lightning-input class="slds-size_1-of-1" placeholder="Add a Subject"
+													name="subject" label="Subject" value={email.subject}
+													onchange={subjectChangeHandler} read-only={isReadOnly}>
+												</lightning-input>
+											</template>
+									</div>
+
+									<!-- Message Information -->
+									<div class="slds-m-bottom_small slds-col">
+										<div class="slds-form-element__label">Message</div>
+										<template if:true={email.isBuilderContent}>
+											<lightning-formatted-rich-text class="slds-input"
+												placeholder="Type, insert files and more" value={email.body}
+												style="min-height: 100px;">
+											</lightning-formatted-rich-text>
+										</template>
+										<template if:false={email.isBuilderContent}>
+											<lightning-input-rich-text placeholder="Type, insert files and more"
+												value={email.body} style="min-height: 100px;"
+												onchange={bodyChangeHandler}>
+											</lightning-input-rich-text>
+										</template>
+									</div>
+
+									<!-- Attachments Information -->
+									<div class="slds-col">
+										<template if:false={isReadOnly}>
+											<lightning-file-upload name="uploadAttachment" label="Attachments"
+												accept=".png,.csv,.pdf,.jpg,.jpeg,.xlsx,.xls,.txt,.docx,.doc"
+												onuploadfinished={fileUploadHandler} multiple>
+											</lightning-file-upload>
+											<template lwc:if={email.attachmentsData}>
+												<div class="slds-m-top_x-small">
+													<lightning-pill-container items={email.attachmentsData.attachments}
+														onitemremove={removeFileHandler}>
+													</lightning-pill-container>
+												</div>
+											</template>
+										</template>
+										<template if:true={isReadOnly}>
+											<template if:true={show.showAttachments}>
+												<div class="slds-form-element__label">Attachments</div>
+												<div class="slds-grid slds-wrap">
+													<template for:each={keyList} for:item="item" for:index="index">
+														<span class="slds-pill slds-pill_link slds-m-right_xx-small slds-m-bottom_xx-small" data-id={item.key}
+															data-title={item.url} onclick={handleDownload} key={item}>
+															<span class="slds-pill__icon_container">
+																<span class="slds-icon_container" title={item.value}>
+																	<lightning-icon icon-name={item.icon}></lightning-icon>
+																</span>
+														</span>
+														<div href="#" class="slds-pill__action" title={item.value}>
+															<span class="slds-pill__label">{item.value}</span>
+														</div>
+														</span>
+														<!-- <lightning-pill
+															class="slds-m-right_xx-small slds-m-bottom_xx-small"
+															icon-name={item.icon} label={item.value} data-id={item.key}
+															data-title={item.url} onclick={handleDownload} key={item}>
+															<lightning-icon icon-name={item.icon}></lightning-icon>
+														</lightning-pill> -->
+													</template>
+												</div>
+											</template>
+										</template>
+									</div>
+
+								</div>
+							</div>
+						</template>
+					</template>
+				</div>
+
+				<!-- Modal Footer for navigation between pages -->
+				<template if:false={isReadOnly}>
+					<div class="slds-modal__footer">
+						<template if:true={currentPage.footerButtons.previous.show}>
+							<lightning-button class="slds-button slds-float_left"
+								label={currentPage.footerButtons.previous.label}
+								data-name={currentPage.footerButtons.previous.name} data-pageno={currentPage.pageNo}
+								variant="brand-outline" onclick={previousModalHandler}
+								disabled={currentPage.footerButtons.previous.disabled}>
+							</lightning-button>
+						</template>
+						<template if:true={currentPage.footerButtons.next.show}>
+							<lightning-button class="slds-button" label={currentPage.footerButtons.next.label}
+								data-name={currentPage.footerButtons.next.name} data-pageno={currentPage.pageNo}
+								variant='brand' onclick={nextModalHandler}
+								disabled={currentPage.footerButtons.next.disabled}>
+							</lightning-button>
+						</template>
+						<template if:true={currentPage.footerButtons.cancel.show}>
+							<lightning-button class="slds-button" label={currentPage.footerButtons.cancel.label}
+								variant="brand-outline" onclick={cancelModalHandler}
+								disabled={currentPage.footerButtons.cancel.disabled}>
+							</lightning-button>
+						</template>
+					</div>
+				</template>
+			</div>
+		</section>
+		<div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
+	</template>
+</template>

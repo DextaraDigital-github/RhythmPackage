@@ -140,7 +140,7 @@ public with sharing class SectionTriggerHandler implements ITriggerHandler {
         Set<Id> templateIds = new Set<Id>();
         try {
             for(Section__c sec: secLst) {
-                if(string.isNotBlank(sec.Assessment_Template__c)){
+                if(string.isNotBlank(sec.Assessment_Template__c) && string.isBlank(sec.Historical_Id__c)){
                     templateIds.add(sec.Assessment_Template__c);
                 }
             }

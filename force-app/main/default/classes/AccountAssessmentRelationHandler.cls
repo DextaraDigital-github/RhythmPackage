@@ -9,8 +9,6 @@
 public with sharing class AccountAssessmentRelationHandler implements ITriggerHandler{
     public static SecurityCheckController safe = new SecurityCheckController();
     private static Savepoint sp;
-
-
      /**
     * @description To execute before insert logic
     * @param newList This is the list of AccountAssessments.  
@@ -97,25 +95,21 @@ public with sharing class AccountAssessmentRelationHandler implements ITriggerHa
     * @description To execute after update logic
     * @param newList This is the list of AccountAssessments.
       @param newMap This is the map of AccountAssessments.
-      @param oldList This is the old list of AccountAssessments.
       @param oldMap This is the old map of AccountAssessments.
     */
-
-    public void updateStatusData(List<SObject> newList , Map<Id, sObject> newMap,Map<Id, sObject> oldMap)
-    {
-     	
+    public void updateStatusData(List<SObject> newList , Map<Id, sObject> newMap,Map<Id, sObject> oldMap){
         List<FieldHistoryTracking__c> fieldtrack = new List<FieldHistoryTracking__c>();
         for(Id assmntId: newMap.keySet()){
-            if(newMap.get(assmntId).get('Rhythm__Status__c') != oldMap.get(assmntId).get('Rhythm__Status__c'))
-            {
-                FieldHistoryTracking__c fieldTracker = new FieldHistoryTracking__c();
-        		fieldTracker.Object_Name__c='AccountAssessmentRelation__c';
-        		fieldTracker.Object_Field_Name__c='Rhythm__Status__c';
-        		fieldTracker.Rhythm__Activity_User__c =UserInfo.getName();
-        		fieldTracker.Object_Field_Value__c=(String)newMap.get(assmntId).get('Rhythm__Status__c');
-        		fieldTracker.Rhythm__object_Record_Id__c=(String)assmntId;
-              	fieldtrack.add(fieldTracker);
-            }
+          if(newMap.get(assmntId).get('Rhythm__Status__c') != oldMap.get(assmntId).get('Rhythm__Status__c')){
+              FieldHistoryTracking__c fieldTracker = new FieldHistoryTracking__c();
+              fieldTracker.Object_Name__c='AccountAssessmentRelation__c';
+              fieldTracker.Object_Field_Name__c='Rhythm__Status__c';
+              fieldTracker.Rhythm__Activity_User__c =UserInfo.getName();
+              fieldTracker.Rhythm__ActivityUserId__c=UserInfo.getUserId();
+              fieldTracker.Object_Field_Value__c=(String)newMap.get(assmntId).get('Rhythm__Status__c');
+              fieldTracker.Rhythm__object_Record_Id__c=(String)assmntId;
+              fieldtrack.add(fieldTracker);
+          }
         }
         if(sp == null){
             sp = Database.setSavepoint();
@@ -137,6 +131,10 @@ public with sharing class AccountAssessmentRelationHandler implements ITriggerHa
     public class SecurityControllerException extends Exception{
     }
 
+
+    /**
+    * @description To get the custom metadata for site.
+    */
     @testVisible 
     public static List<Configuration__mdt> siteURLData{
       get{

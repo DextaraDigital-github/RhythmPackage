@@ -2,7 +2,6 @@ import { LightningElement, track, api } from 'lwc';
 import getRecsCount from '@salesforce/apex/AssessmentTemplateController.getRecordsCount';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent'
 
-
 export default class CustomRecordForm extends LightningElement {
 
   @api fieldsList;
@@ -11,6 +10,9 @@ export default class CustomRecordForm extends LightningElement {
   @api lookupLabel;
   @track selLookupId;
   @track newFlag = false;
+  @track disbaleSave = false;
+  @api sectionId;
+  @api sectionName;
 
   connectedCallback() {
     this.fieldsList = JSON.parse(JSON.stringify(this.fieldsList));
@@ -18,8 +20,13 @@ export default class CustomRecordForm extends LightningElement {
 
   //record on success handler
   handleSuccess(event) {
+    this.sectionName = null;
     const selectedEvent = new CustomEvent('onrefreshdata', { detail: event });
     this.dispatchEvent(selectedEvent);
+    if (this.newFlag === true) {
+      const selEvent = new CustomEvent('savenew');
+      this.dispatchEvent(selEvent);
+    }
   }
 
   //To close the new modal popup
@@ -36,6 +43,7 @@ export default class CustomRecordForm extends LightningElement {
 
   //handle submit for record edit form
   handleSubmit(event) {
+    this.disbaleSave = true;
     var isVal = true;
     this.template.querySelectorAll('lightning-input-field').forEach(element => {
       isVal = isVal && element.reportValidity();
@@ -73,7 +81,9 @@ export default class CustomRecordForm extends LightningElement {
           }
           else {
             fields.Rhythm__Section__c = this.selLookupId;
-            fields.Rhythm__Assessment_Template__c = this.templateId;
+            if (typeof this.templateId !== 'undefined') {
+              fields.Rhythm__Assessment_Template__c = this.templateId;
+            }
             getRecsCount({ objName: 'Questions' }).then(result => {
               fields.Rhythm__Question_Sequence_Number__c = (typeof result !== 'undefined') ? Number(result) + 1 : '0';
               this.template.querySelector('lightning-record-edit-form').submit(fields);
@@ -81,12 +91,11 @@ export default class CustomRecordForm extends LightningElement {
               this.dispatchEvent(
                 new ShowToastEvent({
                   title: 'Success',
-                  message: 'successfully created',
+                  message: 'Successfully Created',
                   variant: 'success',
                 }),
               );
             }).catch(error => {
-              //console.log('getRecsCount==>'+error);
             });
           }
         }
@@ -101,28 +110,52 @@ export default class CustomRecordForm extends LightningElement {
         }
       }
       else if (this.objName === 'Rhythm__Section__c') {
-        fields.Rhythm__Assessment_Template__c = this.templateId;
-        getRecsCount({ objName: 'Questions', templateId: this.templateId }).then(result => {
-          fields.Rhythm__Section_Sequence_Number__c = (typeof result !== 'undefined') ? Number(result) + 1 : '0';
-          this.template.querySelector('lightning-record-edit-form').submit(fields);
-          this.handleCancel(event);
+        if (this.sectionName != '' && this.sectionName != ' ') {
+          if (typeof this.templateId !== 'undefined') {
+            if (typeof fields !== 'undefined') {
+              fields.Rhythm__Assessment_Template__c = this.templateId;
+            }
+          }
+          if (this.sectionId != null && this.sectionId != undefined) {
+            fields.Id === this.sectionId;
+          }
+          getRecsCount({ objName: 'Questions', templateId: this.templateId }).then(result => {
+            //fields.Rhythm__Section_Sequence_Number__c = (typeof result !== 'undefined') ? Number(result) + 1 : '0';
+            this.template.querySelector('lightning-record-edit-form').submit(fields);
+            this.handleCancel(event);
+            if (this.sectionId != null && this.sectionId != undefined) {
+              this.dispatchEvent(
+                new ShowToastEvent({
+                  title: 'Success',
+                  message: 'Successfully Updated',
+                  variant: 'success',
+                }),
+              );
+            }
+            else {
+              this.dispatchEvent(
+                new ShowToastEvent({
+                  title: 'Success',
+                  message: 'Successfully Created',
+                  variant: 'success',
+                }),
+              );
+            }
+
+            this.handleCancel(event);
+
+          }).catch(error => {
+          });
+        }
+        else {
           this.dispatchEvent(
             new ShowToastEvent({
-              title: 'Success',
-              message: 'successfully created',
-              variant: 'success',
+              title: 'Error creating record',
+              message: 'Please enter all the required fields',
+              variant: 'error',
             }),
           );
-          if (this.newFlag === true) {
-            const selEvent = new CustomEvent('savenew');
-            this.dispatchEvent(selEvent);
-          }
-          else {
-            this.handleCancel(event);
-          }
-        }).catch(error => {
-          //console.log('Error in handle submit ' + error);
-        });
+        }
       }
     }
     else {
