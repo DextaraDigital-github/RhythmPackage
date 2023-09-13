@@ -82,7 +82,7 @@ jobs:
 
     # Generate Violation Report
       - name: 'Scan for Violations and Generate report'
-        run: sfdx scanner:run:dfa --target "./**/*.cls" --projectdir "./" --outfile ViolationReport.csv --format csv
+        run: sfdx scanner:run:dfa --target "./**/*.cls" --projectdir "./" --outfile ViolationReport.html --format html
        
     # Send Violation Report Mail 
       - name: 'Send mail'
@@ -97,6 +97,6 @@ jobs:
           to: akamanasf@gmail.com
           from: Rhythm Package Repository Actions Hub	
           body: ${{github.event.name}} pipeline got executed successfully!\n PFA
-          attachments: ViolationReport.csv
+          attachments: ViolationReport.html
           convert_markdown: true
           priority: normal
