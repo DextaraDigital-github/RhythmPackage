@@ -82,7 +82,7 @@ jobs:
 
     # Generate Violation Report
       - name: 'Scan for Violations and Generate report'
-        run: sfdx scanner:run:dfa --target "./**/*.cls" --projectdir "./" --outfile ViolationReport.html
+        run: sfdx scanner:run:dfa --target "./**/*.cls" --projectdir "./" --outfile ViolationReport --format html
        
     # Send Violation Report Mail 
       - name: 'Send mail'
@@ -96,7 +96,7 @@ jobs:
           subject: Github Actions workflow result
           to: akamanasf@gmail.com
           from: RHYTHM GitHub Actions
-          html_body: EmailTemplate.html
+          html_body: file://.github/workflows/EmailTemplate.html
           attachments: ViolationReport.html
           convert_markdown: true
           priority: normal
