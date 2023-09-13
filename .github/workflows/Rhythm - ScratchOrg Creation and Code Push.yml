@@ -40,12 +40,17 @@ jobs:
     steps:
     
     # Install Salesforce CLI
-      - name: 'Install Salesforce CLI'
+      - name: Install Salesforce CLI
+        env:
+          GITHUB_PATH: ~/Git/bin
         run: |
-            wget https://developer.salesforce.com/media/salesforce-cli/sfdx-linux-amd64.tar.xz
-            mkdir sfdx-cli
-            tar xJf sfdx-linux-amd64.tar.xz -C sfdx-cli --strip-components 1
-            ./sfdx-cli/install
+              wget https://developer.salesforce.com/media/salesforce-cli/sfdx/channels/stable/sfdx-linux-x64.tar.xz
+              sudo mkdir ~/sfdx-cli
+              sudo tar xJf sfdx-linux-x64.tar.xz -C ~/sfdx-cli --strip-components 1
+              export PATH=$PATH:~/sfdx-cli/bin
+              echo "~/sfdx-cli/bin" >> $GITHUB_PATH
+              sudo chmod -R 777 ~/sfdx-cli
+              sfdx --version
             
     # Run Salesforce CLI Scanner For Security checks
       - name: 'Check for SFDX Update'
