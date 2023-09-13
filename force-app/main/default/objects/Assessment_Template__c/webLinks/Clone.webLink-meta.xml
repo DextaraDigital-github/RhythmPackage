@@ -8,5 +8,5 @@
     <masterLabel>Clone</masterLabel>
     <openType>replace</openType>
     <protected>false</protected>
-    <url>/apex/cloneTemplate?templateId={!Assessment_Template__c.Id}</url>
+    <url>/apex/Rhythm__cloneTemplate?templateId={!Assessment_Template__c.Id}</url>
 </WebLink>

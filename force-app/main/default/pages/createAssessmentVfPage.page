@@ -41,8 +41,8 @@
             });
            });
     var templateId = "{!$CurrentPage.parameters.templateId}";
-        $Lightning.use("c:createAssessment", function() {
-            $Lightning.createComponent("c:newAssessmentButton",
+        $Lightning.use("Rhythm:createAssessment", function() {
+            $Lightning.createComponent("Rhythm:newAssessmentButton",
                 {"templateId" : templateId },
                 "auraComponentDiv",
                 function(cmp) {

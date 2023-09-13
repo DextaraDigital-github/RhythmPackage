@@ -42,8 +42,8 @@
            });
   	var templateId = "{!$CurrentPage.parameters.templateId}";
     console.log('templateId=='+templateId);
-    $Lightning.use("c:createAssessment", function() {
-        $Lightning.createComponent("c:cloneTemplatewithRelatedRecords",
+    $Lightning.use("Rhythm:createAssessment", function() {
+        $Lightning.createComponent("Rhythm:cloneTemplatewithRelatedRecords",
                                    {"templateId" : templateId,'objectApiName':'Rhythm__Assessment_Template__c'},
                                    "auraComponentDiv",
                                    function(cmp) {

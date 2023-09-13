@@ -9,5 +9,5 @@
     <openType>replace</openType>
     <protected>false</protected>
     <requireRowSelection>true</requireRowSelection>
-    <url>/apex/createAssessmentVfPage?templateId={!Assessment__c.TemplateId__c}</url>
+    <url>/apex/Rhythm__createAssessmentVfPage?templateId={!Assessment__c.TemplateId__c}</url>
 </WebLink>
