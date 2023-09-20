@@ -14,7 +14,6 @@ import CUS_STYLES from '@salesforce/resourceUrl/rtmcpcsldscustomstyles';
 import { loadStyle } from 'lightning/platformResourceLoader';
 
 const actions = [
-    { label: 'View', name: 'view' },
     { label: 'Edit', name: 'edit' },
     { label: 'Delete', name: 'delete' },
 ];
@@ -28,33 +27,39 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
     @api objectName = 'Rhythm__Section__c';
     @track selectedRows = [];
     @track actionName = '';
+    @track viewQuestions = false;
 
     sectionColumns = [
         {
             type: 'text', sortable: true,
             fieldName: 'Name',
             label: 'Section Name',
+
             wrapText: true
         },
         {
             type: 'number', sortable: true,
             fieldName: 'Rhythm__No_of_Questions__c',
             label: 'No of Questions',
-            initialWidth: 170
+            initialWidth: 150
         },
         {
             type: 'number', sortable: true,
             fieldName: 'Rhythm__Section_Sequence_Number__c',
             label: 'Sequence Number',
-            initialWidth: 170,
+            initialWidth: 150,
         },
         {
-            type: "action", typeAttributes: { rowActions: actions }
+            type: "action", typeAttributes: { rowActions: actions }, label: "Actions"
         }
     ];
     columns = this.sectionColumns;
     @track expandedRows = [];
     @track sectionList;
+    @track tempId;
+    @track sectionName;
+    @track questionId;
+    @track tempStatus;
     @track sectionListData;
     @track questionsList;
     @track selectedSectionName;
@@ -85,6 +90,7 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
         this.disableButtons = result.data;
         if (this.disableButtons === false) {
             this.columns = [...this.sectionColumns].filter(col => col.type !== 'action');
+           
         }
     }
 
@@ -95,9 +101,9 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
 
     //Save and New Functionality for New Record
     reOpenCreateModal() {
-        setTimeout(() => {
+       
             this.handleNew();
-        }, 500);
+      
     }
 
     //Save the record and Open new reocrd creation
@@ -122,25 +128,51 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
         this.showModal.editModal = false;
         this.handleRefresh();
     }
+    handleCancel(event) {
+        if (typeof event.detail !== 'undefined') {
+            this.viewQuestions = false;
+            this.handleRefresh();
+        }
+    }
+    handlesave(event) {
+        if (typeof event.detail !== 'undefined' && event.detail!==null) {
+            this.dispatchEvent(
+                new ShowToastEvent({
+                    title: 'Success',
+                    message: 'Reordered Sections Successfully',
+                    variant: 'success'
+                })
+            );
+        }
 
+        this.viewQuestions = false;
+        this.handleRefresh();
+    }
     //Record View and Eit actions
     handleRowActions(event) {
         const actionName = this.actionName;
         const row = this.row;
+        this.questionId = row.Id;
+        this.sectionName = row.sectionName;
+        let bool = false;
+        if (typeof row.Rhythm__No_of_Questions__c !== 'undefined') {
+            bool = true;
+        }
         switch (actionName) {
             case 'view':
-                this[NavigationMixin.Navigate]({
-                    type: 'standard__recordPage',
-                    attributes: {
-                        recordId: row.Id,
-                        actionName: 'view'
-                    }
-                });
+                this.viewQuestions = true;
                 break;
             case 'edit':
-                this.showModal.editModal = true;
-                this.selectedRecordId = this.row.Id;
-                this.selectedSectionName = this.row.Name;
+                if (bool) {
+
+                    this.selectedSectionName = row.sectionName;
+                    this.selectedRecordId = row.Id;
+                    this.showModal.editModal = true;
+                }
+                else {
+                    this.viewQuestions = true;
+                }
+
                 break;
             case 'delete':
                 this.selectedRows = [];
@@ -324,8 +356,13 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
         if (this.selectedRows.length !== 0) {
             if (this.sectionListData && typeof this.sectionListData !== 'undefined') {
                 this.sectionListData.forEach(rec => {
-                    if (this.selectedRows[0] === rec.Id) {
+                    if (this.selectedRows[0] === rec.Id ) {
+                        if(rec["_children"] != null) {
                         this.deletePopupMessage = 'Are you sure you want to delete the Section and Quetions in it?';
+                        }
+                        else {
+                           this.deletePopupMessage = 'Are you sure you want to delete the Section?';
+                        }
                     }
                 });
             }
@@ -371,7 +408,15 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
         refreshApex(this.wiredRecsData);
         this.tempRecsLimit = this.recsLimit;
         getQuestionsList({ templateId: this.recordId }).then(data => {
+            
             let questionData = JSON.parse(JSON.stringify(data));
+            if (data.length > 0) {
+                if (typeof data[0].Rhythm__Assessment_Template__r !== 'undefined') {
+                    this.tempStatus = data[0].Rhythm__Assessment_Template__r.Rhythm__Status__c;
+                    this.tempid = data[0].Rhythm__Assessment_Template__r.Id;
+                }
+            }
+            
             let parent = questionData.filter(res => typeof res.Rhythm__Parent_Question__c === 'undefined');
             this.questionsList = parent;
             getSectionRecsCount({ templateId: this.recordId, objName: this.objLabel }).then(secData => {
@@ -379,15 +424,17 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
                 this.recsCount = secData;
                 this.handleSectionsData(JSON.parse(JSON.stringify(secData)));
             }).catch(error => {
-                //console.error(error);
+                
             });
+
         }).catch(error => {
-            //console.error(error);
+            
         });
     }
 
     connectedCallback() {
         this.handleRefresh();
+
         Promise.all([
             loadStyle(this, CUS_STYLES),
         ]).then(() => {
@@ -420,6 +467,7 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
                         let questionJson = {};
                         questionJson.Id = question.Id;
                         questionJson.Name = question.Rhythm__Question__c;
+                        questionJson.sectionName = section.Name;
                         tempqueslist.push(questionJson);
                     }
                 });
@@ -432,6 +480,7 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
             this.recsCount = this.sectionList.length;
         }
         this.sectionListData = JSON.parse(JSON.stringify(this.sectionList));
+        
     }
 
     //record form onsuccess
@@ -452,8 +501,10 @@ export default class TemplateSections extends NavigationMixin(LightningElement) 
     handleTemplateDetails() {
         getTemplateDetails({ templateId: this.recordId }).then(result => {
             this.disableButtons = result;
+            
             if (this.disableButtons === false) {
                 this.columns = [...this.sectionColumns].filter(col => col.type !== 'action');
+                 
                 if (this.actionName != '') {
                     location.reload();
                     this.dispatchEvent(

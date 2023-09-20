@@ -5,9 +5,10 @@ import cloneTemplate from '@salesforce/apex/TemplateController.doClone';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 
 export default class CloneTemplatewithRelatedRecords extends NavigationMixin(LightningElement) {
-    templateId;
+    @api templateId;
     templateName;
-    objectApiName = 'Rhythm__Assessment_Template__c';
+    templateDescription;
+   @api objectApiName = 'Rhythm__Assessment_Template__c';
     @track templateRecord;
     clonedTemplateId;
 
@@ -17,35 +18,48 @@ export default class CloneTemplatewithRelatedRecords extends NavigationMixin(Lig
           this.templateId = currentPageReference.state.recordId;
         }
     }
-
+connectedCallback() {
+    console.log('template id==='+this.templateId);
+}
     handleSubmit(event){
         try{
             event.preventDefault();
             let fields = event.detail.fields;
             fields = Object.assign( { 'sobjectType': 'Rhythm__Assessment_Template__c'}, fields );
             this.templateRecord = fields;
-            console.log('templateRecord---->',JSON.stringify(this.templateRecord));
+            
             cloneTemplate({templateId:this.templateId,templateRecord:this.templateRecord})
             .then(result => {
-                console.log('cloneTemplateResult------>',JSON.stringify(result));
+                
                 if(result.isSuccess){
+                     this.dispatchEvent(new CustomEvent(
+            'callvf',
+            {
+                detail:{list:result.recordId,type:'record'},
+                bubbles: true,
+                composed: true,
+            }));
                     this.showNotification('Success','Template Cloned Successfully.','success');
                     this.clonedTemplateId = result.recordId;
                     this.closeModal();
                 }else{
-                    this.showNotification('Error',result.message,'error');
+                    this.showVfpageNotification('Error',result.message,'error');
                 }
             })
             .catch(error => {
-                console.log(error);
+                
             });
         }catch(e){
-            console.log('handleSubmit----->',e);
+            
         }
     }
 
     fieldChangeHandler(event){
-        this.templateName = event.detail.value;
+        if(event.detail.name == 'name'){
+            this.templateName = event.detail.value;
+        }else if(event.detail.name == 'description'){
+            this.templateDescription = event.detail.value;
+        }
     }
     closeModal(){
         this.dispatchEvent(new CloseActionScreenEvent());
@@ -77,4 +91,14 @@ export default class CloneTemplatewithRelatedRecords extends NavigationMixin(Lig
         });
         this.dispatchEvent(evt);
     }
+         showVfpageNotification(title,message,variant) {
+          this.dispatchEvent(new CustomEvent(
+            'callvferror',
+            {
+                detail:{title:title,message:message,variant:variant},
+                bubbles: true,
+                composed: true,
+            }));       
+    }
+
 }

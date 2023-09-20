@@ -10,6 +10,7 @@ export default class RtmvpcChildQuestionCreation extends LightningElement {
     @track createQues = false;
     @track loading = false;
     @track showcreateChild;
+    @track savedisable=false;
     connectedCallback() {
         this.showcreateChild = true;
         this.loading = true;
@@ -36,6 +37,20 @@ export default class RtmvpcChildQuestionCreation extends LightningElement {
         
 
     }
+
+    handleClose(){
+        this.template.querySelector('c-rtmvpc-question-creation').handleClosedChild();
+    }
+    handlesave(){
+        this.savedisable=true;
+        this.template.querySelector('c-rtmvpc-question-creation').handlesaveChild();
+          
+    }
+    handledisable(event)
+    {
+         this.savedisable=event.detail;
+    }
+
     hideModalBox()
     {
         this.showcreateChild = false;

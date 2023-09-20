@@ -6,7 +6,7 @@
 		</div>
 	</header>
 	<div class="">
-		<div class="">
+		<div class="slds-p-around_small">
 			<div class="cdgWrapper">
 				<template if:true={show.grid}>
 					<div class="cdgtitletoolbar slds-grid slds-wrap ">
@@ -40,7 +40,7 @@
 							           </div>
 											</div>
 									</template>
-									<!-- <div class="th"></div> -->
+									<div class="th"></div>
 								</div>
 
 								<!-- Grid Rows with data. Iterating through rows.-->
@@ -73,6 +73,8 @@
 												</div>
 											</div>
 										</template>
+										<div class="td" key={obj} data-id={obj.Id}>
+										</div>
 									</div>
 								</template>
 							</div>

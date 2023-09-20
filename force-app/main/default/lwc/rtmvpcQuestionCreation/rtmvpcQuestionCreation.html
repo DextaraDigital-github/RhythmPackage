@@ -19,11 +19,11 @@
 						<lightning-spinner alternative-text="Loading" size="large"></lightning-spinner>
 					</template>
 					<div>
-						<div class="slds-p-top_small slds-p-bottom_small slds-p-horizontal_medium">
+						<div class="slds-p-top_small slds-p-horizontal_medium" style="padding-bottom:60px;">
 							<lightning-layout multiple-rows>
 								<lightning-layout-item size="12"
 									class="slds-p-left_medium slds-p-right_medium slds-p-bottom_x-small"
-									small-device-size="6" medium-device-size="12" large-device-size="6">
+									small-device-size="12" medium-device-size="12" large-device-size="6">
 									<div class="slds-col slds-form-element__label slds-no-flex">Question
 									</div>
 									<textarea style="--slds-c-input-color-border: rgb(201, 201, 201);"
@@ -151,11 +151,11 @@
 		</template>
 		<div class="slds-p-top_small slds-p-bottom_small slds-p-horizontal_medium">
 			<lightning-layout multiple-rows>
-				<lightning-layout-item size="6" class="slds-p-left_medium slds-p-right_medium slds-p-bottom_x-small"
-					small-device-size="6" medium-device-size="6" large-device-size="6">
+				<lightning-layout-item size="12" class="slds-p-left_medium slds-p-right_medium slds-p-bottom_x-small"
+					small-device-size="12" medium-device-size="12" large-device-size="6">
 					<div class="slds-col slds-form-element__label slds-no-flex">Question
 					</div>
-					<textarea style="--slds-c-input-color-border: rgb(201, 201, 201);"  class="slds-input"
+					<textarea style="--slds-c-input-color-border: rgb(201, 201, 201); width:100%"  class="slds-input"
 					variant="standard" name="Question" label="Question"
 					placeholder="Enter your Question here"
 					data-id="Rhythm__Question__c" onchange={handleChange} required ></textarea>
@@ -223,14 +223,7 @@
 				</template>
 			</lightning-layout>
 		</div>
-		<div style="height: 100px; width: 100%;">
-
-		</div>
-		<div class="slds-modal__footer" style="position: absolute; width: 100%; bottom: 0px; z-index: 2;">
-			<button class="slds-button slds-button_neutral" aria-label="Cancel and close" onclick={handleClose}>Cancel</button>
-			<lightning-button class="slds-button" variant="brand" label="Save" title="Save" onclick={handlesave}>
-			</lightning-button>
-		</div>
+		<div style="height: 100px; width: 100%;"></div>
 	</template>
 	<template if:true={showToast}>
 		<c-Show-Toast-Message message-from-component={totastmessage} is-show-modal={showToast} is-sucess={success}

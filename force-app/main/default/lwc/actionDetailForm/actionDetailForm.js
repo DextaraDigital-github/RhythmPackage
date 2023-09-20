@@ -23,6 +23,10 @@ export default class ActionDetailForm extends LightningElement {
   @track showPopup = false;
   @track expired = false;
   @track showForm = false;
+  @track isButton=true;
+  @track isSubmit=false;
+  @track success=false;
+  @track showToast=false;
   @track options = [{ label: 'Open', value: 'Open' },
   { label: 'Closed', value: 'Closed' }
   ];
@@ -36,12 +40,14 @@ export default class ActionDetailForm extends LightningElement {
   connectedCallback() {
     selectedActionRecord({ actionid: this.actionid }).then(res => {
       this.actionFormData = res;
-      console.log('sampletest', this.actionFormData);
+      // if(typeof this.actionFormData[0].Rhythm__Supplier__r === 'undefined'){
+      //   this.actionFormData[0].Rhythm__Supplier__r.Name='sampple';
+      // }
       if (this.actionFormData[0].Rhythm__Status__c === 'Closed' || this.actionFormData[0].Rhythm__Status__c === 'Expired') {
         this.isSave = false;
+        this.isButton=false;
         if (this.actionFormData[0].Rhythm__Status__c === 'Expired') {
           this.expired = true;
-          console.log('sampletest12', this.expired);
           let optionMap = {};
           optionMap.label = 'Expired';
           optionMap.value = 'Expired';
@@ -56,9 +62,23 @@ export default class ActionDetailForm extends LightningElement {
   handleChange(event) {
     let changedData = event.target.value;
     let name = event.currentTarget.dataset.id;
+        if(name === 'Rhythm__Status__c' && changedData === 'Open'){
+      this.isSubmit=false;
+    }
     this.actionFormData[0][name] = changedData;
+    if(name === 'Rhythm__Status__c' && changedData === 'Closed'){
+      this.isSubmit=true;
+    }
     this.showresponse = [];
     this.showresponse.push(this.actionFormData[0]);
+  }
+  handleCommentSave()
+  { 
+    saveActionResponse({ actionResponse: this.showresponse, isUpdate: true }).then(() => {
+    this.showToast = true;
+     this.success = true;
+     this.totastmessage = 'Comment Saved Successfully.';
+    });
   }
   handleSave() {
     this.showPopup = true;
@@ -68,7 +88,7 @@ export default class ActionDetailForm extends LightningElement {
   }
   handleCloseButton() {
     saveActionResponse({ actionResponse: this.showresponse, isUpdate: true }).then(() => {
-      console.log('kkkkk', this.showresponse);
+      
       this.showPopup = false;
       this.showToast = true;
       this.success = true;
@@ -79,9 +99,9 @@ export default class ActionDetailForm extends LightningElement {
         notifyUsers({ actionData: (this.showresponse[0]), body: 'Action Item has been marked as closed', userList: userlist }).then(() => {
 
         }).catch(error => {
-          console.log('ggfgf', error);
         })
         this.isSave = false;
+        this.isButton=false;
       }
 
     })

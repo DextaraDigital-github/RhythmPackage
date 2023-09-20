@@ -48,8 +48,7 @@ export default class AWSS3FileOperations extends LightningElement {
         this.isdisabled = true;
     }
     connectedCallback() {
-        console.log(this.responseRecId);
-        console.log('isdisabled', this.isdisabled);
+        
         if ((this.recId === null || this.recId === undefined) && this.assessmentRecId != null) {
             this.fileRecordID = this.assessmentRecId;
         }
@@ -114,7 +113,7 @@ export default class AWSS3FileOperations extends LightningElement {
         const folderName = this.objectName + '/' + this.responseRecId + '/';
         this.s3.listObjects({ Bucket: this.bucketName, Prefix: folderName }, (err, data) => {
             if (err) {
-                console.error(err);
+                
             } else {
                 const files = data.Contents;
                 let fileList = [];
@@ -197,11 +196,18 @@ export default class AWSS3FileOperations extends LightningElement {
             Bucket: this.bucketName,
             Key: this.keyString
         };
+         let filesCount;
+        if(this.keyList.length > 0) {
+           filesCount =  this.keyList.length - 1 ;
+        }
+        else {
+           filesCount = 0; 
+        }
         this.s3.deleteObject(params, (error, data) => {
             if (data) {
                 updateRespFilesCount({
                     responseId: this.responseRecId,
-                    filesCount: this.keyList.length - 1
+                    filesCount: filesCount
                 }).then(reco => {
                     let fileName = this.fileKey.substring(this.fileKey.lastIndexOf("/") + 1);
                     this.showToastMessage('Deleted', fileName.substring(fileName.indexOf("_") + 1) + ' - Deleted Successfully', 'success');
@@ -212,12 +218,11 @@ export default class AWSS3FileOperations extends LightningElement {
                     let rmp = {};
                     rmp.responseId = this.responseRecId;
                     rmp.questionId = this.questionId;
-                    rmp.numberoffiles = this.keyList.length - 1;
+                    rmp.numberoffiles = filesCount;
                     const selectedEvent = new CustomEvent('deletefile', {
                         detail: {value : rmp}
                     });
-                    console.log('rmp',rmp);
-                    console.log('selectedEvent',selectedEvent);
+                   
                     // Dispatches the event.
                     this.dispatchEvent(selectedEvent);
                     
@@ -228,8 +233,9 @@ export default class AWSS3FileOperations extends LightningElement {
 
 
     //Upload files to AWS after uploaded successfully to salesforce
-    handleUploadFinished() {
+    handleUploadFinished(event) {
         let respMap = {};
+         const uploadedFiles = event.detail.files;
         if (this.responseRecId == null) {
             let filemap = {};
             filemap.quesId = this.questionId;
@@ -246,11 +252,12 @@ export default class AWSS3FileOperations extends LightningElement {
                             this.renderFlag = true;
                             updateRespFilesCount({
                                 responseId: this.responseRecId,
-                                filesCount: this.keyList.length + 1
+                                filesCount: this.keyList.length + uploadedFiles.length
                             }).then(reco => {
                                 this.showToastMessage('Uploaded', 'Uploaded Successfully', 'success');
                                 respMap.response = rec;
                                 respMap.questionId = '';
+                                respMap.filescount =  this.keyList.length + uploadedFiles.length;
                                 const selectedEvent = new CustomEvent('getdata', {
                                     detail: respMap
                                 });
@@ -264,7 +271,7 @@ export default class AWSS3FileOperations extends LightningElement {
                         }
                     })
                         .catch(error => {
-                            window.console.log(error);
+                            
                         });
                 }
             }).catch(error => {
@@ -278,12 +285,13 @@ export default class AWSS3FileOperations extends LightningElement {
                 if (result) {
                     updateRespFilesCount({
                         responseId: this.responseRecId,
-                        filesCount: this.keyList.length + 1
+                        filesCount: this.keyList.length + uploadedFiles.length
                     }).then(reco => {
                         this.renderFlag = true;
                         this.showToastMessage('Uploaded', 'Uploaded Successfully', 'success');
                         respMap.response = '';
                         respMap.questionId = this.questionId;
+                        respMap.filescount =  this.keyList.length + uploadedFiles.length;
                         const selectedEvent = new CustomEvent('getdata', {
                             detail: respMap
                         });
@@ -296,7 +304,7 @@ export default class AWSS3FileOperations extends LightningElement {
                 }
             })
                 .catch(error => {
-                    window.console.log(error);
+                    
                 });
         }
     }

@@ -50,7 +50,7 @@ export function createChildHierarchy(queryResults, parentObj, savedResp, respAtt
     if (typeof thistemp !== 'undefined') {
         temp = thistemp;
     }
-    console.log('responseValues', responseValues);
+   
     const child = queryResults.filter(result =>
         (result['Rhythm__Parent_Question__c'] === parentObj.Id));
     respAttr.forEach(resp => {
@@ -187,12 +187,12 @@ export function createChildHierarchy(queryResults, parentObj, savedResp, respAtt
         }
     }
     else {
-        console.log('Into else', responseValues);
+        
         let childlst = JSON.parse(JSON.stringify(parentObj.Children));
         respAttr.forEach(resp => {
             let childmp = {};
             if (resp.Rhythm__QuestionId__c === parentObj.Id && responseValues.includes(resp.Id)) {
-                console.log('resp', resp);
+                
                 childmp.respAttrId = resp.Id;
                 childmp.uploadrequired = resp.Rhythm__Upload_Required__c;
                 childmp.ispreffered = resp.Rhythm__preferred_Not_preferred__c;

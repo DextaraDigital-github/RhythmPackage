@@ -13,6 +13,8 @@ public with sharing class EmailService {
     static EmailTemplateSelector selector = EmailTemplateSelector.getInstance();
     static AccountAssessmentRelationSelector accAssselector = AccountAssessmentRelationSelector.getInstance();
     static UserSelector usSelector = UserSelector.getInstance();
+    static EmailMessageSelector emSelector = EmailMessageSelector.getInstance();
+    static AssessmentSelector assselector = AssessmentSelector.getInstance();
     private static EmailService service = null; //private static instance of the class
     
     /**
@@ -91,21 +93,55 @@ public with sharing class EmailService {
     /**
     * @description Fetches the EmailMessage records along with the Users based on search string and other parameters
     * @param parameterMap It is a stringified JSON of parameters required to fetch EmailMessage records
-    * @return List of User records
+    * @return List of EmailMessage records
     */
     public List<sObject> fetchEmailMessages(String parameterMap) {
         Map<String,Object> newParameterMap = (Map<String,Object>)JSON.deserializeUntyped(parameterMap);
         String assessmentId = (String)newParameterMap.get('assessmentId');
         
-        List<String> userFields = new List<String>{'Id', 'Email', 'Contact.AccountId', 'Contact.Account.Name'};
-        String userFilter=' WHERE Id IN (SELECT RelationId FROM EmailMessageRelation WHERE EmailMessage.RelatedToId = \''+String.escapeSingleQuotes(assessmentId)+'\' AND RelationType = \'ToAddress\') ';
-        List<String> childQuery = new List<String>{' (SELECT Id, EmailMessageId, EmailMessage.FromName, EmailMessage.FromAddress, EmailMessage.CreatedDate, EmailMessage.Subject, EmailMessage.HtmlBody, EmailMessage.EmailTemplate.Name, EmailMessage.RelatedTo.Name, EmailMessage.Failed_Recipients__c FROM EmailMessageRelations WHERE EmailMessage.RelatedToId = \''+String.escapeSingleQuotes(assessmentId)+'\' AND RelationType = \'ToAddress\' ORDER BY EmailMessage.CreatedDate DESC) '};
-        Map<String,Object> emParameterMap = new Map<String,Object>{'fields'=>userFields, 'filter'=>userFilter, 'childQuery'=>childQuery};
-        Map<Id,User> userMap = usSelector.fetchUsers(emParameterMap);
-        if(userMap != null) {
-            List<User> userList = userMap.values();
-        	if(userList != null) {
-            	return userList;
+        List<String> fields = new List<String>{'Id', 'FromName', 'FromAddress', 'CreatedDate', 'RelatedTo.Name', 'Subject', 'HtmlBody', 'EmailTemplateId', 'Rhythm__Failed_Recipients__c'};
+        String filter=' WHERE RelatedToId  = \'' + String.escapeSingleQuotes(assessmentId) + '\' ORDER BY CreatedDate DESC';
+        List<String> childQuery = new List<String>{' (SELECT Id, RelationId, RelationAddress FROM EmailMessageRelations WHERE RelationType = \'ToAddress\') '};
+        Map<String,Object> inpParameterMap = new Map<String,Object>{'fields'=>fields, 'filter'=>filter, 'childQuery'=>childQuery};
+        Map<Id,EmailMessage> dataMap = emSelector.fetchEmailMessages(inpParameterMap);
+        if(dataMap != null) {
+            List<EmailMessage> dataList = dataMap.values();
+        	if(dataList != null) {
+            	return dataList;
+            }
+        }
+        return null;
+    }
+    
+    /**
+    * @description Fetches the User records based on search string and other parameters
+    * @param parameterMap It is a stringified JSON of parameters required to fetch User records
+    * @return List of User records
+    */
+    public Map<Id,User> fetchUsers(String parameterMap) {
+        Map<String,Object> newParameterMap = (Map<String,Object>)JSON.deserializeUntyped(parameterMap);
+        List<String> userIds = (List<String>)JSON.deserialize(JSON.serialize(newParameterMap.get('userIds')),List<String>.class);
+        Map<Id,User> dataMap = usSelector.fetchUsers(userIds);//inpParameterMap);
+        return dataMap;
+    }
+    
+    /**
+    * @description Fetches the Assessment records based on search string and other parameters
+    * @param parameterMap It is a stringified JSON of parameters required to fetch Assessment records
+    * @return List of Assessment records
+    */
+    public List<sObject> fetchAssessments(String parameterMap) {
+        Map<String,Object> newParameterMap = (Map<String,Object>)JSON.deserializeUntyped(parameterMap);
+        String recordId = (String)newParameterMap.get('recordId');
+        
+        List<String> fields = new List<String>{'Id', 'Name'};
+        String filter = ' WHERE Id = \'' + String.escapeSingleQuotes(recordId) + '\' ';
+        Map<String,Object> inpParameterMap = new Map<String,Object>{'fields'=>fields, 'filter'=>filter};
+        Map<Id,Assessment__c> dataMap = assselector.fetchAssessments(inpParameterMap);
+        if(dataMap != null) {
+            List<Assessment__c> dataList = dataMap.values();
+        	if(dataList != null) {
+            	return dataList;
             }
         }
         return null;

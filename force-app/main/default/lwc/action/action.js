@@ -36,6 +36,7 @@ export default class Action extends LightningElement {
   @track isSupplier;
   @track isSave = false;
   @track showAction = false;
+  @track loading=false;
 
   @track lookupLabel = ['Ownership', 'Assigned To'];
   @track options = [{ label: 'Open', value: 'Open' },
@@ -63,6 +64,7 @@ export default class Action extends LightningElement {
   @track newFlag = false;
   @track relatedRecordName;
   @track optionsData;
+  @track isLabel;
   previewUrl;
   keyString;
   fileKey;
@@ -133,7 +135,6 @@ export default class Action extends LightningElement {
     const folderName = this.objectApiName + '/' + this.responseMap.Id + '/';
     this.s3.listObjects({ Bucket: this.bucketName, Prefix: folderName }, (err, data) => {
       if (err) {
-        console.error(err);
       } else {
         const files = data.Contents;
         let fileList = [];
@@ -234,7 +235,6 @@ export default class Action extends LightningElement {
         }
       })
         .catch(error => {
-          window.console.log(error);
         });
     }
     else {
@@ -267,7 +267,6 @@ export default class Action extends LightningElement {
           }
         })
           .catch(error => {
-            window.console.log(error);
           });
       }).catch(error => {
       });
@@ -275,7 +274,6 @@ export default class Action extends LightningElement {
   }
   handleGetpicklistvalue(){
     getPicklistValues({}).then(data=>{
-      console.log('handleGetpicklistvalue',data);
       if (data) {
       this.pickListNames = [];
       for (let key in data) {
@@ -299,7 +297,6 @@ export default class Action extends LightningElement {
         this.pickListNames.push(obj);
       }
       this.onloadPicklist = this.pickListNames;
-      console.log('picklist', this.onloadPicklist);
     }
     }).catch(error=>{
 
@@ -345,7 +342,6 @@ export default class Action extends LightningElement {
   //       this.pickListNames.push(obj);
   //     }
   //     this.onloadPicklist = this.pickListNames;
-  //     console.log('picklist', this.onloadPicklist);
   //   } else if (error) {
   //     let errormap = {};
   //     errormap.componentName = 'Action';
@@ -358,12 +354,12 @@ export default class Action extends LightningElement {
 
   @api displayForm(response) {
     this.showAction = true;
+    this.loading=true;
      this.isSupplier = response[0].isSupplier;
-    console.log('jjj', response);
+
     if (typeof response !== 'undefined' && this.isSupplier !== true) {
       this.showAction = false;
     }
-    console.log('acton',this.showAction);
     this.updateData = response;
     this.showForm = true;
     this.showCustom = false;
@@ -382,20 +378,22 @@ export default class Action extends LightningElement {
     this.relatedRecordName = response[0].relatedRecordName;
     this.responseMap = {};
     this.resultdata = {};
+    
+    if(typeof this.onloadPicklist !== 'undefined')
+    {
     this.onloadPicklist.forEach(res => {
       if (res.key === 'Rhythm__Status__c') {
         this.optionsData = JSON.parse(JSON.stringify(res.options));
-        console.log('options', this.optionsData);
       }
       if (typeof res.onLoadValue !== 'undefined') {
         res.onLoadValue = '';
       }
     })
+    }
 
     getActionResponse({ actionResponse: response[0] }).then((result) => {
       if (typeof result != 'undefined' && result.length > 0) {
         
-        console.log('samp', result);
         this.resultdata = result[0];
         this.showUpdate = true;
         this.showCustom = true;
@@ -421,17 +419,21 @@ export default class Action extends LightningElement {
         if (typeof result[0].Rhythm__Supplier__c !== 'undefined') {
           this.responseMap.Rhythm__Supplier__c = result[0].Rhythm__Supplier__c;
         }
-
+       if(typeof this.onloadPicklist !== 'undefined'){
         this.onloadPicklist.forEach(res => {
           if (typeof result[0].Rhythm__Related_module__c !== 'undefined' || typeof result[0].Rhythm__Status__c !== 'undefined'
             || typeof result[0].Rhythm__Priority__c !== 'undefined') {
             let keydata = res.key;
-            res.onLoadValue = result[0][keydata];
+            
+             res.onLoadValue = result[0][keydata];
             if (res.onLoadValue === 'Open' || res.onLoadValue === 'Closed') {
               if (res.onLoadValue === 'Closed') {
                 this.isSave = true;
               }
+              this.isLabel='Save';
+              if(typeof this.optionsData !=='undefined'){
               res.options = JSON.parse(JSON.stringify(this.optionsData));
+              }
             }
             if (res.onLoadValue === 'Expired') {
               let optionMap = {};
@@ -439,12 +441,12 @@ export default class Action extends LightningElement {
               optionMap.value = 'Expired';
               res.options.push(optionMap);
               this.options = res.options;
-              console.log('reethika', res.options);
               this.isSave = true;
             }
             this.responseMap[keydata] = result[0][keydata];
           }
         });
+       }
         if (typeof result[0].Rhythm__Assigned_To__c !== 'undefined') {
           this.responseMap.Rhythm__Assigned_To__c = result[0].Rhythm__Assigned_To__c;
         }
@@ -452,9 +454,9 @@ export default class Action extends LightningElement {
           this.responseMap.Rhythm__Ownership__c = result[0].Rhythm__Ownership__c;
         }
         this.saveActionResponse = this.responseMap;
-        console.log('reposnedata', this.responseMap.Rhythm__Status__c);
         this.showresponse = [];
         this.showresponse.push(this.saveActionResponse);
+        this.loading=false;
       }
       else {
         if (this.isSupplier === true) {
@@ -474,7 +476,7 @@ export default class Action extends LightningElement {
         this.saveActionResponse.Rhythm__Assigned_To__c = response[0].assignedToId;
         this.saveActionResponse.Rhythm__Ownership__c = response[0].ownershipId;
         //this.responseMap.Rhythm__Related_Record__Name=response[0].Rhythm__Related_Record__Name;
-        // console.log('jjjfk',this.responseMap.Rhythm__Related_Record__Name);
+         if(typeof this.onloadPicklist !== 'undefined'){
         this.onloadPicklist.forEach(res => {
           if (res.key === 'Rhythm__Related_module__c') {
             res.onLoadValue = 'Assessments';
@@ -482,6 +484,7 @@ export default class Action extends LightningElement {
             this.saveActionResponse.Rhythm__Related_module__c = 'Assessments';
           }
         });
+         }
 
         userMap.Name = response[0].ownershipName;
         this.resultdata.Rhythm__Ownership__r = userMap;
@@ -490,7 +493,7 @@ export default class Action extends LightningElement {
         this.resultdata.Rhythm__Assigned_To__r = userMap;
         this.showresponse = [];
         this.showresponse.push(this.saveActionResponse);
-        console.log('kkkk', this.saveActionResponse);
+        this.loading=false;
 
       }
     }).catch(error => {
@@ -525,12 +528,6 @@ export default class Action extends LightningElement {
       this.showToast = true;
       this.success = true;
       this.totastmessage = 'Action Item has been deleted successfully';
-      // send({ subject: (result[0].Name), body: 'Action Item has been deleted successfully', userList: userlist }).then(() => {
-
-      // }).catch(error => {
-      //   console.log('ggfgf', error);
-      // })
-
       const selectedAction = new CustomEvent('removedeleteicon', {
         detail: this.questionId
       });
@@ -547,18 +544,23 @@ export default class Action extends LightningElement {
 
   handleChange(event) {
     let changedData = event.target.value;
+   
     let name = event.currentTarget.dataset.id;
+     if(name === 'Rhythm__Status__c' && changedData === 'Open'){
+      this.isLabel='Save';
+    }
     this.saveActionResponse[name] = changedData;
     this.showresponse = [];
     this.showresponse.push(this.saveActionResponse);
-    console.log('changeddata', changedData);
     if (name === 'Rhythm__Status__c') {
       this.onloadPicklist.forEach(res => {
-        console.log('res.options');
-        if (res.key === 'Rhythm__Status__c') {
+        if (res.key === 'Rhythm__Status__c' && typeof this.optionsData !=='undefined') {
           res.options = JSON.parse(JSON.stringify(this.optionsData));
         }
       });
+    }
+     if(name === 'Rhythm__Status__c' && changedData === 'Closed'){
+      this.isLabel='Submit';
     }
   }
   handleSelectedValue(event) {
@@ -571,7 +573,6 @@ export default class Action extends LightningElement {
     }
   }
   handleSave() {
-    console.log('save', this.showresponse);
     if ((typeof this.showresponse[0].Name !== 'undefined') && (typeof this.showresponse[0].Rhythm__Ownership__c !== 'undefined')
       && (typeof this.showresponse[0].Rhythm__Assigned_To__c !== 'undefined') && (typeof this.showresponse[0].Rhythm__Priority__c !== 'undefined')
       && (typeof this.showresponse[0].Rhythm__Status__c !== 'undefined')) {
@@ -586,11 +587,6 @@ export default class Action extends LightningElement {
             this.showToast = true;
             this.success = true;
             this.totastmessage = 'Action Item has been created successfully';
-            // send({ subject: (this.showresponse[0].Name), body: 'Action Item has been created successfully', userList: userlist }).then(() => {
-
-            // }).catch(error => {
-            //   console.log('ggfgf', error);
-            // })
             this.displayForm(this.updateData);
             this.saveActionResponse.saveActionForm = true;
             const selectedAction = new CustomEvent('closeform', {
@@ -602,12 +598,11 @@ export default class Action extends LightningElement {
             this.showToast = true;
             this.success = true;
             this.totastmessage = 'Action Item has been updated successfully';
-            // send({ subject: (this.showresponse[0].Name), body: 'Action Item has been updated successfully', userList: userlist }).then(() => {
-
-            // }).catch(error => {
-            //   console.log('ggfgf', error);
-            // });
-
+            if (this.saveActionResponse.Rhythm__Status__c === 'Open' && this.isSupplier === true) {
+              this.showToast = true;
+              this.success = true;
+              this.totastmessage = 'Comment saved Successfully';
+            }
             if (this.saveActionResponse.Rhythm__Status__c === 'Closed' && this.isSupplier === true) {
               this.showToast = true;
               this.success = true;
@@ -617,10 +612,10 @@ export default class Action extends LightningElement {
               notifyUsers({ actionData: (this.showresponse[0]), body: 'Action Item has been marked as closed', userList: userlist }).then(() => {
 
               }).catch(error => {
-                console.log('ggfgf', error);
               })
               this.isSave = true;
             }
+            this.displayForm(this.updateData);
           }
         })
           .catch((error) => {

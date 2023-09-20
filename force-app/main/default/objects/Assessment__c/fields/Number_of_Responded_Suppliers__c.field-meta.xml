@@ -6,11 +6,11 @@
     <summaryFilterItems>
         <field>AccountAssessmentRelation__c.Status__c</field>
         <operation>equals</operation>
-        <value>Submitted, In review, Accepted</value>
+        <value>Submitted, In Review, Need More Information, Review Completed</value>
     </summaryFilterItems>
     <summaryForeignKey>AccountAssessmentRelation__c.Assessment__c</summaryForeignKey>
     <summaryOperation>count</summaryOperation>
     <trackHistory>false</trackHistory>
-    <trackTrending>false</trackTrending>  
+    <trackTrending>false</trackTrending>
     <type>Summary</type>
 </CustomField>

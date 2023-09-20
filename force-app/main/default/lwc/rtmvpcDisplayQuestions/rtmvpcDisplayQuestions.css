@@ -4,8 +4,11 @@
 /* :host{
 	--slds-c-card-color-background: rgb(243,243,243);
 } */
-
+div.cdgtitletoolbar { background:#f3f3f3; font-size:var(--fs-16); line-height:24px; padding:10px 10px 8px 10px;border-radius:3px 3px 0px 0px ;border:0px solid var(--cdg-bdrouter-color); border-bottom:0px; }
 
 
 /* .rdm-outer { border-radius: 10px; border: 1px solid rgb(201 201 201); }
 .rdm-header { background-color: rgb(243,243,243); border-radius: 10px 10px 0 0; border-bottom: 1px solid rgb(201 201 201); } */
+@media only screen and (max-width:991px) {
+	div.cdgtitletoolbar { background:#f3f3f3; font-size:var(--fs-16); line-height:24px; padding:10px 0px 8px 10px;border-radius:3px 3px 0px 0px ;border:0px solid var(--cdg-bdrouter-color); border-bottom:0px; }
+}

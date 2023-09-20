@@ -125,13 +125,11 @@
         <field>Account.AccountNumber</field>
         <readable>true</readable>
     </fieldPermissions>
-    
     <fieldPermissions>
         <editable>true</editable>
         <field>Account.Address_Line_2__c</field>
         <readable>true</readable>
     </fieldPermissions>
-   
     <fieldPermissions>
         <editable>true</editable>
         <field>Account.BillingAddress</field>
@@ -142,7 +140,6 @@
         <field>Account.City__c</field>
         <readable>true</readable>
     </fieldPermissions>
-    
     <fieldPermissions>
         <editable>true</editable>
         <field>Account.Company_Description__c</field>
@@ -168,7 +165,6 @@
         <field>Account.D_B_Number__c</field>
         <readable>true</readable>
     </fieldPermissions>
-    
     <fieldPermissions>
         <editable>true</editable>
         <field>Account.Description</field>
@@ -179,7 +175,6 @@
         <field>Account.Diversity_Classifications__c</field>
         <readable>true</readable>
     </fieldPermissions>
-   
     <fieldPermissions>
         <editable>true</editable>
         <field>Account.Email__c</field>
@@ -200,7 +195,6 @@
         <field>Account.Industry</field>
         <readable>true</readable>
     </fieldPermissions>
-    
     <fieldPermissions>
         <editable>true</editable>
         <field>Account.NumberOfEmployees</field>
@@ -211,7 +205,6 @@
         <field>Account.Number_of_Employess__c</field>
         <readable>true</readable>
     </fieldPermissions>
-    
     <fieldPermissions>
         <editable>true</editable>
         <field>Account.Ownership</field>
@@ -247,8 +240,6 @@
         <field>Account.ShippingAddress</field>
         <readable>true</readable>
     </fieldPermissions>
-    
-    
     <fieldPermissions>
         <editable>true</editable>
         <field>Account.State__c</field>
@@ -259,13 +250,11 @@
         <field>Account.Supplier_Settings__c</field>
         <readable>true</readable>
     </fieldPermissions>
-    
     <fieldPermissions>
         <editable>true</editable>
         <field>Account.Trading_Name__c</field>
         <readable>true</readable>
     </fieldPermissions>
-    
     <fieldPermissions>
         <editable>true</editable>
         <field>Account.Zipcode__c</field>
@@ -641,7 +630,6 @@
         <field>Contact.City__c</field>
         <readable>true</readable>
     </fieldPermissions>
-    
     <fieldPermissions>
         <editable>true</editable>
         <field>Contact.Country__c</field>
@@ -657,7 +645,6 @@
         <field>Contact.Description</field>
         <readable>true</readable>
     </fieldPermissions>
-    
     <fieldPermissions>
         <editable>true</editable>
         <field>Contact.Email</field>
@@ -668,8 +655,6 @@
         <field>Contact.Fax</field>
         <readable>true</readable>
     </fieldPermissions>
-   
-    
     <fieldPermissions>
         <editable>true</editable>
         <field>Contact.MailingAddress</field>
@@ -917,12 +902,12 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>Response__c.Rejected__c</field>
+        <field>Response__c.Reject__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>Response__c.Reject__c</field>
+        <field>Response__c.Rejected__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -1001,8 +986,8 @@
     </objectPermissions>
     <objectPermissions>
         <allowCreate>true</allowCreate>
-        <allowDelete>false</allowDelete>
-        <allowEdit>false</allowEdit>
+        <allowDelete>true</allowDelete>
+        <allowEdit>true</allowEdit>
         <allowRead>true</allowRead>
         <modifyAllRecords>false</modifyAllRecords>
         <object>Assessment_Supplier__c</object>
@@ -1111,6 +1096,14 @@
         <apexPage>RenderAsPdf</apexPage>
         <enabled>true</enabled>
     </pageAccesses>
+    <pageAccesses>
+        <apexPage>cloneTemplate</apexPage>
+        <enabled>true</enabled>
+    </pageAccesses>
+    <pageAccesses>
+        <apexPage>createAssessmentVfPage</apexPage>
+        <enabled>true</enabled>
+    </pageAccesses>
     <recordTypeVisibilities>
         <recordType>Account.Customer</recordType>
         <visible>true</visible>
@@ -1120,6 +1113,10 @@
         <visible>true</visible>
     </recordTypeVisibilities>
     <tabSettings>
+        <tab>Action__c</tab>
+        <visibility>Visible</visibility>
+    </tabSettings>
+    <tabSettings>
         <tab>Assessment_Template__c</tab>
         <visibility>Visible</visibility>
     </tabSettings>
@@ -1127,4 +1124,12 @@
         <tab>Assessment__c</tab>
         <visibility>Visible</visibility>
     </tabSettings>
+    <userPermissions>
+        <enabled>true</enabled>
+        <name>ManagePartners</name>
+    </userPermissions>
+    <userPermissions>
+        <enabled>true</enabled>
+        <name>SendCustomNotifications</name>
+    </userPermissions>
 </PermissionSet>

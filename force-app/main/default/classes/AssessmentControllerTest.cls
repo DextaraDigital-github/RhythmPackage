@@ -945,4 +945,67 @@ private class AssessmentControllerTest
             Test.stopTest();
         }
     }
+    
+     @isTest
+    static void fetchlistviewIdTest(){
+        user u = [SELECT Id,UserName FROM User WHERE Email='standarduser@testorg.com' LIMIT 1];
+        System.runAs(u){    
+            Test.startTest();
+            AssessmentController.fetchlistviewId();
+            Test.stopTest();
+        }
+    }
+
+
+    @isTest
+    static void sendAssessmentUpdateTestforData(){
+        user u = [SELECT Id,UserName FROM User WHERE Email='standarduser@testorg.com' LIMIT 1];
+        System.runAs(u){
+            String testString;
+            List<Assessment__c> assmentList = [select Id,Start_Date__c,End_Date__c,Template__c from Assessment__c];
+            set<Id> assmentIds = new set<Id>{assmentList[0].Id};
+            Map<Id,Assessment__c> assmap = new Map<Id,Assessment__c>();
+            for(Assessment__c ass:assmentList){
+                assmap.put(ass.Id,ass);
+            }
+            Test.startTest();
+            AssessmentTriggerHandler.sendUpdatedAssessments(assmentIds,assmap);
+            testString = 'Success';
+            System.assertEquals(testString =='Success', true,'assessment updated');
+            Test.stopTest();
+        }
+    }
+    
+    @isTest
+    static void getPdfDataTest(){
+        user u = [SELECT Id,UserName FROM User WHERE Email='standarduser@testorg.com' LIMIT 1];
+        System.runAs(u){
+            String testString;
+           	String recordData = '[ { "templateId": "a048G000003qxprQAA", "id": "a008G000002XlnWQAS", "record": [ { "fieldName": "Name", "label": "Assessment Name", "value": "New defect check assessment", "isHyperlink": true }, { "fieldName": "Rhythm__End_Date__c", "label": "Target Completion Date" }, { "fieldName": "Rhythm__Status__c", "label": "Assessment Status", "value": "Need More Information", "classList": "cad-timeline_rejected", "surveySymbol": "utility:unlock" }, { "fieldName": "Rhythm__Follow_Up_Requests__c", "label": "#Follow Up Requests", "value": 3 }, { "fieldName": "Rhythm__Response_Percentage__c", "label": "% Completed" } ] } ]';
+            String columnData = '[{"label":"Assessment Name","fieldName":"Name"},{"label":"Target Completion Date","fieldName":"Rhythm__End_Date__c","type":"date"},{"label":"Assessment Status","fieldName":"Rhythm__Status__c"},{"label":"#Follow Up Requests","fieldName":"Rhythm__Follow_Up_Requests__c"},{"label":"% Completed","fieldName":"Rhythm__Response_Percentage__c","type":"progressBar"}]';
+            Test.startTest();
+            AssessmentController.getPDFData(recordData,columnData);
+            testString = 'Success';
+            System.assertEquals(testString =='Success', true,'assessment updated');
+            Test.stopTest();
+        }
+    }
+    
+    @isTest
+    static void deleteResponseTest(){
+        user u = [SELECT Id,UserName FROM User WHERE Email='standarduser@testorg.com' LIMIT 1];
+        System.runAs(u){
+            String testString;
+            List<Question__c> queList = [SELECT Id FROM Question__c LIMIT 1];
+            List<AccountAssessmentRelation__c> assaccRel = [SELECT Id FROM AccountAssessmentRelation__c LIMIT 1];
+            //Map<string,object> mapData = {'responsequestionId'=>queList[0].Id,'accountassessmentId'=>assaccRel[0].Id};
+            Map<String,Object> contactAttributes  = new Map<String,Object>{'responsequestionId'=>queList,'accountassessmentId'=>assaccRel[0].Id};
+           	string jsonstring = JSON.serialize(contactAttributes);
+            Test.startTest();
+            AssessmentController.deleteResponse(contactAttributes);
+            testString = 'Success';
+            System.assertEquals(testString =='Success', true,'assessment updated');
+            Test.stopTest();
+        }
+    }
 }

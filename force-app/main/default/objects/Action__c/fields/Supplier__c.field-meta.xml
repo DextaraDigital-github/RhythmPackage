@@ -4,7 +4,17 @@
     <deleteConstraint>Restrict</deleteConstraint>
     <externalId>false</externalId>
     <label>Supplier</label>
+    <lookupFilter>
+        <active>true</active>
+        <filterItems>
+            <field>Account.RecordTypeId</field>
+            <operation>equals</operation>
+            <value>Supplier</value>
+        </filterItems>
+        <isOptional>false</isOptional>
+    </lookupFilter>
     <referenceTo>Account</referenceTo>
+    <relationshipLabel>Action Items</relationshipLabel>
     <relationshipName>Action_Items</relationshipName>
     <required>false</required>
     <trackHistory>false</trackHistory>

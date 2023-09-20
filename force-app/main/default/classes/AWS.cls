@@ -235,6 +235,15 @@ public abstract class AWS {
             setHeader('x-amz-content-sha256', payloadSha256);
             setHeader('Content-Length', String.valueOf(payload.size()));
             setHeader('Content-Type', contType);
+            //setHeader('ACL', 'public-read');
+            if(contType == '.docx' || contType == '.doc' || contType == '.xlsx'|| contType == '.xls') {
+                setHeader('Content-Disposition', 'attachment');  
+                
+            }
+            else{
+                setHeader('Content-Disposition', 'inline');  
+            }
+            
             request.setBodyAsBlob(payload);
         } 
         

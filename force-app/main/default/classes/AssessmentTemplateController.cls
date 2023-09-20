@@ -146,7 +146,8 @@ public with sharing class AssessmentTemplateController {
         try {
             templateId = String.escapeSingleQuotes(templateId) ;
             if(String.isNotBlank(templateId)) {
-                List<Question__c> questionList = [SELECT Id,Rhythm__Question__c,Section__c,Parent_Question__c
+                List<Question__c> questionList = [SELECT Id,Rhythm__Question__c,Section__c,Parent_Question__c,
+                                                 Assessment_Template__r.Status__c
                                 FROM Question__c
                                 WHERE Assessment_Template__c= :templateId
                                 AND Section__c != NULL
@@ -257,18 +258,19 @@ public with sharing class AssessmentTemplateController {
             if(recIdList.size()>0) {
                 Database.DeleteResult[] drchildList;
                 List<Question__c> questionList = new List<Question__c>();
+                List<Question__c> childquestionList = new List<Question__c>();
                 if(delchildobjrecs==true) {
-                    questionList = [SELECT Id
+                    questionList = [SELECT Id,(SELECT Id,name from Questions__r)
                                     FROM Question__c
                                     WHERE section__c IN :recIdList
                                     WITH SECURITY_ENFORCED];
-                    
+                   
                 }
                 if(questionList.isEmpty() == false) {
                     drchildList=safe.doDelete(questionList);
                 }
                 else {
-                    questionList = [SELECT Id from Question__c where Id IN:recIdList WITH SECURITY_ENFORCED];
+                    questionList = [SELECT Id from Question__c where Id IN:recIdList or Parent_Question__c IN:recIdList WITH SECURITY_ENFORCED];
                 }
                 if(questionList.isEmpty() == false) {
                     drchildList=safe.doDelete(questionList);

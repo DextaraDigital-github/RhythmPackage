@@ -1,19 +1,32 @@
 <template>
-    <lightning-quick-action-panel header="Clone Template">
-        <lightning-record-edit-form object-api-name={objectApiName} record-id={templateId} onsubmit={handleSubmit}>
-            <lightning-messages></lightning-messages>
-            <lightning-layout multiple-rows>
-                <lightning-layout-item size="6" padding="around-small">
-                    <lightning-input-field field-name="Name" data-id="name" onchange={fieldChangeHandler} name="name" value={templateName} required></lightning-input-field>
-                </lightning-layout-item>
-                <lightning-layout-item size="6" padding="around-small">
-                    <lightning-input-field field-name="Rhythm__Status__c" data-id="status" name="status" value="New" disabled required></lightning-input-field>
-                </lightning-layout-item>
-            </lightning-layout>
-            <div class="slds-align_absolute-center">
-                <lightning-button label="Cancel" title="Cancel" onclick={closeModal}></lightning-button>
-                <lightning-button variant="brand" label="Save" title="Save" type="submit" class="slds-m-left_xx-small"></lightning-button>
+
+    <section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="modal-heading-01" class="slds-modal slds-fade-in-open slds-modal_small">
+        <div class="slds-modal__container">
+            <div class="slds-modal__header">
+                <h1 id="modal-heading-01" class="slds-modal__title slds-hyphenate">Clone Template</h1>
             </div>
-        </lightning-record-edit-form>
-    </lightning-quick-action-panel>
+            <div class="slds-modal__content" id="modal-content-id-1">
+                <lightning-record-edit-form object-api-name={objectApiName} record-id={templateId} onsubmit={handleSubmit}>
+                    <lightning-messages></lightning-messages>
+                    <lightning-layout multiple-rows>
+                        <lightning-layout-item size="6" padding="around-small">
+                            <lightning-input-field field-name="Name" data-id="name" onchange={fieldChangeHandler} name="name" value={templateName} required></lightning-input-field>
+                        </lightning-layout-item>
+                        <lightning-layout-item size="6" padding="around-small">
+                            <lightning-input-field field-name="Rhythm__Status__c" data-id="status" name="status" value="New" disabled required></lightning-input-field>
+                        </lightning-layout-item>
+
+                        <lightning-layout-item size="6" padding="around-small">
+                            <lightning-input-field field-name="Rhythm__Template_Description__c" data-id="description" onchange={fieldChangeHandler} name="description" value={templateDescription}></lightning-input-field>
+                        </lightning-layout-item>
+                    </lightning-layout>
+                    <div class="slds-modal__footer slds-align_absolute-center">
+                        <lightning-button label="Cancel" title="Cancel" onclick={closeModal}></lightning-button>
+                        <lightning-button variant="brand" label="Save" title="Save" type="submit" class="slds-m-left_xx-small"></lightning-button>
+                    </div>
+                </lightning-record-edit-form>
+            </div>
+        </div>
+    </section>
+    <div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
 </template>

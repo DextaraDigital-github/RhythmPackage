@@ -52,7 +52,7 @@ export default class RtmvpcQuestionCreation extends LightningElement {
     */
     @api
     getParentQuestionCondition(conditionValue) {
-        
+
         if (typeof conditionValue !== 'undefined') {
             this.questionWrapper['Rhythm__Conditional_Response__c'] = conditionValue.conditionalResponse;
             //this.questionWrapper['Rhythm__Section__c'] = 
@@ -85,12 +85,11 @@ export default class RtmvpcQuestionCreation extends LightningElement {
     }
     renderedCallback() {
         Promise.all([
-            loadStyle(this,ComponentStylesheet)
+            loadStyle(this, ComponentStylesheet)
         ]);
     }
     handleOnLoad() {
         this.questionWrapper.Rhythm__Question__c = '';
-        console.log('this.assessmentTemplate',this.assessmentTemplate);
         if (typeof this.assessmentTemplate !== 'undefined') {
             this.createQues = true;
         }
@@ -196,7 +195,6 @@ export default class RtmvpcQuestionCreation extends LightningElement {
         This method method is used to Select the sections value (custom lookup).
     */
     handleSelectedValue(event) {
-        console.log('In update',event.detail);
         this.questionWrapper['Rhythm__Section__c'] = event.detail;
         if (typeof this.assessmentTemplate !== 'undefined') {
             this.questionWrapper['Rhythm__Assessment_Template__c'] = this.assessmentTemplate;
@@ -208,6 +206,19 @@ export default class RtmvpcQuestionCreation extends LightningElement {
     handleResponseAttribute(event) {
         this.responseAttributes = event.detail;
 
+    }
+    @api
+    handleClosedChild() {
+        this.createQues = false;
+        this.childQuesCreation = false;
+        const selectedEvent = new CustomEvent('handlecancel', {
+            detail: this.createQues
+        });
+        this.dispatchEvent(selectedEvent);
+
+    }
+    @api handlesaveChild() {
+        this.handlesave();
     }
     /* 
         This method method is used to display the toast messages.
@@ -243,6 +254,10 @@ export default class RtmvpcQuestionCreation extends LightningElement {
             // this.showToast = true;
             this.loading = false;
             this.configureToast('Some Error has occured', 'Please Fill the required Fields : Question, Question Type and Section ', 'error');
+            const selectedEvent = new CustomEvent('handleerror', {
+                detail: false
+            });
+            this.dispatchEvent(selectedEvent);
         }
         else {
             this.questionlst = [];
@@ -284,6 +299,7 @@ export default class RtmvpcQuestionCreation extends LightningElement {
                                 this.loading = false;
                             }).catch(error => {
                                 this.configureToast('Some Error has occured', 'Please contact admin', 'error');
+                              
                                 let errormap = {};
                                 this.loading = false;
                                 errormap.componentName = 'RtmvpcQuestionCreation';
@@ -291,6 +307,10 @@ export default class RtmvpcQuestionCreation extends LightningElement {
                                 errormap.className = 'QuestionAttributeResponseService';
                                 errormap.errorData = error.message;
                                 errorLogRecord({ errorLogWrapper: JSON.stringify(errormap) }).then(() => { });
+                                  const selectedEvent = new CustomEvent('handleerror', {
+                                    detail: false
+                                });
+                                this.dispatchEvent(selectedEvent);
                             });
                             if (updatelst.length > 0) {
                                 updateResponseAttributes({ responseAttributes: updatelst }).then(result => {
@@ -299,11 +319,16 @@ export default class RtmvpcQuestionCreation extends LightningElement {
                                     let errormap = {};
                                     this.loading = false;
                                     this.configureToast('Some Error has occured', 'Please contact admin', 'error');
+                                   
+                                    this.dispatchEvent(selectedEvent);
                                     errormap.componentName = 'RtmvpcQuestionCreation';
                                     errormap.methodName = 'updateResponseAttributes';
                                     errormap.className = 'QuestionAttributeResponseService';
                                     errormap.errorData = error.message;
                                     errorLogRecord({ errorLogWrapper: JSON.stringify(errormap) }).then(() => { });
+                                     const selectedEvent = new CustomEvent('handleerror', {
+                                        detail: false
+                                    });
                                 })
                             }
                             if (isChildCreated) {
@@ -313,7 +338,6 @@ export default class RtmvpcQuestionCreation extends LightningElement {
                                 let respQueslst = [];
                                 respQueslst.push(responsemap);
                                 createResponseQuestionMap({ responseQuestionmap: respQueslst }).then(result => {
-                                    console.log('createResponseQuestionMap', result);
                                     this.totastmessage = 'Conditional Question has been created Successfully.';
                                     this.createQues = false;
                                     this.childQuesCreation = false;
@@ -348,19 +372,23 @@ export default class RtmvpcQuestionCreation extends LightningElement {
                         });
                     }
                     else {
-                        let toastmessage = 'Preferred/Not Preferred and Upload Required fields are mandatory';
+                        let toastmessage = 'ResponseValue,Preferred/Not Preferred and Upload Required fields are mandatory';
                         if (Array.from(set1).length !== this.responseAttributes.length) {
-                            if(responselst.length!==0){
-                                 toastmessage = 'ResponseValue, Preferred/Not Preferred and Upload Required fields are mandatory';
+                            if (responselst.length !== 0) {
+                                toastmessage = 'ResponseValue, Preferred/Not Preferred and Upload Required fields are mandatory';
                             }
-                            else{
-                                 toastmessage ='Enter unique response values';
+                            else {
+                                toastmessage = 'Enter unique response values';
                             }
                         }
                         else {
-                            toastmessage = 'Preferred/Not Preferred and Upload Required fields are mandatory';
+                            toastmessage = 'ResponseValue, Preferred/Not Preferred and Upload Required fields are mandatory';
                         }
                         this.configureToast('Some Error has occured', toastmessage, 'error');
+                        const selectedEvent = new CustomEvent('handleerror', {
+                            detail: false
+                        });
+                        this.dispatchEvent(selectedEvent);
                         this.loading = false;
                     }
                 }
@@ -377,18 +405,30 @@ export default class RtmvpcQuestionCreation extends LightningElement {
                                     detail: this.totastmessage
                                 });
                                 this.dispatchEvent(selectedEvent);
-                            }).catch(error=>{
+                            }).catch(error => {
                                 this.configureToast('Some Error has occured', 'Response value,Preferred/Not Preferred and Upload Required fields are mandatory', 'error');
+                                const selectedEvent = new CustomEvent('handleerror', {
+                                    detail: false
+                                });
+                                this.dispatchEvent(selectedEvent);
                                 this.loading = false;
                             });
                         }
                         else {
-                            this.configureToast('Some Error has occured', 'Preferred/Not Preferred and Upload Required fields are mandatory', 'error');
+                            this.configureToast('Some Error has occured', 'Response value,Preferred/Not Preferred and Upload Required fields are mandatory', 'error');
+                            const selectedEvent = new CustomEvent('handleerror', {
+                                detail: true
+                            });
+                            this.dispatchEvent(selectedEvent);
                             this.loading = false;
                         }
                     }
                     else {
-                        this.configureToast('Some Error has occured', 'Preferred/Not Preferred and Upload Required fields are mandatory', 'error');
+                        this.configureToast('Some Error has occured', 'Response value,Preferred/Not Preferred and Upload Required fields are mandatory', 'error');
+                        const selectedEvent = new CustomEvent('handleerror', {
+                            detail: false
+                        });
+                        this.dispatchEvent(selectedEvent);
                         this.loading = false;
                     }
                 }
@@ -400,8 +440,16 @@ export default class RtmvpcQuestionCreation extends LightningElement {
                         getChildQuestions({ questionId: this.questionWrapper.Id, templateId: this.templateId }).then(result => {
                             if (result.length > 0) {
                                 this.configureToast('Some Error has occured', 'Before changing the Response type, please delete Condtional questions', 'error');
+                                const errorEvent = new CustomEvent('handleerror', {
+                                    detail: true
+                                });
+                                this.dispatchEvent(errorEvent);
                                 this.createQues = false;
                                 this.loading = false;
+                                const selectedEvent = new CustomEvent('handleaftersave', {
+                                    detail: undefined
+                                });
+                                this.dispatchEvent(selectedEvent);
                             }
                             else {
                                 this.questionWrapper['Rhythm__OptionValueSet__c'] = '';
@@ -424,23 +472,33 @@ export default class RtmvpcQuestionCreation extends LightningElement {
                                         this.dispatchEvent(selectedEvent);
                                     }).catch(error => {
                                         this.loading = false;
-                                        this.configureToast('Some Error has occured', 'Please contact admin', 'error');
+                                       
                                         let errormap = {};
                                         errormap.componentName = 'RtmvpcQuestionCreation';
                                         errormap.methodName = 'deleteQuesRespAttribute';
                                         errormap.className = 'QuestionAttributeResponseService';
                                         errormap.errorData = error.message;
                                         errorLogRecord({ errorLogWrapper: JSON.stringify(errormap) }).then(() => { });
+                                         this.configureToast('Some Error has occured', 'Please contact admin', 'error');
+                                        const errorEvent = new CustomEvent('handleerror', {
+                                            detail: false
+                                        });
+                                        this.dispatchEvent(errorEvent);
                                     });
                                 }).catch(error => {
                                     this.loading = false;
                                     this.configureToast('Some Error has occured', 'Please contact admin', 'error');
+                                  
                                     let errormap = {};
                                     errormap.componentName = 'RtmvpcQuestionCreation';
                                     errormap.methodName = 'createQuestions';
                                     errormap.className = 'QuestionAttributeResponseService';
                                     errormap.errorData = error.message;
                                     errorLogRecord({ errorLogWrapper: JSON.stringify(errormap) }).then(() => { });
+                                      const selectedEvent = new CustomEvent('handleerror', {
+                                        detail: true
+                                    });
+                                    this.dispatchEvent(selectedEvent);
                                 });
                             }
                         });
@@ -464,11 +522,16 @@ export default class RtmvpcQuestionCreation extends LightningElement {
                             let errormap = {};
                             this.loading = false;
                             this.configureToast('Some Error has occured', 'Please contact admin', 'error');
+                            
                             errormap.componentName = 'RtmvpcQuestionCreation';
                             errormap.methodName = 'createQuestions';
                             errormap.className = 'QuestionAttributeResponseService';
                             errormap.errorData = error.message;
                             errorLogRecord({ errorLogWrapper: JSON.stringify(errormap) }).then(() => { });
+                            const selectedEvent = new CustomEvent('handleerror', {
+                                detail: false
+                            });
+                            this.dispatchEvent(selectedEvent);
                         });
                     }
                 }
@@ -494,11 +557,16 @@ export default class RtmvpcQuestionCreation extends LightningElement {
                         this.loading = false;
                         let errormap = {};
                         this.configureToast('Some Error has occured', 'Please contact admin', 'error');
+                        
                         errormap.componentName = 'RtmvpcQuestionCreation';
                         errormap.methodName = 'createResponseQuestionMap';
                         errormap.className = 'QuestionAttributeResponseService';
                         errormap.errorData = error.message;
                         errorLogRecord({ errorLogWrapper: JSON.stringify(errormap) }).then(() => { });
+                        const selectedEvent = new CustomEvent('handleerror', {
+                            detail: false
+                        });
+                        this.dispatchEvent(selectedEvent);
                     });
                 });
             }

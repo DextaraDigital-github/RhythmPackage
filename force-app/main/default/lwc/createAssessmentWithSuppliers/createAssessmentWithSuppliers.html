@@ -4,7 +4,7 @@
 			aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open slds-modal_medium">
 			<div class="slds-modal__container">
 				<!-- modal header start -->
-				<header class="slds-modal__header">
+				<div class="slds-modal__header">
 					<button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeModal}>
                         <lightning-icon icon-name="utility:close"
                         alternative-text="close"
@@ -13,75 +13,88 @@
                         <span class="slds-assistive-text">Close</span>
                     </button>
 					<h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">{modalHeading}</h2>
-				</header>
+				</div>
 
 				<!-- modal body start -->
-				<div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
-					<template if:true={showNewAssessment}>
-						<div>
-							<lightning-record-edit-form object-api-name="Rhythm__Assessment__c" onsubmit={handleNext}>
-								<lightning-messages></lightning-messages>
-								<lightning-layout multiple-rows>
-									<lightning-layout-item size="6" padding="around-small">
-										<lightning-input-field field-name="Name" data-id="name"
-											onchange={updateValuesHandler} name="name" value={values.name} required>
-										</lightning-input-field>
-									</lightning-layout-item>
-									<lightning-layout-item size="6" padding="around-small">
-										<!-- <lightning-combobox name="Rhythm__Template__c" label="Template Name"
+				<template if:true={showNewAssessment}>
+					<lightning-record-edit-form object-api-name="Rhythm__Assessment__c" onsubmit={handleNext}>
+						<div class="slds-modal__content slds-p-horizontal_large slds-p-vertical_medium"
+							id="modal-content-id-1" style="height:365px;">
+							<lightning-messages></lightning-messages>
+							<lightning-layout multiple-rows>
+								<lightning-layout-item size="12" large-device-size="6" medium-device-size="6"
+									class="slds-p-horizontal_small slds-m-bottom_x-small">
+									<lightning-input-field variant="label-stacked" field-name="Name" data-id="name"
+										onchange={updateValuesHandler} name="name" value={values.name} required>
+									</lightning-input-field>
+								</lightning-layout-item>
+								<lightning-layout-item size="12" large-device-size="6" medium-device-size="6"
+									class="slds-p-horizontal_small slds-m-bottom_x-small">
+									<!-- <lightning-combobox name="Rhythm__Template__c" label="Template Name"
 											value={templateId} options={templateOptions} data-id="template"
 											onchange={handleChange}></lightning-combobox> -->
-										<c-custom-combobox label="Template Name" value={templateId}
-											options={templateOptions} data-id="template" allow-search="true"
-											onchange={handleChange} required="true">
-										</c-custom-combobox>
-										<!-- <lightning-input-field field-name="Rhythm__Template__c" data-id="template" onchange={handleChange} name="template" value={templateId} required></lightning-input-field> -->
-									</lightning-layout-item>
-									<lightning-layout-item size="6" padding="around-small">
-										<lightning-input-field field-name="Rhythm__Start_Date__c" data-id="startdate"
-											onchange={updateValuesHandler} name="startdate" required>
-										</lightning-input-field>
-									</lightning-layout-item>
-									<lightning-layout-item size="6" padding="around-small">
-										<lightning-input-field field-name="Rhythm__End_Date__c" data-id="enddate"
-											onchange={updateValuesHandler} name="enddate" value={values.enddate}>
-										</lightning-input-field>
-									</lightning-layout-item>
-									<lightning-layout-item size="6" padding="around-small">
-										<lightning-input-field field-name="Rhythm__Category__c" data-id="category"
-											onchange={updateValuesHandler} name="category" value={values.category}
-											required></lightning-input-field>
-									</lightning-layout-item>
-									<lightning-layout-item size="6" padding="around-small">
-										<lightning-input-field field-name="Rhythm__Frequency__c"
-											data-id="frequencyvalue" onchange={updateValuesHandler}
-											name="frequencyValue" value={values.frequencyValue}></lightning-input-field>
-									</lightning-layout-item>
-									<lightning-layout-item size="6" padding="around-small">
-										<lightning-input-field field-name="Rhythm__Disclosure__c" data-id="disclosure"
-											onchange={updateValuesHandler} name="disclosure" value={values.disclosure}>
-										</lightning-input-field>
-									</lightning-layout-item>
-									<lightning-layout-item size="6" padding="around-small">
-										<lightning-input-field field-name="Rhythm__Description__c" data-id="description"
-											onchange={updateValuesHandler} name="description"
-											value={values.description}></lightning-input-field>
-									</lightning-layout-item>
-								</lightning-layout>
-
-								<footer class="slds-modal__footer">
-									<lightning-button label="Cancel" title="Cancel" onclick={closeModal}>
-									</lightning-button>
-									<lightning-button variant="brand" label="Next" title="Next" type="submit"
-										class="slds-m-left_xx-small"></lightning-button>
-								</footer>
-							</lightning-record-edit-form>
+									<c-custom-combobox label="Template Name" value={templateId}
+										options={templateOptions} data-id="template" allow-search="true"
+										onchange={handleChange} required="true">
+									</c-custom-combobox>
+									<!-- <lightning-input-field field-name="Rhythm__Template__c" data-id="template" onchange={handleChange} name="template" value={templateId} required></lightning-input-field> -->
+								</lightning-layout-item>
+								<lightning-layout-item size="12" large-device-size="6" medium-device-size="6"
+									class="slds-p-horizontal_small slds-m-bottom_x-small">
+									<lightning-input-field variant="label-stacked" field-name="Rhythm__Start_Date__c" data-id="startdate"
+										onchange={updateValuesHandler} name="startdate" value={startDate} required>
+									</lightning-input-field>
+								</lightning-layout-item>
+								<lightning-layout-item size="12" large-device-size="6" medium-device-size="6"
+									class="slds-p-horizontal_small slds-m-bottom_x-small">
+									<lightning-input-field variant="label-stacked" field-name="Rhythm__End_Date__c" data-id="enddate"
+										onchange={updateValuesHandler} name="enddate" value={values.enddate}>
+									</lightning-input-field>
+								</lightning-layout-item>
+								<lightning-layout-item size="12" large-device-size="6" medium-device-size="6"
+									class="slds-p-horizontal_small slds-m-bottom_x-small">
+									<lightning-input-field variant="label-stacked" field-name="Rhythm__Category__c" data-id="category"
+										onchange={updateValuesHandler} name="category" value={values.category} required>
+									</lightning-input-field>
+								</lightning-layout-item>
+								<lightning-layout-item size="12" large-device-size="6" medium-device-size="6"
+									class="slds-p-horizontal_small slds-m-bottom_x-small">
+									<lightning-input-field variant="label-stacked" field-name="Rhythm__Frequency__c" data-id="frequencyvalue"
+										onchange={updateValuesHandler} name="frequencyValue"
+										value={values.frequencyValue}>
+									</lightning-input-field>
+								</lightning-layout-item>
+								<lightning-layout-item size="12" large-device-size="6" medium-device-size="6"
+									class="slds-p-horizontal_small slds-m-bottom_x-small">
+									<lightning-input-field variant="label-stacked" field-name="Rhythm__Disclosure__c" data-id="disclosure"
+										onchange={updateValuesHandler} name="disclosure" value={values.disclosure}>
+									</lightning-input-field>
+								</lightning-layout-item>
+								<lightning-layout-item size="12" large-device-size="6" medium-device-size="6"
+									class="slds-p-horizontal_small slds-m-bottom_x-small">
+									<lightning-input-field variant="label-stacked" field-name="Rhythm__Description__c" data-id="description"
+										onchange={updateValuesHandler} name="description" value={values.description}>
+									</lightning-input-field>
+								</lightning-layout-item>
+							</lightning-layout>
 						</div>
-					</template>
-					<template if:true={showSuppliers}>
-						<c-add-suppliers onupdatedsupliers={updateSupplierData}></c-add-suppliers>
-					</template>
-					<template if:true={isTemplateInactive}>
+
+						<div class="slds-modal__footer">
+							<lightning-button class="slds-button" label="Cancel" title="Cancel" onclick={closeModal} >
+							</lightning-button>
+							<lightning-button class="slds-button" variant="brand" label="Next" title="Next" type="submit"></lightning-button>
+						</div>
+					</lightning-record-edit-form>
+				</template>
+				<template if:true={showSuppliers}>
+					<div class="slds-modal__content slds-p-horizontal_large slds-p-vertical_medium"
+						id="modal-content-id-2" style="height:365px;">
+						<c-add-suppliers onupdatedsupliers={updateSupplierData} today-date={todayDate} start-date={startDate} end-date={endDate}></c-add-suppliers>
+					</div>
+				</template>
+				<template if:true={isTemplateInactive}>
+					<div class="slds-modal__content slds-p-horizontal_large slds-p-vertical_medium"
+						id="modal-content-id-3" style="height:365px;">
 						<div class="slds-align_absolute-center">
 							<p class="slds-text-title_bold slds-text-color_destructive">New Assessment cannot be added
 								for the Inactive Template.</p>
@@ -90,23 +103,22 @@
 							<lightning-button label="OK" title="Cancel" variant="brand" onclick={closeModal}>
 							</lightning-button>
 						</div>
-					</template>
-				</div>
+					</div>
+				</template>
 
 				<!-- modal footer start-->
-
-
 				<template if:true={showSuppliers}>
-					<footer class="slds-modal__footer">
-						<lightning-button label="Back" title="Back" onclick={backHandler}></lightning-button>
-						<lightning-button label="Cancel" title="Cancel" onclick={closeModal}></lightning-button>
-						<lightning-button variant="brand" label="Save" title="Save" onclick={addSuppliers}
-							class="slds-m-left_xx-small"></lightning-button>
-					</footer>
+					<div class="slds-modal__footer slds-modal__footer_directional">
+						<lightning-button class="slds-button" label="Back" title="Back" onclick={backHandler}>
+						</lightning-button>
+						<lightning-button class="slds-button" label="Cancel" title="Cancel" onclick={closeModal}>
+						</lightning-button>
+						<lightning-button class="slds-button" variant="brand" label="Save" title="Save"
+							onclick={addSuppliers}></lightning-button>
+					</div>
 				</template>
 			</div>
 		</section>
 		<div class="slds-backdrop slds-backdrop_open"></div>
 	</template>
-
 </template>

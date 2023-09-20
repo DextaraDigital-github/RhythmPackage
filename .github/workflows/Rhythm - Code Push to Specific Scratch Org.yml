@@ -47,12 +47,17 @@ jobs:
     steps:
     
     # Install Salesforce CLI
-      - name: 'Install Salesforce CLI'
+      - name: Install Salesforce CLI
+        env:
+          GITHUB_PATH: ~/Git/bin
         run: |
-            wget https://developer.salesforce.com/media/salesforce-cli/sfdx-linux-amd64.tar.xz
-            mkdir sfdx-cli
-            tar xJf sfdx-linux-amd64.tar.xz -C sfdx-cli --strip-components 1
-            ./sfdx-cli/install
+              wget https://developer.salesforce.com/media/salesforce-cli/sfdx/channels/stable/sfdx-linux-x64.tar.xz
+              sudo mkdir ~/sfdx-cli
+              sudo tar xJf sfdx-linux-x64.tar.xz -C ~/sfdx-cli --strip-components 1
+              export PATH=$PATH:~/sfdx-cli/bin
+              echo "~/sfdx-cli/bin" >> $GITHUB_PATH
+              sudo chmod -R 777 ~/sfdx-cli
+              sfdx --version
             
     # Run Salesforce CLI Scanner For Security checks
       - name: 'Check for SFDX Update'
@@ -74,7 +79,24 @@ jobs:
     # Code Push to Scratch org
       - name: 'code push'
         run: sfdx force:source:push --targetusername=${{github.event.inputs.scratch-org_username}} --wait 20 -f --loglevel debug
-       
+
     # Generate Violation Report
       - name: 'Scan for Violations and Generate report'
-        run: sfdx scanner:run:dfa --target "./**/*.cls" --projectdir "./"
+        run: sfdx scanner:run:dfa --target "./**/*.cls" --projectdir "./" --outfile ViolationReport.html --format html
+       
+    # Send Violation Report Mail 
+      - name: 'Send mail'
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: mail.smtp2go.com
+          server_port: 465
+          secure: true
+          username: ${{secrets.MAIL_USERNAME}}
+          password: ${{secrets.MAIL_PASSWORD}}
+          subject: Github Actions workflow result
+          to: akamanasf@gmail.com
+          from: RHYTHM GitHub Actions
+          html_body: file://.github/workflows/EmailTemplate.html
+          attachments: ViolationReport.html
+          convert_markdown: true
+          priority: normal

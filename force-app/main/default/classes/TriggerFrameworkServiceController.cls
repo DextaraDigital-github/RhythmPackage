@@ -27,8 +27,14 @@ public with sharing class TriggerFrameworkServiceController {
                         isCriteriaMet = true;
                 }
             }else{
-                if(record.get(fName) != oldRecord.get(fName)){
-                    isCriteriaMet = true;
+                if(objectName.equalsIgnoreCase('Assessment_Template_c')){
+                    if((!String.valueOf(record.get('Status__c')).equalsIgnoreCase('New')) && record.get(fName) != oldRecord.get(fName)){
+                        isCriteriaMet = true;
+                    }
+                }else{
+                     if(record.get(fName) != oldRecord.get(fName)){
+                        isCriteriaMet = true;
+                    }
                 }
             }
         }

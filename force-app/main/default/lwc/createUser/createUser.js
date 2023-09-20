@@ -14,7 +14,7 @@ export default class CreateUser extends LightningElement {
     }
 
     handleCreate(){
-        console.log('handleCreate---->',this.contactId);
+        
         createUser({contactId:this.contactId})
         .then((result) => {
             if(result.isSuccess){
@@ -25,7 +25,7 @@ export default class CreateUser extends LightningElement {
             }
         })
         .catch((error) => {
-            console.log(error);
+            
         });
     }
 

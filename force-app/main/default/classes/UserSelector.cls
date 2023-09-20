@@ -9,8 +9,8 @@ public with sharing class UserSelector {
     public static SecurityCheckController safe = new SecurityCheckController();  //Implementing singleton pattern
     public static List<ErrorTransactionLog__c> errorList;   //Stores list of ErrorTransactionLog__c records to store errors
     public static ErrorTransactionLog__c errorRec;   //Used for creating an instance for ErrorTransactionLog__c to log/store an error
-
     private static UserSelector selector = null; //private static instance of the class
+    
     /**
     * @description Singleton Design Pattern 
     * @return 
@@ -24,19 +24,12 @@ public with sharing class UserSelector {
     
     /**
     * @description Fetches the User records w.r.t fields, filter, child queries, etc.
-    * @param parameterMap It is a Map of all parameters like fields, filter, child queries, etc.
+    * @param userIds It is a List of all recordId's.
     * @return Map of Id and its User record
     */
-    public Map<Id,User> fetchUsers(Map<String,Object> parameterMap){
-        List<String> fields = (List<String>)JSON.deserialize(JSON.serialize(parameterMap.get('fields')), List<String>.class);
-        String filter = (String)parameterMap.get('filter');
-        List<String> childQuery = (List<String>)JSON.deserialize(JSON.serialize(parameterMap.get('childQuery')),List<String>.class);
-        if(fields != null && !fields.isEmpty()){
-            filter = (filter == null)?'':filter;
-            String childQry = (childQuery !=  null && !childQuery.isEmpty())?(' , ' + String.join(childQuery, ', ')):'';
-            String query = 'SELECT ' + String.join(fields,',') + childQry + ' FROM User ' + filter;
+    public Map<Id,User> fetchUsers(List<String> userIds){
             try{
-                List<User> userList = safe.doQuery(query);
+                List<User> userList = [SELECT Id, Email, Contact.AccountId, Contact.Account.Name FROM USER where Id IN :userIds WITH SECURITY_ENFORCED];
                 return new Map<Id,User>(userList);
             }catch(Exception e){
                 errorList = new List<ErrorTransactionLog__c>();
@@ -50,7 +43,5 @@ public with sharing class UserSelector {
                 safe.doInsert(errorList);
                 throw new AuraHandledException(e.getMessage());   //Throws an exception
             }
-        }
-        return null;
     }
 }

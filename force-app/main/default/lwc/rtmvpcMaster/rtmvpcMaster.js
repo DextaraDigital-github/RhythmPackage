@@ -103,7 +103,7 @@ export default class RtmvpcMaster extends NavigationMixin(LightningElement) {
         this.isReports = false; 
         this.isDashboard = false; 
         this.isSettings = false;
-          console.log('this.isAssessments',this.isAssessments);
+          
         if (event.detail === 'Inbox') {
             this.isInbox = true;
             data = 'Rhythm__Inbox__c';
@@ -127,7 +127,7 @@ export default class RtmvpcMaster extends NavigationMixin(LightningElement) {
             this.isAction = true;
             data = 'Rhythm__Action__c';
         }
-        console.log('this.isAssessments',this.isAssessments);
+        
 
         const pageRef = {
             type: 'comm__namedPage',
@@ -147,7 +147,7 @@ export default class RtmvpcMaster extends NavigationMixin(LightningElement) {
         }
         if(this.isAction === true)
         {
-            console.log('handleaction', this.template.querySelector('c-action-item-grid'));
+            
              this.template.querySelector('c-action-item-grid').handleActionItem();
         }
 
@@ -169,15 +169,15 @@ export default class RtmvpcMaster extends NavigationMixin(LightningElement) {
     }
     @wire(CurrentPageReference)
     getStateParameters(currentPageReference) {
-        console.log('current', typeof currentPageReference.state?.Rhythm__Action__c);
+        
 
         if (typeof currentPageReference.state?.Rhythm__Action__c !== 'undefined') {
             this.urlId = currentPageReference.state?.Rhythm__Action__c;
-            console.log('inaction');
+            
         }
         if (typeof currentPageReference.state?.navigate !== 'undefined') {
             this.openClicked = currentPageReference.state?.navigate;
-            console.log('inaction', this.openClicked);
+            
         }
     }
 
@@ -198,7 +198,7 @@ export default class RtmvpcMaster extends NavigationMixin(LightningElement) {
         }
         if (typeof this.urlId !== 'undefined') {
 
-            console.log('this.isAction', this.isAction);
+            
             this.isAction = true;
         }
         this.template.addEventListener('leftmenu', this.handleLeftMenu.bind(this));

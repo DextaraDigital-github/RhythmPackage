@@ -2,7 +2,7 @@
 	-->
 <template>
 	<template if:true={showBack}>
-		<button class="slds-m-bottom_small slds-float_right" onclick={handleBackButton}>
+		<button class="slds-float_right cad-btn_bck1" onclick={handleBackButton}>
 			<span >	
 				<i class="las la-chevron-circle-left"></i> Back
 			</span>
@@ -15,7 +15,8 @@
 					<div class="cad-sec_container">
 						<div class="cad-sec_header">
 							<button class="cad_actions" onclick={handleLeftButtonClick} title="Close Timeline Panel" style="z-index:1; position:inherit;">
-								<i class="las la-chevron-circle-left"></i>
+								<!-- <i class="las la-chevron-circle-left"></i> -->
+								<i class="las la-indent" style="transform:rotate(0deg);"></i>
 							</button><span>Time Line</span>
 						</div>
 						<div class="cad-sec_bodyfull1">
@@ -43,13 +44,13 @@
 				<div class="cad-cel cad-auto cad-list">
 					<div class="cad-sec_container">
 						<div class="cad-sec_header cad-titlebutton_more">
-							<div class="slds-float_left slds-is-absolute" style="width:100%; padding:4px 80px 0px 31px;"
+							<div class="slds-float_left slds-is-absolute" style="width:100%; padding:4px 170px 0px 31px;"
 								title="Details : ESG Assessment (Due date 05/14/2023)">
 								<div class="slds-truncate">Details : {assessmentName} {endDate}</div>
 							</div>
 
 							<div class="slds-float_left slds-is-relative">
-								<button class="cad_actions" onclick={handleLeftButtonClick} title="Show / Hide Timeline Panel"><i class="las la-indent" style="transform:rotate(0deg);"></i></button>
+								<button class="cad_actions" onclick={handleLeftButtonClick} title="Show / Hide Timeline Panel"><i class="las la-indent" style="transform:rotate(180deg);"></i></button>
 							</div>
 
 							<div class="slds-float_right slds-is-relative">
@@ -93,17 +94,17 @@
 										<!-- <lightning-menu-item label="Excel" title="Excel" value="Excel"></lightning-menu-item> -->
 									</lightning-button-menu>
 								</template>
-								<button class="cad_actions" onclick={handleRightButtonClick} title="Show / Hide Info Panel"><i class="las la-indent" style="transform:rotate(180deg);"></i></button>
+								<button class="cad_actions" onclick={handleRightButtonClick} title="Show / Hide Info Panel"><i class="las la-indent" style="transform:rotate(0deg);"></i></button>
 							</div>
 						</div>
 						<div class="cad-sec_bodyfull1 cad-titlebutton_more">
 							<div class="cad-sec_vcontainer2_2" style="height:calc(100% - 0px)">
-								<div class="slds-scrollable_y" style="max-height:calc(100% - 40px);">
+								<div class="slds-scrollable_y" style="max-height:calc(100% - 0px);">
 									<div class="slds-text-align_center slds-text-heading_large">
 										<template if:true={showSections}>
 											<c-Questionnaire vendor={accountid} assessment={assessmentid}
 												object-api-name={objectApiName} record-id={recordId} accid={assaccId}
-												object-name ={objectRecname}
+												object-name ={objectRecname} 
 												onselectconversation={chatHistory} onshowsummary={showsummaryHandler}
 												account-assessment-status={accountAssessmentStatus} 
 												onupdatetimeline={handleupdatetimeline} onuploadfile={handleFileData}
@@ -124,10 +125,25 @@
 					<div class="cad-sec_container">
 						<div class="cad-sec_header cad-titlebutton_more">
 							<div class="slds-float_right slds-is-relative">
-								<button class="cad_actions " onclick={handleRightButtonClick} title="Show / Hide Timeline Panel"><i class=" las la-chevron-circle-right" style="transform:rotate(0deg);"></i></button>
+								<button class="cad_actions" onclick={handleRightButtonClick} title="Show / Hide Timeline Panel">
+								<i class="las la-indent" style="transform:rotate(180deg);"></i>
+								<!-- <i class=" las la-chevron-circle-right" style="transform:rotate(0deg);"></i> -->
+								</button>
 							</div>
-							<div>
-								<lightning-button-icon class="cad_actions slds-float_right slds-is-absolute"
+							
+								
+							<div class="slds-float_right slds-is-relative">
+								<button class="cad_actions" onclick={handleSelectedChat} title="Comments">
+									<i class="las la-comments"></i>
+								</button>
+								<button class="cad_actions" onclick={handleSelectedFile} title="Attachments">
+									<i class="las la-paperclip"></i>
+								</button>
+								<button class="cad_actions" onclick={handleSelectedAction} title="CAPA">
+									<i class="las la-file-invoice"></i>
+								</button>
+								
+								<!-- <lightning-button-icon class="cad_actions slds-float_right slds-is-absolute"
 									style="right:30px;top:3px;" size="small" icon-name="utility:edit_form"
 									onclick={handleSelectedAction}>
 								</lightning-button-icon>
@@ -138,13 +154,12 @@
 								<lightning-button-icon class="cad_actions slds-float_right slds-is-absolute "
 									style="right:90px;top:3px;border-radius:0px" size="small"
 									icon-name="utility:comments" onclick={handleSelectedChat}>
-								</lightning-button-icon>
+								</lightning-button-icon> -->
 							</div>
 						</div>
 						<div class="cad-sec_bodyfull1 cad-titlebutton_more">
 							<div class="cad-sec_vcontainer2_2" style="height:calc(100% - 0px);">
-								<div class="slds-scrollable_y"
-									style="max-height:calc(100% - 40px); --slds-c-input-color-border: rgb(187 187 187);">
+								
 
 
 									<template if:true={openReviewComments}>
@@ -167,7 +182,7 @@
 											</c-portal-s3-files>
 										</template>
 									</template>
-								</div>
+								
 							</div>
 
 						</div>

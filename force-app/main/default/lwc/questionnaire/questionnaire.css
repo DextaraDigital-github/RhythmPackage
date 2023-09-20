@@ -108,7 +108,7 @@
 .cad-tnailcardinner {margin-left:30px; margin-right:30px; width:30px; height:30px; border:5px solid #f3f3f3; border-top:5px solid orange; border-radius:50%; animation:spin 2s linear infinite; background:transparent;}
 .cad-tnailcard2 {width:100px; height:90px; border-radius:5px;box-shadow:rgba(0, 0, 0, 0.1) 0px 0px 3px; background: #ebebeb;}
 .cad-tnailcard2inner { height:36px; display:flex; justify-content:center; align-items:center}
-
+.cad-btn_bck1 { margin-top:-48px;min-width:70px;position:relative; z-index:99; }
 @media screen and (max-width:992px) {    
     .cad-row { display:block; height:100%; position:relative; } 
 	.cad-pl8 { padding-left:0px;}  
@@ -126,7 +126,8 @@
     .cad-sec_vcontainer2 { display:block; width:100%; position:absolute; height:calc(100% - 207px); margin:0px 0px 0px; overflow-y:auto; }
     .cad-sec_vcontainer2_1 { display:block; width:100%; position:absolute; height:calc(100% - 1px); margin:0px 0px 0px; overflow-y:auto; }
     .cad-sec_vcontainer2_2 { display:block; width:100%; position:absolute; height:calc(100% - 0px); margin:0px 0px 0px; overflow-y:auto; }
-    .cad-sec_vcontainer2bdr { margin:0px 0px 114px;}    
+    .cad-sec_vcontainer2bdr { margin:0px 0px 114px;} 
+    .cad-btn_bck1 {/* margin-top:0px;*/ margin-bottom:4px; margin-top:-42px; min-width:70px; position:relative; z-index:99; }    
 }
 
 @media screen and (max-width:600px) {

@@ -4,7 +4,7 @@
 	</template>
 	<div style="height: 100%;">
 		<c-send-email what-id={assessmentId} what-name={assessmentName} recipients={accountsData}
-			page-labels-data={pageLabelsData}>
+			page-labels-data={pageLabelsData} onclose={closeHandler}>
 		</c-send-email>
 	</div>
 </template>

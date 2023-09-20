@@ -5,7 +5,7 @@ import fetchAccounts from '@salesforce/apex/EmailController.fetchAccounts';
 export default class SendEmailToContacts extends LightningElement {
     @api assessmentId;   // Stores the assessment Id coming from Aura Component 
     @api assessmentName;   // Stores the assessment Name coming from Aura Component
-    @track show = {spinner: false};   // Conditionally renders/displays data on UI
+    @track show = { spinner: false };   // Conditionally renders/displays data on UI
     @track accountsData;
     @track pageLabelsData;
 
@@ -48,7 +48,12 @@ export default class SendEmailToContacts extends LightningElement {
 
     /* Creates page labels to display on pages on the UI */
     createPageLabelsData() {
-        this.pageLabelsData = {'page1':'Choose Suppliers'};
+        this.pageLabelsData = { 'page1': 'Choose Suppliers' };
         this.show.spinner = false;
+    }
+
+    closeHandler() {
+        const close = new CustomEvent('close', {});
+        this.dispatchEvent(close);
     }
 }

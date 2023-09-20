@@ -11,6 +11,9 @@ import getUserName from '@salesforce/apex/AssessmentController.getUserName';
 import getPdfContent from '@salesforce/apex/AssessmentController.getPdfContent';
 import errorLogRecord from '@salesforce/apex/AssessmentController.errorLogRecord';
 import { NavigationMixin } from 'lightning/navigation';
+import CUS_STYLES from '@salesforce/resourceUrl/rtmcpcsldscustomstyles';
+import { loadStyle } from 'lightning/platformResourceLoader';
+
 import getQuestionsList from '@salesforce/apex/AssessmentController.getQuestionsList'; //To fetch all the Questions from the Assessment_Template__c Id from the Supplier_Assessment__c record
 import getSupplierResponseList from '@salesforce/apex/AssessmentController.getSupplierResponseList'; //To fetch all the Supplier_Response__c records related to the Supplier_Assessment__c record
 import getSupplierAssessmentList from '@salesforce/apex/AssessmentController.getSupplierAssessmentList'; //To fetch the Assessment_Template__c Id from the Supplier_Assessment__c record
@@ -55,7 +58,7 @@ export default class RtmvpcAssessmentDetail extends NavigationMixin(LightningEle
     @track showResponseForm;
     @track showCapaForm = false;
     @track openReviewComments = false;
-    @track actionData; 
+    @track actionData;
     @track fileData;
     @track selectedchatData;
     @track accountassessmentFileId;
@@ -66,33 +69,80 @@ export default class RtmvpcAssessmentDetail extends NavigationMixin(LightningEle
     @track isdisabled = false;
     @track openRightFile = false;
     @track assessmentId;
-    @track showBack=false;
+    @track showBack = false;
+    @track isOpened = false;
 
     connectedCallback() {
-        this.customerId = this.recordId;
-        this.showconverstion = false;
-        this.assaccId = this.accountid;
-        if (this.templateId != undefined) {
-            this.tempId = this.templateId;
+
+        let pageurl = window.location.href;
+        let id = pageurl.split('=');
+        let urlaccountid = '';
+        if (typeof id[1] !== 'undefined' && id[1].length === 18) {
+            getAccountAssessmentRecordData({ assrecordId: id[1] }).then(asmtResult => {
+                urlaccountid = asmtResult[0].Rhythm__Account__c;
+                if (urlaccountid === this.accountid || typeof this.recordId !== 'undefined') {
+                    this.customerId = this.recordId;
+                    this.showconverstion = false;
+                    this.assaccId = this.accountid;
+                    if (this.templateId != undefined) {
+                        this.tempId = this.templateId;
+                    }
+                    if (typeof this.recordId !== 'undefined') {
+                        this.accountassessmentid = this.recordId;
+                        this.showBack = true;
+                    }
+                    this.handleTimeLine();
+                }
+                else {
+                    const pageRef = {
+                        type: 'comm__namedPage',
+                        attributes: {
+                            name: 'Home' // Replace with your community page name
+                        },
+
+                    };
+                    const selectedevent = new CustomEvent('handleurl', {
+                        detail: true
+                    });
+                    this.dispatchEvent(selectedevent);
+                    this[NavigationMixin.Navigate](pageRef);
+                }
+            }).catch(error => {
+
+            });
         }
-        if(typeof this.recordId!=='undefined'){
-            this.accountassessmentid  = this.recordId;
-            this.showBack=true;
+        else {
+            this.customerId = this.recordId;
+            this.showconverstion = false;
+            this.assaccId = this.accountid;
+            if (this.templateId != undefined) {
+                this.tempId = this.templateId;
+            }
+            if (typeof this.recordId !== 'undefined') {
+                this.accountassessmentid = this.recordId;
+                this.showBack = true;
+            }
+            this.handleTimeLine();
         }
-        console.log('detaileddata------>', this.detaileddata);
-        console.log('assaccId------>', this.assaccId);
-        console.log('TADId------>', this.tempId);
-        /* To get the username */
-        this.handleTimeLine();
+
+        // this.handleRefresh();
+
+        Promise.all([
+            loadStyle(this, CUS_STYLES),
+        ]).then(() => {
+        })
+            .catch(error => {
+            });
+
     }
     handleDeleteIcon(event) {
         this.template.querySelectorAll('c-Questionnaire')[0].removeDeleteButton(event.detail);
     }
-    handleBackButton(){
-         this[NavigationMixin.Navigate]({
+    handleBackButton() {
+        this[NavigationMixin.Navigate]({
             type: 'standard__recordPage',
             attributes: {
-                recordId:this.assessmentId ,
+                recordId: this.assessmentId,
                 objectApiName: 'Rhythm__Assessment__c',
                 actionName: 'view'
             },
@@ -109,7 +159,6 @@ export default class RtmvpcAssessmentDetail extends NavigationMixin(LightningEle
     }
 
     handleTimeLine() {
-        console.log('this.assessmentTimeline',this.assessmentTimeline);
         
         let accountAssessmentRecord = ''
         getUserName({}).then(result => {
@@ -125,14 +174,14 @@ export default class RtmvpcAssessmentDetail extends NavigationMixin(LightningEle
             }
             /* */
             getAccountAssessmentRecordData({ assrecordId: accountAssessmentRecord }).then(asmtResult => {
-              
+                
                 /* To get the assessment tracking history to update on timeline*/
                 getAssessmentStatus({ assessmentId: accountAssessmentRecord, objectName: 'AccountAssessmentRelation__c' }).then(statusResult => {
-                   
+
                     this.assessmentTimeline = [];
                     if (this.isRecordPage) {
                         this.assessid = asmtResult[0].Rhythm__Assessment__r.Id;
-                         this.assessmentId=asmtResult[0].Rhythm__Assessment__r.Id;
+                        this.assessmentId = asmtResult[0].Rhythm__Assessment__r.Id;
                     } else {
                         this.assesstid = this.accountassessmentid;
                     }
@@ -190,7 +239,7 @@ export default class RtmvpcAssessmentDetail extends NavigationMixin(LightningEle
                     }
 
 
-                   
+
                     let assessmentStatus = statusResult;
                     if (typeof statusResult !== 'undefined') {
                         if (assessmentStatus && assessmentStatus !== null) {
@@ -251,20 +300,15 @@ export default class RtmvpcAssessmentDetail extends NavigationMixin(LightningEle
 
 
     }
-
-
-
-     handleResponse(event)
-    {
-        let response=event.detail;
-        console.log('sampledata');
+    handleResponse(event) {
+        let response = event.detail;
+        
         this.template.querySelector('c-Questionnaire').handleChatResponse(response);
     }
-    handleDeleteFile(event)
-    {
-        console.log('handleDeleteFile');
+    handleDeleteFile(event) {
+        
         let mp = event.detail;
-        console.log('handleDeleteFile');
+       
         this.template.querySelector('c-Questionnaire').handleDeleteFile(mp);
     }
     handleFilter() {
@@ -282,11 +326,11 @@ export default class RtmvpcAssessmentDetail extends NavigationMixin(LightningEle
                 }
             })
         }
-        setTimeout(()=>{
-             console.log(' this.template',this.template.querySelectorAll('c-Questionnaire')[0]);
+        setTimeout(() => {
+            
             this.template.querySelectorAll('c-Questionnaire')[0].gethandleTimeline(this.assessmentTimeline);
-        },400);
-       
+        }, 400);
+
     }
     /*To display only the flagged questions(flag colour- green) or all questions(flag colour- red) by clicking on flag */
     handleChange(event) {
@@ -308,12 +352,16 @@ export default class RtmvpcAssessmentDetail extends NavigationMixin(LightningEle
 
     }
     handleAction(event) {
-        console.log('hhh', event.detail);
+        let uiDetails = navigator.userAgent;
+        let uiRegexp = /android|iphone|kindle|ipad/i;
+        let isMobileDevice = uiRegexp.test(uiDetails);
+        if (!this.isOpened && isMobileDevice) {
+            this.handleRightButtonClick();
+        }
         this.showResponseForm = event.detail.action;
         this.showCapaForm = this.showResponseForm[0].showCapaForm;
         this.openReviewComments = false;
         this.selectedchatData = event.detail.chat;
-        console.log('sample', this.showResponseForm, this.openReviewComments);
         this.assessmentTimeline.forEach(res => {
             if (res.status === 'In Review') {
                 this.showResponseForm[0].ownershipId = res.id;
@@ -348,6 +396,7 @@ export default class RtmvpcAssessmentDetail extends NavigationMixin(LightningEle
     handleRightButtonClick() {
         var cadtype = this.template.querySelector('[data-id="caddisc"]');
         cadtype.classList.toggle('cadshowright');
+        this.isOpened = !this.isOpened;
     }
 
     /* showQuestionnaire is used to get section id and send it to the child component*/
@@ -360,13 +409,19 @@ export default class RtmvpcAssessmentDetail extends NavigationMixin(LightningEle
     }
     /* chatHistory is used to get the question id, assessment id and flag boolean from the child component (Questionnaire) and pass it to the child component(AssessmentChatter)*/
     chatHistory(event) {
+        let uiDetails = navigator.userAgent;
+        let uiRegexp = /android|iphone|kindle|ipad/i;
+        let isMobileDevice = uiRegexp.test(uiDetails);
+        if (!this.isOpened && isMobileDevice && typeof event.detail !== 'undefined' && typeof event.detail.identifier !== 'undefined' && event.detail.identifier === 'button') {
+            this.handleRightButtonClick();
+        }
+
         this.showChat = event.detail.chat;
         //this.showCapaForm=event.detail.showCapaForm;
         this.openReviewComments = this.showChat.openReviewComments;
         this.showCapaForm = false;
         this.openRightFile = false;
 
-        console.log('chatter', this.showChat);
         this.showChat.accountassessmentId = this.accountassessmentid;
         this.showData = this.showChat.openChat;
         this.showconverstion = this.showChat.disableSendButton;
@@ -383,11 +438,16 @@ export default class RtmvpcAssessmentDetail extends NavigationMixin(LightningEle
                 this.actionData[0].assignedToName = res.name;
             }
         })
-        console.log('sample', this.fileData);
-        setTimeout(() => {
-            console.log('chatter===>', this.template.querySelectorAll('c-rtmvpc-assessment-chatter'));
-            this.template.querySelectorAll('c-rtmvpc-assessment-chatter')[0].displayConversation(this.showChat);
-        }, 300);
+        
+        if (typeof this.showChat !== 'undefined') {
+            setTimeout(() => {
+                
+                let dispConvList = this.template.querySelectorAll('c-rtmvpc-assessment-chatter');
+                if (typeof dispConvList !== 'undefined' && dispConvList.length > 0 && dispConvList[0] !== 'undefined') {
+                    this.template.querySelectorAll('c-rtmvpc-assessment-chatter')[0].displayConversation(this.showChat);
+                }
+            }, 300);
+        }
 
 
     }
@@ -395,18 +455,26 @@ export default class RtmvpcAssessmentDetail extends NavigationMixin(LightningEle
         this.openReviewComments = false;
         this.showCapaForm = true;
         this.openRightFile = false;
+        // this.template.querySelectorAll('c-action')[0].displayForm(this.actionData);
         setTimeout(() => {
             this.template.querySelectorAll('c-action')[0].displayForm(this.actionData);
-        }, 500);
+        }, 800);
 
     }
     handleFileData(event) {
+        let uiDetails = navigator.userAgent;
+        let uiRegexp = /android|iphone|kindle|ipad/i;
+        let isMobileDevice = uiRegexp.test(uiDetails);
+        if (!this.isOpened && isMobileDevice) {
+            this.handleRightButtonClick();
+        }
+
         this.openRightFile = true;
         this.openReviewComments = false;
         this.showCapaForm = false;
         this.objectRecname = event.detail.objectApiName;
         this.isdisabled = (event.detail.isEditable === "true") ? true : false;
-        console.log('isdisable', event.detail);
+       
         this.responseId = event.detail.response;
         this.showUpload = (event.detail.showUpload === "true") ? true : false;
         this.recid = event.detail.recid;
@@ -414,7 +482,6 @@ export default class RtmvpcAssessmentDetail extends NavigationMixin(LightningEle
         this.accountassessmentFileId = event.detail.accountassessmentid;
     }
     handleOnLoad(event) {
-        console.log('filemap', event.detail);
         this.template.querySelectorAll('c-questionnaire')[0].handleGetRespRecord(event.detail);
     }
     handleSelectedChat() {
@@ -423,10 +490,9 @@ export default class RtmvpcAssessmentDetail extends NavigationMixin(LightningEle
         this.openRightFile = false;
         setTimeout(() => {
             this.template.querySelectorAll('c-rtmvpc-assessment-chatter')[0].displayConversation(this.selectedchatData);
-        }, 300);
+        }, 200);
     }
     handleSelectedFile() {
-        console.log('this.filedata', this.fileData);
         this.openRightFile = true;
         this.openReviewComments = false;
         this.showCapaForm = false;
@@ -451,8 +517,11 @@ export default class RtmvpcAssessmentDetail extends NavigationMixin(LightningEle
     handleExportCSV() {
         if (this.recordId !== null && typeof this.recordId !== 'undefined') {
             this.accountassessmentid = this.recordId;
+            this.handlemobilecsv(this.accountassessmentid);
         }
-        this.handlCsv(this.accountassessmentid);
+        else {
+            this.handlCsv(this.accountassessmentid);
+        }
     }
     isJsonString(str) {
         try {
@@ -492,36 +561,43 @@ export default class RtmvpcAssessmentDetail extends NavigationMixin(LightningEle
     }
     handleExportPDF() {
         if (this.recordId !== null && typeof this.recordId !== 'undefined') {
-            let pageurl = window.location.href;
             if (typeof this.recordId != 'undefined') {
-                let baseurl = pageurl.split('.com')[0] + '.com/apex/RenderAsPdf?id=' + this.recordId;
+                // let url = result.split('=');
+                let pageurl = window.location.href;
+                let baseurl = pageurl.split('.com')[0] + '.com/apex/Rhythm__RenderAsPdf?id=' + this.recordId;
                 window.open(baseurl);
+
+                //this.handlemobilepdf(this.recordId);
+
             } else {
-                let baseurl = pageurl.split('.com')[0] + '.com/apex/RenderAsPdf?id=' + this.accountassessmentid;
+                let pageurl = window.location.href;
+                let baseurl = pageurl.split('.com')[0] + '.com/apex/Rhythm__RenderAsPdf?id=' + this.accountassessmentid;
                 window.open(baseurl);
             }
         }
         else {
-            this.handlepdf(this.accountassessmentid);
+            //this.handlepdf(this.accountassessmentid);
+            let pageurl = window.location.href;
+            let baseurl = pageurl.split('/s/')[0] + '/apex/Rhythm__RenderAsPdf?id=' + this.accountassessmentid;
+            window.open(baseurl);
         }
     }
 
     handleupdatetimeline(event) {
         let filesdata = event.detail;
-        this.handleTimeLine(); 
-        if(filesdata.files){
-        this.template.querySelector('c-portal-s3-files').handleFilesdata(filesdata);
-        }      
+        this.handleTimeLine();
+        if (filesdata.files) {
+            this.template.querySelector('c-portal-s3-files').handleFilesdata(filesdata);
+        }
     }
     handlepdf(accountassessmentId) {
         getPdfContent({ accountassessmentId: accountassessmentId }).then(result => {
             let attachment = (result[0].Rhythm__PdfConvertor__c);
             name = result[0].Rhythm__Assessment__r.Name;
-           
+
             let attachmentstr = attachment.replaceAll('&quot;', '\"');
             let parseLst = JSON.parse(attachmentstr);
             let count = 0;
-             console.log('parseLst',parseLst);
             let tableHtml = '<table><thead><tr>';
             tableHtml += '<th>Section</th><th colspan="2">Question</th><th>Response</th><th>NumberOfAttachments</th><th>ConversationHistory</th>';
             tableHtml += '</tr></thead><tbody>';
@@ -530,38 +606,37 @@ export default class RtmvpcAssessmentDetail extends NavigationMixin(LightningEle
                 let data = parseLst[section];
                 tableHtml += '<tr><td class="oddLeftTd" rowspan=' + data.length + '>' + section + '</td>';
                 if (count % 2 === 0) {
-                   // tableHtml += '<tr><td class="evenLeftTd" rowspan=' + section.length + '>' + section + '</td>';
+                    // tableHtml += '<tr><td class="evenLeftTd" rowspan=' + section.length + '>' + section + '</td>';
                 }
                 else {
-                    
+
                 }
-                
+
                 data.forEach(ques => {
                     tableHtml += '<td class="align-to-top">';
                     tableHtml = tableHtml + ques.snumber + '</td><td>' + ques.question + '</td>';
                     if (typeof ques.value !== 'undefined') {
                         tableHtml = tableHtml + '<td>' + ques.value + '</td>';
                     }
-                     if(typeof ques.value === 'undefined'){
-                         tableHtml = tableHtml + '<td>' + '' + '</td>';
+                    if (typeof ques.value === 'undefined') {
+                        tableHtml = tableHtml + '<td>' + '' + '</td>';
                     }
                     if (typeof ques.files !== 'undefined') {
                         tableHtml = tableHtml + '<td>' + ques.files + '</td>';
                     }
-                     if (typeof ques.files === 'undefined') {
+                    if (typeof ques.files === 'undefined') {
                         tableHtml = tableHtml + '<td>' + '' + '</td>';
                     }
                     if (typeof ques.conversationHistory !== 'undefined') {
                         tableHtml = tableHtml + '<td>' + ques.conversationHistory + '</td>';
                     }
                     if (typeof ques.conversationHistory === 'undefined') {
-                        tableHtml = tableHtml + '<td>' + ''+ '</td>';
+                        tableHtml = tableHtml + '<td>' + '' + '</td>';
                     }
-                    tableHtml = tableHtml +'</tr>';
+                    tableHtml = tableHtml + '</tr>';
                 });
             }
             tableHtml += '</tbody></table>';
-            console.log('Str>>', tableHtml);
             let win = window.open('', '', 'width=' + (window.innerWidth * 0.9) + ',height=' + (window.innerHeight * 0.9) + ',location=no, top=' + (window.innerHeight * 0.1) + ', left=' + (window.innerWidth * 0.1));
             let style = '<style>@media print { * {-webkit-print-color-adjust:exact;}}} @page{ margin: 0px;} *{margin: 0px; padding: 0px; height: 0px; font-family: Source Sans Pro, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif !important;} .headerDiv{width: 100%; height: 56px; padding: 20px; background-color: #03314d;} .headerText{font-size: 40px; color: white; font-weight: bold} .tableDiv{padding: 20px;} table {border-collapse:collapse; font-size: 14px;} table td, th{ padding: 4px;} table tr:nth-child(odd) td {background-color: #F9F9F9;} .oddLeftTd{background-color: #E9E9E9 !important;} .evenLeftTd{background-color: #F1F1F1 !important;} table th{ border: 1px solid #E9E9E9; background-color:#B5BEC58F} table { page-break-inside:auto; } tr { page-break-inside:avoid; page-break-after:auto; } .align-to-top{ vertical-align: top; }</style>';
             win.document.getElementsByTagName('head')[0].innerHTML += style;
@@ -579,30 +654,27 @@ export default class RtmvpcAssessmentDetail extends NavigationMixin(LightningEle
     }
     handlCsv(accountassessmentId) {
         let name = 'Sample';
-        console.log('this.accountassessmentId', accountassessmentId);
-
         getPdfContent({ accountassessmentId: accountassessmentId }).then(result => {
             let attachment = (result[0].Rhythm__PdfConvertor__c);
             name = result[0].Rhythm__Assessment__r.Name;
             let attachmentstr = attachment.replaceAll('&quot;', '\"');
             let parseLst = JSON.parse(attachmentstr);
-            let str = 'Section,Question,Answer,NumberOfAttachments,ConversationHistory\n';
+            let str = 'Section,Question,Response,NumberOfAttachments,ConversationHistory\n';
             for (const section in parseLst) {
                 str = str + section + '"\n"';
                 let data = parseLst[section];
-                console.log('data', data);
                 data.forEach(ques => {
                     str = str + ques.snumber + '","' + ques.question + '","';
                     if (typeof ques.value !== 'undefined') {
                         str = str + ques.value + '","';
                     }
-                      if (typeof ques.value === 'undefined') {
-                        str = str +''+ '","';
+                    if (typeof ques.value === 'undefined') {
+                        str = str + '' + '","';
                     }
                     if (typeof ques.files !== 'undefined') {
                         str = str + ques.files + '","';
                     }
-                     if (typeof ques.files === 'undefined') {
+                    if (typeof ques.files === 'undefined') {
                         str = str + '' + '","';
                     }
                     if (typeof ques.conversationHistory !== 'undefined') {
@@ -615,7 +687,6 @@ export default class RtmvpcAssessmentDetail extends NavigationMixin(LightningEle
                 });
                 str = str + '"\n"';
             }
-            console.log('Str>>', str);
             //str = str.replaceAll('undefined', '').replaceAll('null', '');
             let blob = new Blob([str], { type: 'text/plain' });
             let url = window.URL.createObjectURL(blob);
@@ -627,5 +698,120 @@ export default class RtmvpcAssessmentDetail extends NavigationMixin(LightningEle
         }).catch(error => {
 
         });
+    }
+    handlemobilecsv(accountassessmentId) {
+        let name = 'Sample';
+        getPdfContent({ accountassessmentId: accountassessmentId }).then(result => {
+            let attachment = (result[0].Rhythm__PdfConvertor__c);
+            name = result[0].Rhythm__Assessment__r.Name;
+            let attachmentstr = attachment.replaceAll('&quot;', '\"');
+            let parseLst = JSON.parse(attachmentstr);
+            let str = 'Section,Question,Response,NumberOfAttachments,ConversationHistory\n';
+            for (const section in parseLst) {
+                str = str + section + '"\n"';
+                let data = parseLst[section];
+                data.forEach(ques => {
+                    str = str + ques.snumber + '","' + ques.question + '","';
+                    if (typeof ques.value !== 'undefined') {
+                        str = str + ques.value + '","';
+                    }
+                    if (typeof ques.value === 'undefined') {
+                        str = str + '' + '","';
+                    }
+                    if (typeof ques.files !== 'undefined') {
+                        str = str + ques.files + '","';
+                    }
+                    if (typeof ques.files === 'undefined') {
+                        str = str + '' + '","';
+                    }
+                    if (typeof ques.conversationHistory !== 'undefined') {
+                        str = str + ques.conversationHistory;
+                    }
+                    if (typeof ques.conversationHistory === 'undefined') {
+                        str = str + '' + '","';
+                    }
+                    str = str + '"\n"';
+                });
+                str = str + '"\n"';
+            }
+            // let win = window.open('', '', 'width=' + (window.innerWidth * 0.9) + ',height=' + (window.innerHeight * 0.9) + ',location=no, top=' + (window.innerHeight * 0.1) + ', left=' + (window.innerWidth * 0.1));
+            // let style = '<style>@media print { * {-webkit-print-color-adjust:exact;}}} @page{ margin: 0px;} *{margin: 0px; padding: 0px; height: 0px; font-family: Source Sans Pro, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif !important;} .headerDiv{width: 100%; height: 56px; padding: 20px; background-color: #03314d;} .headerText{font-size: 40px; color: white; font-weight: bold} .tableDiv{padding: 20px;} table {border-collapse:collapse; font-size: 14px;} table td, th{ padding: 4px;} table tr:nth-child(odd) td {background-color: #F9F9F9;} .oddLeftTd{background-color: #E9E9E9 !important;} .evenLeftTd{background-color: #F1F1F1 !important;} table th{ border: 1px solid #E9E9E9; background-color:#B5BEC58F} table { page-break-inside:auto; } tr { page-break-inside:avoid; page-break-after:auto; } .align-to-top{ vertical-align: top; }</style>';
+            // win.document.getElementsByTagName('head')[0].innerHTML += style;
+            // win.document.getElementsByTagName('body')[0].innerHTML += '<div class="headerDiv slds-p-around_small"><span class="headerText">Rhythm</span></div><br/>';
+            // tableHtml = tableHtml.replaceAll('undefined', '').replaceAll('null', '');
+            // win.document.getElementsByTagName('body')[0].innerHTML += '<div class="tableDiv slds-p-around_medium">' + tableHtml + '</div>';
+            // win.print();
+            // win.close();
+            var element = 'data:application/vnd.ms-excel,' + encodeURIComponent(str);
+            let downloadElement = document.createElement('a');
+            downloadElement.href = element;
+            downloadElement.target = '_self';
+            // use .csv as extension on below line if you want to export data as csv
+            downloadElement.download = name + '.csv';
+            document.body.appendChild(downloadElement);
+            downloadElement.click();
+        }).catch(error => {
+
+        });
+
+    }
+    handlemobilepdf(accountassessmentId) {
+        let name = 'Sample';
+        getPdfContent({ accountassessmentId: accountassessmentId }).then(result => {
+            let attachment = (result[0].Rhythm__PdfConvertor__c);
+            name = result[0].Rhythm__Assessment__r.Name;
+            let attachmentstr = attachment.replaceAll('&quot;', '\"');
+            let parseLst = JSON.parse(attachmentstr);
+            let count = 0;
+            let tableHtml = '<table><thead><tr>';
+            tableHtml += '<th>Section</th><th colspan="2">Question</th><th>Response</th><th>NumberOfAttachments</th><th>ConversationHistory</th>';
+            tableHtml += '</tr></thead><tbody>';
+            for (const section in parseLst) {
+                count++;
+                let data = parseLst[section];
+                tableHtml += '<tr><td class="oddLeftTd" rowspan=' + data.length + '>' + section + '</td>';
+                if (count % 2 === 0) {
+                    // tableHtml += '<tr><td class="evenLeftTd" rowspan=' + section.length + '>' + section + '</td>';
+                }
+                else {
+
+                }
+
+                data.forEach(ques => {
+                    tableHtml += '<td class="align-to-top">';
+                    tableHtml = tableHtml + ques.snumber + '</td><td>' + ques.question + '</td>';
+                    if (typeof ques.value !== 'undefined') {
+                        tableHtml = tableHtml + '<td>' + ques.value + '</td>';
+                    }
+                    if (typeof ques.value === 'undefined') {
+                        tableHtml = tableHtml + '<td>' + '' + '</td>';
+                    }
+                    if (typeof ques.files !== 'undefined') {
+                        tableHtml = tableHtml + '<td>' + ques.files + '</td>';
+                    }
+                    if (typeof ques.files === 'undefined') {
+                        tableHtml = tableHtml + '<td>' + '' + '</td>';
+                    }
+                    if (typeof ques.conversationHistory !== 'undefined') {
+                        tableHtml = tableHtml + '<td>' + ques.conversationHistory + '</td>';
+                    }
+                    if (typeof ques.conversationHistory === 'undefined') {
+                        tableHtml = tableHtml + '<td>' + '' + '</td>';
+                    }
+                    tableHtml = tableHtml + '</tr>';
+                });
+            }
+            tableHtml += '</tbody></table>';
+            var encodedStringBtoA = btoa(tableHtml);
+            var element = 'data:application/pdf;base64,' + encodedStringBtoA;
+            let downloadElement = document.createElement('a');
+            downloadElement.href = element;
+            downloadElement.download = name + '.pdf';
+            document.body.appendChild(downloadElement);
+            downloadElement.click();
+        }).catch(error => {
+
+        });
+
     }
 }

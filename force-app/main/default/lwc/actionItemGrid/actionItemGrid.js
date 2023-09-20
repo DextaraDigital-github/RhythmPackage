@@ -1,4 +1,4 @@
-import { LightningElement, track, wire,api } from 'lwc';
+import { LightningElement, track, wire, api } from 'lwc';
 import actionRecords from '@salesforce/apex/CAPAController.actionRecords';
 import getCurrentDate from '@salesforce/apex/CAPAController.getCurrentDate';
 import greenFlag from '@salesforce/resourceUrl/greenFlag';
@@ -26,9 +26,14 @@ export default class ActionItemGrid extends NavigationMixin(LightningElement) {
     @track actionRecordsData;
     greenFlagUrl = greenFlag;
     redFlagUrl = redFlag;
-    orangeFlagUrl=orangeFlag;
+    orangeFlagUrl = orangeFlag;
     connectedCallback() {
         this.show.grid = true;
+        this.handleonload();
+    }
+    handleonload(refreshData) {
+        this.actionItemData = [];
+        this.allRecordsList = [];
         getCurrentDate({}).then((result) => {
             this.currentDate = result;
         })
@@ -44,14 +49,19 @@ export default class ActionItemGrid extends NavigationMixin(LightningElement) {
                         if (this.viewColList[i].fieldName == key) {
                             var actionRecordMap = {};
                             this.fieldCheck = true;
-                            if ( key === 'Rhythm__Due_Date__c' || key === 'Rhythm__Priority__c'
+                            if (key === 'Rhythm__Due_Date__c' || key === 'Rhythm__Priority__c'
                                 || key === 'Rhythm__Status__c' || key === 'Rhythm__OwnershipName__c') {
                                 actionRecordMap.fieldName = key;
+                                if(key === 'Rhythm__Due_Date__c'){actionRecordMap.label='Due Date';}
+                                if(key === 'Rhythm__Priority__c'){actionRecordMap.label='Priority';}
+                                if(key === 'Rhythm__Status__c'){actionRecordMap.label='Status';}
+                                 if(key === 'Rhythm__OwnershipName__c'){actionRecordMap.label='Ownership';}
                                 actionRecordMap.value = res[key];
                                 actionRecordList.push(actionRecordMap);
                             }
                             if (key === 'Name') {
                                 actionRecordMap.fieldName = key;
+                                actionRecordMap.label='Action Item Name';
                                 actionRecordMap.value = res[key];
                                 actionRecordMap.isHyperlink = true;
                                 actionRecordList.push(actionRecordMap);
@@ -59,19 +69,22 @@ export default class ActionItemGrid extends NavigationMixin(LightningElement) {
                             if (key === 'Rhythm__Flag_Status__c') {
                                 actionRecordMap.fieldName = key;
                                 actionRecordMap.value = res[key];
+                                 actionRecordMap.label='Flag Status';
                                 if (res['Rhythm__Status__c'] == 'Closed') {
                                     actionRecordMap.isFlag = true;
                                 }
-                                if(res['Rhythm__Status__c'] == 'Expired'){
+                                if (res['Rhythm__Status__c'] == 'Expired') {
                                     actionRecordMap.isRedFlag = true;
                                 }
-                                else if(res['Rhythm__Status__c'] == 'Open'){
+                                else if (res['Rhythm__Status__c'] == 'Open') {
                                     actionRecordMap.isOrangeFlag = true;
                                 }
                                 actionRecordList.push(actionRecordMap);
                             }
-                            if (key === 'Rhythm__Assigned_To__r' || key==='Rhythm__Related_Record__r') {
+                            if (key === 'Rhythm__Assigned_To__r' || key === 'Rhythm__Related_Record__r') {
                                 actionRecordMap.fieldName = key;
+                                 if(key === 'Rhythm__Assigned_To__r'){actionRecordMap.label='Assigned To';}
+                                  if(key === 'Rhythm__Related_Record__r'){actionRecordMap.label='Related Record';}
                                 actionRecordMap.value = res[key]['Name'];
                                 actionRecordList.push(actionRecordMap);
                             }
@@ -81,14 +94,19 @@ export default class ActionItemGrid extends NavigationMixin(LightningElement) {
                         var actionRecordMapData = {};
                         actionRecordMapData.fieldName = this.viewColList[i].fieldName;
                         actionRecordMapData.value = '';
+                        if(this.viewColList[i].fieldName === 'Rhythm__Due_Date__c'){
+                        actionRecordMapData.label='Due Date';
+                        }
                         actionRecordList.push(actionRecordMapData);
                     }
                 }
 
                 actionMap.record = actionRecordList;
                 this.actionItemData.push(actionMap);
+                
             })
             this.allRecordsList = this.actionItemData;
+           
         });
 
         if (this.urlId !== null && typeof this.urlId !== 'undefined') {
@@ -96,6 +114,20 @@ export default class ActionItemGrid extends NavigationMixin(LightningElement) {
             this.show.survey = true;
             this.show.grid = false;
         }
+        if (typeof refreshData !== 'undefined' && refreshData === true) {
+            this.show.grid = true;
+            this.show.survey = false;
+            const pageRef = {
+                type: 'comm__namedPage',
+                attributes: {
+                    name: 'Home' // Replace with your community page name
+                }
+
+            };
+            // Navigate to the community page
+            this[NavigationMixin.Navigate](pageRef);
+        }
+
     }
     @wire(CurrentPageReference)
     getStateParameters(currentPageReference) {
@@ -103,9 +135,7 @@ export default class ActionItemGrid extends NavigationMixin(LightningElement) {
             this.urlId = currentPageReference.state?.Rhythm__Action__c;
         }
     }
-    @api handleActionItem()
-    {
-        console.log('handle');
+    @api handleActionItem() {
         this.show.grid = true;
         this.show.survey = false;
     }
@@ -129,17 +159,8 @@ export default class ActionItemGrid extends NavigationMixin(LightningElement) {
 
     }
     backClickHandler() {
-        this.show.grid = true;
-        this.show.survey = false;
-        const pageRef = {
-            type: 'comm__namedPage',
-            attributes: {
-                name: 'Home' // Replace with your community page name
-            }
+        this.handleonload(true);
 
-        };
-        // Navigate to the community page
-        this[NavigationMixin.Navigate](pageRef);
     }
     inputChangeHandler() {
         let filterDetailsList = this.getAllFilterDetails();

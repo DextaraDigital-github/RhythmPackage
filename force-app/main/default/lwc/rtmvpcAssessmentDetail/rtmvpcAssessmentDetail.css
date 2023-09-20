@@ -1,4 +1,4 @@
-.cad-cardbase {position:relative; width:100%; height:calc(100vh - 120px); border-radius:0px; overflow:hidden;}
+.cad-cardbase {position:relative; width:100%; height:calc(100vh - 115px); border-radius:0px; overflow:hidden;}
 
 .cad-tbl { display:table; width:100%; height:100%;}
 .cad-row { display:table-row; }
@@ -13,11 +13,11 @@
 
 .cad-sec_container { width:100%; height:100%; border-radius:0px; border:1px solid var(--cibcadcdg-bdr-color); background:var(--bg-primary-color1); display:flex; flex-direction:column;}
 .cad-sec_container_nobdr { width:100%; height:100%; border-radius:0px; border:0px solid rgba(0,0,0,0.2); background:transparent; display:flex; flex-direction:column;}
-.cad-sec_header { position:relative; width:100%; padding:3px 3px 0px; border-bottom:1px solid var(--cibcadcdg-bdr-color); background:var(--bg-primary-color1); }
+.cad-sec_header { position:relative; width:100%; padding:3px 3px 0px; border-bottom:1px solid var(--cibcadcdg-bdr-color); background:var(--bg-primary-color1); min-height:32px; }
 .cad-sec_header:before { content:''; position:absolute; background:var(--bg-secheader); z-index:0; width:100%; height:100%; left:0px; top:0px;}
 .cad-sec_header span { display:inline-block; line-height:31px;}
 .cad-sec_header select { width:90px; height:18px; }
-.cad-sec_bodyfull1 { overflow-y:auto; overflow-x:hidden; height:calc(100% - 36px); position:relative; }
+.cad-sec_bodyfull1 { overflow-y:auto; overflow-x:hidden; height:calc(100% - 32px); position:relative; }
 .cad-sec_bodyfull2 { overflow-y:auto; overflow-x:hidden; height:calc(100% - 65px); position:relative; }
 .cad-listul, .cad-listul li {margin:0; padding:0; }
 .cad-listul li {border-bottom:1px solid var(--cibcadcdg-bdr-color1);}
@@ -74,7 +74,7 @@
 
 .cad-approved, .cad-timeline_approved .cad-timeline_content {background:#d1f7c4; border:1px solid #a6cf98;}
 .cad-rejected, .cad-timeline_rejected .cad-timeline_content {background:#ffbdc7; border:1px solid #e0a2ab;}
-.cad-inprogress, .cad-timeline_submited .cad-timeline_content {background:#b6ddeb; border:1px solid #97bfce;}
+.cad-inprogress, .cad-timeline_submited .cad-timeline_content {background:#d1f7c4; border:1px solid #d1f7c4;}
 .cad-default, .cad-timeline_default .cad-timeline_content {background:#e5e4e4; border:1px solid #b9b9b9;}
 .cad-pending, .cad-timeline_pending .cad-timeline_content {background:#ffebb3; border:1px solid #dbc790;}
 .cad-needmoreinfo, .cad-timeline_needmoreinfo .cad-timeline_content {background:#d3b0e4; border:1px solid #b18ec2;}
@@ -107,16 +107,20 @@
 .cad-tnailcard2 {width:100px; height:90px; border-radius:5px;box-shadow:rgba(0, 0, 0, 0.1) 0px 0px 3px; background: #ebebeb;}
 .cad-tnailcard2inner { height:36px; display:flex; justify-content:center; align-items:center}
 
-@media screen and (max-width:992px) {    
+.cad-btn_bck1 { margin-top:-45px; }
+
+@media screen and (max-width:992px) {
+    .cad-cardbase { height:calc(100vh - 45px); }
+    .comm-page-home .cad-cardbase { height:calc(100vh - 115px)!important; }
     .cad-row { display:block; height:100%; position:relative; } 
 	.cad-pl8 { padding-left:0px;}  
     .cad-pr8 { padding-right:0px;} 
 	.cad-type{ display:block; position:absolute; left:-300px; height:100%; }
-    .cad-type.cadshowleft{ display:block; position:absolute; left:0px; z-index:9; height:100%; }
+    .cad-type.cadshowleft{ display:block; position:absolute; left:0px; z-index:7; height:100%; }
     .cad-cel { display:inline-block;}
     .cad-list{ display:block; position:relative; width:100%; height:100%; }
-    .cad-disc{ display:block; position:absolute; right:0px; top:0; width:300px; height:100%; z-index:10;}
-    .cad-disc.cadshowright {display:block; position:absolute; right:-320px; top:0; width:300px; height:100%; z-index:10; }
+    .cad-disc{ display:block; position:absolute; right:0px; top:0; width:300px; height:100%; z-index:8;}
+    .cad-disc.cadshowright {display:block; position:absolute; right:-320px; top:0; width:300px; height:100%; z-index:8; }
     .cad-top_back_container {display:block; height:30px;}
     .cad-tophead-details { border-bottom:0px solid rgba(0,0,0,0.2); margin-bottom:0px; }
     .cad-sec_vcontainer1 { display:block; position:relative; z-index:2; top:0px; height:63px; }
@@ -124,7 +128,8 @@
     .cad-sec_vcontainer2 { display:block; width:100%; position:absolute; height:calc(100% - 207px); margin:0px 0px 0px; overflow-y:auto; }
     .cad-sec_vcontainer2_1 { display:block; width:100%; position:absolute; height:calc(100% - 1px); margin:0px 0px 0px; overflow-y:auto; }
     .cad-sec_vcontainer2_2 { display:block; width:100%; position:absolute; height:calc(100% - 0px); margin:0px 0px 0px; overflow-y:auto; }
-    .cad-sec_vcontainer2bdr { margin:0px 0px 114px;}    
+    .cad-sec_vcontainer2bdr { margin:0px 0px 114px;}   
+    .cad-btn_bck1 { margin-top:-38px; margin-bottom:0px; z-index:9; position: relative; } 
 }
 
 @media screen and (max-width:600px) {
@@ -133,10 +138,10 @@
 	.cad-pl8 { padding-left:0px;}
     .cad-pr8 { padding-right:0px;} 
     .cad-type{ display:block; position:absolute; left:-300px; height:100%; }
-    .cad-type.cadshowleft{ display:block; position:absolute; left:0px; z-index:9; height:100%; }
+    .cad-type.cadshowleft{ display:block; position:absolute; left:0px; z-index:7; height:100%; }
     .cad-list{ display:block; position:relative; width:100%; height:100%; }
-    .cad-disc{ display:block; position:absolute; right:0px; top:0; width:100%; height:100%; z-index:10;}
-    .cad-disc.cadshowright {display:block; position:absolute; right:-115%; top:0; width:100%; height:100%; z-index:10; }
+    .cad-disc{ display:block; position:absolute; right:0px; top:0; width:calc(100% - 40px); height:100%; z-index:8;}
+    .cad-disc.cadshowright {display:block; position:absolute; right:-115%; top:0; width:100%; height:100%; z-index:8; }
     .cad-top_menu_container{display:block; height:30px;}
     .cad-sec_bodyfull2 {height:calc(100% - 95px);}
     .cad-tophead-details { border-bottom:0px solid rgba(0,0,0,0.2); margin-bottom:0px; }

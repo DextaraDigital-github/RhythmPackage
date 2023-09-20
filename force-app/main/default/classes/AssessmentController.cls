@@ -33,7 +33,34 @@ public with sharing class AssessmentController {
             throw new AuraHandledException(errorMsg);
         }
     }
-    
+        
+    /**
+    * @description Gets Salesforce Url.
+    * @return Salesforce url.  
+    */
+    @AuraEnabled	
+    public static String getSalesforceDomainURL(){
+        String url= System.Url.getOrgDomainUrl()+'/';
+        return url;
+    }
+     /**
+    * @description Gets pdfContent Url.
+    * @return pdfContent for particular AccountAssessment.  
+    */
+    @AuraEnabled
+    public static void updatePdfContent(String paramMap){
+         Map<String,object> queryMap = (Map<String,Object>)JSON.deserializeUntyped(paramMap);
+         String accAssmtId =(string)queryMap.get('accountassessmentid');
+		List<AccountAssessmentRelation__c> assessment = [SELECT Id,Name,Follow_Up_Requests__c,Status__c,
+                                                        Assessment__c,Account__c,PdfConvertor__c
+                                                        FROM AccountAssessmentRelation__c
+                                                        WHERE Id=:accAssmtId
+                                                        WITH SECURITY_ENFORCED];
+        if(!assessment.isEmpty()){
+            assessment[0].PdfConvertor__c =(String)queryMap.get('pdfContnet');
+            safe.doUpdate(assessment);
+        }
+    }
     /**
     * @description Gets the Question__c,Section__c information of a particular Assessment_Template__c.
     * @param templateId This is a record id of an Assessment_Template__c.
@@ -306,11 +333,11 @@ public with sharing class AssessmentController {
             String errorMsg = e.getMessage();
             throw new AuraHandledException(errorMsg);
         }
+        //return null;
     }
-
     /**
     * @description To update the rejected flag.
-    * @param updateRejectFlagList This is the list of records. 
+    * @param updateRejectFlagList This is the list of records.  
     * @return 
     */
     @AuraEnabled
@@ -367,8 +394,21 @@ public with sharing class AssessmentController {
     @AuraEnabled
     public static string getCommunityURL(){
         try{
-            String relativeUrlBase = URL.getSalesforceBaseUrl().toExternalForm()+'/login';
+            String relativeUrlBase = '';
+            if(!Test.isRunningTest()){
+                Id currentNetworkId = Network.getNetworkId();
+                Network currNetwork = [SELECT Id, Name, UrlPathPrefix FROM Network WHERE Id = :currentNetworkId];
+                relativeUrlBase = URL.getSalesforceBaseUrl().toExternalForm()+'/';
+               if(currNetwork.UrlPathPrefix != null)
+                {
+                    relativeUrlBase = relativeUrlBase+currNetwork.UrlPathPrefix+'/s/login';
+                }
+                else{
+                    relativeUrlBase = relativeUrlBase+'/s/login';
+                }
+            }
             return relativeUrlBase;
+            //String relativeUrlBase = URL.getSalesforceBaseUrl().toExternalForm()+'/s'+'/login';
         }catch(exception e){
             String errorMsg = e.getMessage();
             throw new AuraHandledException(errorMsg);
@@ -550,6 +590,7 @@ public with sharing class AssessmentController {
             Map<string,string> responseData=new Map<string,string>();
             String quesId = (String)chatMap.get('questionId');
             String accAssmtId = (String)chatMap.get('accountassessmentId');
+            string accType=(String)chatMap.get('accountData');
             accAssmtId = String.escapeSingleQuotes(accAssmtId);
             List<Response__c> responseRecords = [SELECT Conversation_History__c,createdDate
                                                 FROM Response__c
@@ -562,11 +603,14 @@ public with sharing class AssessmentController {
             }
             if(!responseRecords.isEmpty()){
                 responseRecords[0].put('Conversation_History__c',JSON.serialize(chatMap.get('responseList')));
+                if(accType !='supplier'){
                 responseRecords[0].put('Flag__c',true);
+                }
                 Database.SaveResult[] saveResult = safe.doUpdate(responseRecords);
                 List<String> errorList = SecurityCheckController.safeClassExceptionHandlerInsert(saveResult);
                 responseData.put('questionId',(String)chatMap.get('questionId'));
                 responseData.put('responseId',responseRecords[0].Id);
+                responseData.put('conversation',responseRecords[0].Conversation_History__c);
                 if(errorList.size()>0){
                     Database.rollback(sp);
                     throw new SecurityControllerException(String.join( errorList, ', ' ));
@@ -577,15 +621,17 @@ public with sharing class AssessmentController {
                 response.Conversation_History__c = JSON.serialize(chatMap.get('responseList'));
                 response.AccountAssessmentRelation__c=(String)chatMap.get('accountassessmentId');
                 response.Is_Latest_Response__c = true;
+                if(accType !='supplier'){
                 response.Flag__c=true;
-                List<Response__c> responseList = new List<Response__c>();
+                }
+                List<Response__c> responseList = new List<Response__c>(); 
                 responseList.add(response);
                 Database.SaveResult[] results = safe.doInsert(responseList);
                 for(Database.SaveResult result : results) {
                     if(result.isSuccess()){
                         responseData.put('questionId',(String)chatMap.get('questionId'));
                         responseData.put('responseId',result.getId());
-                        
+ 						responseData.put('conversation', JSON.serialize(chatMap.get('responseList')));                        
                     }
                 }
                 List<String> errorsList = SecurityCheckController.safeClassExceptionHandlerInsert(results);
@@ -833,6 +879,7 @@ public with sharing class AssessmentController {
                 List<Assessment_Supplier__c> assSuppList=  [SELECT Id
                                                             FROM Assessment_Supplier__c
                                                             WHERE Account__c IN:deleteSupList
+                                                            AND Assessment__c=:assessmentId
                                                             WITH SECURITY_ENFORCED];
                 if(assSuppList.isEmpty() == false){
                     List<Database.DeleteResult> deleteResult = safe.doDelete(assSuppList);
@@ -954,7 +1001,7 @@ public with sharing class AssessmentController {
                     conIds.add(con.Id);
                 }
             }
-            if(conIds.isEmpty() == false){
+           if(conIds.isEmpty() == false){
                 for(User us:[SELECT Id,Name,Contact.AccountId,Email FROM User WHERE ContactId IN:conIds WITH SECURITY_ENFORCED]){
                     if(accUserMap.containsKey(us.Contact.AccountId)){
                         List<User> tempList = accUserMap.get(us.Contact.AccountId);
@@ -1281,6 +1328,72 @@ public with sharing class AssessmentController {
     }
     
     /**
+    * @description To download the assessments as the PDF
+    * @recordData List of assessments as string to print.
+    * @columnsData List of columns as string to print.
+    */
+    @AuraEnabled
+    public static String getPDFData(String recordData, String columnsData){
+        try{
+            List<ColumnData> pdfColumns = (List<ColumnData>) JSON.deserialize(columnsData, List<ColumnData>.class);
+            List<PDFWrapper> pdfData = (List<PDFWrapper>) JSON.deserialize(recordData, List<PDFWrapper>.class);
+            string tableHtml = '';
+            tableHtml += '<html><body><div><table style="page-break-inside: auto">';
+            tableHtml += '<tr><td height="5px" bgcolor="rgb(107, 56, 136)"></td><td height="5px" bgcolor="rgb(239, 104, 55)"></td></tr>';
+            tableHtml += '<tr><td bgcolor="white" colspan="2"><span><font color="#535353" size=3><b>&nbsp;&nbsp;RHYTHM</b></font></span><br/><span><font color="#535353" size=1><b>&nbsp;&nbsp;&nbsp;INNOVATIONS</b></font></span></td></tr>';
+            tableHtml += '<tr><td colspan="2" height="5px"></td></tr>';
+            tableHtml += '<tr><td colspan="2"><table cellpadding="5"><tr>';
+            for (integer i = 0; i < pdfColumns.size(); i++) {
+                tableHtml += '<th bgcolor="#d6dbde"><font color="rgb(60 60 60)" size=1 face="sans-serif"><b>' + pdfColumns[i].label + '</b></font></th>';
+            }
+            tableHtml += '</tr></table></td></tr>';
+            for (integer i = 0; i < pdfData.size(); i++) {
+                tableHtml += '<tr><td colspan="2"><table cellpadding="5"><tr>';
+                for (integer j = 0; j < pdfData[i].record.size(); j++) {
+                    string dataValue = '';
+                    if(pdfData[i].record[j].value != null){
+                        dataValue = pdfData[i].record[j].value;
+                        if(pdfData[i].record[j].fieldName == 'Rhythm__Response_Percentage__c' && dataValue != null) {
+                            dataValue += '%';
+                        }
+                    }
+                    if(Math.mod(i,2) == 0) {
+                    	tableHtml += '<td bgcolor="white">' + dataValue + '</td>';
+                    }
+                    else {
+                    	tableHtml += '<td bgcolor="rgb(246 246 246)">' + dataValue + '</td>';
+                    }
+                }
+                tableHtml += '</tr></table></td></tr>';
+            }
+            tableHtml += '</table></div></body></html>';
+            Blob pdfContent = Blob.toPdf(tableHtml);
+            return EncodingUtil.base64Encode(pdfContent);
+        }catch(Exception e){
+            String errorMsg = e.getMessage();
+            throw new AuraHandledException(errorMsg);
+        }
+    }
+     /**
+    * @description To fetch the listviewid
+    */
+     @AuraEnabled
+    public static List<ListView> fetchlistviewId(){
+        return [SELECT Id FROM ListView WHERE Name = 'All' AND SObjectType = 'rhythm__assessment__c' WITH SECURITY_ENFORCED];
+    }
+    
+    /**
+    * @description Fetches the AccountAssessmentRelation record based on Id
+    * @param parameterMap It is a stringified JSON of parameters required to fetch AccountAssessmentRelation record
+    * @return AccountAssessmentRelation record
+    */
+    @AuraEnabled
+    public static sObject fetchAccountAssessmentRelation(String parameterMap) {
+        return accAssService.fetchAccountAssessmentRelation(parameterMap);
+    }
+    
+    
+    /**
     * @description It is used to store the response from server
     */
     public class ResultWrapper{
@@ -1303,12 +1416,39 @@ public with sharing class AssessmentController {
         @AuraEnabled public string recordId;
     }
     
+    /**
+    * @description It is used to store the PDFData from server
+    */
+    public class PDFWrapper{
+        @AuraEnabled public string templateId;
+        @AuraEnabled public string id;
+        @AuraEnabled public string progressBarValue;
+        @AuraEnabled public List<RecordData> record;
+    }
+
+    /**
+    * @description It is used to store the RecordData from server
+    */
+    public class RecordData{
+        @AuraEnabled public string fieldName;
+        @AuraEnabled public string label;
+        @AuraEnabled public string value;
+        @AuraEnabled public string classList;
+        @AuraEnabled public string surveySymbol;
+    }
     
-   
+    /**
+    * @description It is used to store the ColumnData from server
+    */
+    public class ColumnData{
+        @AuraEnabled public string label;
+        @AuraEnabled public string fieldName;
+        @AuraEnabled public string type;
+    }
+    
     /**
     * @description It is used to throw the exception
     */
     public class SecurityControllerException extends Exception{
     }
-    
 }

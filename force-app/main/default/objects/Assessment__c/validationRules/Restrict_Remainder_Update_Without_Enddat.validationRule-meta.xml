@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Restrict_Remainder_Update_Without_Enddat</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND(ISBLANK( End_Date__c ),ISCHANGED( Expiry_Reminder_Before_in_Days__c ))</errorConditionFormula>
+    <errorMessage>Cannot set a Due Date Reminder without an End Date for the Assessment.</errorMessage>
+</ValidationRule>

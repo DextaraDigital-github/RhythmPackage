@@ -155,7 +155,8 @@
 									<div class="slds-col">
 										<template if:false={isReadOnly}>
 											<lightning-file-upload name="uploadAttachment" label="Attachments"
-												accept=".png,.csv,.pdf,.jpg,.jpeg,.xlsx,.xls,.txt,.docx,.doc" onuploadfinished={fileUploadHandler} multiple>
+												accept=".png,.csv,.pdf,.jpg,.jpeg,.xlsx,.xls,.txt,.docx,.doc"
+												onuploadfinished={fileUploadHandler} multiple>
 											</lightning-file-upload>
 											<template lwc:if={email.attachmentsData}>
 												<div class="slds-m-top_x-small">
@@ -170,11 +171,23 @@
 												<div class="slds-form-element__label">Attachments</div>
 												<div class="slds-grid slds-wrap">
 													<template for:each={keyList} for:item="item" for:index="index">
-														<lightning-pill class="slds-m-right_xx-small slds-m-bottom_xx-small" icon-name={item.icon} label={item.value}
-															data-id={item.key} data-title={item.url}
-															onclick={handleDownload} key={item}>
+														<span class="slds-pill slds-pill_link slds-m-right_xx-small slds-m-bottom_xx-small" data-id={item.key}
+															data-title={item.url} onclick={handleDownload} key={item}>
+															<span class="slds-pill__icon_container">
+																<span class="slds-icon_container" title={item.value}>
+																	<lightning-icon icon-name={item.icon}></lightning-icon>
+																</span>
+														</span>
+														<div href="#" class="slds-pill__action" title={item.value}>
+															<span class="slds-pill__label">{item.value}</span>
+														</div>
+														</span>
+														<!-- <lightning-pill
+															class="slds-m-right_xx-small slds-m-bottom_xx-small"
+															icon-name={item.icon} label={item.value} data-id={item.key}
+															data-title={item.url} onclick={handleDownload} key={item}>
 															<lightning-icon icon-name={item.icon}></lightning-icon>
-														</lightning-pill>
+														</lightning-pill> -->
 													</template>
 												</div>
 											</template>

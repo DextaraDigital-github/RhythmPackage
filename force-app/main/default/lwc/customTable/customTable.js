@@ -1,4 +1,5 @@
 import { LightningElement, track, api } from 'lwc';
+import getPDFData from '@salesforce/apex/AssessmentController.getPDFData';
 //import deleteRecords from '@salesforce/apex/rtmvpcRelatedListsController.deleteRecords';
 
 export default class CustomTable extends LightningElement {
@@ -335,7 +336,7 @@ export default class CustomTable extends LightningElement {
                                 recJson.classList = 'status-completed';
                             else if (recJson.value.toLowerCase() === 'deferred' || recJson.value.toLowerCase() === 'overdue' || recJson.value.toLowerCase() === 'inactive')
                                 recJson.classList = 'status-deferred';
-                            else if (recJson.value.toLowerCase() === 'In Progress')
+                            else if (recJson.value === 'In Progress')
                                 recJson.classList = 'cad-timeline_pending';
                             else if (recJson.value.toLowerCase() === 'waiting on someone else' || recJson.value.toLowerCase() === 'on hold' || recJson.value.toLowerCase() === 'new')
                                 recJson.classList = 'status-waitingonsomeoneelse';
@@ -357,7 +358,9 @@ export default class CustomTable extends LightningElement {
                         }
                         if (colList[j].fieldName === 'Rhythm__Status__c') {
                             if (typeof relatedListRecords[i].Rhythm__Status__c !== 'undefined')
-                                if (relatedListRecords[i].Rhythm__Status__c === 'Submitted') {
+                                if (relatedListRecords[i].Rhythm__Status__c === 'Submitted' ||
+                                relatedListRecords[i].Rhythm__Status__c ==='Review Completed'
+                                || relatedListRecords[i].Rhythm__Status__c ==='In Review') {
                                     recJson.surveySymbol = 'utility:lock';
                                 }
                                 else {
@@ -370,7 +373,7 @@ export default class CustomTable extends LightningElement {
                                 recDetails.progressBarValue = relatedListRecords[i].Rhythm__Response_Percentage__c +'%';
                             }
                         }
-                        console.log('Rdata',relatedListRecords[i]);
+                        
                         recDetails.templateId = relatedListRecords[i].Rhythm__Assessment__r.Rhythm__Template__c;
                         recDetails.id = relatedListRecords[i].Id;
                     }
@@ -378,8 +381,8 @@ export default class CustomTable extends LightningElement {
             }
             recDetails.record = recArray;
             recDataList.push(recDetails);
-            console.log('cData---->',JSON.stringify(recDataList));
         }
+        
         return recDataList;
     }
 
@@ -554,38 +557,22 @@ export default class CustomTable extends LightningElement {
 
     // Extracts the Grid as PDF
     exportGridAsPdfHandler() {
-        var tableHtml = '<table><thead><tr>';
-        for (let i = 0; i < this.viewColList.length; i++) {
-            tableHtml += '<th>' + this.viewColList[i].label + '</th>';
+        try {
+            getPDFData({ recordData: JSON.stringify(this.recList), columnsData: JSON.stringify(this.viewColList) })
+                .then((result) => {
+                    let a = window.document.createElement("a");
+                    a.href = "data:application/octet-stream;base64," + result;
+                    a.download = "Assessments.pdf"
+                    a.click();
+                })
+                .catch((error) => {
+                    errorLogRecord({ componentName: 'customTable', methodName: 'getPDFData', className: 'AssessmentController', errorData: error }).then(() => {
+                    });
+                });
+        } catch (e) {
+            errorLogRecord({ componentName: 'customTable', methodName: 'getPDFData', className: 'AssessmentController', errorData: e }).then(() => {
+            });
         }
-        // tableHtml += '<th>% Completed</th>';
-        // tableHtml += '</tr></thead><tbody>';
-        for (let i = 0; i < this.recList.length; i++) {
-            tableHtml += '<tr>';
-            for (let j = 0; j < this.recList[i].record.length; j++) {
-                if (j === 0) {
-                    if (i % 2 === 0)
-                        tableHtml += '<td class="oddLeftTd">' + this.recList[i].record[j].value + '</td>';
-                    else
-                        tableHtml += '<td class="evenLeftTd">' + this.recList[i].record[j].value + '</td>';
-                }
-                else {
-                    tableHtml += '<td>' + this.recList[i].record[j].value + '</td>';
-                }
-                 
-            }
-            // tableHtml += '<td>' + this.recList[i].progressBarValue + '</td>'; 
-            // tableHtml += '</tr>';
-        }
-        tableHtml += '</tbody></table>';
-        let win = window.open('', '', 'width=' + (window.innerWidth * 0.9) + ',height=' + (window.innerHeight * 0.9) + ',location=no, top=' + (window.innerHeight * 0.1) + ', left=' + (window.innerWidth * 0.1));
-        let style = '<style>@media print { * {-webkit-print-color-adjust:exact;}} @page{ margin: 0px;} *{margin: 0px; padding: 0px; height: 0px; font-family: Source Sans Pro, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif !important;} .headerDiv{width: 100%; height: 56px; padding: 20px; background-color: #03314d;} .headerText{font-size: 40px; color: white; font-weight: bold} .tableDiv{padding: 20px;} table {border-collapse:collapse; font-size: 14px;} table td, th{ padding: 4px;} table tr:nth-child(odd) td {background-color: #F9F9F9;} .oddLeftTd{background-color: #E9E9E9 !important;} .evenLeftTd{background-color: #F1F1F1 !important;} table th{ border: 1px solid #E9E9E9; background-color:#B5BEC58F}</style>';
-        win.document.getElementsByTagName('head')[0].innerHTML += style;
-        win.document.getElementsByTagName('body')[0].innerHTML += '<div class="headerDiv slds-p-around_small"><span class="headerText">Rhythm</span></div><br/>';
-        tableHtml = tableHtml.replaceAll('undefined', '').replaceAll('null', '');
-        win.document.getElementsByTagName('body')[0].innerHTML += '<div class="tableDiv slds-p-around_medium">' + tableHtml + '</div>';
-        win.print();
-        win.close();
     }
     
     // Handles the selection of checkboxes in the table

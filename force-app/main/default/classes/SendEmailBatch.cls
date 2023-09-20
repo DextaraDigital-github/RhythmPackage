@@ -125,7 +125,9 @@ public with sharing class SendEmailBatch implements Database.batchable<sObject>,
             singleEmail.setTreatTargetObjectAsRecipient(true);
             singleEmail.setTargetObjectId(u.Id);
             singleEmail.setSaveAsActivity(false);
-            singleEmail.setFileAttachments(emailAttachments);
+            if(emailAttachments != null && emailAttachments.size() > 0) {
+            	singleEmail.setFileAttachments(emailAttachments);
+            }
             singleEmailList.add(singleEmail);
             
             /* Creating EmailMessageRelation to link the EmailMessage to the User */
@@ -178,84 +180,129 @@ public with sharing class SendEmailBatch implements Database.batchable<sObject>,
         emailMsg.MessageDate = DateTime.now();
         emailMsg.EmailTemplateId = email.templateId;
        	
-        /* Capturing Failed Emails to store on EmailMessage */
-        String htmlBody = '';
-        Map<String,Object> selectedRecipientsMap = (Map<String,Object>)JSON.deserializeUntyped(email.selectedRecipientsData);
-        for(Id accId: email.selectedRecipients) {
-            failedEmailsWrapper failedEmailsMap = new failedEmailsWrapper();   // Stores UserId and respective Email
-            Map<String,Object> selectedRecipient = (Map<String,Object>)JSON.deserializeUntyped(JSON.serialize(selectedRecipientsMap.get(String.valueOf(accId))));
-            if(!email.accUserMap.containsKey(accId)) {    // Storing 'No Email' against accountId which is not in accUserMap as the account might not have a primary contact, account's primary contact or the primary contact's user might not have an email
-            	failedEmailsMap.Id = accId;
-                if(selectedRecipient != null){
-                    failedEmailsMap.Name = (String)selectedRecipient.get('Name');
+        try {
+            /* Capturing Failed Emails to store on EmailMessage */
+            String htmlBody = '';
+            Map<Id, Account> selectedRecipientsMap = new Map<Id,Account>([SELECT Id, Name FROM Account WHERE Id IN :email.selectedRecipients]);
+            //Map<String,Object> selectedRecipientsMap = (Map<String,Object>)JSON.deserializeUntyped(email.selectedRecipientsData);
+            for(Id accId: email.selectedRecipients) {
+                failedEmailsWrapper failedEmailsMap = new failedEmailsWrapper();   // Stores UserId and respective Email
+                //Map<String,Object> selectedRecipient = (Map<String,Object>)JSON.deserializeUntyped(JSON.serialize(selectedRecipientsMap.get(String.valueOf(accId))));
+                if(!email.accUserMap.containsKey(accId)) {    // Storing 'No Email' against accountId which is not in accUserMap as the account might not have a primary contact, account's primary contact or the primary contact's user might not have an email
+                    failedEmailsMap.Id = accId;
+                    // if(selectedRecipient != null){
+                    //     failedEmailsMap.Name = (String)selectedRecipient.get('Name');
+                    // }
+                    failedEmailsMap.Name = (String)selectedRecipientsMap.get(accId).get('Name');
+                    failedEmailsMap.Email = 'No Email';
+                    failedEmailsMapList.add(failedEmailsMap);
+                    htmlBody += '<li>' + failedEmailsMap.Name + ' (' + 'No Email' + ')</li>';
                 }
-                failedEmailsMap.Email = 'No Email';
-                failedEmailsMapList.add(failedEmailsMap);
-                htmlBody += '<li>' + failedEmailsMap.Name + ' (' + 'No Email' + ')</li>';
-            }
-            else if(email.userEmailMap != null && email.userEmailMap.size() > 0 && !email.userEmailMap.containsKey(email.accUserMap.get(accId).Id)) {   // Storing email and this email might not have been sent due to some other issue despite the user having email address
-            	failedEmailsMap.Id = accId;
-                if(selectedRecipient != null){
-                    failedEmailsMap.Name = (String)selectedRecipient.get('Name');
+                else if(email.userEmailMap != null && email.userEmailMap.size() > 0 && !email.userEmailMap.containsKey(email.accUserMap.get(accId).Id)) {   // Storing email and this email might not have been sent due to some other issue despite the user having email address
+                    failedEmailsMap.Id = accId;
+                    // if(selectedRecipient != null){ 
+                    //     failedEmailsMap.Name = (String)selectedRecipient.get('Name');
+                    // }
+                    failedEmailsMap.Name = (String)selectedRecipientsMap.get(accId).get('Name');
+                    failedEmailsMap.Email = email.userEmailMap.get('Email');
+                    failedEmailsMapList.add(failedEmailsMap);
+                    htmlBody += '<li>' + failedEmailsMap.Name + ' (' + email.userEmailMap.get('Email') + ')</li>';
                 }
-                failedEmailsMap.Email = email.userEmailMap.get('Email');
-                failedEmailsMapList.add(failedEmailsMap);
-                htmlBody += '<li>' + failedEmailsMap.Name + ' (' + email.userEmailMap.get('Email') + ')</li>';
+            }
+            
+            if(failedEmailsMapList != null && failedEmailsMapList.size() > 0) {
+                emailMsg.Failed_Recipients__c = JSON.serialize(failedEmailsMapList);
+            }
+            emailMsg.toAddress = String.join(email.userEmailMap.values(),'; ');
+            email.emailMsgList = new List<EmailMessage>();
+            email.emailMsgList.add(emailMsg);
+            safe.doInsert(email.emailMsgList);
+            /* Creating an EmailMessage to maintain a track ---> END */
+            
+            /* Inserting EmailMessageRelation records to create a relation between the Email Message and the users to whom it was sent */
+            for(EmailMessageRelation emr: email.userEmrMap.values()) {
+                emr.EmailMessageId = email.emailMsgList[0].Id;
+            }
+            safe.doInsert(email.userEmrMap.values());
+            
+            List<User> userList = [SELECT Id, Email, ContactId, Contact.AccountId, Contact.Account.Name FROM User WHERE Email!=null AND Contact.Primary_Contact__c = true AND Contact.Email != null AND Contact.AccountId IN :email.selectedRecipients];
+            if((userList == null || userList.size() == 0) && email.attachmentsData != null && email.attachmentsData.contentDocuments != null && email.attachmentsData.contentDocuments.size() > 0) {
+                /* Fetching Content Versions to attach to the email */  
+                List<Messaging.EmailFileAttachment> emailAttachments = new List<Messaging.EmailFileAttachment>();
+                List<String> cvFields = new List<String>{'Id', 'VersionData', 'FileExtension', 'PathOnClient'};
+                String cvFilter = 'where ContentDocumentId in (\'' + String.join(email.attachmentsData.contentDocuments,'\',\'') + '\')';
+                Map<String,Object> cvParameterMap = new Map<String,Object>{ 'fields'=>cvFields, 'filter'=>cvFilter };
+                email.contentVersionMap = cvSelector.fetchContentVersions(cvParameterMap);   // Stores map of all the ContentVersions of all the attachments which will be attached to the email
+                List<ContentVersion> cvList = new List<ContentVersion>();
+                if(email.contentVersionMap != null) {
+                    cvList = email.contentVersionMap.values();
+                }
+                
+                /* Creating File Attachments for the Email */
+                for(ContentVersion cv:cvList) {
+                    Messaging.EmailFileAttachment mef = new Messaging.EmailFileAttachment();
+                    mef.setFileName(cv.PathOnClient);
+                    mef.setBody(cv.VersionData);
+                    switch on cv.FileExtension {
+                        when 'png', 'jpeg' {
+                            mef.setContentType('image/'+cv.FileExtension);
+                        }
+                        when 'csv' {
+                            mef.setContentType('text/csv');
+                        }
+                        when 'pdf' {
+                            mef.setContentType('application/pdf');
+                        }
+                    }
+                    emailAttachments.add(mef);
+                }
+            }
+            /* Storing the Email Attachments in AWS S3 */
+            if(email.contentVersionMap != null && email.contentVersionMap.size() > 0) {
+                AWSS3ServiceQueueable awsQu=new AWSS3ServiceQueueable();
+                awsQu.recId = email.emailMsgList[0].Id;
+                awsQu.objectName = 'EmailMessage';
+                awsQu.pathRecId = null;
+                awsQu.deleteFlag = true;
+                awsQu.contVerIds = email.contentVersionMap.keySet();
+                System.enqueueJob(awsQu);
+            }
+            
+            /* Deleting the email attachments stored as files in salesforce as these files are already stored in AWS S3 */
+            if(email.attachmentsData.deleteContentDocuments != null && email.attachmentsData.deleteContentDocuments.size() > 0) {
+                List<String> cdFields = new List<String>{'Id'};
+                String cdFilter = ' WHERE Id IN (\'' + String.join(email.attachmentsData.deleteContentDocuments,'\',\'') + '\') ';
+                Map<String,Object> cdParameterMap = new Map<String,Object>{'fields'=>cdFields, 'filter'=>cdFilter};
+                selector.fetchContentDocuments(cdParameterMap).values();
+            }
+            
+            /* Sending a status report of the email to all the user who has sent the mails */
+            if(email.selectedRecipients.size() - email.success > 0) {
+                Messaging.SingleEmailMessage singleEmail = new Messaging.SingleEmailMessage();
+                singleEmail.setSubject('Status of the email - "' + email.subject + '"');
+                singleEmail.setHtmlBody('<div>Hello&nbsp;<strong>' + UserInfo.getName() + '</strong>,</div><div><p>Delivery has failed to the ' + (email.selectedRecipients.size() - email.success) + ' recipient(s) for the email with Subject, <strong>' + email.subject + '</strong>.</p></div><div><ol type="1">' + htmlBody + '</ol></div><div><p><a href="' + URL.getSalesforceBaseUrl().toExternalForm() + '/lightning/r/Rhythm__Assessment__c/' + email.whatId + '/view">Click here</a>&nbsp;to view the status of the email.</p></div>');
+                singleEmail.setTargetObjectId(UserInfo.getUserId());
+                singleEmail.setSaveAsActivity(false);
+                Messaging.sendEmail(new Messaging.SingleEmailMessage[]{singleEmail});
+            }
+            
+            SendEmailEvent__e event = new SendEmailEvent__e();
+            event.Source__c = 'Refresh Emails';
+            event.Type__c = 'RefreshEmails';
+            try {
+                EventBus.publish(event);
+            }
+            catch(Exception e) {
+                throw new AuraHandledException(e.getMessage());   //Throws an exception
             }
         }
-        
-        if(failedEmailsMapList != null && failedEmailsMapList.size() > 0) {
-        	emailMsg.Failed_Recipients__c = JSON.serialize(failedEmailsMapList);
-        }
-        emailMsg.toAddress = String.join(email.userEmailMap.values(),'; ');
-        email.emailMsgList = new List<EmailMessage>();
-        email.emailMsgList.add(emailMsg);
-        safe.doInsert(email.emailMsgList);
-        /* Creating an EmailMessage to maintain a track ---> END */
-        
-        /* Inserting EmailMessageRelation records to create a relation between the Email Message and the users to whom it was sent */
-        for(EmailMessageRelation emr: email.userEmrMap.values()) {
-            emr.EmailMessageId = email.emailMsgList[0].Id;
-        }
-        safe.doInsert(email.userEmrMap.values());
-        
-        /* Storing the Email Attachments in AWS S3 */
-        if(email.contentVersionMap != null && email.contentVersionMap.size() > 0) {
-            AWSS3ServiceQueueable awsQu=new AWSS3ServiceQueueable();
-            awsQu.recId = email.emailMsgList[0].Id;
-            awsQu.objectName = 'EmailMessage';
-            awsQu.pathRecId = null;
-            awsQu.deleteFlag = true;
-            awsQu.contVerIds = email.contentVersionMap.keySet();
-            System.enqueueJob(awsQu);
-        }
-        
-        /* Deleting the email attachments stored as files in salesforce as these files are already stored in AWS S3 */
-        if(email.attachmentsData.deleteContentDocuments != null && email.attachmentsData.deleteContentDocuments.size() > 0) {
-            List<String> cdFields = new List<String>{'Id'};
-            String cdFilter = ' WHERE Id IN (\'' + String.join(email.attachmentsData.deleteContentDocuments,'\',\'') + '\') ';
-            Map<String,Object> cdParameterMap = new Map<String,Object>{'fields'=>cdFields, 'filter'=>cdFilter};
-            selector.fetchContentDocuments(cdParameterMap).values();
-        }
-        
-        /* Sending a status report of the email to all the user who has sent the mails */
-        if(email.selectedRecipients.size() - email.success > 0) {
+        catch(Exception e) {
             Messaging.SingleEmailMessage singleEmail = new Messaging.SingleEmailMessage();
         	singleEmail.setSubject('Status of the email - "' + email.subject + '"');
-            singleEmail.setHtmlBody('<div>Hello&nbsp;<strong>' + UserInfo.getName() + '</strong>,</div><div><p>Delivery has failed to the ' + (email.selectedRecipients.size() - email.success) + ' recipient(s) for the email with Subject, <strong>' + email.subject + '</strong>.</p></div><div><ol type="1">' + htmlBody + '</ol></div><div><p><a href="' + URL.getSalesforceBaseUrl().toExternalForm() + '/lightning/r/Rhythm__Assessment__c/' + email.whatId + '/view">Click here</a>&nbsp;to view the status of the email.</p></div>');
+            singleEmail.setHtmlBody('<div>Hello&nbsp;<strong>' + UserInfo.getName() + '</strong>,</div><div><p>Delivery has failed to all the recipient(s) for the email with Subject, <strong>' + email.subject + '</strong>.</p></div><div>Please try resending the email or contact your System Administrator.</div>');
         	singleEmail.setTargetObjectId(UserInfo.getUserId());
             singleEmail.setSaveAsActivity(false);
             Messaging.sendEmail(new Messaging.SingleEmailMessage[]{singleEmail});
-        }
-        
-        SendEmailEvent__e event = new SendEmailEvent__e();
-        event.Source__c = 'Refresh Emails';
-        event.Type__c = 'RefreshEmails';
-        try {
-            EventBus.publish(event);
-        }
-        catch(Exception e) {
-            throw new AuraHandledException(e.getMessage());   //Throws an exception
         }
     }
     

@@ -12,6 +12,7 @@ public class AssessmentService {
 
     private static AssessmentService service = null; //private static instance of the class
     static TemplateSelector selector = TemplateSelector.getInstance();
+    static AccountAssessmentRelationSelector accAssselector = AccountAssessmentRelationSelector.getInstance();
 
     /**
     * @description Singleton Design Pattern 
@@ -36,6 +37,28 @@ public class AssessmentService {
             List<Assessment_Template__c> recList = selector.fetchAssessmentTemplates(newParameterMap).values();
             if(recList != null) {
                 return recList;
+            }
+        }
+        return null;
+    }
+    
+    /**
+    * @description Fetches the AccountAssessmentRelation record based on Id
+    * @param parameterMap It is a stringified JSON of parameters required to fetch AccountAssessmentRelation record
+    * @return AccountAssessmentRelation record
+    */
+    public sObject fetchAccountAssessmentRelation(String parameterMap) {
+        Map<String,Object> newParameterMap = (Map<String,Object>)JSON.deserializeUntyped(parameterMap);
+        String id = (String)newParameterMap.get('id');
+        
+        List<String> fields = new List<String>{'Status__c'};
+        String filter = ' WHERE Id = \'' + String.escapeSingleQuotes(id) + '\' ';
+        Map<String,Object> inpParameterMap = new Map<String,Object>{'fields'=>fields, 'filter'=>filter};
+        Map<Id,AccountAssessmentRelation__c> dataMap = accAssselector.fetchAccounts(inpParameterMap);
+        if(dataMap != null) {
+            List<AccountAssessmentRelation__c> dataList = dataMap.values();
+        	if(dataList != null && dataList.size() > 0) {
+            	return dataList[0];
             }
         }
         return null;
